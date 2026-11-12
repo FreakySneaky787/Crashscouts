@@ -5,7 +5,7 @@ Sicherheitsrelevante Werte für die Produktion stehen in prod.py und werden dort
 
 from pathlib import Path
 
-from .env import env_int, env_str
+from .env import env_int, env_list, env_str
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -23,6 +23,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
+    "allauth",
+    "allauth.account",
+    "allauth.headless",
     "apps.core",
     "apps.accounts",
 ]
@@ -35,6 +38,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -88,6 +92,26 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# --- django-allauth (headless, Browser-Sessions; ADR 0004) ---
+# VORLÄUFIG (AP 0.4, SSR-Durchstich): nur Login/Logout/Session. Registrierung, Login-Methode,
+# E-Mail-Regeln und GitHub-Login werden in Phase 1 mit dem Projektverantwortlichen festgelegt.
+HEADLESS_ONLY = True
+HEADLESS_CLIENTS = ("browser",)  # keine Token-basierten App-Clients
+HEADLESS_FRONTEND_URLS: dict[str, str] = {}
+ACCOUNT_SIGNUP_ENABLED = False
+ACCOUNT_LOGIN_METHODS = {"username"}
+
+# Origins, deren POST-Anfragen den CSRF-Origin-Check bestehen (z. B. das SSR-Frontend).
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", [])
+
+# Test-only-Probe für den SSR-Durchstich (AP 0.4). In Produktion nie installiert.
+ENABLE_SSR_PROBE = False
 
 # Für Drittanbieter-Modelle; eigene Modelle verwenden UUIDv4 (siehe apps.core.models).
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

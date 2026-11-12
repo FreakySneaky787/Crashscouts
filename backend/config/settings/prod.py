@@ -34,3 +34,8 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS
 SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
 
 SERVE_API_SCHEMA = False
+
+# Die SSR-Probe ist ein reines Testwerkzeug und darf in Produktion nie aktiv sein.
+ENABLE_SSR_PROBE = False
+if "apps.ssr_probe" in INSTALLED_APPS:  # noqa: F405
+    raise ImproperlyConfigured("apps.ssr_probe darf in Produktion nicht installiert sein.")

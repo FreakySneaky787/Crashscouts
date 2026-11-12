@@ -1,0 +1,35 @@
+{
+  "home": {
+    "title": "Welcome",
+    "intro": "This is an early development build. The SSR probe pages below validate the architecture."
+  },
+  "nav": {
+    "home": "Home",
+    "account": "Account",
+    "login": "Log in",
+    "logout": "Log out"
+  },
+  "login": {
+    "title": "Log in",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Log in",
+    "error": "The username or password is incorrect."
+  },
+  "account": {
+    "title": "Your account",
+    "signedInAs": "Signed in as {{username}}"
+  },
+  "probe": {
+    "touch": "Touch",
+    "touchCount": "Touched {{count}} times",
+    "private": "Private item",
+    "public": "Public item"
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFound": "The requested page could not be found.",
+    "genericTitle": "Error",
+    "generic": "An unexpected error occurred."
+  }
+}

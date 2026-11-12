@@ -1,0 +1,57 @@
+"""Legt Testdaten für die SSR-E2E-Tests an (nur dev/test).
+
+Passwörter kommen ausschliesslich aus Umgebungsvariablen (nie aus Argumenten, damit sie nicht in
+Prozesslisten oder der Shell-Historie landen). Ausgabe: JSON mit den IDs der Probe-Objekte.
+"""
+
+import json
+import os
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+
+from apps.ssr_probe.models import ProbeItem
+
+
+class Command(BaseCommand):
+    help = "Create SSR probe test users and items (dev/test only)."
+
+    def handle(self, *args, **options):
+        if not settings.ENABLE_SSR_PROBE:
+            raise CommandError("SSR probe is disabled in these settings.")
+
+        owner_password = os.environ.get("PROBE_OWNER_PASSWORD")
+        stranger_password = os.environ.get("PROBE_STRANGER_PASSWORD")
+        if not owner_password or not stranger_password:
+            raise CommandError("PROBE_OWNER_PASSWORD and PROBE_STRANGER_PASSWORD must be set.")
+
+        user_model = get_user_model()
+        with transaction.atomic():
+            owner = self._user(user_model, "probe-owner", owner_password)
+            self._user(user_model, "probe-stranger", stranger_password)
+            ProbeItem.objects.filter(owner=owner).delete()
+            public = ProbeItem.objects.create(
+                title="Public probe item",
+                description="A public item rendered on the server.",
+                is_public=True,
+                owner=owner,
+            )
+            private = ProbeItem.objects.create(
+                title="Private probe item",
+                description="Only the owner may see this.",
+                is_public=False,
+                owner=owner,
+            )
+
+        self.stdout.write(json.dumps({"public_id": str(public.pk), "private_id": str(private.pk)}))
+
+    @staticmethod
+    def _user(user_model, username: str, password: str):
+        user, _ = user_model.objects.get_or_create(username=username)
+        user.set_password(password)
+        user.is_staff = False
+        user.is_superuser = False
+        user.save()
+        return user

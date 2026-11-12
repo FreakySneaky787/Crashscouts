@@ -26,6 +26,9 @@ print(json.dumps({
     "SECURE_HSTS_SECONDS": settings.SECURE_HSTS_SECONDS,
     "SERVE_API_SCHEMA": settings.SERVE_API_SCHEMA,
     "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
+    "ENABLE_SSR_PROBE": settings.ENABLE_SSR_PROBE,
+    "PROBE_INSTALLED": "apps.ssr_probe" in settings.INSTALLED_APPS,
+    "ACCOUNT_SIGNUP_ENABLED": settings.ACCOUNT_SIGNUP_ENABLED,
 }))
 """
 
@@ -69,6 +72,9 @@ def test_prod_settings_are_secure():
         "SECURE_HSTS_SECONDS": 31_536_000,
         "SERVE_API_SCHEMA": False,
         "ALLOWED_HOSTS": ["example.invalid"],
+        "ENABLE_SSR_PROBE": False,
+        "PROBE_INSTALLED": False,
+        "ACCOUNT_SIGNUP_ENABLED": False,
     }
 
 

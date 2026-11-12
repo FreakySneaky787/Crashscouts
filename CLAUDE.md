@@ -21,7 +21,8 @@ Offene Punkte stehen in [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md).
 
 ## Arbeitsweise
 
-- In **Arbeitspaketen** arbeiten. Vor Beginn vorstellen: Ziel, Anforderungen, Komponenten, Umsetzung, Abhängigkeiten, Akzeptanzkriterien, Tests, Definition of Done. Danach auf Freigabe warten.
+- In **Arbeitspaketen** arbeiten. Vor Beginn vorstellen: Ziel, Anforderungen, Komponenten, Umsetzung, Abhängigkeiten, Akzeptanzkriterien, Tests, Definition of Done.
+- **Rückfragen nur bei echter Tragweite** (Wunsch des Projektverantwortlichen, 2026-11-12): Design- und Produktfragen sowie Entscheidungen mit wesentlicher Wirkung auf Kosten, Sicherheit, Datenmodell oder Erweiterbarkeit. **Nicht** nachfragen bei Routineschritten wie dem Push eines freigegebenen Arbeitspakets, nachdem alle Prüfungen grün sind; das Ergebnis danach berichten.
 - Keine grossen, unkontrollierten Codemengen.
 - **Kritisch prüfen statt automatisch zustimmen.** Verbesserungen als Vorschlag einbringen; wichtige Änderungen brauchen Zustimmung.
 - **Versionen und Fakten nie erfinden.** Zuerst offizielle Quellen prüfen und die Quelle nennen.
