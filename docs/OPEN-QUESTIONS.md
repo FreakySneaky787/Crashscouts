@@ -9,7 +9,6 @@
 | # | Question | Due | Proposal |
 |---|---|---|---|
 | A | Waiting period for new accounts before they may submit public campaigns | phase 3B | 7 days plus verified email plus 2FA, or manual approval by an admin |
-| B | Method of repository verification | phase 2 | token file in the repository (independent of the code host), plus a check via GitHub OAuth |
 | C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | H | Who moderates initially? | phase 3B | the project owner only |
@@ -22,6 +21,10 @@
 
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
+| B | Repository verification | **Two ways:** a file with a check code in the repository (works with every code host) or, for GitHub projects, a check via the connected GitHub account. |
+| – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |
+| – | Who may create projects | **Every account with a confirmed email address**, with a daily limit; abuse is handled by reporting and blocking (phase 3B). |
+| – | Adding maintainers | **Invitation that the person must accept**; nobody is added to a project without consent. |
 | F | Provider for transactional email | **Scaleway Transactional Email** (France; free allowance, then pay per use – owner's constraint: free or very cheap). Development and CI use Mailpit; the code speaks provider-neutral SMTP. Limits and prices are verified on the official pages before signing up. |
 | D | Default visibility of profiles | **Minimally public:** username and initials avatar; bio, interests, operating systems and skills optional and individually switchable; email never visible; profiles not indexed unless the user opts in. What participants see of each other is decided in phase 3A. |
 | L | Password rules | **Minimum 12 characters**, at least 64 allowed, no composition rules, blocklist of common passwords, similarity check against username/email. Deliberately below NIST SP 800-63B-4 (15 characters for single-factor passwords); recorded in [ADR 0009](adr/0009-account-rules-and-password-policy.md). |

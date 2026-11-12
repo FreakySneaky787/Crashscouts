@@ -79,6 +79,17 @@ regression tests.
 - Repository verification (B).
 - Public SSR project page with meta and Open Graph tags.
 
+Work packages (decisions 2026-11-12: public or private projects, every confirmed account may
+create projects, maintainers by accepted invitation, repository verification by file or GitHub):
+
+| WP | Content | State |
+|---|---|---|
+| 2.1 | Catalog: programming languages, SPDX licences from the official SPDX list (open-source label from OSI approval) | planned |
+| 2.2 | Projects: model, permissions (owner/maintainer, public/private with 404), create/edit, public SSR page with Open Graph, daily limit, export/purge integration | planned |
+| 2.3 | Maintainer invitations (invite by username, accept/decline, leave, remove) | planned |
+| 2.4 | Logo and screenshots via the image upload pipeline (ADR 0010) | planned |
+| 2.5 | Repository verification: check file in the repository or connected GitHub account | planned |
+
 ## Phase 3A – Campaigns (public visibility locked)
 
 - Private campaigns complete; public campaigns as drafts only.
