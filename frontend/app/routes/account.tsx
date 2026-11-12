@@ -1,14 +1,15 @@
 import { useTranslation } from "react-i18next";
-import { data, Form, redirect } from "react-router";
+import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/account";
 import { Button, ButtonLink } from "~/components/ui/Button";
+import { Notice } from "~/components/ui/Notice";
 import { Avatar } from "~/components/ui/Data";
-import { DatabaseIcon, EyeIcon, PencilSimpleIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
+import { DatabaseIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
-import { ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
+import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 
 import styles from "./forms.module.css";
@@ -22,9 +23,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const csrf = await ensureCsrfToken(request);
+  const [csrf, projects] = await Promise.all([
+    ensureCsrfToken(request),
+    backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
+  ]);
+  const deleted = new URL(request.url).searchParams.get("project") === "deleted";
   return data(
-    { username: user.username, csrfToken: csrf.token },
+    { username: user.username, csrfToken: csrf.token, projects: projects.data ?? [], deleted },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
@@ -42,6 +47,31 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         leading={<Avatar name={loaderData.username} id={loaderData.username} size="lg" />}
         subtitle={<span data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</span>}
       />
+      {loaderData.deleted ? <Notice tone="ok" title={t("projects.deleted")} /> : null}
+      <Panel title={t("projects.mine")}>
+        <div className={styles.stack}>
+          {loaderData.projects.length ? (
+            <ul className={styles.plainList} aria-label={t("projects.mine")}>
+              {loaderData.projects.map((project) => (
+                <li key={project.slug} className={styles.listRow}>
+                  <Link to={`/p/${project.slug}`}>{project.name}</Link>
+                  <span className={styles.muted}>
+                    {project.visibility === "private" ? <LockSimpleIcon aria-hidden="true" className={styles.inlineIcon} /> : null}{" "}
+                    {t(`projects.roles.${project.role as "owner"}`)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>{t("projects.none")}</p>
+          )}
+          <div>
+            <ButtonLink to="/projects/new" icon={PlusIcon}>
+              {t("projects.newTitle")}
+            </ButtonLink>
+          </div>
+        </div>
+      </Panel>
       <Panel title={t("account.profile")}>
         <div className={styles.stack}>
           <p>{t("account.profileText")}</p>

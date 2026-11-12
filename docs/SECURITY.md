@@ -65,6 +65,11 @@ including the negative cases.
 - ✅ URL parameters are validated (UUID) before they are used in backend paths.
 - Markdown only through a sanitizer allowlist (when introduced).
 
+- ✅ User Markdown (project descriptions) is rendered as React elements with an allowlist
+  (`react-markdown` 10.1.0, MIT, with `remark-gfm` 4.0.1): raw HTML skipped, no images (no
+  third-party requests), links only http(s)/mailto with `nofollow ugc`; `dangerouslySetInnerHTML`
+  stays banned. Tested with script, image, event-handler and `javascript:` inputs.
+
 ## 4. Download links and the security gate
 
 - `https://` only.

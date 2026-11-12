@@ -43,6 +43,8 @@ export default defineConfig({
         DJANGO_CSRF_TRUSTED_ORIGINS: FRONTEND_URL,
         FRONTEND_URL,
         DJANGO_SIGNUP_ENABLED: "true",
+        // Development settings only: the suite signs in more often per minute than allauth allows.
+        DJANGO_E2E_RELAXED_RATE_LIMITS: "true",
         // Dummy GitHub app: tests stop at github.com and never call GitHub (secret generated per run).
         DJANGO_GITHUB_CLIENT_ID: "e2e-dummy-client-id",
         DJANGO_GITHUB_CLIENT_SECRET: randomBytes(20).toString("hex"),

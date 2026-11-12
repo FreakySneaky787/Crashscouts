@@ -20,6 +20,17 @@ CSRF_TRUSTED_ORIGINS = env_list(
 # Signup is open locally unless switched off; emails go to Mailpit (docker compose up -d mailpit).
 SIGNUP_ENABLED = env_bool("DJANGO_SIGNUP_ENABLED", True)
 
+# The E2E suite signs in many times per minute from one IP (127.0.0.1) and would hit allauth's
+# rate limits. This switch exists ONLY in the development settings; production and the pytest
+# settings keep the defaults, and the limits themselves are tested in pytest.
+if env_bool("DJANGO_E2E_RELAXED_RATE_LIMITS", False):
+    ACCOUNT_RATE_LIMITS = {
+        "login": "1000/m/ip",
+        "login_failed": "1000/m/ip,100/5m/key",
+        "signup": "1000/m/ip",
+        "reset_password": "1000/m/ip,100/m/key",
+    }
+
 ENABLE_SSR_PROBE = True
 INSTALLED_APPS = [*INSTALLED_APPS, "apps.ssr_probe"]  # noqa: F405
 

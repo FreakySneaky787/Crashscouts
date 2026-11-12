@@ -199,6 +199,15 @@ def test_invalid_input_is_rejected(people, overrides, field):
     assert field in response.json()
 
 
+def test_errors_come_as_codes(people, projects):
+    response = client_for(people["stranger"]).post(
+        "/api/v1/projects/",
+        create_payload(slug="public-app", repository_url="http://x.test"),
+        format="json",
+    )
+    assert response.json() == {"slug": ["slug_taken"], "repository_url": ["invalid"]}
+
+
 def test_short_names_are_unique_including_former_names(people, projects):
     client = client_for(people["stranger"])
     assert (

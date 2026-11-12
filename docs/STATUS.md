@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 2.2a) · **Current phase:** 2 – Projects
+**Last update:** 2026-11-12 (WP 2.2b) · **Current phase:** 2 – Projects
 
 ## Work packages
 
@@ -369,6 +369,32 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
   matrix anonymous/stranger/maintainer/owner × public/private × view/edit/delete). Mutation
   checks: making private projects visible to all, and letting maintainers delete, were each
   caught.
+
+### WP 2.2b – Project pages (2026-11-12) ✅
+
+- **Pages:** `/projects/new`, `/p/<name>` (server-rendered; Open Graph and description tags for
+  public projects, `noindex` for private ones; former names redirect with 301),
+  `/p/<name>/edit` (team; deletion with confirmation for the owner), "Your projects" on the
+  account page. Everything works without JavaScript.
+- **Markdown** via `react-markdown` 10.1.0 and `remark-gfm` 4.0.1 (MIT) with an allowlist: no raw
+  HTML, no images, links only http(s)/mailto; `dangerouslySetInnerHTML` stays banned.
+- **Backend:** project and account endpoints return machine-readable error codes (shared helper
+  `apps/core/api.py`).
+- **Verification (run on 2026-11-12):** pytest **182 passed**; Vitest **66 passed** (Markdown
+  safety with script, image, event-handler and `javascript:` inputs); Playwright **53 passed**
+  (6 new: create with safe Markdown and link previews, private = 404 for strangers, rename with
+  301, strangers cannot edit, owner deletion with confirmation, creation without JavaScript with
+  field errors, axe in both themes); production build OK.
+- **Findings during the work:**
+  - A route module exported a helper that used server-only code; the production build refused it
+    (moved to `lib/projects.server.ts`).
+  - The accessible name of the visibility radio buttons contained the whole hint; the hint is now
+    linked via `aria-describedby` (found by E2E).
+  - The growing E2E suite hit allauth's login limit (30 per minute per IP; confirmed by 429s in
+    the Django log). The development settings now have a switch `DJANGO_E2E_RELAXED_RATE_LIMITS`
+    that only the E2E run sets; production and pytest keep the limits.
+  - The Docker daemon of the cloud session stops after its time limit; it is now started inside
+    the check commands instead of as a long-running background task.
 
 ## Known limitations
 

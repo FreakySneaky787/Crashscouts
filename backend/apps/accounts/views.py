@@ -12,16 +12,9 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.core.api import error_codes
+
 from .lifecycle import export_data, request_deletion
-
-
-def error_codes(serializer: serializers.Serializer) -> Response:
-    """400 with machine-readable codes per field, e.g. {"password": ["wrong_password"]}."""
-    codes = {
-        field: [str(getattr(e, "code", "invalid")) for e in errors]
-        for field, errors in serializer.errors.items()
-    }
-    return Response(codes, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordSerializer(serializers.Serializer):

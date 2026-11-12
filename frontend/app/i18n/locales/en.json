@@ -292,5 +292,87 @@
     "scheduled": "Your account will be deleted in 14 days.",
     "text": "You were signed out everywhere and your profile is hidden. We sent you a confirmation by email.",
     "changedMind": "Changed your mind? Sign in to cancel the deletion."
+  },
+  "projects": {
+    "mine": "Your projects",
+    "none": "You have no projects yet.",
+    "deleted": "The project was deleted.",
+    "roles": {
+      "owner": "Owner",
+      "maintainer": "Maintainer"
+    },
+    "newTitle": "New project",
+    "newIntro": "Present your software so testers can find it. You can keep it private until you are ready.",
+    "create": "Create project",
+    "save": "Save changes",
+    "edit": "Edit",
+    "editTitle": "Edit {{name}}",
+    "basics": "Basics",
+    "name": "Name",
+    "slug": "Short name",
+    "slugHint": "Used in the address /p/short-name. 3 to 40 characters: lowercase letters, digits and single hyphens.",
+    "summary": "Summary",
+    "summaryHint": "One sentence, shown in lists and link previews.",
+    "description": "Description",
+    "descriptionHint": "Markdown: headings, lists, links and code. No HTML and no images.",
+    "repository": "Repository",
+    "repositoryHint": "An https link to the source code, if public.",
+    "classification": "Classification",
+    "status": "Status",
+    "license": "Licence",
+    "licenseHint": "Open source means approved by the Open Source Initiative. Choose \"Proprietary\" for closed source.",
+    "allLicenses": "All SPDX licences",
+    "proprietary": "Proprietary (closed source)",
+    "categories": "Categories",
+    "platforms": "Operating systems and devices",
+    "languages": "Programming languages",
+    "visibility": "Visibility",
+    "visibilities": {
+      "private": "Private",
+      "public": "Public"
+    },
+    "visibilityHints": {
+      "private": "Only you and your maintainers can see it. Use this until you are ready, or for private tests.",
+      "public": "Everyone can see it, and search engines may list it."
+    },
+    "statuses": {
+      "development": "Development",
+      "alpha": "Alpha",
+      "beta": "Beta",
+      "stable": "Stable",
+      "archived": "Archived"
+    },
+    "openSource": "Open source",
+    "notOpenSource": "Not open source",
+    "about": "About",
+    "details": "Details",
+    "owner": "Owner",
+    "noDescription": "No description yet.",
+    "deleteTitle": "Delete project",
+    "deleteText": "Deletes the project for everyone, including its team memberships. This cannot be undone.",
+    "deleteConfirm": "Delete {{name}} for good",
+    "delete": "Delete project",
+    "errors": {
+      "slug_taken": "This short name is already taken.",
+      "invalid_slug": "Use 3 to 40 characters: lowercase letters, digits and single hyphens.",
+      "reserved_slug": "This short name is reserved. Choose another one.",
+      "field": {
+        "name": "Enter a name (at most 80 characters).",
+        "summary": "Enter a summary (at most 160 characters).",
+        "description": "The description can have at most 10,000 characters.",
+        "repository_url": "Enter a complete link that starts with https://.",
+        "license": "Choose a licence from the list.",
+        "slug": "Check the short name."
+      }
+    },
+    "problem": {
+      "invalid": "Some entries need your attention.",
+      "emailUnconfirmed": "Confirm your email address before creating projects.",
+      "rateLimited": "You created many projects today. Try again tomorrow.",
+      "forbidden": "You cannot change this project.",
+      "confirmDelete": "Tick the box to confirm the deletion.",
+      "ownerOnly": "Only the owner can delete the project.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

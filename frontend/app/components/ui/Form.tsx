@@ -67,8 +67,13 @@ export function SelectField({
   hint,
   error,
   options,
+  groups,
   ...select
-}: FieldMeta & { options: { value: string; label: string }[] } & ComponentPropsWithoutRef<"select">) {
+}: FieldMeta & {
+  options: { value: string; label: string }[];
+  /** Optional additional option groups after `options` (e.g. "All licences"). */
+  groups?: { label: string; options: { value: string; label: string }[] }[];
+} & ComponentPropsWithoutRef<"select">) {
   return (
     <FieldFrame id={id} label={label} hint={hint} error={error}>
       <select
@@ -82,6 +87,15 @@ export function SelectField({
           <option key={o.value} value={o.value}>
             {o.label}
           </option>
+        ))}
+        {groups?.map((group) => (
+          <optgroup key={group.label} label={group.label}>
+            {group.options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </optgroup>
         ))}
       </select>
     </FieldFrame>

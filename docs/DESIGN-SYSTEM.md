@@ -93,9 +93,10 @@ module.
 | `KeyFigures`, `Progress` | figures and progress | native `<progress>` with label |
 | `Avatar`, `ProjectIcon` | identity | initials on a hue derived from the ID; `Avatar` shows an uploaded image when `src` is set (decorative, the name is always next to it) |
 | `Chips`, `FactList`, `RowList` | data display | list semantics (`ul`/`dl`) |
-| `TextField`, `TextAreaField`, `SelectField`, `ChoiceGroup`, `FormNote` | forms | visible labels, hints and errors via `aria-describedby`, `aria-invalid` |
+| `TextField`, `TextAreaField`, `SelectField` (optional option groups), `ChoiceGroup`, `FormNote` | forms | visible labels, hints and errors via `aria-describedby`, `aria-invalid` |
 | `CheckboxGroup` | multiple choice from a fixed list | fieldset with legend, hint and error; e.g. platforms |
 | `CheckboxField` | single confirmation | label next to the box; error via `aria-describedby` |
+| `Markdown` | user Markdown (e.g. project descriptions) | allowlist of elements, no raw HTML, no images, links only http(s)/mailto with `rel="nofollow ugc noopener noreferrer"`, headings start at h2 |
 | `QrCode` | QR code (e.g. authenticator setup) | server-rendered SVG, dark on light in both themes, `role="img"` with a label |
 | `Notice` | inline message | tones `ok`, `info` (role `status`), `danger` (role `alert`); icon + text |
 | `EmptyState` | empty and error states | kinds `first-use` (with action), `empty`, `error` |

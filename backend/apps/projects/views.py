@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
+from apps.core.api import error_codes
 
 from .policies import can_delete, can_edit
 from .selectors import project_for, projects_of
@@ -28,7 +29,8 @@ class ProjectCreateView(APIView):
         if not has_confirmed_email(request.user):
             return Response({"detail": "email_unconfirmed"}, status=status.HTTP_403_FORBIDDEN)
         serializer = ProjectWriteSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return error_codes(serializer)
         project = create_project(request.user, **serializer.validated_data)
         return Response(
             ProjectSerializer(project, context={"request": request}).data,
@@ -60,7 +62,8 @@ class ProjectDetailView(APIView):
         if not can_edit(request.user, project):
             raise PermissionDenied  # visible (public) but not part of the team
         serializer = ProjectWriteSerializer(project, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return error_codes(serializer)
         data = dict(serializer.validated_data)
         new_slug = data.pop("slug", project.slug)
         old_visibility = project.visibility
