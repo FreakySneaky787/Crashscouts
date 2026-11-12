@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 0.4) · **Current phase:** 0 – Foundation
+**Last update:** 2026-11-12 (WP 0.5) · **Current phase:** 0 – Foundation
 
 ## Work packages
 
@@ -13,7 +13,7 @@
 | 0.2 Documentation skeleton | ✅ done | docs match the approved plan; gitleaks clean |
 | 0.3 Backend skeleton | ✅ done | tests green against PostgreSQL 18.6; Ruff clean; OpenAPI validated |
 | 0.4 Frontend skeleton and SSR auth spike | ✅ done | **all six SSR criteria pass** (Playwright); vitest, ESLint, tsc clean |
-| 0.5 Dev container and setup script | ⏳ open | – |
+| 0.5 Dev container and setup script | ◐ done, Codespaces check pending | dev container image + backend setup verified with Docker; cloud setup script verified; a real Codespace start is still to be confirmed (open question R) |
 | 0.6 CI and pre-commit | ⏳ open | – |
 | 0.7 Playwright skeleton | ◐ largely pulled forward into WP 0.4 | CI integration follows in WP 0.6 |
 
@@ -75,6 +75,32 @@
 - **Finding:** React Router 8 rejects actions from a foreign `Origin` itself (400) – an additional
   CSRF layer in front of Django's checks. The E2E suite verifies both layers separately. This has a
   consequence for the production setup (open question P).
+
+## Results of WP 0.5 (2026-11-12)
+
+- **Dev container** (`.devcontainer/`): official image `mcr.microsoft.com/devcontainers/python:3-3.14-trixie`
+  (Python 3.14.10), features Node 24, GitHub CLI and Claude Code (`claude-code:1.0`), non-root user
+  `vscode`, named volume for Claude Code's configuration, ports 5173/8000 forwarded (private),
+  PostgreSQL shared via `network_mode: service:db` without an extra port. `initialize.sh` creates a
+  local `.env` with a random database password; `post-create.sh` installs the pinned tools and all
+  dependencies and migrates.
+- **Pinned tool versions:** uv 0.13.7 (accepts the existing `uv.lock` unchanged) and pnpm 10.34.9
+  (newest 10.x; `packageManager` field in `package.json`). pnpm 12 is deliberately not adopted yet.
+- **Cloud setup script** `scripts/cloud-setup.sh`: installs uv, Python 3.14, pnpm and all
+  dependencies; run from the checkout's parent directory exactly as at session start – exit 0.
+- **Verification (run on 2026-11-12):**
+  - `devcontainer.json` parses; the merged Compose configuration shows PostgreSQL bound to
+    `127.0.0.1` only and no published workspace ports.
+  - `initialize.sh` tested in a throwaway copy: creates a 32-character random password; second run
+    is a no-op.
+  - Workspace container from the official image started with Docker Compose; as user `vscode`:
+    uv 0.13.7 installed, `uv sync --frozen`, migrations, **pytest 39 passed** against the shared
+    database.
+  - With uv 0.13.7 and pnpm 10.34.9 on the host: pytest 39, vitest 31, Playwright 8 passed; lockfiles
+    unchanged.
+- **Not verifiable here:** the dev container features (Node, GitHub CLI, Claude Code) and the full
+  `post-create.sh`, because running the Dev Container CLI via `npx` was blocked by this
+  environment's safety check. This needs one real Codespace start (open question R).
 
 ## Known limitations
 

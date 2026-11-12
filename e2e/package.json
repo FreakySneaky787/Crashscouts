@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
+  "packageManager": "pnpm@10.34.9",
   "scripts": {
     "test": "playwright test --trace off"
   },

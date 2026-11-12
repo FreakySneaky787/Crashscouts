@@ -32,6 +32,11 @@ rendering spike exist; there are no product features yet. The actual state is tr
 Python 3.14 · Django 6.1 · Django REST Framework · django-allauth · PostgreSQL 18 · React 19 ·
 React Router 8 (SSR) · Vite 8 · TypeScript 6 · Docker Compose
 
+## Getting started
+
+- **GitHub Codespaces:** open the repository in a Codespace – the dev container sets everything up.
+- **Elsewhere:** see [`CONTRIBUTING.md`](CONTRIBUTING.md#development-environment).
+
 ## Repository layout
 
 | Path | Content |
@@ -40,6 +45,8 @@ React Router 8 (SSR) · Vite 8 · TypeScript 6 · Docker Compose
 | [`frontend/`](frontend/) | React Router SSR app ([README](frontend/README.md)) |
 | [`e2e/`](e2e/) | Playwright end-to-end tests ([README](e2e/README.md)) |
 | [`docs/`](docs/) | Product and architecture documentation |
+| [`.devcontainer/`](.devcontainer/) | Dev container for Codespaces |
+| [`scripts/`](scripts/) | Setup script for Claude Code cloud sessions |
 | `compose.yaml` | Development services (PostgreSQL) |
 
 ## License

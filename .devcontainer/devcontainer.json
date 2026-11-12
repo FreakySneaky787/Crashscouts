@@ -1,0 +1,50 @@
+// Dev container for GitHub Codespaces (and VS Code Dev Containers).
+// Reference: https://containers.dev/implementors/json_reference/
+// Claude Code feature: https://code.claude.com/docs/en/devcontainer
+{
+  "name": "testhub (working name)",
+  "dockerComposeFile": ["../compose.yaml", "compose.devcontainer.yml"],
+  "service": "workspace",
+  "runServices": ["db", "workspace"],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "shutdownAction": "stopCompose",
+
+  // Runs on the host before the containers start: creates .env with a random local
+  // database password if it does not exist yet (never committed, see .gitignore).
+  "initializeCommand": "bash .devcontainer/initialize.sh",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "24" },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+
+  // Non-root user (security, see docs/SECURITY.md §11).
+  "remoteUser": "vscode",
+  "containerEnv": {
+    // Claude Code keeps its configuration in a named volume so it survives rebuilds.
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+  },
+
+  // Only the web servers are forwarded; Codespaces forwards ports privately by default.
+  // PostgreSQL is reachable inside the container network only.
+  "forwardPorts": [5173, 8000],
+  "portsAttributes": {
+    "5173": { "label": "frontend (Vite dev server)", "onAutoForward": "notify" },
+    "8000": { "label": "backend (Django)", "onAutoForward": "silent" }
+  },
+  "otherPortsAttributes": { "onAutoForward": "ignore" },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "ms-python.python",
+        "dbaeumer.vscode-eslint",
+        "ms-playwright.playwright"
+      ]
+    }
+  }
+}

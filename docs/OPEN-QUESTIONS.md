@@ -48,6 +48,8 @@ Sources: [FADP (Fedlex)](https://www.fedlex.admin.ch/eli/cc/2022/491/de) ·
 |---|---|---|
 | O | Shared Django cache for allauth rate limits (the default per-process memory cache is insufficient with several processes), e.g. the database cache | before phase 3B / beta |
 | P | Behind the TLS proxy, the SSR server must see the public origin (host and `https`), because React Router rejects actions whose `Origin` does not match the request URL. Configure via a custom server with trusted proxy headers or `allowedActionOrigins`, and cover it with an E2E test against the production-like setup | WP 0.5 / phase 8 |
+| R | Confirm the dev container in a real GitHub Codespace: features (Node 24, GitHub CLI, Claude Code), full `post-create.sh` including Playwright's Chromium, private port forwarding, `pnpm e2e` | before phase 1 (needs one Codespace start by the project owner) |
+| S | Evaluate pnpm 12 (major upgrade from 10.x) | when convenient |
 | Q | Remove `apps.ssr_probe` and the probe routes once the regression tests have moved to the real models | phase 2/3 |
 | – | Hosting provider (Switzerland/EU) and object storage | phase 8 |
 | – | Whether Dependabot is available for free on private repositories | WP 0.6 |

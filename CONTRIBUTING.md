@@ -16,8 +16,14 @@
 
 ## Development environment
 
-- Database: `cp .env.example .env`, set `POSTGRES_PASSWORD`, then `docker compose up -d db`.
-- Dev container for GitHub Codespaces and a setup for Claude Code cloud sessions follow in WP 0.5.
+- **GitHub Codespaces / VS Code Dev Containers:** open the repository in a Codespace; the dev
+  container creates `.env`, starts PostgreSQL, installs everything and migrates. For Claude Code,
+  store `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`) or `ANTHROPIC_API_KEY` as a
+  Codespaces secret – never in the repository.
+- **Claude Code cloud sessions:** the environment's setup script runs `scripts/cloud-setup.sh`.
+  Start the database per session: `dockerd` (if `docker info` fails), then `docker compose up -d db`.
+- **Elsewhere:** Docker, Python 3.14 with uv 0.13.7, Node ≥ 22.22 with pnpm 10.34.9;
+  `cp .env.example .env`, set `POSTGRES_PASSWORD`, `docker compose up -d db`.
 
 ## Tests
 

@@ -159,13 +159,19 @@ React Router's data requests.
 
 - **GitHub is the single source of truth.** Codespaces and Claude cloud sessions are
   interchangeable workplaces; unpushed work counts as not saved.
-- **Codespaces:** `.devcontainer/` with Compose (workspace and `postgres:18`), Node 24, gh and the
-  Claude Code feature `ghcr.io/anthropics/devcontainer-features/claude-code:1.0`. The container
-  user is not root; a volume for `~/.claude`; only ports 5173 and 8000 are forwarded, privately.
-  PostgreSQL is reachable on the internal network only. Created in WP 0.5.
-- **Claude cloud session:** WP 0.1 verified that `dockerd` starts and `postgres:18` (18.6) runs.
-  Background processes are stopped after their time limit, so `dockerd` may need restarting. The
-  environment's setup script follows in WP 0.5 (separate approval).
+- **Pinned tools (everywhere):** Python 3.14, uv 0.13.7, Node 24 (≥ 22.22 works), pnpm 10.34.9.
+- **Codespaces / VS Code Dev Containers:** `.devcontainer/devcontainer.json` combines
+  `compose.yaml` (`postgres:18`) with `.devcontainer/compose.devcontainer.yml` (workspace from
+  `mcr.microsoft.com/devcontainers/python:3-3.14-trixie`, sharing the database's network so
+  PostgreSQL is on `127.0.0.1:5432`). Features: Node 24, GitHub CLI, Claude Code
+  (`ghcr.io/anthropics/devcontainer-features/claude-code:1.0`). User `vscode` (not root); Claude
+  Code's configuration lives in a named volume; only ports 5173 and 8000 are forwarded, privately.
+  `initialize.sh` (host) creates `.env` with a random password; `post-create.sh` installs tools and
+  dependencies and migrates. Authentication for Claude Code via a Codespaces secret.
+- **Claude cloud session:** `scripts/cloud-setup.sh` (stored as the environment's setup script)
+  installs the pinned tools and dependencies. Background processes are stopped after their time
+  limit, so `dockerd` is started per session when needed (`dockerd`, then
+  `docker compose up -d db`).
 - **Git workflow (decided):** commits go directly to `main`, authored by the project owner, with
   English commit messages. Because GitHub Free offers no branch protection and no push protection
   for private repositories, gitleaks and CI are the protective layer.

@@ -87,7 +87,11 @@ Open items live in [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md).
 ## Local development (short)
 
 - Database: `docker compose up -d db` (values from `.env`, see `.env.example`). In Claude cloud
-  sessions, start `dockerd` first if `docker info` cannot reach the daemon.
+  sessions, start `dockerd` first (as a background task) if `docker info` cannot reach the daemon.
+- Tool versions are pinned in `.devcontainer/post-create.sh` and `scripts/cloud-setup.sh`
+  (uv 0.13.7, pnpm 10.34.9); keep both in sync.
+- E2E in the cloud environment: `PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm test` in
+  `e2e/`.
 - Backend: see [`backend/README.md`](backend/README.md).
 - Frontend: see [`frontend/README.md`](frontend/README.md).
 - E2E: see [`e2e/README.md`](e2e/README.md).

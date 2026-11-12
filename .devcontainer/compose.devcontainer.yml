@@ -1,0 +1,21 @@
+# Compose override used only by the dev container (combined with ../compose.yaml).
+# Paths are relative to the repository root (the directory of the first compose file).
+services:
+  workspace:
+    # Official dev container image: Python 3.14 on Debian trixie, non-root user "vscode".
+    image: mcr.microsoft.com/devcontainers/python:3-3.14-trixie
+    volumes:
+      # Mount the parent directory, as in the official templates, so that
+      # workspaceFolder /workspaces/<repository> resolves.
+      - ..:/workspaces:cached
+      - claude-code-config:/home/vscode/.claude
+    command: sleep infinity
+    # Share the database's network namespace: PostgreSQL is reachable on 127.0.0.1:5432,
+    # exactly as in other environments, without publishing any additional port.
+    network_mode: service:db
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  claude-code-config:
