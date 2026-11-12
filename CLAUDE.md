@@ -60,8 +60,11 @@ Open items live in [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md).
 
 - **No secrets, tokens, passwords or personal data in files, commits, logs or test data.** `.env*`
   is ignored; templates come as `.env.example`.
-- Run gitleaks before **every** commit (from WP 0.6 automatically via a pre-commit hook). On a
-  finding: stop and report – never silence the rule.
+- gitleaks runs before **every** commit via `.githooks/pre-commit` (make sure
+  `git config core.hooksPath` is `.githooks`). On a finding: stop and report – never silence the
+  rule, never use `--no-verify`.
+- After pushing, check the CI run (`gh run list` / the Actions API for this repository) and fix
+  failures before starting new work.
 - The repository is private on GitHub Free, i.e. without push protection and without branch
   protection. Therefore review the diff before every push.
 - Public campaigns stay locked (`PUBLIC_CAMPAIGNS_ENABLED=false`) until the security gate of

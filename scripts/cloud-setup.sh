@@ -11,6 +11,7 @@ set -euo pipefail
 
 UV_VERSION="0.13.7"
 PNPM_VERSION="10.34.9"
+GITLEAKS_VERSION="v8.30.1"
 
 if [ ! -d testhub ]; then
   echo "cloud-setup: repository 'testhub' not found here, nothing to do."
@@ -29,6 +30,12 @@ uv python install 3.14
 echo "==> pnpm ${PNPM_VERSION}"
 npm install --global --silent "pnpm@${PNPM_VERSION}"
 pnpm --version
+
+echo "==> gitleaks ${GITLEAKS_VERSION} (Go module proxy, verified against sum.golang.org)"
+GOBIN="${HOME}/.local/bin" go install "github.com/zricethezav/gitleaks/v8@${GITLEAKS_VERSION}"
+
+echo "==> git hooks"
+git -C testhub config core.hooksPath .githooks
 
 echo "==> backend dependencies"
 (cd testhub/backend && uv sync --frozen)

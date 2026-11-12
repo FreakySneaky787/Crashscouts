@@ -33,4 +33,13 @@
 | Frontend | Vitest, ESLint, `tsc` | [`frontend/README.md`](frontend/README.md) |
 | End-to-end | Playwright against Django and the production SSR build | [`e2e/README.md`](e2e/README.md) |
 
-CI follows in WP 0.6.
+CI (`.github/workflows/ci.yml`) runs all of the above on every push to `main` and on pull
+requests.
+
+## Pre-commit hook
+
+`git config core.hooksPath .githooks` activates `.githooks/pre-commit` (done automatically in the
+dev container and the cloud setup). It scans staged changes with gitleaks and runs Ruff/ESLint
+for staged files. It blocks the commit if gitleaks is not available – install it with
+`GOBIN=$HOME/.local/bin go install github.com/zricethezav/gitleaks/v8@v8.30.1` or make Docker
+available. Do not bypass it with `--no-verify`.

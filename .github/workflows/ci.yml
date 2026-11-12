@@ -1,0 +1,154 @@
+# Continuous integration. Kept lean because the private repository uses the free Actions quota:
+# superseded runs are cancelled, and only first-party actions are used (pinned to commit SHAs).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_VERSION: "0.13.7"
+  PNPM_VERSION: "10.34.9"
+  NODE_VERSION: "24"
+  # Official image, pinned by digest (gitleaks v8.30.1).
+  GITLEAKS_IMAGE: zricethezav/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+
+jobs:
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan full git history
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/repo" "$GITLEAKS_IMAGE" \
+            git --no-banner --redact --exit-code 1 /repo
+
+  backend:
+    name: Backend (lint, tests, schema, audit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        # Same image and digest as compose.yaml.
+        image: postgres:18@sha256:e3d24f6906d0760bf4da0dae872415391ededefad23fd471c47dc53b0ddf3c42
+        env:
+          POSTGRES_DB: testhub
+          POSTGRES_USER: testhub
+          # Throwaway database for this run only; not a secret.
+          POSTGRES_PASSWORD: ci-${{ github.run_id }}-${{ github.run_attempt }}
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U testhub -d testhub"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      POSTGRES_DB: testhub
+      POSTGRES_USER: testhub
+      POSTGRES_PASSWORD: ci-${{ github.run_id }}-${{ github.run_attempt }}
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv and Python 3.14
+        run: |
+          pipx install "uv==${UV_VERSION}"
+          uv python install 3.14
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
+      - name: No missing migrations
+        run: uv run python manage.py makemigrations --check --dry-run
+      - name: OpenAPI schema is valid
+        run: uv run python manage.py spectacular --validate --fail-on-warn --file /tmp/openapi.yaml
+      - name: Dependency audit (PyPI advisories)
+        run: |
+          uv export --frozen --format requirements-txt > /tmp/requirements.txt
+          uvx "pip-audit==2.10.1" --requirement /tmp/requirements.txt --disable-pip
+
+  frontend:
+    name: Frontend (lint, types, tests, build, audit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install --global "pnpm@${PNPM_VERSION}"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Dependency audit (fails on high/critical)
+        run: pnpm audit --audit-level high
+
+  e2e:
+    name: End-to-end (Playwright, production SSR build)
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18@sha256:e3d24f6906d0760bf4da0dae872415391ededefad23fd471c47dc53b0ddf3c42
+        env:
+          POSTGRES_DB: testhub
+          POSTGRES_USER: testhub
+          POSTGRES_PASSWORD: ci-${{ github.run_id }}-${{ github.run_attempt }}
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U testhub -d testhub"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install tools
+        run: |
+          pipx install "uv==${UV_VERSION}"
+          uv python install 3.14
+          npm install --global "pnpm@${PNPM_VERSION}"
+      - name: Local .env for this run (matches the service container)
+        run: |
+          {
+            echo "POSTGRES_DB=testhub"
+            echo "POSTGRES_USER=testhub"
+            echo "POSTGRES_PASSWORD=ci-${{ github.run_id }}-${{ github.run_attempt }}"
+            echo "POSTGRES_HOST=127.0.0.1"
+            echo "POSTGRES_PORT=5432"
+          } > .env
+      - name: Install dependencies
+        run: |
+          (cd backend && uv sync --frozen)
+          (cd frontend && pnpm install --frozen-lockfile)
+          (cd e2e && pnpm install --frozen-lockfile && pnpm exec playwright install --with-deps chromium)
+      - name: Run Playwright
+        working-directory: e2e
+        run: pnpm test

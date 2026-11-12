@@ -52,7 +52,9 @@ Sources: [FADP (Fedlex)](https://www.fedlex.admin.ch/eli/cc/2022/491/de) ·
 | S | Evaluate pnpm 12 (major upgrade from 10.x) | when convenient |
 | Q | Remove `apps.ssr_probe` and the probe routes once the regression tests have moved to the real models | phase 2/3 |
 | – | Hosting provider (Switzerland/EU) and object storage | phase 8 |
-| – | Whether Dependabot is available for free on private repositories | WP 0.6 |
+| – | Whether Dependabot version updates run for this private repository on GitHub Free (configured; not confirmed by the docs consulted) – check once the first Dependabot PRs appear or not | after WP 0.6 |
+| – | `minimatch` moderate advisory (GHSA-g3hv-75wg-m249) via ESLint (dev only) | next ESLint update |
+| – | Measure the real CI duration per run and re-check it against the free Actions quota | after the first runs |
 | – | Upgrade to Django 6.2 LTS (planned for April 2027) | after release |
 | – | Switch to TypeScript 7 once typescript-eslint supports it | ongoing |
 | – | drf-spectacular 0.30.0 and pytest-django 4.14.0 officially declare Django only up to 6.0; they work with 6.1.3 in our tests. Watch on updates | ongoing |

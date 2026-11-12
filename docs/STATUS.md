@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 0.5) · **Current phase:** 0 – Foundation
+**Last update:** 2026-11-12 (WP 0.6) · **Current phase:** 0 – Foundation
 
 ## Work packages
 
@@ -14,7 +14,7 @@
 | 0.3 Backend skeleton | ✅ done | tests green against PostgreSQL 18.6; Ruff clean; OpenAPI validated |
 | 0.4 Frontend skeleton and SSR auth spike | ✅ done | **all six SSR criteria pass** (Playwright); vitest, ESLint, tsc clean |
 | 0.5 Dev container and setup script | ◐ done, Codespaces check pending | dev container image + backend setup verified with Docker; cloud setup script verified; a real Codespace start is still to be confirmed (open question R) |
-| 0.6 CI and pre-commit | ⏳ open | – |
+| 0.6 CI and pre-commit | ✅ done locally; first GitHub run see below | hook tested (blocks a fake token, passes clean commits, Docker fallback); workflow YAML valid; gitleaks history scan and pip-audit clean |
 | 0.7 Playwright skeleton | ◐ largely pulled forward into WP 0.4 | CI integration follows in WP 0.6 |
 
 ## Results of WP 0.1 (2026-11-12)
@@ -102,11 +102,34 @@
   `post-create.sh`, because running the Dev Container CLI via `npx` was blocked by this
   environment's safety check. This needs one real Codespace start (open question R).
 
+## Results of WP 0.6 (2026-11-12)
+
+- **CI** (`.github/workflows/ci.yml`) on push to `main`, pull requests and manual trigger;
+  superseded runs are cancelled. Jobs: secret scan (gitleaks v8.30.1 Docker image by digest, full
+  history), backend (Ruff, pytest against `postgres:18`, migration check, OpenAPI validation,
+  `pip-audit` with hashed requirements), frontend (ESLint, `tsc`, Vitest, build, `pnpm audit`
+  failing on high/critical), E2E (Playwright against the production SSR build). Only the
+  first-party actions `actions/checkout` v7.0.1 and `actions/setup-node` v7.1.0 are used, pinned to
+  commit SHAs; `permissions: contents: read`; checkout without persisted credentials.
+- **Dependabot** (`.github/dependabot.yml`): uv, npm (frontend, e2e), GitHub Actions, dev containers.
+- **Pre-commit hook** (`.githooks/pre-commit`, activated via `core.hooksPath` by `post-create.sh`
+  and `cloud-setup.sh`): gitleaks on the staged changes (binary or Docker; **blocks the commit if
+  neither is available**), Ruff for backend files, ESLint for frontend files. gitleaks is installed
+  via `go install` from the Go module proxy (checksum-verified); the dev container gets the Go
+  feature for this.
+- **Verification (run on 2026-11-12):** hook in a throwaway clone – fake token blocked, harmless
+  commit passed, Docker fallback without the binary blocked a fake token; YAML of workflow and
+  Dependabot parses, all actions pinned to SHAs; gitleaks Docker scan of the full history: no
+  leaks; `pip-audit` (hashed requirements): no known vulnerabilities; `pnpm audit`: e2e clean,
+  frontend one **moderate** finding (see below).
+- **Known finding:** `minimatch` (GHSA-g3hv-75wg-m249, moderate, denial of service) via the dev-only
+  tool ESLint; not part of the shipped application. Not force-upgraded across a major version;
+  left to Dependabot/ESLint updates and tracked in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
+
 ## Known limitations
 
 - GitHub Free for private repositories: no push protection and no branch protection (see
   [`SECURITY.md`](SECURITY.md), section 10).
-- No CI yet (WP 0.6) and no dev container yet (WP 0.5).
 - allauth rate limits use the per-process memory cache; a shared cache is required before the beta
   (open question O).
 - The UI is deliberately unstyled until the visual direction is decided (open question E).

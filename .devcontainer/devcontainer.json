@@ -16,6 +16,8 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1": { "version": "24" },
     "ghcr.io/devcontainers/features/github-cli:1": {},
+    // Go is only needed to build gitleaks from the Go module proxy (checksum-verified).
+    "ghcr.io/devcontainers/features/go:1": {},
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
 

@@ -108,16 +108,18 @@ admin logins, deletions and exports.
 
 - ✅ **No secrets in the repository.** `.env*` is ignored; templates come as `.env.example`. Tests
   generate credentials randomly at runtime.
-- ✅ **gitleaks** (v8.30.1, built from the Go module proxy with checksum verification) is run on
-  every commit; from WP 0.6 automatically as a pre-commit hook and in CI.
+- ✅ **gitleaks** v8.30.1 runs automatically: as a pre-commit hook on the staged changes (the
+  commit is blocked if gitleaks is unavailable) and in CI on the full history. The binary is built
+  from the Go module proxy with checksum verification; CI uses the official image pinned by digest.
 - **GitHub Free limitation for private repositories:** no push protection for secret scanning, no
   branch protection and no rulesets. gitleaks and CI are therefore the protective layer until the
   repository is public; then all free GitHub features are enabled.
   Sources: [Push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection),
   [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
-- ✅ Lockfiles for all dependencies. `pip-audit` and `pnpm audit` in CI and Dependabot (whether it is
-  available for private repositories will be checked in WP 0.6).
-- GitHub Actions pinned to commit SHAs.
+- ✅ Lockfiles for all dependencies; `pip-audit` (hashed requirements) and `pnpm audit` (fails on
+  high/critical) in CI; Dependabot configured for uv, npm, GitHub Actions and dev containers.
+- ✅ CI uses only first-party GitHub actions, pinned to commit SHAs, with read-only permissions and
+  without persisted checkout credentials.
 - ✅ Tools and images only from official sources with checksums or digests (e.g. `postgres:18`
   pinned by digest).
 - ✅ pnpm 10 does not run dependency install scripts unless explicitly allowed.
