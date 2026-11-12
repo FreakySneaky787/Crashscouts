@@ -302,9 +302,10 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
 - **Frontend:** "Continue with GitHub" on login and signup (plain form), callback route,
   `/login/provider/callback`, `/signup/github`, connected accounts in the security settings
   (connect, disconnect); CSP `form-action` additionally allows `https://github.com`.
-- **The owner created a GitHub OAuth app** (2026-11-12). Its client ID and secret are not yet in
-  the environment, so the real login has not been tried; required callback URL:
-  `http://localhost:3000/accounts/github/login/callback/`.
+- **The owner created a GitHub OAuth app** (2026-11-12) with the callback URL
+  `http://localhost:3000/accounts/github/login/callback/`. The real login will be tried on the
+  first test server with a real domain (open question U); a cloud session is not reachable from
+  the owner's browser under `localhost`.
 - **Verification (run on 2026-11-12):** pytest **134 passed** (8 new with a simulated GitHub:
   not offered without credentials, public callback URL, forged state, signup with age
   confirmation, no login into an existing account with the same email, connect and log in,
