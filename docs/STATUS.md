@@ -143,6 +143,10 @@
   notifications, the tester's feedback report dialog (private by default) and "Your reports" on
   the campaign page; phone fixes. Re-verified: 60 checks with 0 violations, dialog without axe
   findings, all interaction checks passed. No production UI has been changed yet.
+- Iteration 3 (typography and hierarchy, the owner's feedback): fixed type scale for concept A
+  (12.5 / 13.5 / 14.5 / 16 / 20 / 28 px), panel titles larger than body text, 28 px page titles,
+  key figures as large tabular numbers, sentence-case labels instead of letter-spaced capitals,
+  three distinct text levels. Re-verified: 60 checks, 0 violations.
 
 ## Known limitations
 

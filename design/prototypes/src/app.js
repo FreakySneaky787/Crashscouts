@@ -201,7 +201,7 @@
     },
     home() {
       const forDevices = publicCampaigns().filter((c) => c.status === "Open" && !state.joined.has(c.id));
-      return `<div class="a-head"><div><h1 class="a-h1">Home</h1><div class="meta">Activity from projects you follow and campaigns you test</div></div></div>
+      return `<div class="a-head"><div><h1 class="a-h1">Home</h1><p class="a-sub">Activity from projects you follow and campaigns you test</p></div></div>
         <div class="a-split">
           <section class="a-panel" aria-labelledby="a-act"><header><h2 id="a-act">Activity</h2><span class="aside">Chronological</span></header>${A.rowsFeed(DATA.feed)}</section>
           <div style="display:grid;gap:16px">${A.myCampaignsPanel()}
@@ -228,14 +228,14 @@
     },
     discover() {
       const list = filteredProjects();
-      return `<div class="a-head"><div><h1 class="a-h1">Discover</h1><div class="meta"><span class="num">${list.length}</span> projects · sorted by recent activity</div></div></div>${A.filters()}<div id="results">${A.projectTable(list)}</div>`;
+      return `<div class="a-head"><div><h1 class="a-h1">Discover</h1><p class="a-sub"><span class="num">${list.length}</span> projects · sorted by recent activity, not popularity</p></div></div>${A.filters()}<div id="results">${A.projectTable(list)}</div>`;
     },
     projects() {
-      return `<div class="a-head"><div><h1 class="a-h1">Your projects</h1><div class="meta">Projects you maintain</div></div><div class="actions"><span class="btn" aria-disabled="true">${ic("plus")}New project</span></div></div>${A.projectTable(filteredProjects(true))}`;
+      return `<div class="a-head"><div><h1 class="a-h1">Your projects</h1><p class="a-sub">Projects you maintain</p></div><div class="actions"><span class="btn" aria-disabled="true">${ic("plus")}New project</span></div></div>${A.projectTable(filteredProjects(true))}`;
     },
     testing() {
       const list = publicCampaigns();
-      return `<div class="a-head"><div><h1 class="a-h1">Testing</h1><div class="meta">Public campaigns. Private campaigns appear only for invited testers.</div></div></div>
+      return `<div class="a-head"><div><h1 class="a-h1">Testing</h1><p class="a-sub">Public campaigns. Private campaigns appear only for invited testers.</p></div></div>
         <div class="a-table-wrap"><table class="a-table"><thead><tr><th scope="col">Campaign</th><th scope="col">Status</th><th scope="col">Method</th><th scope="col">Platforms</th><th scope="col" class="r">Testers</th><th scope="col" class="r">Ends</th><th scope="col">You</th></tr></thead><tbody>${list.map((c) =>
           `<tr><td><div class="pname">${picon(P(c.project))}<div><a href="${href("campaign", c.id)}">${esc(c.title)}</a><small>${esc(P(c.project).name)} · <span class="mono">${esc(c.version)}</span></small></div></div></td><td>${campStatus(c)}</td><td>${esc(c.method)}</td><td>${esc(c.platforms.join(", "))}</td><td class="r">${c.testers}/${c.target}</td><td class="r">${esc(c.ends)}</td><td>${state.joined.has(c.id) ? pill("ok", "check", "Joined") : state.requested.has(c.id) ? pill("neutral", "hourglass-medium", "Requested") : '<span class="muted">—</span>'}</td></tr>`).join("")}</tbody></table></div>`;
     },
@@ -245,8 +245,8 @@
       if (tab === "overview") {
         const c = activeCamp(p.id);
         body = `<div class="a-split"><div style="display:grid;gap:16px">
-            <section class="a-panel" aria-labelledby="a-about"><header><h2 id="a-about">About</h2></header><div class="body"><p class="b-prose" style="font-size:15px">${esc(p.description)}</p></div></section>
-            ${c ? `<section class="a-panel" aria-labelledby="a-cur"><header><h2 id="a-cur">Current campaign</h2>${campStatus(c)}</header><div class="body"><a href="${href("campaign", c.id)}"><strong>${esc(c.title)}</strong></a><p class="sec">${esc(c.summary)}</p>${meter(c.testers, c.target, "Testers")}<div class="muted num">${c.testers} of ${c.target} testers · ends ${esc(c.ends)}</div><div>${joinButton(c)}</div></div></section>` : ""}
+            <section class="a-panel" aria-labelledby="a-about"><header><h2 id="a-about">About</h2></header><div class="body"><p class="a-prose">${esc(p.description)}</p></div></section>
+            ${c ? `<section class="a-panel" aria-labelledby="a-cur"><header><h2 id="a-cur">Current campaign</h2>${campStatus(c)}</header><div class="body"><a class="a-camptitle" href="${href("campaign", c.id)}">${esc(c.title)} <span class="mono muted" style="font-weight:500;font-size:13px">${esc(c.version)}</span></a><p class="sec">${esc(c.summary)}</p><div class="a-figs"><div class="a-fig"><strong>${c.testers}<small>/ ${c.target}</small></strong><span>testers</span></div><div class="a-fig"><strong>${c.daysLeft}</strong><span>days left</span></div></div>${meter(c.testers, c.target, "Testers")}<div>${joinButton(c)}</div></div></section>` : ""}
           </div>
           <section class="a-panel" aria-labelledby="a-spec"><header><h2 id="a-spec">Details</h2></header><div class="body"><dl class="kv">
             <dt>Repository</dt><dd>${p.repo ? `<a href="#" class="mono" data-act="ext">${esc(p.repo)} ${ic("arrow-square-out")}</a>` : '<span class="muted">Not public</span>'}</dd>
@@ -262,7 +262,7 @@
         body = p.releases.length ? `<section class="a-panel"><ul class="a-rows">${p.releases.map((r) => `<li>${ic("tag")}<span class="t"><strong class="mono">${esc(r.v)}</strong><span class="d">${esc(r.notes)}</span></span><time>${esc(r.date)}</time></li>`).join("")}</ul></section>` : `<p class="empty">No releases published on this platform yet.</p>`;
       }
       return `<nav class="a-crumbs" aria-label="Breadcrumb"><a href="${href("discover")}">Discover</a>${ic("caret-right")}<span aria-current="page">${esc(p.name)}</span></nav>
-        <div class="a-head">${picon(p, "lg")}<div style="min-width:0"><h1 class="a-h1">${esc(p.name)}</h1><p class="sec">${esc(p.tagline)}</p><div class="meta">${license(p)}${projStatus(p)}${verified(p)}<span class="num">${p.followers.toLocaleString("en")} followers</span><span>Updated ${esc(p.updated)}</span></div></div><div class="actions">${followButton(p.id)}</div></div>
+        <div class="a-head">${picon(p, "lg")}<div style="min-width:0"><h1 class="a-h1">${esc(p.name)}</h1><p class="a-sub">${esc(p.tagline)}</p><div class="meta">${license(p)}${projStatus(p)}${verified(p)}<span class="num">${p.followers.toLocaleString("en")} followers</span><span>Updated ${esc(p.updated)}</span></div></div><div class="actions">${followButton(p.id)}</div></div>
         ${tabs("project", [["overview", "Overview"], ["campaigns", "Campaigns", camps.length], ["feedback", "Feedback", fb.length], ["releases", "Releases", p.releases.length]], tab)}
         ${panel("project", tab, body)}`;
     },
@@ -287,14 +287,14 @@
           <dt>Hardware</dt><dd>${esc(c.hardware)}</dd><dt>Changes</dt><dd>${c.changelog.map(esc).join("<br>")}</dd></dl></div></section>`;
       }
       return `<nav class="a-crumbs" aria-label="Breadcrumb"><a href="${href("testing")}">Testing</a>${ic("caret-right")}<a href="${href("project", p.id)}">${esc(p.name)}</a>${ic("caret-right")}<span aria-current="page">${esc(c.title)}</span></nav>
-        <div class="a-head"><div style="min-width:0"><h1 class="a-h1">${esc(c.title)} <span class="mono sec">${esc(c.version)}</span></h1><div class="meta">${campStatus(c)}<span>${esc(c.method)} testing</span><span>${ic(c.visibility === "Public" ? "globe" : "lock-simple")} ${esc(c.visibility)}</span><span>${esc(c.participation)}</span><span class="num">${esc(c.starts)} – ${esc(c.ends)}</span></div></div><div class="actions">${state.joined.has(c.id) ? `${pill("ok", "check", "You're testing this")}<button class="btn primary" data-act="report" data-id="${c.id}">${ic("bug")}Report feedback</button>` : joinButton(c)}</div></div>
+        <div class="a-head"><div style="min-width:0"><h1 class="a-h1">${esc(c.title)}<span class="ver">${esc(c.version)}</span></h1><div class="meta">${campStatus(c)}<span>${esc(c.method)} testing</span><span>${ic(c.visibility === "Public" ? "globe" : "lock-simple")} ${esc(c.visibility)}</span><span>${esc(c.participation)}</span><span class="num">${esc(c.starts)} – ${esc(c.ends)}</span></div></div><div class="actions">${state.joined.has(c.id) ? `${pill("ok", "check", "You're testing this")}<button class="btn primary" data-act="report" data-id="${c.id}">${ic("bug")}Report feedback</button>` : joinButton(c)}</div></div>
         <div class="a-split"><div style="display:grid;gap:12px;min-width:0">
           ${tabs("campaign", [...(c.tasks.length ? [["tasks", "Tasks", c.tasks.length]] : []), ["feedback", "Feedback", fb.length], ["participants", "Participants", c.testers], ["details", "Details"]], tab)}
           ${panel("campaign", tab, body)}
           ${state.joined.has(c.id) ? A.myReports(c) : ""}
         </div>
         <div style="display:grid;gap:16px">
-          <section class="a-panel" aria-labelledby="a-part"><header><h2 id="a-part">Participation</h2></header><div class="body">${meter(c.testers, c.target, "Testers")}<div class="num">${c.testers} of ${c.target} testers · ${c.daysLeft} days left</div>${pr.total && state.joined.has(c.id) ? `${meter(pr.done, pr.total, "Your tasks")}<div class="num sec">Your tasks: ${pr.done} of ${pr.total}</div>` : ""}</div></section>
+          <section class="a-panel" aria-labelledby="a-part"><header><h2 id="a-part">Participation</h2></header><div class="body"><div class="a-figs"><div class="a-fig"><strong>${c.testers}<small>/ ${c.target}</small></strong><span>testers</span></div><div class="a-fig"><strong>${c.daysLeft}</strong><span>days left</span></div>${pr.total && state.joined.has(c.id) ? `<div class="a-fig"><strong>${pr.done}<small>/ ${pr.total}</small></strong><span>your tasks</span></div>` : ""}</div>${meter(c.testers, c.target, "Testers joined")}</div></section>
           <section class="a-panel" aria-labelledby="a-env"><header><h2 id="a-env">Test on</h2></header><div class="body"><div class="chips">${c.platforms.map((x) => `<span class="chip">${esc(x)}</span>`).join("")}</div></div></section>
           <section class="a-panel" aria-labelledby="a-dl"><header><h2 id="a-dl">Downloads</h2></header><div class="body">${c.downloads.map((d) => `<a href="#" data-act="ext" class="btn">${ic("download-simple")}${esc(d.label)} <span class="mono muted">${esc(d.host)}</span></a>`).join("")}<p class="ext-note">${ic("warning")}Downloads come from the project's own sources. You will see a warning before leaving.</p></div></section>
         </div></div>${state.joined.has(c.id) ? A.reportDialog(c) : ""}`;
@@ -324,12 +324,12 @@
     },
     profile(u) {
       const fb = feedbackBy(u.id); const rate = Math.round((u.stats.confirmed / u.stats.reports) * 100);
-      return `<div class="a-head">${avatar(u, "lg")}<div><h1 class="a-h1">${esc(u.name)}</h1><div class="meta"><span>${esc(u.role)}</span><span>${esc(u.location)}</span><span>Joined ${esc(u.joined)}</span></div><p class="sec" style="margin-top:6px;max-width:70ch">${esc(u.bio)}</p></div></div>
+      return `<div class="a-head">${avatar(u, "lg")}<div><h1 class="a-h1">${esc(u.name)}</h1><div class="meta"><span>${esc(u.role)}</span><span>${esc(u.location)}</span><span>Joined ${esc(u.joined)}</span></div><p class="a-sub" style="max-width:70ch">${esc(u.bio)}</p></div></div>
         <div class="a-split"><div style="display:grid;gap:16px;min-width:0">
           <section class="a-panel" aria-labelledby="a-dev"><header><h2 id="a-dev">Test devices</h2><span class="aside num">${u.devices.length}</span></header><ul class="a-rows">${u.devices.map((d) => { const [os, hw] = d.split(" · "); return `<li>${ic("monitor")}<span class="t"><strong>${esc(os)}</strong><span class="d">${esc(hw || "")}</span></span><span></span></li>`; }).join("")}</ul></section>
           <section class="a-panel" aria-labelledby="a-rep"><header><h2 id="a-rep">Recent reports</h2></header>${fb.length ? `<ul class="a-rows">${fb.map((f) => `<li>${ic(FB_ICON[f.type])}<span class="t"><strong>${esc(f.title)}</strong><span class="d">${esc(P(C(f.campaign).project).name)} · <span class="mono">#${f.id}</span></span></span>${fbStatus(f)}</li>`).join("")}</ul>` : `<div class="body"><p class="empty">No published reports yet.</p></div>`}</section>
         </div><div style="display:grid;gap:16px">
-          <section class="a-panel" aria-labelledby="a-st"><header><h2 id="a-st">Testing record</h2></header><div class="body"><dl class="kv"><dt>Campaigns</dt><dd class="num">${u.stats.campaigns}</dd><dt>Reports</dt><dd class="num">${u.stats.reports}</dd><dt>Confirmed</dt><dd class="num">${u.stats.confirmed} (${rate}%)</dd></dl></div></section>
+          <section class="a-panel" aria-labelledby="a-st"><header><h2 id="a-st">Testing record</h2></header><div class="body"><div class="a-figs"><div class="a-fig"><strong>${u.stats.campaigns}</strong><span>campaigns</span></div><div class="a-fig"><strong>${u.stats.reports}</strong><span>reports</span></div><div class="a-fig"><strong>${rate}<small>%</small></strong><span>confirmed</span></div></div></div></section>
           <section class="a-panel" aria-labelledby="a-sk"><header><h2 id="a-sk">Skills</h2></header><div class="body"><div class="chips">${u.skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div></div></section>
           ${u.recognitions ? `<section class="a-panel" aria-labelledby="a-rec"><header><h2 id="a-rec">Recognitions</h2></header><ul class="a-rows">${u.recognitions.map((r) => `<li>${ic("shield-check")}<span class="t"><strong>${esc(r.name)}</strong><span class="d" style="white-space:normal">${esc(r.reason)}</span></span><span></span></li>`).join("")}</ul></section>` : ""}
         </div></div>`;
