@@ -11,7 +11,7 @@ dependencies = [
     "drf-spectacular>=0.30.0,<0.31",
     "psycopg[binary]>=3.3.9,<3.4",
     "argon2-cffi>=25.1.0,<26",
-    "django-allauth[headless,mfa]>=65.22.0,<66",
+    "django-allauth[headless,mfa,socialaccount]>=65.22.0,<66",
     "pillow==13.0.0",
 ]
 

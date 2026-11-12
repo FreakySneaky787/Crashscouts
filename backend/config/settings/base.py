@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.headless",
     "allauth.mfa",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.github",
     "apps.core",
     "apps.accounts",
     "apps.audit",
@@ -158,12 +160,51 @@ MFA_TOTP_TOLERANCE = 1  # one 30-second step of clock drift
 # Links in emails point to the SSR frontend, never to Django.
 # "localhost", not 127.0.0.1: WebAuthn (passkeys) does not accept IP addresses as relying party.
 FRONTEND_URL = env_str("FRONTEND_URL", "http://localhost:5173").rstrip("/")
-HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email": f"{FRONTEND_URL}/verify-email/{{key}}",
-    "account_reset_password": f"{FRONTEND_URL}/password/forgot",
-    "account_reset_password_from_key": f"{FRONTEND_URL}/password/reset/{{key}}",
-    "account_signup": f"{FRONTEND_URL}/signup",
+
+
+def frontend_urls(base: str) -> dict[str, str]:
+    """Pages of the SSR frontend that allauth links to (emails, provider callbacks)."""
+    return {
+        "account_confirm_email": f"{base}/verify-email/{{key}}",
+        "account_reset_password": f"{base}/password/forgot",
+        "account_reset_password_from_key": f"{base}/password/reset/{{key}}",
+        "account_signup": f"{base}/signup",
+        "socialaccount_login_error": f"{base}/login/provider/callback",
+    }
+
+
+HEADLESS_FRONTEND_URLS = frontend_urls(FRONTEND_URL)
+
+# The SSR server (and in production the reverse proxy) passes the public host in
+# X-Forwarded-Host, so URLs Django builds from the request (e.g. the GitHub callback) use the
+# public address instead of the internal backend host. Django is never reachable directly from
+# the internet; the proxy must overwrite this header (docs/SECURITY.md, section 8).
+USE_X_FORWARDED_HOST = True
+
+# --- GitHub login (WP 1.4; decision: no automatic linking by email) ---
+# Credentials come only from the environment; without them the provider is not offered at all.
+GITHUB_CLIENT_ID = env_str("DJANGO_GITHUB_CLIENT_ID", "")
+GITHUB_CLIENT_SECRET = env_str("DJANGO_GITHUB_CLIENT_SECRET", "")
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {
+        "APPS": (
+            [{"client_id": GITHUB_CLIENT_ID, "secret": GITHUB_CLIENT_SECRET, "key": ""}]
+            if GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
+            else []
+        ),
+        # Profile and (verified) email addresses only; no repository access.
+        "SCOPE": ["read:user", "user:email"],
+    }
 }
+# Ask GitHub for the account's email addresses (with their "verified" flag).
+SOCIALACCOUNT_QUERY_EMAIL = True
+# Always show the signup form: username and the 16+ confirmation are required.
+SOCIALACCOUNT_AUTO_SIGNUP = False
+# Never log into an existing account just because the email matches.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
+# Only identity is needed; GitHub access tokens are not stored.
+SOCIALACCOUNT_STORE_TOKENS = False
 
 
 # --- Email: provider-neutral SMTP via MAILERS (Django 6.1; the EMAIL_* settings are deprecated).

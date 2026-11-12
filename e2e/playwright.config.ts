@@ -1,3 +1,5 @@
+import { randomBytes } from "node:crypto";
+
 import { defineConfig, devices } from "@playwright/test";
 
 /**
@@ -41,6 +43,9 @@ export default defineConfig({
         DJANGO_CSRF_TRUSTED_ORIGINS: FRONTEND_URL,
         FRONTEND_URL,
         DJANGO_SIGNUP_ENABLED: "true",
+        // Dummy GitHub app: tests stop at github.com and never call GitHub (secret generated per run).
+        DJANGO_GITHUB_CLIENT_ID: "e2e-dummy-client-id",
+        DJANGO_GITHUB_CLIENT_SECRET: randomBytes(20).toString("hex"),
       } as Record<string, string>,
       reuseExistingServer: false,
       timeout: 120_000,

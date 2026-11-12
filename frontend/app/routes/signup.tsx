@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/signup";
+import { GitHubButton } from "~/components/auth/GitHubButton";
 import { Button } from "~/components/ui/Button";
 import { CheckboxField, TextField } from "~/components/ui/Form";
 import { UserPlusIcon } from "~/components/ui/icons";
@@ -24,13 +25,16 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (await getSessionUser(request)) {
     throw redirect("/account", { headers: privateNoStoreHeaders() });
   }
-  const config = await backendFetch<{ data?: { account?: { is_open_for_signup?: boolean } } }>(
+  const config = await backendFetch<{
+    data?: { account?: { is_open_for_signup?: boolean }; socialaccount?: { providers?: { id?: string }[] } };
+  }>(
     request,
     `${AUTH_BASE}/config`,
   );
   const open = config.data?.data?.account?.is_open_for_signup === true;
+  const github = (config.data?.data?.socialaccount?.providers ?? []).some((p) => p.id === "github");
   const csrf = await ensureCsrfToken(request);
-  return data({ csrfToken: csrf.token, open }, { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) });
+  return data({ csrfToken: csrf.token, open, github }, { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) });
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -132,6 +136,11 @@ export default function Signup({ loaderData, actionData }: Route.ComponentProps)
           </div>
         </Form>
       </Panel>
+      {loaderData.github ? (
+        <Panel title={t("github.signupPanel")}>
+          <GitHubButton csrfToken={loaderData.csrfToken} />
+        </Panel>
+      ) : null}
       <p className={styles.aside}>
         {t("signup.haveAccount")} <Link to="/login">{t("signup.login")}</Link>
       </p>

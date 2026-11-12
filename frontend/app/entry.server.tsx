@@ -23,7 +23,9 @@ function contentSecurityPolicy(nonce: string): string {
     "object-src 'none'",
     "base-uri 'none'",
     "frame-ancestors 'none'",
-    "form-action 'self'",
+    // GitHub login: the form POST to /auth/github ends in a redirect to GitHub's authorization
+    // page, which browsers check against form-action. Only GitHub's origin is added.
+    "form-action 'self' https://github.com",
   ].join("; ");
 }
 

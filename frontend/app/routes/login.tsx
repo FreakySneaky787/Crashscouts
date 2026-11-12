@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/login";
+import { GitHubButton } from "~/components/auth/GitHubButton";
 import { PasskeySignIn } from "~/components/auth/Passkeys";
 import { Button } from "~/components/ui/Button";
 import { TextField } from "~/components/ui/Form";
@@ -11,7 +12,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { isFlowPending } from "~/lib/auth";
-import { AUTH_BASE, backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
+import { AUTH_BASE, backendFetch, ensureCsrfToken, getLoginProviders, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, safeRedirectPath, setCookieHeaders } from "~/lib/http";
 
 import styles from "./forms.module.css";
@@ -29,9 +30,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (await getSessionUser(request)) {
     throw redirect(next, { headers: privateNoStoreHeaders() });
   }
-  const csrf = await ensureCsrfToken(request);
+  const [csrf, providers] = await Promise.all([ensureCsrfToken(request), getLoginProviders(request)]);
   return data(
-    { csrfToken: csrf.token, next, notice },
+    { csrfToken: csrf.token, next, notice, github: providers.includes("github") },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
@@ -95,7 +96,10 @@ export default function Login({ loaderData, actionData }: Route.ComponentProps) 
         </Form>
       </Panel>
       <Panel title={t("passkeys.loginPanel")}>
-        <PasskeySignIn mode="login" csrfToken={loaderData.csrfToken} next={loaderData.next} />
+        <div className={styles.stack}>
+          <PasskeySignIn mode="login" csrfToken={loaderData.csrfToken} next={loaderData.next} />
+          {loaderData.github ? <GitHubButton csrfToken={loaderData.csrfToken} /> : null}
+        </div>
       </Panel>
       <p className={styles.aside}>
         <Link to="/password/forgot">{t("login.forgot")}</Link>

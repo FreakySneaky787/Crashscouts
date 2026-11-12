@@ -42,6 +42,10 @@ including the negative cases.
 - New session on login; session list with "sign out everywhere" (phase 1).
 - ✅ Signup can be closed with `DJANGO_SIGNUP_ENABLED` (production default: closed).
 
+- ✅ GitHub login ([ADR 0012](adr/0012-github-login.md)): no automatic linking or login by email;
+  signup form with 16+ confirmation; scopes `read:user`, `user:email` only; tokens not stored;
+  credentials only from the environment; redirects only to GitHub's authorization page.
+
 ## 3. Web
 
 - ✅ Django CSRF; forms carry the token, and the SSR server forwards it without ever bypassing the
@@ -116,6 +120,11 @@ including the negative cases.
   personalized content; no `Set-Cookie`.
 - No shared cache for user data in the SSR server; i18n uses one instance per request.
 - Logout only via POST with a CSRF token; a GET to `/logout` signs no one out.
+
+- ✅ The SSR server forwards the public host (`X-Forwarded-Host`); Django trusts it
+  (`USE_X_FORWARDED_HOST`). Requirement for production: Django is reachable only through the
+  reverse proxy, which overwrites `X-Forwarded-Host` and `X-Forwarded-Proto`.
+- CSP `form-action 'self' https://github.com` (GitHub login redirect after a form POST).
 
 ## 9. Audit log
 

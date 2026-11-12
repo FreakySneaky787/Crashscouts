@@ -29,6 +29,8 @@ export type BackendResult<T> = {
   status: number;
   data: T | null;
   setCookies: string[];
+  /** Location header of a redirect response (redirects are never followed). */
+  location: string | null;
 };
 
 export async function backendFetch<T = unknown>(
@@ -44,7 +46,11 @@ export async function backendFetch<T = unknown>(
 
   // For Django behind the proxy (SECURE_PROXY_SSL_HEADER); in production the reverse proxy sets
   // the protocol of the browser request.
-  headers.set("X-Forwarded-Proto", new URL(request.url).protocol.replace(":", ""));
+  const publicUrl = new URL(request.url);
+  headers.set("X-Forwarded-Proto", publicUrl.protocol.replace(":", ""));
+  // Public host, so URLs Django builds (e.g. the GitHub callback) point to the frontend, not to
+  // the internal backend address (USE_X_FORWARDED_HOST in the Django settings).
+  headers.set("X-Forwarded-Host", publicUrl.host);
 
   if (method !== "GET") {
     for (const name of ["Origin", "Referer"] as const) {
@@ -76,7 +82,12 @@ export async function backendFetch<T = unknown>(
     await response.body?.cancel();
   }
 
-  return { status: response.status, data, setCookies: response.headers.getSetCookie() };
+  return {
+    status: response.status,
+    data,
+    setCookies: response.headers.getSetCookie(),
+    location: response.headers.get("Location"),
+  };
 }
 
 export type SessionUser = { username: string };
@@ -87,6 +98,15 @@ export type SessionUser = { username: string };
  */
 export async function backendFetchBinary(path: string): Promise<Response> {
   return fetch(new URL(path, BACKEND_URL), { headers: { Accept: "image/webp,image/*" }, redirect: "manual" });
+}
+
+/** Login providers that are configured (e.g. ["github"]); empty without credentials. */
+export async function getLoginProviders(request: Request): Promise<string[]> {
+  const result = await backendFetch<{ data?: { socialaccount?: { providers?: { id?: string }[] } } }>(
+    request,
+    `${AUTH_BASE}/config`,
+  );
+  return (result.data?.data?.socialaccount?.providers ?? []).map((p) => p.id ?? "").filter(Boolean);
 }
 
 /** Asks Django for the current session. `null` = not signed in. */

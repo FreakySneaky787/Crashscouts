@@ -189,6 +189,9 @@ React Router's data requests.
 - Database without a public port.
 - Encrypted, off-site backups with a tested restore (database **and** uploaded files in
   `DJANGO_MEDIA_ROOT`).
+- The reverse proxy overwrites `X-Forwarded-Host`/`X-Forwarded-Proto`, routes
+  `/accounts/github/login/callback/` (to the SSR server or Django) and never exposes Django
+  directly ([ADR 0012](adr/0012-github-login.md)).
 - The reverse proxy limits request bodies (a few MB) in front of the SSR server and Django
   ([ADR 0010](adr/0010-image-upload-pipeline.md)); `/media` is never routed.
 - Transactional email via Scaleway (open question F), configured through `DJANGO_EMAIL_*`.

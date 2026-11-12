@@ -51,12 +51,7 @@ STORAGES = {
 FRONTEND_URL = env_str("FRONTEND_URL").rstrip("/")
 if not FRONTEND_URL.startswith("https://"):
     raise ImproperlyConfigured("FRONTEND_URL must be an https:// URL in production.")
-HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email": f"{FRONTEND_URL}/verify-email/{{key}}",
-    "account_reset_password": f"{FRONTEND_URL}/password/forgot",
-    "account_reset_password_from_key": f"{FRONTEND_URL}/password/reset/{{key}}",
-    "account_signup": f"{FRONTEND_URL}/signup",
-}
+HEADLESS_FRONTEND_URLS = frontend_urls(FRONTEND_URL)  # noqa: F405
 MAILERS = {
     "default": smtp_mailer(  # noqa: F405
         host=env_str("DJANGO_EMAIL_HOST"),

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/settings-security";
+import { GitHubButton } from "~/components/auth/GitHubButton";
 import { PasskeyRegister } from "~/components/auth/Passkeys";
 import { Button } from "~/components/ui/Button";
 import { TextField } from "~/components/ui/Form";
@@ -18,7 +19,7 @@ import { QrCode } from "~/components/ui/QrCode";
 import { StatusPill } from "~/components/ui/StatusPill";
 import { brand } from "~/config/brand";
 import { hasFlow } from "~/lib/auth";
-import { AUTH_BASE, backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
+import { AUTH_BASE, backendFetch, ensureCsrfToken, getLoginProviders, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { groupSecret, type Authenticator } from "~/lib/mfa";
 
@@ -34,10 +35,18 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!(await getSessionUser(request))) {
     throw redirect(`/login?next=${encodeURIComponent(SELF)}`, { headers: privateNoStoreHeaders() });
   }
-  const [list, csrf] = await Promise.all([
+  const [list, csrf, providers, linked] = await Promise.all([
     backendFetch<{ data?: Authenticator[] }>(request, `${AUTH_BASE}/account/authenticators`),
     ensureCsrfToken(request),
+    getLoginProviders(request),
+    backendFetch<{ data?: { uid: string; display: string; provider: { id: string } }[] }>(
+      request,
+      `${AUTH_BASE}/account/providers`,
+    ),
   ]);
+  const githubAccounts = (linked.data?.data ?? [])
+    .filter((account) => account.provider?.id === "github")
+    .map((account) => ({ uid: account.uid, display: account.display }));
   const authenticators = list.data?.data ?? [];
   const totp = authenticators.find((a) => a.type === "totp") ?? null;
   const recovery = authenticators.find((a) => a.type === "recovery_codes") ?? null;
@@ -55,13 +64,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     if (secret && url) setup = { secret, url };
   }
   return data(
-    { csrfToken: csrf.token, totp, recovery, setup, passkeys },
+    { csrfToken: csrf.token, totp, recovery, setup, passkeys, github: providers.includes("github"), githubAccounts },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
 
 type ActionResult = {
-  done?: "activated" | "deactivated" | "regenerated" | "passkeyRemoved";
+  done?: "activated" | "deactivated" | "regenerated" | "passkeyRemoved" | "githubDisconnected";
   codes?: string[];
   error?: "incorrect" | "forbidden" | "rateLimited" | "generic";
 };
@@ -72,17 +81,25 @@ export async function action({ request }: Route.ActionArgs) {
   const intent = String(form.get("intent") ?? "");
   const path =
     intent === "activate" || intent === "deactivate" ? "totp" : intent === "passkey-remove" ? "webauthn" : "recovery-codes";
+  const endpoint =
+    intent === "github-disconnect" ? `${AUTH_BASE}/account/providers` : `${AUTH_BASE}/account/authenticators/${path}`;
   const method =
-    intent === "activate" || intent === "regenerate" ? "POST" : intent === "deactivate" || intent === "passkey-remove" ? "DELETE" : "GET";
+    intent === "activate" || intent === "regenerate"
+      ? "POST"
+      : intent === "deactivate" || intent === "passkey-remove" || intent === "github-disconnect"
+        ? "DELETE"
+        : "GET";
   const passkeyId = Number(form.get("id"));
   const json =
     intent === "activate"
       ? { code: String(form.get("code") ?? "").replace(/\s+/g, "") }
       : intent === "passkey-remove"
         ? { authenticators: Number.isInteger(passkeyId) ? [passkeyId] : [] }
-        : undefined;
+        : intent === "github-disconnect"
+          ? { provider: "github", account: String(form.get("uid") ?? "") }
+          : undefined;
 
-  const result = await backendFetch<{ data?: { unused_codes?: string[] } }>(request, `${AUTH_BASE}/account/authenticators/${path}`, {
+  const result = await backendFetch<{ data?: { unused_codes?: string[] } }>(request, endpoint, {
     method,
     csrfToken,
     json: method === "GET" ? undefined : json,
@@ -100,6 +117,7 @@ export async function action({ request }: Route.ActionArgs) {
     if (intent === "deactivate") return data<ActionResult>({ done: "deactivated" }, { headers });
     if (intent === "regenerate") return data<ActionResult>({ done: "regenerated", codes }, { headers });
     if (intent === "passkey-remove") return data<ActionResult>({ done: "passkeyRemoved" }, { headers });
+    if (intent === "github-disconnect") return data<ActionResult>({ done: "githubDisconnected" }, { headers });
     return data<ActionResult>({ codes }, { headers });
   }
   const error: ActionResult["error"] =
@@ -122,7 +140,7 @@ function Hidden({ csrfToken, intent }: { csrfToken: string; intent: string }) {
 
 export default function SettingsSecurity({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { csrfToken, totp, recovery, setup, passkeys } = loaderData;
+  const { csrfToken, totp, recovery, setup, passkeys, github, githubAccounts } = loaderData;
 
   return (
     <div className={styles.stack}>
@@ -207,6 +225,34 @@ export default function SettingsSecurity({ loaderData, actionData }: Route.Compo
           <PasskeyRegister csrfToken={csrfToken} />
         </div>
       </Panel>
+
+      {github || githubAccounts.length ? (
+        <Panel title={t("github.connectedTitle")}>
+          <div className={styles.stack}>
+            <p>{t("github.connectedText")}</p>
+            {githubAccounts.length ? (
+              <ul className={styles.plainList} aria-label={t("github.connectedTitle")}>
+                {githubAccounts.map((account) => (
+                  <li key={account.uid} className={styles.listRow}>
+                    <span>GitHub · {account.display}</span>
+                    <Form method="post">
+                      <Hidden csrfToken={csrfToken} intent="github-disconnect" />
+                      <input type="hidden" name="uid" value={account.uid} />
+                      <Button type="submit" variant="quiet" size="sm" icon={XIcon} aria-label={t("github.disconnectNamed", { name: account.display })}>
+                        {t("github.disconnect")}
+                      </Button>
+                    </Form>
+                  </li>
+                ))}
+              </ul>
+            ) : github ? (
+              <div>
+                <GitHubButton csrfToken={csrfToken} process="connect" />
+              </div>
+            ) : null}
+          </div>
+        </Panel>
+      ) : null}
 
       {recovery ? (
         <Panel title={t("mfa.recoveryTitle")} aside={t("mfa.recoveryLeft", { count: recovery.unused_code_count ?? 0 })}>

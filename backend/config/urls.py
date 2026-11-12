@@ -10,6 +10,8 @@ urlpatterns = [
     path("api/v1/", include("apps.profiles.urls")),
     # django-allauth headless: /_allauth/browser/v1/...
     path("_allauth/", include("allauth.headless.urls")),
+    # Provider callbacks only (headless mode): /accounts/github/login/callback/
+    path("accounts/", include("allauth.urls")),
 ]
 
 if settings.ENABLE_SSR_PROBE:

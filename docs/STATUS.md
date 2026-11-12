@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 1.3b) · **Current phase:** 1 – Accounts
+**Last update:** 2026-11-12 (WP 1.4) · **Current phase:** 1 – Accounts
 
 ## Work packages
 
@@ -292,6 +292,31 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
     `127.0.0.1:8000` directly; the SSR test that calls Django directly now sends them explicitly.
   - Several test selectors matched panel titles such as "Sign in without a password"; the tests
     now match field labels exactly.
+
+### WP 1.4 – GitHub login (2026-11-12) ✅ (real login still to be tried)
+
+- **Backend:** allauth `socialaccount` with GitHub (extra packages `requests` 2.34.2, `oauthlib`
+  4.0.1); credentials only from `DJANGO_GITHUB_CLIENT_ID`/`_SECRET`; no automatic linking by email;
+  signup form with username and 16+ confirmation; scopes `read:user`, `user:email`; tokens not
+  stored; public host via `X-Forwarded-Host` ([ADR 0012](adr/0012-github-login.md)).
+- **Frontend:** "Continue with GitHub" on login and signup (plain form), callback route,
+  `/login/provider/callback`, `/signup/github`, connected accounts in the security settings
+  (connect, disconnect); CSP `form-action` additionally allows `https://github.com`.
+- **The owner created a GitHub OAuth app** (2026-11-12). Its client ID and secret are not yet in
+  the environment, so the real login has not been tried; required callback URL:
+  `http://localhost:3000/accounts/github/login/callback/`.
+- **Verification (run on 2026-11-12):** pytest **134 passed** (8 new with a simulated GitHub:
+  not offered without credentials, public callback URL, forged state, signup with age
+  confirmation, no login into an existing account with the same email, connect and log in,
+  connect without session links nothing, foreign callback URL refused); Vitest **57 passed**;
+  Playwright **43 passed** (6 new; GitHub is never contacted).
+- **Findings during the work:**
+  - allauth builds the callback URL from the request host, i.e. the internal backend host; fixed
+    with the forwarded public host.
+  - The CSP `form-action 'self'` blocked the redirect to GitHub after the form POST (found by
+    E2E); GitHub's origin is now allowed explicitly and tested.
+  - Playwright cannot intercept redirects of a navigation; the tests capture the server's
+    redirect target at the form POST instead, so they never load github.com.
 
 ## Known limitations
 
