@@ -172,6 +172,12 @@
   self-hosted fonts, no-JS mobile menu); `pnpm audit`: only the known moderate `minimatch` finding.
   Visual review of screenshots in both themes and on a phone.
 
+## Phase 1 – Accounts (started 2026-11-12)
+
+- Product decisions for phase 1 recorded in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (D, L, M,
+  GitHub linking, 2FA methods, account deletion). Email provider (F) stays open until the beta;
+  development uses Mailpit. No phase 1 code yet.
+
 ## Known limitations
 
 - GitHub Free for private repositories: no push protection and no branch protection (see

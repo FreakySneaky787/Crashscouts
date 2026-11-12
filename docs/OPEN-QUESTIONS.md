@@ -11,20 +11,23 @@
 | A | Waiting period for new accounts before they may submit public campaigns | phase 3B | 7 days plus verified email plus 2FA, or manual approval by an admin |
 | B | Method of repository verification | phase 2 | token file in the repository (independent of the code host), plus a check via GitHub OAuth |
 | C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
-| D | What do participants see of each other? Default visibility of profiles | phase 1 / 3A | participants do not see each other; profiles minimally public by default |
-| F | Provider for transactional email (Switzerland/EU) | phase 1 | Mailpit or console in development; provider before the beta |
+| F | Provider for transactional email (Switzerland/EU) | before the beta | **Decided for development:** Mailpit, provider-neutral SMTP. Owner's constraint: free or very cheap. Proposal: Scaleway Transactional Email (France; 300 emails/month free, then pay per use), fallback Brevo free plan; verify on the official pages before signing up |
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | H | Who moderates initially? | phase 3B | the project owner only |
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
-| L | Password rules (minimum length etc.) | phase 1 | define with signup; Django defaults until then |
-| M | Is the email address unique per account, and how is letter case handled? | phase 1 | decide together with the allauth setup |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
 ### Resolved
 
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
+| D | Default visibility of profiles | **Minimally public:** username and initials avatar; bio, interests, operating systems and skills optional and individually switchable; email never visible; profiles not indexed unless the user opts in. What participants see of each other is decided in phase 3A. |
+| L | Password rules | **Minimum 12 characters**, at least 64 allowed, no composition rules, blocklist of common passwords, similarity check against username/email. Deliberately below NIST SP 800-63B-4 (15 characters for single-factor passwords); recorded in an ADR in phase 1. |
+| M | Login and email uniqueness | **Login with email only**; one account per email, case-insensitive; separate unique public username (case-insensitive) for profiles. |
+| – | GitHub login with an email that already exists | **No automatic linking.** The user signs in normally and connects GitHub in the settings (allauth default `SOCIALACCOUNT_EMAIL_AUTHENTICATION=False`). |
+| – | 2FA methods in phase 1 | TOTP, passkeys/security keys and recovery codes; **plus passwordless passkey login**. 2FA stays optional. |
+| – | Account deletion | **14-day grace period:** the account is deactivated and invisible immediately, restorable by signing in, deleted after 14 days; feedback is anonymized, not deleted. |
 | E | Visual direction | **Concept A – Developer Workbench**, with light/dark mode in the product UI ([ADR 0007](adr/0007-visual-direction-developer-workbench.md)). Implemented as the design system ([`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), [ADR 0008](adr/0008-design-system-implementation.md)). |
 | I | Language of the repository documentation | **English** for all documentation, code comments and commit messages. The original master prompt stays available in German as [`MASTER-PROMPT.de.md`](MASTER-PROMPT.de.md). |
 
