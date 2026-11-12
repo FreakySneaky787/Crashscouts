@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 1.2) · **Current phase:** 1 – Accounts
+**Last update:** 2026-11-12 (WP 1.3a) · **Current phase:** 1 – Accounts
 
 ## Work packages
 
@@ -247,6 +247,30 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
     view (found by E2E, covered by a backend test).
   - E2E race: a previous success notice was still visible after the second save; the tests now
     wait for the POST response.
+
+### WP 1.3a – Two-factor authentication: authenticator app and recovery codes (2026-11-12) ✅
+
+- **Backend:** `allauth.mfa` (headless) with `fido2` 2.2.1 and `qrcode` 8.2; TOTP with one step of
+  tolerance and no code reuse; 10 single-use recovery codes; reauthentication only by password or
+  second factor (allauth's default would also accept an emailed code); security notification
+  emails; audit events `mfa.*`; passkey relying party = host of `FRONTEND_URL`
+  ([ADR 0011](adr/0011-two-factor-authentication.md)).
+- **Frontend:** second login step `/login/2fa`, `/reauthenticate`, `/settings/security` (QR code as
+  server-rendered SVG via `uqr` 0.1.3, key for manual entry, recovery codes shown only in an action
+  response); all without JavaScript.
+- **Verification (run on 2026-11-12):** pytest **125 passed** (10 new 2FA tests with an
+  independent RFC 6238 implementation); Vitest **54 passed**; Playwright **34 passed** (4 new:
+  enable TOTP with password confirmation, wrong code, valid code, recovery code once, 2FA login
+  without JavaScript, access rules and open-redirect check, axe in both themes).
+- **Findings during the work:**
+  - allauth counts only an explicit reauthentication for security changes, not the login itself –
+    stricter than expected; the UI leads through `/reauthenticate`.
+  - allauth's default reauthentication methods include an emailed code; restricted to password or
+    second factor.
+  - allauth's mail helper needs the current request; notification mails are sent after the commit,
+    when there is none. The adapter now builds the mail context itself.
+  - Passkeys need the public frontend host as relying party and do not accept IP addresses;
+    `FRONTEND_URL` defaults to `localhost` (relevant for WP 1.3b).
 
 ## Known limitations
 

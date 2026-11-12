@@ -35,6 +35,10 @@ class AuditEvent(models.Model):
         LOGOUT = "auth.logout", "Signed out"
         PASSWORD_CHANGED = "auth.password_changed", "Password changed"
         PASSWORD_RESET = "auth.password_reset", "Password reset"
+        MFA_ADDED = "mfa.added", "Two-factor method added"
+        MFA_REMOVED = "mfa.removed", "Two-factor method removed"
+        MFA_RESET = "mfa.reset", "Recovery codes regenerated"
+        MFA_FAILED = "mfa.failed", "Failed two-factor check"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

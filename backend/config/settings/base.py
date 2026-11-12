@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.headless",
+    "allauth.mfa",
     "apps.core",
     "apps.accounts",
     "apps.audit",
@@ -127,6 +128,9 @@ ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
 ACCOUNT_SESSION_REMEMBER = True
+# Security notifications by email (password changed, second factor added or removed, ...), so an
+# account owner notices changes made by someone else.
+ACCOUNT_EMAIL_NOTIFICATIONS = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = f"[{PLATFORM_NAME}] "
 
 
@@ -137,9 +141,23 @@ def _usernames_reserved() -> list[str]:
 
 
 ACCOUNT_USERNAME_BLACKLIST = _usernames_reserved()
+# Changing security settings (2FA, password) requires a login within the last 5 minutes.
+ACCOUNT_REAUTHENTICATION_TIMEOUT = 300
+# Only password or a second factor confirm such changes, not an emailed code (whoever controls
+# the mailbox must not be able to change the second factor).
+ACCOUNT_REAUTHENTICATION_METHODS = ["password", "mfa"]
+
+# --- Two-factor authentication (optional for users; owner's decision 2026-11-12) ---
+MFA_ADAPTER = "apps.accounts.adapter.MFAAdapter"
+MFA_SUPPORTED_TYPES = ["totp", "recovery_codes", "webauthn"]
+MFA_PASSKEY_LOGIN_ENABLED = True
+MFA_RECOVERY_CODE_COUNT = 10
+MFA_TOTP_TOLERANCE = 1  # one 30-second step of clock drift
+
 
 # Links in emails point to the SSR frontend, never to Django.
-FRONTEND_URL = env_str("FRONTEND_URL", "http://127.0.0.1:5173").rstrip("/")
+# "localhost", not 127.0.0.1: WebAuthn (passkeys) does not accept IP addresses as relying party.
+FRONTEND_URL = env_str("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": f"{FRONTEND_URL}/verify-email/{{key}}",
     "account_reset_password": f"{FRONTEND_URL}/password/forgot",

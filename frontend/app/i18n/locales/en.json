@@ -37,7 +37,10 @@
     "sessionText": "You are signed in on this device. Log out when you use a shared computer.",
     "profile": "Profile",
     "profileText": "Your public profile shows your username and avatar. You decide which other details appear.",
-    "editProfile": "Edit profile"
+    "editProfile": "Edit profile",
+    "security": "Security",
+    "securityText": "Protect your account with a second factor such as an authenticator app.",
+    "editSecurity": "Security settings"
   },
   "probe": {
     "touch": "Touch",
@@ -173,5 +176,46 @@
       "listInvalid": "Choose from the listed options.",
       "avatarInvalid": "Upload a PNG, JPEG or WebP image of at most 2 MB."
     }
+  },
+  "mfa": {
+    "loginTitle": "Two-factor check",
+    "loginIntro": "Your account is protected with a second factor.",
+    "codePanel": "Enter a code",
+    "code": "Code",
+    "codeHint": "The 6-digit code from your authenticator app, or one of your recovery codes.",
+    "verify": "Verify",
+    "incorrect": "This code is not valid. Check the time on your device and try again.",
+    "startOver": "Use a different account",
+    "settingsTitle": "Security settings",
+    "settingsIntro": "Two-factor authentication is optional. It protects your account even if your password becomes known.",
+    "appTitle": "Authenticator app",
+    "on": "On",
+    "off": "Off",
+    "appOnText": "Each login asks for a code from your authenticator app after the password.",
+    "step1": "Install an authenticator app on your phone, for example an open-source one.",
+    "step2": "Scan this QR code with the app.",
+    "step3": "Enter the 6-digit code the app shows.",
+    "qrLabel": "QR code for your authenticator app",
+    "manualKey": "Cannot scan it? Enter this key instead:",
+    "turnOn": "Turn on",
+    "turnOff": "Turn off",
+    "recoveryTitle": "Recovery codes",
+    "recoveryLeft": "{{count}} unused",
+    "recoveryText": "Use a recovery code when you cannot use your authenticator app. Each code works once.",
+    "recoveryStore": "Store these codes in a safe place, for example a password manager.",
+    "showCodes": "Show codes",
+    "regenerate": "Create new codes",
+    "done": {
+      "activated": "Two-factor authentication is on. Your recovery codes are ready.",
+      "deactivated": "Two-factor authentication is off.",
+      "regenerated": "New recovery codes were created. The old ones no longer work."
+    }
+  },
+  "reauth": {
+    "title": "Confirm it's you",
+    "intro": "Security settings can only be changed right after you confirm your password.",
+    "panel": "Confirm your password",
+    "submit": "Confirm",
+    "incorrect": "The password is incorrect."
   }
 }

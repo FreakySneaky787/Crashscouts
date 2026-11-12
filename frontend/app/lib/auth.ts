@@ -51,6 +51,12 @@ export function isFlowPending(body: unknown, flowId: string): boolean {
   return Array.isArray(flows) && flows.some((flow) => flow?.id === flowId && flow.is_pending === true);
 }
 
+/** True if the response offers the given flow at all (e.g. "reauthenticate"), pending or not. */
+export function hasFlow(body: unknown, flowId: string): boolean {
+  const flows = (body as AllauthBody | null)?.data?.flows;
+  return Array.isArray(flows) && flows.some((flow) => flow?.id === flowId);
+}
+
 /** Keys from email links: allauth keys are URL-safe tokens with ":" separators. */
 export function isPlausibleKey(key: string | undefined): key is string {
   return typeof key === "string" && key.length > 0 && key.length <= 512 && /^[A-Za-z0-9:_\-.]+$/.test(key);

@@ -4,7 +4,7 @@ import { data, Form, redirect } from "react-router";
 import type { Route } from "./+types/account";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { Avatar } from "~/components/ui/Data";
-import { EyeIcon, PencilSimpleIcon, SignOutIcon } from "~/components/ui/icons";
+import { EyeIcon, PencilSimpleIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
@@ -51,6 +51,16 @@ export default function Account({ loaderData }: Route.ComponentProps) {
             </ButtonLink>
             <ButtonLink to={`/u/${loaderData.username}`} variant="quiet" icon={EyeIcon}>
               {t("settings.viewPublic")}
+            </ButtonLink>
+          </div>
+        </div>
+      </Panel>
+      <Panel title={t("account.security")}>
+        <div className={styles.stack}>
+          <p>{t("account.securityText")}</p>
+          <div>
+            <ButtonLink to="/settings/security" icon={ShieldCheckIcon}>
+              {t("account.editSecurity")}
             </ButtonLink>
           </div>
         </div>

@@ -1,6 +1,7 @@
 """Signal receivers that turn authentication events into audit log entries."""
 
 from allauth.account import signals as account_signals
+from allauth.mfa import signals as mfa_signals
 from django.contrib.auth import get_user_model
 from django.contrib.auth import signals as auth_signals
 from django.dispatch import receiver
@@ -49,3 +50,24 @@ def on_password_changed(sender, request, user, **kwargs):
 @receiver(account_signals.password_reset)
 def on_password_reset(sender, request, user, **kwargs):
     record(AuditEvent.Kind.PASSWORD_RESET, subject=user)
+
+
+@receiver(mfa_signals.authenticator_added)
+def on_mfa_added(sender, request, user, authenticator, **kwargs):
+    record(AuditEvent.Kind.MFA_ADDED, actor=user, subject=user, data={"type": authenticator.type})
+
+
+@receiver(mfa_signals.authenticator_removed)
+def on_mfa_removed(sender, request, user, authenticator, **kwargs):
+    record(AuditEvent.Kind.MFA_REMOVED, actor=user, subject=user, data={"type": authenticator.type})
+
+
+@receiver(mfa_signals.authenticator_reset)
+def on_mfa_reset(sender, request, user, authenticator, **kwargs):
+    record(AuditEvent.Kind.MFA_RESET, actor=user, subject=user, data={"type": authenticator.type})
+
+
+@receiver(mfa_signals.authentication_failed)
+def on_mfa_failed(sender, request, user, authenticator=None, **kwargs):
+    data = {"type": authenticator.type} if authenticator is not None else {}
+    record(AuditEvent.Kind.MFA_FAILED, subject=user, data=data)

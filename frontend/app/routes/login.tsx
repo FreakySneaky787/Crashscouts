@@ -52,6 +52,10 @@ export async function action({ request }: Route.ActionArgs) {
   if (result.status === 200) {
     throw redirect(next, { headers });
   }
+  // Correct password; the account has two-factor authentication: ask for the second factor.
+  if (result.status === 401 && isFlowPending(result.data, "mfa_authenticate")) {
+    throw redirect(`/login/2fa?next=${encodeURIComponent(next)}`, { headers });
+  }
   // Correct password, but the email address is not confirmed yet.
   if (result.status === 401 && isFlowPending(result.data, "verify_email")) {
     return data({ error: "unverified" as const }, { status: 400, headers });

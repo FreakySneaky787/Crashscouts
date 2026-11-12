@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { fieldErrorCodes, isFlowPending, isPlausibleKey } from "./auth";
+import { fieldErrorCodes, hasFlow, isFlowPending, isPlausibleKey } from "./auth";
 
 describe("fieldErrorCodes", () => {
   it("maps the first known code per field", () => {
@@ -52,5 +52,13 @@ describe("isPlausibleKey", () => {
     expect(isPlausibleKey("a".repeat(513))).toBe(false);
     expect(isPlausibleKey("../../etc/passwd")).toBe(false);
     expect(isPlausibleKey("key\r\nX-Injected: 1")).toBe(false);
+  });
+});
+
+describe("hasFlow", () => {
+  it("finds a flow with or without the pending flag", () => {
+    expect(hasFlow({ data: { flows: [{ id: "reauthenticate" }] } }, "reauthenticate")).toBe(true);
+    expect(hasFlow({ data: { flows: [{ id: "login" }] } }, "reauthenticate")).toBe(false);
+    expect(hasFlow(null, "reauthenticate")).toBe(false);
   });
 });

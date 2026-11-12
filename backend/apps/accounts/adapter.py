@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from urllib.parse import urlsplit
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.mfa.adapter import DefaultMFAAdapter
 from django.conf import settings
 
 
@@ -30,4 +31,20 @@ class AccountAdapter(DefaultAccountAdapter):
         return super().clean_username(username.strip().lower(), shallow=shallow)
 
     def send_mail(self, template_prefix: str, email: str, context: dict) -> None:
-        super().send_mail(template_prefix, email, {**context, "current_site": platform_site()})
+        # Built here instead of in allauth: no lookup of the request's host (internal backend
+        # host, and no request at all for mails sent after a transaction commit).
+        ctx = {"email": email, **context, "current_site": platform_site()}
+        self.render_mail(template_prefix, email, ctx).send()
+
+
+class MFAAdapter(DefaultMFAAdapter):
+    def get_public_key_credential_rp_entity(self) -> dict[str, str]:
+        # WebAuthn relying party = the public frontend host the browser talks to, never the
+        # internal backend host the SSR server uses (e.g. "django" inside Docker).
+        return {
+            "id": urlsplit(settings.FRONTEND_URL).hostname or "",
+            "name": settings.PLATFORM_NAME,
+        }
+
+    def get_totp_issuer(self) -> str:
+        return settings.PLATFORM_NAME

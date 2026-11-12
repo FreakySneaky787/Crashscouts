@@ -26,6 +26,7 @@ import {
 } from "~/components/ui/icons";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { QrCode } from "~/components/ui/QrCode";
 import { Panel } from "~/components/ui/Panel";
 import { StatusPill } from "~/components/ui/StatusPill";
 import { CAMPAIGN_STATUS, FEEDBACK_STATUS, PROJECT_STATUS, TASK_STATUS } from "~/components/ui/statuses";
@@ -215,6 +216,10 @@ export default function DesignSystem() {
             <Button variant="quiet" type="button">Cancel</Button>
           </div>
         </form>
+      </Panel>
+
+      <Panel title="QR code" aside="Server-rendered SVG, same in both themes">
+        <QrCode value="otpauth://totp/example?secret=EXAMPLEEXAMPLEEX&issuer=Example" label="Example QR code" />
       </Panel>
 
       <Panel title="Notices">

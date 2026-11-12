@@ -96,6 +96,7 @@ module.
 | `TextField`, `TextAreaField`, `SelectField`, `ChoiceGroup`, `FormNote` | forms | visible labels, hints and errors via `aria-describedby`, `aria-invalid` |
 | `CheckboxGroup` | multiple choice from a fixed list | fieldset with legend, hint and error; e.g. platforms |
 | `CheckboxField` | single confirmation | label next to the box; error via `aria-describedby` |
+| `QrCode` | QR code (e.g. authenticator setup) | server-rendered SVG, dark on light in both themes, `role="img"` with a label |
 | `Notice` | inline message | tones `ok`, `info` (role `status`), `danger` (role `alert`); icon + text |
 | `EmptyState` | empty and error states | kinds `first-use` (with action), `empty`, `error` |
 | `ThemeToggle` | system / light / dark | see section 6 |
