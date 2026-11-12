@@ -1,33 +1,48 @@
-# TestHub (Arbeitsname)
+# TestHub (working name)
 
-> **Hinweis:** „TestHub" ist ein vorläufiger Platzhalter, kein Produktname.
+> **Note:** "TestHub" is a provisional placeholder, not a product name.
 
-Eine Open-Source-Plattform, die Softwareentwickler mit freiwilligen Testern zusammenbringt.
-Entwickler finden Tester für ihre Beta-Versionen; Tester entdecken neue Software und helfen mit strukturiertem Feedback, sie zu verbessern.
+An open-source platform that connects software developers with volunteer testers.
+Developers find testers for their beta versions; testers discover new software and help improve it
+with structured feedback.
 
-*Software gemeinsam testen. Gemeinsam besser machen.*
+*Test software together. Make it better together.*
 
 ## Status
 
-🚧 **Frühe Entwicklung, Phase 0 (Foundation).** Es gibt noch keinen lauffähigen Code. Der tatsächliche Stand steht in [`docs/STATUS.md`](docs/STATUS.md).
+🚧 **Early development, phase 0 (foundation).** A backend skeleton and a validated server-side
+rendering spike exist; there are no product features yet. The actual state is tracked in
+[`docs/STATUS.md`](docs/STATUS.md).
 
-## Dokumentation
+## Documentation
 
-| Dokument | Inhalt |
+| Document | Content |
 |---|---|
-| [`docs/PRD.md`](docs/PRD.md) | Produktanforderungen (Kern-MVP) |
-| [`docs/MVP-PLAN.md`](docs/MVP-PLAN.md) | Phasen, Arbeitspakete, Sicherheits-Gate |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architektur, Datenmodell, API, Berechtigungen |
-| [`docs/SECURITY.md`](docs/SECURITY.md) | Sicherheitskonzept |
-| [`docs/adr/`](docs/adr/) | Architekturentscheidungen (ADRs) |
-| [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md) | Offene Fragen |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Pläne nach dem MVP |
-| [`docs/MASTER-PROMPT.md`](docs/MASTER-PROMPT.md) | Ursprüngliche Projektvorgabe |
+| [`docs/PRD.md`](docs/PRD.md) | Product requirements (core MVP) |
+| [`docs/MVP-PLAN.md`](docs/MVP-PLAN.md) | Phases, work packages, security gate |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture, data model, API, permissions |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Security concept |
+| [`docs/adr/`](docs/adr/) | Architecture decision records |
+| [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md) | Open questions |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Plans beyond the MVP |
+| [`docs/MASTER-PROMPT.md`](docs/MASTER-PROMPT.md) | Original project brief (English translation; German original in [`MASTER-PROMPT.de.md`](docs/MASTER-PROMPT.de.md)) |
 
-## Geplanter Stack
+## Stack
 
-Python 3.14 · Django 6.1 · Django REST Framework · django-allauth · PostgreSQL 18 · React 19 · React Router 8 (SSR) · Vite 8 · TypeScript 6 · Docker Compose
+Python 3.14 · Django 6.1 · Django REST Framework · django-allauth · PostgreSQL 18 · React 19 ·
+React Router 8 (SSR) · Vite 8 · TypeScript 6 · Docker Compose
 
-## Lizenz
+## Repository layout
 
-[GNU Affero General Public License v3.0](LICENSE). Wer eine veränderte Version als Netzwerkdienst betreibt, muss deren Quellcode den Nutzerinnen und Nutzern zugänglich machen.
+| Path | Content |
+|---|---|
+| [`backend/`](backend/) | Django API ([README](backend/README.md)) |
+| [`frontend/`](frontend/) | React Router SSR app ([README](frontend/README.md)) |
+| [`e2e/`](e2e/) | Playwright end-to-end tests ([README](e2e/README.md)) |
+| [`docs/`](docs/) | Product and architecture documentation |
+| `compose.yaml` | Development services (PostgreSQL) |
+
+## License
+
+[GNU Affero General Public License v3.0](LICENSE). Anyone who runs a modified version as a network
+service must make its source code available to its users.

@@ -1,42 +1,56 @@
-# Offene Fragen
+# Open Questions
 
-> Stand: 2026-11-12. Jede Frage wird **vor** der Phase geklärt, in der sie gebraucht wird. Bis dahin wird nichts implementiert, was von ihr abhängt.
-> Die Spalte „Vorschlag" ist eine Empfehlung, **keine** Entscheidung.
+> As of: 2026-11-12. Every question is clarified **before** the phase that needs it. Until then,
+> nothing that depends on it is implemented.
+> The "Proposal" column is a recommendation, **not** a decision.
 
-## Produkt
+## Product
 
-| # | Frage | Bis | Vorschlag |
+| # | Question | Due | Proposal |
 |---|---|---|---|
-| A | Wartezeit neuer Konten, bevor sie öffentliche Kampagnen einreichen dürfen | Phase 3B | 7 Tage plus verifizierte E-Mail plus 2FA, oder manuelle Freigabe durch Admin |
-| B | Methode der Repository-Verifizierung | Phase 2 | Datei mit Token im Repo (unabhängig vom Code-Hosting-Anbieter), zusätzlich Prüfung per GitHub-OAuth |
-| C | Ist `target_testers` eine harte Grenze (automatisch „Full")? Wann wechselt der Status auf „In Progress"? | Phase 3A | harte Grenze bei direkter Teilnahme; „In Progress" ab `starts_at` |
-| D | Was sehen Teilnehmende voneinander? Standard-Sichtbarkeit von Profilen | Phase 1 / 3A | Teilnehmende sehen sich gegenseitig nicht; Profile sind standardmässig minimal öffentlich |
-| E | **Visuelle Richtung, Komponentenbibliothek, Styling** | vor Phase 1 | 2–3 Richtungen als Mockups vorlegen; Entscheidung durch den Projektverantwortlichen |
-| F | Anbieter für Transaktions-E-Mails (Schweiz/EU) | Phase 1 | In der Entwicklung Mailpit oder Konsole; Anbieter vor der Beta |
-| G | Beitragsmodell: DCO oder CLA | vor dem Öffentlichschalten | DCO |
-| H | Wer moderiert anfangs? | Phase 3B | nur der Projektverantwortliche |
-| I | Sprache der Repo-Doku (aktuell Deutsch) | vor dem Öffentlichschalten | README, CONTRIBUTING und SECURITY auf Englisch für die internationale Community; interne Planungsdoku darf deutsch bleiben |
-| J | Verhaltenskodex (Code of Conduct) | vor dem Öffentlichschalten | etablierte Vorlage, Auswahl durch den Projektverantwortlichen |
-| K | Endgültiger Produktname, Logo, Domain | offen | Entscheidung ausschliesslich durch den Projektverantwortlichen |
-| L | Passwortregeln (Mindestlänge usw.) | Phase 1 | bei der Registrierung festlegen; bis dahin Django-Standard |
-| M | Ist die E-Mail-Adresse pro Konto eindeutig, und wie werden Gross- und Kleinschreibung behandelt? | Phase 1 | zusammen mit dem allauth-Setup festlegen |
-| N | HSTS `includeSubDomains` und `preload` | nach der Domainwahl | erst aktivieren, wenn alle Subdomains dauerhaft nur über HTTPS laufen |
+| A | Waiting period for new accounts before they may submit public campaigns | phase 3B | 7 days plus verified email plus 2FA, or manual approval by an admin |
+| B | Method of repository verification | phase 2 | token file in the repository (independent of the code host), plus a check via GitHub OAuth |
+| C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
+| D | What do participants see of each other? Default visibility of profiles | phase 1 / 3A | participants do not see each other; profiles minimally public by default |
+| E | **Visual direction, component library, styling** | before phase 1 | present 2–3 directions as mockups; the project owner decides |
+| F | Provider for transactional email (Switzerland/EU) | phase 1 | Mailpit or console in development; provider before the beta |
+| G | Contribution model: DCO or CLA | before going public | DCO |
+| H | Who moderates initially? | phase 3B | the project owner only |
+| J | Code of conduct | before going public | an established template, chosen by the project owner |
+| K | Final product name, logo, domain | open | decided exclusively by the project owner |
+| L | Password rules (minimum length etc.) | phase 1 | define with signup; Django defaults until then |
+| M | Is the email address unique per account, and how is letter case handled? | phase 1 | decide together with the allauth setup |
+| N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
-## Recht (keine Rechtsberatung; vor der Beta juristisch prüfen lassen)
+### Resolved
 
-- Als Privatperson muss der Betreiber in der Datenschutzerklärung seine Identität und Kontaktdaten angeben (DSG Art. 19 Abs. 2 lit. a; DSGVO Art. 13).
-- Die DSGVO gilt voraussichtlich zusätzlich, weil sich das Angebot an Personen in der EU richtet (Art. 3 Abs. 2 DSGVO).
-- Ob ein EU-Vertreter nach Art. 27 DSGVO nötig ist, ist zu prüfen; Ausnahmen gelten für gelegentliche Verarbeitung mit geringem Risiko.
-- Die Nutzungsbedingungen brauchen einen Haftungsausschluss für Links auf Fremdsoftware und ein Meldeverfahren.
-- AGPL-3.0: Die gehostete Version muss einen Link zum Quellcode anbieten (Footer).
+| # | Question | Decision (2026-11-12) |
+|---|---|---|
+| I | Language of the repository documentation | **English** for all documentation, code comments and commit messages. The original master prompt stays available in German as [`MASTER-PROMPT.de.md`](MASTER-PROMPT.de.md). |
 
-Quellen: [DSG (Fedlex)](https://www.fedlex.admin.ch/eli/cc/2022/491/de) · [DSGVO (EUR-Lex)](https://eur-lex.europa.eu/eli/reg/2016/679/oj)
+## Legal (not legal advice; have it reviewed before the beta)
 
-## Technik
+- As a private individual, the operator must state their identity and contact details in the
+  privacy policy (FADP art. 19 para. 2 lit. a; GDPR art. 13). These details become public.
+- The GDPR presumably applies in addition, because the service targets people in the EU (GDPR
+  art. 3 para. 2).
+- Whether an EU representative under GDPR art. 27 is required must be checked; exceptions apply to
+  occasional, low-risk processing.
+- The terms of use need a disclaimer for links to third-party software and a reporting procedure.
+- AGPL-3.0: the hosted version must link to its source code (footer).
 
-| Thema | Bis |
-|---|---|
-| Hosting-Anbieter (Schweiz/EU) und Objektspeicher | Phase 8 |
-| Ob Dependabot für private Repos kostenlos verfügbar ist | AP 0.6 |
-| Upgrade auf Django 6.2 LTS (geplant April 2027) | nach Release |
-| Wechsel auf TypeScript 7, sobald typescript-eslint es unterstützt | laufend |
+Sources: [FADP (Fedlex)](https://www.fedlex.admin.ch/eli/cc/2022/491/de) ·
+[GDPR (EUR-Lex)](https://eur-lex.europa.eu/eli/reg/2016/679/oj)
+
+## Technical
+
+| # | Topic | Due |
+|---|---|---|
+| O | Shared Django cache for allauth rate limits (the default per-process memory cache is insufficient with several processes), e.g. the database cache | before phase 3B / beta |
+| P | Behind the TLS proxy, the SSR server must see the public origin (host and `https`), because React Router rejects actions whose `Origin` does not match the request URL. Configure via a custom server with trusted proxy headers or `allowedActionOrigins`, and cover it with an E2E test against the production-like setup | WP 0.5 / phase 8 |
+| Q | Remove `apps.ssr_probe` and the probe routes once the regression tests have moved to the real models | phase 2/3 |
+| – | Hosting provider (Switzerland/EU) and object storage | phase 8 |
+| – | Whether Dependabot is available for free on private repositories | WP 0.6 |
+| – | Upgrade to Django 6.2 LTS (planned for April 2027) | after release |
+| – | Switch to TypeScript 7 once typescript-eslint supports it | ongoing |
+| – | drf-spectacular 0.30.0 and pytest-django 4.14.0 officially declare Django only up to 6.0; they work with 6.1.3 in our tests. Watch on updates | ongoing |

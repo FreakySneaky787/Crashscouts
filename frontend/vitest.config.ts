@@ -1,6 +1,6 @@
 import { defineConfig } from "vitest/config";
 
-// Eigene Konfiguration ohne React-Router-Vite-Plugin: Unit-Tests für Hilfsfunktionen.
+// Separate config without the React Router Vite plugin: unit tests for helper functions.
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,

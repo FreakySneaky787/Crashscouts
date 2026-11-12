@@ -1,5 +1,5 @@
-"""Produktions-Einstellungen werden in einem separaten Prozess geprüft,
-damit die Test-Einstellungen dieses Prozesses unberührt bleiben."""
+"""Production settings are checked in a separate process so that this process's test settings
+stay untouched."""
 
 import json
 import os
@@ -11,7 +11,7 @@ import pytest
 
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 
-# Nur für diesen Test generierter, zufälliger Wert (kein echtes Geheimnis).
+# Random value generated for this test only (not a real secret).
 VALID_KEY = "x" * 10 + os.urandom(32).hex()
 
 PROBE = """
@@ -108,10 +108,10 @@ def test_prod_refuses_to_start_without_allowed_hosts():
 
 
 def test_prod_deploy_check_has_only_documented_warnings():
-    """`manage.py check --deploy` darf nur die bewusst offenen HSTS-Domain-Warnungen melden.
+    """`manage.py check --deploy` may only report the deliberately open HSTS domain warnings.
 
-    security.W005 (includeSubDomains) und security.W021 (preload) bleiben offen, bis die
-    Domain feststeht (siehe config/settings/prod.py).
+    security.W005 (includeSubDomains) and security.W021 (preload) stay open until the domain
+    is decided (see config/settings/prod.py).
     """
     env = {**os.environ, **_prod_env(), "DJANGO_SETTINGS_MODULE": "config.settings.prod"}
     result = subprocess.run(

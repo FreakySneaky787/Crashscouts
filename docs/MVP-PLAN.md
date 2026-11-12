@@ -1,126 +1,146 @@
-# MVP-Plan (Kern-MVP)
+# MVP Plan (core MVP)
 
-> Stand: 2026-11-12 · Status: **freigegeben**
+> As of: 2026-11-12 · Status: **approved**
 >
-> Vor Beginn wird jedes Arbeitspaket (AP) detailliert: Ziel, Anforderungen, betroffene Komponenten, Umsetzung, Abhängigkeiten, Akzeptanzkriterien, Tests und Definition of Done.
-> Offene Produktfragen werden vorher geklärt ([`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)). Der aktuelle Fortschritt steht in [`STATUS.md`](STATUS.md).
+> Before it starts, every work package (WP) is detailed: goal, requirements, affected components,
+> implementation, dependencies, acceptance criteria, tests and definition of done.
+> Open product questions are clarified first ([`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)). Current
+> progress is tracked in [`STATUS.md`](STATUS.md).
 
-## Abweichung von der ursprünglichen Phasenreihenfolge
+## Deviation from the original phase order
 
-Die Phasen aus dem Master-Prompt wurden mit Zustimmung umgeordnet:
+The phases from the master prompt were reordered with the project owner's approval:
 
-- Feed, Following, Diskussionen und Empfehlungen kommen **nach** der Closed Beta.
-- Die **Moderations-Grundlagen** kommen **vor** öffentliche Kampagnen (Sicherheits-Gate, Phase 3B).
-- Grund: Externe Download-Links zu unbekannter Software sind der grösste Missbrauchsweg. Schutzmassnahmen dürfen nicht hinter den Funktionen herhinken, die sie absichern.
+- Feed, following, discussions and recommendations come **after** the closed beta.
+- The **moderation basics** come **before** public campaigns (security gate, phase 3B).
+- Reason: external download links to unknown software are the biggest abuse vector. Protective
+  measures must not lag behind the features they protect.
 
 ## Phase 0 – Foundation
 
-| AP | Inhalt | Akzeptanzkriterium |
+| WP | Content | Acceptance criterion |
 |---|---|---|
-| 0.1 | Repo anbinden, Umgebung prüfen | Bericht: was läuft, welche Versionen |
-| 0.2 | Doku-Grundgerüst, ADR 0001–0006, `CLAUDE.md`, `LICENSE`, Repo-Grundlagen | Doku entspricht dem Plan; gitleaks findet nichts |
-| 0.3 | Backend-Skelett: Django 6.1, Custom-User, Settings-Aufteilung, Health-Endpunkt, OpenAPI, pytest | `pytest` grün gegen PostgreSQL 18 |
-| 0.4 | Frontend-Skelett und **SSR-Auth-Durchstich** (siehe unten) | alle 6 SSR-Kriterien automatisiert grün |
-| 0.5 | Dev-Container und Compose, Setup-Skript für die Claude-Cloud-Umgebung | Start in Codespaces und in der Cloud-Sitzung dokumentiert und verifiziert |
-| 0.6 | CI: Lint, Typecheck, Tests, gitleaks, Audits, Schema-Check; Dependabot; pre-commit | CI grün |
-| 0.7 | Playwright-Grundgerüst mit Smoke-Test | E2E-Smoke-Test in CI grün |
+| 0.1 | Attach repository, inspect environment | Report: what runs, which versions |
+| 0.2 | Documentation skeleton, ADRs 0001–0006, `CLAUDE.md`, `LICENSE`, repository basics | Docs match the plan; gitleaks finds nothing |
+| 0.3 | Backend skeleton: Django 6.1, custom user, split settings, health endpoint, OpenAPI, pytest | `pytest` green against PostgreSQL 18 |
+| 0.4 | Frontend skeleton and **SSR auth spike** (see below) | all six SSR criteria green, automated |
+| 0.5 | Dev container and Compose, setup script for the Claude cloud environment | startup in Codespaces and in a cloud session documented and verified |
+| 0.6 | CI: lint, typecheck, tests, gitleaks, audits, schema check; Dependabot; pre-commit | CI green |
+| 0.7 | Playwright skeleton with smoke test | E2E smoke test green in CI (largely pulled forward into WP 0.4) |
 
-### AP 0.4 – SSR-Auth-Durchstich: Abnahmekriterien
+### WP 0.4 – SSR auth spike: acceptance criteria
 
-Neben React Router SSR, TypeScript 6, i18n, `brand.ts` und Vitest gehören dazu ein minimaler allauth-Login (E-Mail und Passwort) und eine ⚑ **test-only-Probe-App** mit einem öffentlichen und einem privaten Probe-Objekt. Die Probe-App wird in der Produktion nicht installiert, damit das echte Datenmodell nicht vorzeitig festgelegt wird.
+Besides React Router SSR, TypeScript 6, i18n, `brand.ts` and Vitest, the spike includes a minimal
+allauth login (username and password) and a ⚑ **test-only probe app** with one public and one
+private probe object. The probe app is never installed in production, so the real data model is
+not fixed prematurely.
 
-1. Eine öffentliche Seite wird serverseitig gerendert.
-2. Ein angemeldeter Nutzer öffnet eine geschützte Seite.
-3. Die Session bleibt über mehrere Navigationen und einen Reload erhalten; `Set-Cookie` und CSRF funktionieren bei Login, Logout und einer schreibenden Aktion.
-4. Ein privates Objekt liefert Fremden und Anonymen **404**, sowohl über SSR als auch über die API.
-5. Private SSR-Antworten tragen `Cache-Control: private, no-store` und `Vary: Cookie`; öffentliche anonyme Seiten setzen keine Session-Cookies.
-6. `curl` ohne JavaScript erhält vollständiges HTML mit Titel und Open-Graph-Tags.
+1. A public page is server-side rendered.
+2. A signed-in user opens a protected page.
+3. The session survives several navigations and a reload; `Set-Cookie` and CSRF work for login,
+   logout and a write action.
+4. A private object returns **404** to strangers and anonymous users, via SSR and via the API.
+5. Private SSR responses carry `Cache-Control: private, no-store` and `Vary: Cookie`; public
+   anonymous pages set no session cookies.
+6. `curl` without JavaScript receives complete HTML with title and Open Graph tags.
 
-**Erst dann gilt die SSR-Architektur als validiert.** Schlägt etwas fehl, wird gestoppt und es werden Alternativen vorgelegt. Die Tests werden in Phase 2 und 3 auf die echten Modelle übertragen und bleiben als Regressionstests bestehen.
+**Only then does the SSR architecture count as validated.** If anything fails, work stops and
+alternatives are presented. The tests are moved to the real models in phases 2 and 3 and remain as
+regression tests.
+
+**Result (2026-11-12): all six criteria pass** – see [`STATUS.md`](STATUS.md).
 
 ## Phase 1 – Accounts
 
-- Registrierung (16+), E-Mail-Verifizierung, Login und Logout, Passwort-Reset.
-- GitHub-Login.
-- Optionale 2FA (TOTP, Passkeys, Recovery-Codes).
-- Profil und Privatsphäre-Einstellungen.
-- ⚑ Konto löschen und Daten exportieren.
-- Grundlage für das Audit-Log.
-- **Vorher zu klären:** visuelle Richtung (E) und E-Mail-Versand (F).
+- Signup (16+), email verification, login and logout, password reset.
+- GitHub login.
+- Optional 2FA (TOTP, passkeys, recovery codes).
+- Profile and privacy settings.
+- ⚑ Account deletion and data export.
+- Audit log foundation.
+- **To clarify first:** visual direction (E) and email delivery (F).
 
 ## Phase 2 – Projects
 
-- Projekte anlegen und bearbeiten.
-- Taxonomien, SPDX-Lizenz mit Kennzeichnung „Open Source" oder „Proprietär".
-- Maintainer verwalten.
-- Screenshots über eine sichere Upload-Pipeline.
-- Repository-Verifizierung (B).
-- Öffentliche SSR-Projektseite mit Meta-Tags und Open-Graph-Tags.
+- Create and edit projects.
+- Taxonomies, SPDX license with "open source" or "proprietary" label.
+- Manage maintainers.
+- Screenshots through a secure upload pipeline.
+- Repository verification (B).
+- Public SSR project page with meta and Open Graph tags.
 
-## Phase 3A – Campaigns (öffentliche Sichtbarkeit gesperrt)
+## Phase 3A – Campaigns (public visibility locked)
 
-- Private Kampagnen vollständig; öffentliche Kampagnen nur als Entwurf.
-- Statusmaschine (C).
-- Download-Links mit Warnseite.
-- Einladungen.
-- Teilnahme direkt oder nach Freigabe.
-- Minimale Benachrichtigungen.
-- Feature-Flag `PUBLIC_CAMPAIGNS_ENABLED=false`, serverseitig erzwungen und getestet.
+- Private campaigns complete; public campaigns as drafts only.
+- Status machine (C).
+- Download links with interstitial warning page.
+- Invitations.
+- Participation directly or after approval.
+- Minimal notifications.
+- Feature flag `PUBLIC_CAMPAIGNS_ENABLED=false`, enforced server-side and tested.
 
-## Phase 3B – Sicherheits-Gate (Pflicht vor jeder öffentlichen Kampagne)
+## Phase 3B – Security gate (mandatory before any public campaign)
 
-Das Gate ist erst erfüllt, wenn **alle** Punkte implementiert und getestet sind. Erst danach wird das Flag umgeschaltet, und zwar nur durch den Projektverantwortlichen.
+The gate is met only when **all** items are implemented and tested. Only then is the flag switched,
+and only by the project owner.
 
-1. **Melden:** Projekte, Kampagnen und einzelne Download-Links (Grund, Freitext, Ratelimit). Auch Eingeladene in privaten Kampagnen können melden.
-2. **Sperren durch Admin:** Kampagnen und Projekte sind sofort verborgen, und Links werden nicht mehr ausgeliefert, auch nicht an Teilnehmende. Die Sperre ist begründet, protokolliert und reversibel.
-3. **Rate Limiting** pro Nutzer und IP für Login, Registrierung, Reset, Meldungen, Kampagnen-Erstellung, Einladungen und Uploads; getestet.
-4. **Verifizierte E-Mail** ist Pflicht für das Erstellen von Kampagnen und für Meldungen.
-5. **Kontrollierte Freigabe:** Jede neue öffentliche Kampagne läuft über eine Prüfqueue. ⚑ Änderungen an Download-Links einer freigegebenen Kampagne lösen eine erneute Prüfung aus.
-6. **Moderationsablauf:** Queue mit den Status offen, in Prüfung, erledigt und abgewiesen; Aktionen ausblenden, sperren und verwarnen; Rückmeldung an die meldende Person; Audit-Log; Moderationsseiten in der App.
-7. Wartezeit- und 2FA-Regel für Owner öffentlicher Kampagnen (A).
-8. E2E-Test „Missbrauchsfall": einreichen, prüfen, freigeben, Link melden, sperren; danach ist der Link nicht mehr erreichbar.
+1. **Reporting:** projects, campaigns and individual download links (reason, free text, rate
+   limit). Invitees of private campaigns can report too.
+2. **Blocking by admins:** campaigns and projects are hidden immediately, and links are no longer
+   served, not even to participants. The block has a reason, is logged and is reversible.
+3. **Rate limiting** per user and IP for login, signup, reset, reports, campaign creation,
+   invitations and uploads; tested.
+4. **Verified email** is required to create campaigns and to report.
+5. **Controlled approval:** every new public campaign goes through a review queue. ⚑ Changes to
+   the download links of an approved campaign trigger a new review.
+6. **Moderation workflow:** queue with the statuses open, in review, resolved and dismissed;
+   actions hide, block and warn; feedback to the reporter; audit log; moderation pages in the app.
+7. Waiting-period and 2FA rule for owners of public campaigns (A).
+8. E2E test "abuse case": submit, review, approve, report link, block; afterwards the link is no
+   longer reachable.
 
 ## Phase 4 – Testing
 
-- Testaufgaben für die Methoden frei, strukturiert und kombiniert.
-- Fortschritt pro Teilnahme.
-- Übersicht für Maintainer.
+- Test tasks for the free, structured and combined methods.
+- Progress per participation.
+- Overview for maintainers.
 
 ## Phase 5 – Feedback
 
-- Fünf Typen mit typspezifischen Feldern.
-- Sichere Anhänge.
-- Statusworkflow.
-- Standardmässig privat, einzeln veröffentlichbar.
-- Maintainer-Inbox.
+- Five types with type-specific fields.
+- Secure attachments.
+- Status workflow.
+- Private by default, publishable individually.
+- Maintainer inbox.
 
 ## Phase 6 – Discover
 
-- PostgreSQL-Volltextsuche mit Filtern.
-- Fairnessregel: Standard-Sortierung neu oder aktiv statt Popularität.
+- PostgreSQL full-text search with filters.
+- Fairness rule: default sort by new or active instead of popularity.
 
-## Phase 7 – Moderation ausbauen und Sicherheitsreview
+## Phase 7 – Extend moderation and security review
 
-- Melden von Nutzern und veröffentlichtem Feedback.
-- Kontosperren mit Fristen, Einsprüche.
-- Mehrere Moderatoren mit zweckgebundenem, protokolliertem Zugriff.
-- Statistiken.
-- Sicherheitsreview nach OWASP ASVS Level 1.
+- Reporting of users and published feedback.
+- Account suspensions with deadlines, appeals.
+- Several moderators with purpose-bound, logged access.
+- Statistics.
+- Security review against OWASP ASVS level 1.
 
-## Phase 8 – Release (Closed Beta)
+## Phase 8 – Release (closed beta)
 
-- Integrations-, Performance- und Barrierefreiheitsprüfung.
-- Rechtstexte und juristische Prüfung.
-- Hosting-Entscheidung und Produktions-Setup.
-- Getestete Backup-Wiederherstellung.
-- Repo öffentlich schalten.
-- Closed Beta.
+- Integration, performance and accessibility testing.
+- Legal texts and legal review.
+- Hosting decision and production setup.
+- Tested backup restore.
+- Make the repository public.
+- Closed beta.
 
-## Abnahmekriterien Kern-MVP
+## Acceptance criteria for the core MVP
 
-- Alle Kernabläufe sind als E2E-Tests in CI grün.
-- Die Berechtigungsmatrix ist vollständig getestet, inklusive Negativfällen für private Kampagnen und privates Feedback.
-- Keine offenen hohen oder kritischen Befunde aus Audits und dem ASVS-L1-Review.
-- Die Backup-Wiederherstellung ist dokumentiert getestet.
-- Rechtstexte sind vorhanden und geprüft.
-- `STATUS.md` und die Doku entsprechen der Implementierung.
+- All core flows are green as E2E tests in CI.
+- The permission matrix is fully tested, including negative cases for private campaigns and
+  private feedback.
+- No open high or critical findings from audits and the ASVS L1 review.
+- Backup restore is tested and documented.
+- Legal texts exist and have been reviewed.
+- `STATUS.md` and the documentation match the implementation.

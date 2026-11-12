@@ -1,27 +1,30 @@
-# 0005 – TypeScript 6.0 statt 7.0
+# 0005 – TypeScript 6.0 instead of 7.0
 
-- Status: Akzeptiert
-- Datum: 2026-11-12
+- Status: Accepted
+- Date: 2026-11-12
 
-## Kontext
+## Context
 
-Am 2026-11-12 ist TypeScript 7.0.2 die neueste Version (`latest`). Das Linting-Paket `typescript-eslint` 8.72.2 deklariert als Peer-Abhängigkeit aber `typescript >=4.8.4 <6.1.0`. Die neueste unterstützte Version ist TypeScript 6.0.3.
+On 2026-11-12, TypeScript 7.0.2 is the latest version (`latest`). The linting package
+`typescript-eslint` 8.72.2, however, declares the peer dependency `typescript >=4.8.4 <6.1.0`.
+The newest supported version is TypeScript 6.0.3.
 
-## Entscheidung
+## Decision
 
-- TypeScript **6.0.x**, fixiert per Lockfile.
-- Gewechselt wird erst, wenn `typescript-eslint` TypeScript 7 offiziell unterstützt.
+- TypeScript **6.0.x**, pinned via the lockfile (`~6.0.3`).
+- Switch only once `typescript-eslint` officially supports TypeScript 7.
 
-## Alternativen
+## Alternatives
 
-- **TypeScript 7 ohne typed linting:** Wichtige Sicherheits- und Qualitätsregeln würden fehlen.
-- **TypeScript 7 mit erzwungener Peer-Abhängigkeit:** nicht unterstützt und damit unvorhersehbar.
+- **TypeScript 7 without typed linting:** important security and quality rules would be missing.
+- **TypeScript 7 with a forced peer dependency:** unsupported and therefore unpredictable.
 
-## Konsequenzen
+## Consequences
 
-- Verbesserungen aus TypeScript 7 fehlen vorerst.
-- Ein Wechsel wird regelmässig geprüft (siehe [`OPEN-QUESTIONS.md`](../OPEN-QUESTIONS.md)).
+- Improvements from TypeScript 7 are not available for now.
+- A switch is checked regularly (see [`OPEN-QUESTIONS.md`](../OPEN-QUESTIONS.md)).
 
-## Quellen
+## Sources
 
-- npm-Registry, abgefragt am 2026-11-12: [typescript](https://www.npmjs.com/package/typescript), [typescript-eslint](https://www.npmjs.com/package/typescript-eslint).
+- npm registry, queried on 2026-11-12: [typescript](https://www.npmjs.com/package/typescript),
+  [typescript-eslint](https://www.npmjs.com/package/typescript-eslint).

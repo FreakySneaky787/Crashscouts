@@ -39,7 +39,7 @@ export async function action({ request }: Route.ActionArgs) {
   if (result.status === 200) {
     throw redirect(next, { headers });
   }
-  // 400 = falsche Zugangsdaten, 403 = CSRF-Prüfung fehlgeschlagen. Keine weiteren Details preisgeben.
+  // 400 = wrong credentials, 403 = CSRF check failed. Reveal no further details.
   return data(
     { error: result.status === 403 ? "forbidden" : "invalid" },
     { status: result.status === 403 ? 403 : 400, headers },

@@ -4,7 +4,7 @@ import type { Route } from "./+types/logout";
 import { AUTH_BASE, backendFetch } from "~/lib/backend.server";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 
-// Abmelden nur per POST mit CSRF-Token – ein GET (z. B. ein eingebettetes Bild) meldet niemanden ab.
+// Logout only via POST with a CSRF token – a GET (e.g. an embedded image) never logs anyone out.
 export function loader() {
   throw redirect("/", { headers: privateNoStoreHeaders() });
 }
@@ -18,6 +18,6 @@ export async function action({ request }: Route.ActionArgs) {
   if (result.status === 403) {
     throw new Response("Forbidden", { status: 403, headers: privateNoStoreHeaders() });
   }
-  // allauth antwortet nach erfolgreichem Logout mit 401 und löscht das Session-Cookie.
+  // After a successful logout allauth answers 401 and clears the session cookie.
   throw redirect("/", { headers: setCookieHeaders(result.setCookies, privateNoStoreHeaders()) });
 }

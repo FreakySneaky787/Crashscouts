@@ -1,4 +1,4 @@
-"""Lokale Entwicklung. NIEMALS in Produktion verwenden."""
+"""Local development. NEVER use in production."""
 
 from .base import *  # noqa: F403
 from .base import REST_FRAMEWORK
@@ -6,7 +6,7 @@ from .env import env_list, env_str
 
 DEBUG = True
 
-# Absichtlich offensichtlich unsicherer, nicht geheimer Entwicklungsschlüssel.
+# Deliberately, obviously insecure and non-secret development key.
 SECRET_KEY = env_str("DJANGO_SECRET_KEY", "dev-only-insecure-key-do-not-use-in-production")
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])

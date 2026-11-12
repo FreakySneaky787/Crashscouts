@@ -5,7 +5,7 @@ from apps.core.models import BaseModel
 
 
 class ProbeItem(BaseModel):
-    """Platzhalter-Objekt: öffentlich für alle sichtbar oder privat nur für den Eigentümer."""
+    """Placeholder object: public for everyone, or private and visible to its owner only."""
 
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=500, blank=True)

@@ -1,6 +1,6 @@
 /**
- * SSR-Auth-Durchstich (AP 0.4): die 6 Abnahmekriterien aus docs/MVP-PLAN.md.
- * Die SSR-Architektur gilt erst als validiert, wenn alle Tests hier grün sind.
+ * SSR auth spike (WP 0.4): the six acceptance criteria from docs/MVP-PLAN.md.
+ * The SSR architecture only counts as validated when every test in this file passes.
  */
 import { execFileSync } from "node:child_process";
 
@@ -10,7 +10,7 @@ const BACKEND_URL = "http://127.0.0.1:8000";
 
 const env = (name: string): string => {
   const value = process.env[name];
-  if (!value) throw new Error(`${name} fehlt (global-setup.ts)`);
+  if (!value) throw new Error(`${name} is missing (global-setup.ts)`);
   return value;
 };
 
@@ -27,7 +27,7 @@ async function login(page: Page, user: { username: string; password: string }) {
   await expect(page).toHaveURL(/\/account$/);
 }
 
-/** Sammelt CSP-Verstösse und JavaScript-Fehler; am Testende muss die Liste leer sein. */
+/** Collects CSP violations and JavaScript errors; the list must be empty at the end of a test. */
 function watchConsole(page: Page): string[] {
   const problems: string[] = [];
   page.on("console", (message) => {
@@ -44,13 +44,13 @@ async function loggedInPage(browser: Browser, user: { username: string; password
   return { context, page };
 }
 
-test("(1) eine öffentliche Seite wird serverseitig gerendert", async ({ browser, request }) => {
+test("(1) a public page is server-side rendered", async ({ browser, request }) => {
   const response = await request.get(publicPath());
   expect(response.status()).toBe(200);
   const html = await response.text();
   expect(html).toContain("<h1>Public probe item</h1>");
 
-  // Auch ohne JavaScript ist der Inhalt vollständig sichtbar.
+  // The content is fully visible even without JavaScript.
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(publicPath());
@@ -58,10 +58,10 @@ test("(1) eine öffentliche Seite wird serverseitig gerendert", async ({ browser
   await context.close();
 });
 
-test("(2) ein angemeldeter Nutzer öffnet eine geschützte Seite", async ({ page }) => {
+test("(2) a signed-in user opens a protected page", async ({ page }) => {
   const problems = watchConsole(page);
 
-  // Anonym: Weiterleitung zum Login.
+  // Anonymous: redirected to the login page.
   await page.goto("/account");
   await expect(page).toHaveURL(/\/login\?next=%2Faccount$|\/login\?next=\/account$/);
 
@@ -70,16 +70,16 @@ test("(2) ein angemeldeter Nutzer öffnet eine geschützte Seite", async ({ page
   expect(problems).toEqual([]);
 });
 
-test("(3) Session bleibt erhalten; Set-Cookie und CSRF funktionieren", async ({ page, context }) => {
+test("(3) the session persists; Set-Cookie and CSRF work", async ({ page, context }) => {
   const problems = watchConsole(page);
   await login(page, owner());
 
-  // Set-Cookie beim Login wurde vom SSR-Server korrekt weitergegeben.
+  // The Set-Cookie from login was passed on correctly by the SSR server.
   const session = (await context.cookies()).find((c) => c.name === "sessionid");
   expect(session?.httpOnly).toBe(true);
   expect(session?.sameSite).toBe("Lax");
 
-  // Mehrere Navigationen (clientseitig) und ein Reload.
+  // Several (client-side) navigations and a reload.
   await page.getByRole("link", { name: "Home" }).click();
   await expect(page).toHaveURL(/\/$/);
   await page.getByRole("link", { name: "Account" }).click();
@@ -87,10 +87,10 @@ test("(3) Session bleibt erhalten; Set-Cookie und CSRF funktionieren", async ({ 
   await page.reload();
   await expect(page.getByTestId("signed-in-as")).toHaveText("Signed in as probe-owner");
 
-  // Schreibende Aktion mit CSRF-Token.
+  // Write action with CSRF token.
   await page.goto(privatePath());
   const counter = page.getByTestId("touch-count");
-  let before = Number((await counter.textContent())?.match(/\d+/)?.[0]);
+  const before = Number((await counter.textContent())?.match(/\d+/)?.[0]);
   await page.getByRole("button", { name: "Touch" }).click();
   await expect(counter).toHaveText(`Touched ${before + 1} times`);
   await page.reload();
@@ -123,10 +123,8 @@ test("(3) Session bleibt erhalten; Set-Cookie und CSRF funktionieren", async ({ 
   expect(trustedOriginDirect.status()).toBe(200);
   await page.reload();
   await expect(counter).toHaveText(`Touched ${before + 2} times`);
-  before += 1;
-  await expect(counter).toHaveText(`Touched ${before + 1} times`);
 
-  // Logout: Session-Cookie wird gelöscht, geschützte Seite ist wieder gesperrt.
+  // Logout: the session cookie is removed and the protected page is locked again.
   await page.goto("/account");
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(/\/$/);
@@ -137,19 +135,19 @@ test("(3) Session bleibt erhalten; Set-Cookie und CSRF funktionieren", async ({ 
   expect(problems).toEqual([]);
 });
 
-test("(4) ein privates Objekt ist für Fremde und Anonyme nicht abrufbar", async ({
+test("(4) a private object is not retrievable for strangers and anonymous users", async ({
   browser,
   request,
 }) => {
   const apiPath = `${BACKEND_URL}/api/v1/probe/items/${env("PROBE_PRIVATE_ID")}/`;
 
-  // Anonym – SSR und API.
+  // Anonymous – SSR and API.
   const anonymousSsr = await request.get(privatePath());
   expect(anonymousSsr.status()).toBe(404);
   expect(await anonymousSsr.text()).not.toContain("Private probe item");
   expect((await request.get(apiPath)).status()).toBe(404);
 
-  // Fremder Nutzer – SSR und API (mit seinen eigenen Cookies).
+  // Another user – SSR and API (with their own cookies).
   const { context, page } = await loggedInPage(browser, stranger());
   const strangerSsr = await page.goto(privatePath());
   expect(strangerSsr?.status()).toBe(404);
@@ -157,7 +155,7 @@ test("(4) ein privates Objekt ist für Fremde und Anonyme nicht abrufbar", async
   const strangerApi = await context.request.get(apiPath);
   expect(strangerApi.status()).toBe(404);
 
-  // Kontrolle: Der Eigentümer sieht es.
+  // Control: the owner can see it.
   const ownerSession = await loggedInPage(browser, owner());
   const ownerSsr = await ownerSession.page.goto(privatePath());
   expect(ownerSsr?.status()).toBe(200);
@@ -166,11 +164,11 @@ test("(4) ein privates Objekt ist für Fremde und Anonyme nicht abrufbar", async
   await ownerSession.context.close();
 });
 
-test("(5) private Antworten werden nicht gecacht, öffentliche setzen keine Cookies", async ({
+test("(5) private responses are not cached; public ones set no cookies", async ({
   browser,
   request,
 }) => {
-  // Anonym, öffentlich: cachebar und ohne Set-Cookie.
+  // Anonymous, public: cacheable and without Set-Cookie.
   for (const path of ["/", publicPath()]) {
     const response = await request.get(path);
     expect(response.status()).toBe(200);
@@ -181,7 +179,7 @@ test("(5) private Antworten werden nicht gecacht, öffentliche setzen keine Cook
     );
   }
 
-  // Angemeldet: alles privat und nicht speicherbar – auch die öffentliche Seite.
+  // Signed in: everything private and not storable – including the public page.
   const { context, page } = await loggedInPage(browser, owner());
   for (const path of ["/account", privatePath(), publicPath(), "/"]) {
     const response = await page.goto(path);
@@ -189,14 +187,14 @@ test("(5) private Antworten werden nicht gecacht, öffentliche setzen keine Cook
     expect(headers["cache-control"], path).toBe("private, no-store");
     expect(headers["vary"], path).toContain("Cookie");
   }
-  // Fehlerseiten ebenfalls.
+  // Error pages too.
   const notFound = await page.goto("/probe/private/not-a-uuid");
   expect(notFound?.status()).toBe(404);
   expect(notFound?.headers()["cache-control"]).toBe("private, no-store");
   await context.close();
 });
 
-test("(6) curl ohne JavaScript erhält vollständiges HTML mit Titel und Open-Graph-Tags", () => {
+test("(6) curl without JavaScript receives complete HTML with title and Open Graph tags", () => {
   const url = `http://127.0.0.1:3000${publicPath()}`;
   const html = execFileSync("curl", ["-sS", "--fail", url], { encoding: "utf-8" });
 
@@ -209,7 +207,7 @@ test("(6) curl ohne JavaScript erhält vollständiges HTML mit Titel und Open-Gr
   expect(html).toContain("<h1>Public probe item</h1>");
 });
 
-test("Sicherheits-Header und CSP sind im Produktions-Build gesetzt", async ({ request }) => {
+test("security headers and CSP are set in the production build", async ({ request }) => {
   const response = await request.get("/");
   const headers = response.headers();
   expect(headers["content-security-policy"]).toMatch(/script-src 'self' 'nonce-[A-Za-z0-9+/=]+'/);
@@ -219,12 +217,12 @@ test("Sicherheits-Header und CSP sind im Produktions-Build gesetzt", async ({ re
   expect(headers["x-content-type-options"]).toBe("nosniff");
   expect(headers["referrer-policy"]).toBe("same-origin");
 
-  // Jede Antwort hat eine neue Nonce.
+  // Every response gets a fresh nonce.
   const again = (await request.get("/")).headers()["content-security-policy"];
   expect(again).not.toBe(headers["content-security-policy"]);
 });
 
-test("Logout per GET ist nicht möglich", async ({ browser }) => {
+test("logout via GET is not possible", async ({ browser }) => {
   const { context, page } = await loggedInPage(browser, owner());
   await page.goto("/logout");
   await page.goto("/account");

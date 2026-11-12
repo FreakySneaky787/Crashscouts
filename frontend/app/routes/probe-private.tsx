@@ -14,7 +14,7 @@ function notFound(): never {
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   if (!isUuid(params.id)) notFound();
-  // Django entscheidet: Fremde und Anonyme erhalten 404 (Existenz wird nicht verraten).
+  // Django decides: strangers and anonymous users get 404 (existence is not revealed).
   const result = await backendFetch<ProbeItem>(request, `/api/v1/probe/items/${params.id}/`);
   if (result.status !== 200 || !result.data) notFound();
 

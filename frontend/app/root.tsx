@@ -46,7 +46,7 @@ function Navigation() {
 }
 
 export default function App() {
-  // Eine i18n-Instanz pro Render-Baum: auf dem Server also pro Anfrage.
+  // One i18n instance per render tree, i.e. per request on the server.
   const [i18n] = useState(() => createI18n());
   return (
     <I18nextProvider i18n={i18n}>
@@ -63,7 +63,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const notFound = isRouteErrorResponse(error) && error.status === 404;
   const title = i18n.t(notFound ? "error.notFoundTitle" : "error.genericTitle");
   const message = i18n.t(notFound ? "error.notFound" : "error.generic");
-  // Technische Details (Stacktrace) nur im Dev-Server, nie im Produktions-Build.
+  // Technical details (stack trace) only in the dev server, never in the production build.
   const stack = import.meta.env.DEV && error instanceof Error ? error.stack : undefined;
 
   return (

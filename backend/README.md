@@ -1,32 +1,34 @@
 # Backend (Django)
 
-Python 3.14 · Django 6.1 · Django REST Framework · drf-spectacular · PostgreSQL 18 · Paketverwaltung mit [uv](https://docs.astral.sh/uv/)
+Python 3.14 · Django 6.1 · Django REST Framework · drf-spectacular · django-allauth (headless) ·
+PostgreSQL 18 · package management with [uv](https://docs.astral.sh/uv/)
 
-## Struktur
+## Layout
 
 ```
 backend/
-├── config/            Projektkonfiguration
-│   ├── settings/      base.py (gemeinsam), dev.py, test.py, prod.py, env.py (Env-Helfer)
+├── config/            project configuration
+│   ├── settings/      base.py (shared), dev.py, test.py, prod.py, env.py (env helpers)
 │   └── urls.py
 ├── apps/
-│   ├── core/          Basismodelle (UUIDv4, Zeitstempel), Health-Endpunkt
-│   └── accounts/      eigenes User-Modell (UUIDv4-Primärschlüssel)
-├── conftest.py        gemeinsame pytest-Fixtures
-└── pyproject.toml     Abhängigkeiten (gesperrt in uv.lock), pytest- und Ruff-Konfiguration
+│   ├── core/          base models (UUIDv4, timestamps), health endpoint
+│   ├── accounts/      custom user model (UUIDv4 primary key), allauth tests
+│   └── ssr_probe/     TEST ONLY: probe objects for the SSR spike (never installed in production)
+├── conftest.py        shared pytest fixtures
+└── pyproject.toml     dependencies (locked in uv.lock), pytest and Ruff configuration
 ```
 
-Tests liegen bei ihrem Modul (`apps/<app>/tests/`).
+Tests live next to their module (`apps/<app>/tests/`).
 
-## Lokal starten
+## Running locally
 
-Voraussetzungen: Docker und uv. Die Befehle laufen im Repository-Wurzelverzeichnis bzw. in `backend/`.
+Prerequisites: Docker and uv. Commands run in the repository root or in `backend/`.
 
 ```bash
 cp .env.example .env
 ```
 
-In `.env` ein lokales `POSTGRES_PASSWORD` setzen. Die Datei wird von Git ignoriert.
+Set a local `POSTGRES_PASSWORD` in `.env`. The file is ignored by Git.
 
 ```bash
 docker compose up -d db
@@ -44,9 +46,9 @@ uv run --env-file ../.env python manage.py migrate
 uv run --env-file ../.env python manage.py runserver 127.0.0.1:8000
 ```
 
-Danach antwortet `http://127.0.0.1:8000/api/v1/health/` mit `{"status": "ok", "checks": {"database": "ok"}}`.
+Afterwards `http://127.0.0.1:8000/api/v1/health/` answers `{"status": "ok", "checks": {"database": "ok"}}`.
 
-## Prüfen
+## Checks
 
 ```bash
 uv run --env-file ../.env pytest
@@ -60,16 +62,25 @@ uv run ruff check . && uv run ruff format --check .
 uv run --env-file ../.env python manage.py spectacular --validate --fail-on-warn --file /tmp/openapi.yaml
 ```
 
-Die Tests laufen gegen **echtes PostgreSQL** (nicht SQLite). Die Datenbank aus `compose.yaml` muss laufen.
+Tests run against a **real PostgreSQL** (not SQLite); the database from `compose.yaml` must be
+running.
 
-## Einstellungen
+## Settings
 
-| Modul | Zweck |
+| Module | Purpose |
 |---|---|
-| `config.settings.dev` | Standard für `manage.py`. `DEBUG` an, Browsable API und Schema-Endpunkt `/api/v1/schema/` aktiv |
-| `config.settings.test` | Standard für pytest. `DEBUG` aus, kein Schema-Endpunkt |
-| `config.settings.prod` | Standard für WSGI/ASGI. Startet **nicht** ohne `DJANGO_SECRET_KEY` (≥ 50 Zeichen, kein Entwicklungsschlüssel) und `DJANGO_ALLOWED_HOSTS`; erzwingt sichere Cookies, HTTPS-Weiterleitung und HSTS |
+| `config.settings.dev` | Default for `manage.py`. `DEBUG` on, browsable API and schema endpoint `/api/v1/schema/`, SSR probe installed, CSRF trusted origins `http://localhost:5173` and `http://127.0.0.1:5173` (override with `DJANGO_CSRF_TRUSTED_ORIGINS`) |
+| `config.settings.test` | Default for pytest. `DEBUG` off, no schema endpoint, SSR probe installed |
+| `config.settings.prod` | Default for WSGI/ASGI. Refuses to start without `DJANGO_SECRET_KEY` (≥ 50 characters, not a development key) and `DJANGO_ALLOWED_HOSTS`, or if the SSR probe is installed; enforces secure cookies, HTTPS redirect and HSTS |
 
-Die Konfiguration kommt ausschliesslich aus Umgebungsvariablen (siehe `.env.example`), nie aus dem Repository.
+Configuration comes exclusively from environment variables (see `.env.example`), never from the
+repository.
 
-`manage.py check --deploy` meldet mit Produktions-Einstellungen bewusst nur `security.W005` und `security.W021` (HSTS `includeSubDomains` und `preload`). Beides wird erst nach der Wahl der Domain entschieden.
+With production settings, `manage.py check --deploy` deliberately reports only `security.W005` and
+`security.W021` (HSTS `includeSubDomains` and `preload`). Both are decided once the domain is chosen.
+
+## Authentication (current state)
+
+django-allauth in headless mode with the `browser` client only, under `/_allauth/browser/v1/`.
+Only login, logout and the session endpoint are in use; signup is disabled until phase 1 (see
+[ADR 0004](../docs/adr/0004-authentication-with-allauth.md)).

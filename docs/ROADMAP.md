@@ -1,32 +1,34 @@
 # Roadmap
 
-> Stand: 2026-11-12. Nichts davon ist Teil des Kern-MVP. Jeder Punkt braucht vor der Umsetzung eine eigene Klärung und Freigabe.
+> As of: 2026-11-12. None of this is part of the core MVP. Every item needs its own clarification
+> and approval before implementation.
 
-## 1. Kern-MVP bis zur Closed Beta
+## 1. Core MVP up to the closed beta
 
-Siehe [`MVP-PLAN.md`](MVP-PLAN.md), Phasen 0 bis 8.
+See [`MVP-PLAN.md`](MVP-PLAN.md), phases 0 to 8.
 
-## 2. Nach der Closed Beta (Richtung öffentlicher MVP)
+## 2. After the closed beta (towards the public MVP)
 
-Diese Funktionen waren ursprünglich für den MVP vorgesehen und wurden zurückgestellt:
+These features were originally planned for the MVP and have been deferred:
 
-- Home-Feed (chronologisch) und Following.
-- Kommentare, Antworten und Diskussionen.
-- Projekt-Updates und Releases als eigene Objekte.
-- Öffentliche Aktivitäten und Follower im Profil.
-- Reputation und Abzeichen (Helpful Tester, Reliable Tester, Compatibility Expert, Early Contributor, Community Helper); Qualität zählt mehr als Menge.
-- Personalisierte Empfehlungen, mit Fairness für kleine Projekte.
-- Weitere Logins wie Codeberg/Forgejo und GitLab.
-- Öffentlicher MVP.
+- Home feed (chronological) and following.
+- Comments, replies and discussions.
+- Project updates and releases as separate objects.
+- Public activity and followers on profiles.
+- Reputation and badges (Helpful Tester, Reliable Tester, Compatibility Expert, Early Contributor,
+  Community Helper); quality counts more than quantity.
+- Personalized recommendations, with fairness for small projects.
+- Further logins such as Codeberg/Forgejo and GitLab.
+- Public MVP.
 
-## 3. Langfristige Vision (aus dem Master-Prompt)
+## 3. Long-term vision (from the master prompt)
 
-- Integration mit GitHub, GitLab, Forgejo und Codeberg.
-- Automatisches Zusammenbringen passender Tester und Projekte (Tester-Matching).
-- Mehrere Testphasen pro Kampagne.
-- Vergleich verschiedener Releases.
-- Teststatistiken.
-- Öffentliche API.
-- Self-Hosting.
-- Föderation.
-- Mobile Apps.
+- Integration with GitHub, GitLab, Forgejo and Codeberg.
+- Automatic matching of suitable testers and projects (tester matching).
+- Several testing phases per campaign.
+- Comparison of releases.
+- Test statistics.
+- Public API.
+- Self-hosting.
+- Federation.
+- Mobile apps.

@@ -16,9 +16,9 @@ class ProbeItemSerializer(serializers.ModelSerializer):
 
 
 def visible_items(request: Request) -> QuerySet[ProbeItem]:
-    """Zentrale Sichtbarkeitsregel: öffentliche Objekte für alle, private nur für den Eigentümer.
+    """Central visibility rule: public objects for everyone, private ones for the owner only.
 
-    Unsichtbare Objekte führen zu 404 (nicht 403), damit ihre Existenz nicht verraten wird.
+    Invisible objects yield 404 (not 403) so that their existence is not revealed.
     """
     items = ProbeItem.objects.all()
     if request.user.is_authenticated:
@@ -35,7 +35,7 @@ class ProbeItemDetailView(APIView):
 
 
 class ProbeItemTouchView(APIView):
-    """Schreibende Aktion für den CSRF-Test: nur angemeldet und nur auf sichtbaren Objekten."""
+    """Write action for the CSRF test: authenticated users only, visible objects only."""
 
     permission_classes = (IsAuthenticated,)
 

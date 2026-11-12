@@ -1,6 +1,6 @@
-"""Gemeinsame Einstellungen für alle Umgebungen.
+"""Settings shared by all environments.
 
-Sicherheitsrelevante Werte für die Produktion stehen in prod.py und werden dort erzwungen.
+Security-relevant production values live in prod.py and are enforced there.
 """
 
 from pathlib import Path
@@ -9,7 +9,7 @@ from .env import env_int, env_list, env_str
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Zentraler, austauschbarer Plattformname (Arbeitsname "TestHub" ist ein Platzhalter).
+# Central, replaceable platform name (the working name "TestHub" is a placeholder).
 PLATFORM_NAME = env_str("PLATFORM_NAME", "TestHub")
 
 DEBUG = False
@@ -60,7 +60,7 @@ TEMPLATES = [
     },
 ]
 
-# --- Datenbank: ausschliesslich PostgreSQL (auch in Tests) ---
+# --- Database: PostgreSQL only (also in tests) ---
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -74,10 +74,10 @@ DATABASES = {
     }
 }
 
-# --- Benutzer & Passwörter ---
+# --- Users & passwords ---
 AUTH_USER_MODEL = "accounts.User"
 
-# Argon2 zuerst (Empfehlung der Django-Doku); weitere Hasher nur zum Prüfen/Umstellen alter Hashes.
+# Argon2 first (recommended by the Django docs); others only verify/upgrade legacy hashes.
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -85,7 +85,7 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
-# Passwortregeln werden in Phase 1 (Registrierung) festgelegt; bis dahin Django-Standard.
+# Password rules are decided in phase 1 (registration); Django defaults until then.
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -98,25 +98,25 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# --- django-allauth (headless, Browser-Sessions; ADR 0004) ---
-# VORLÄUFIG (AP 0.4, SSR-Durchstich): nur Login/Logout/Session. Registrierung, Login-Methode,
-# E-Mail-Regeln und GitHub-Login werden in Phase 1 mit dem Projektverantwortlichen festgelegt.
+# --- django-allauth (headless, browser sessions; ADR 0004) ---
+# PROVISIONAL (WP 0.4, SSR spike): login/logout/session only. Signup, login method, email rules
+# and GitHub login are decided in phase 1 together with the project owner.
 HEADLESS_ONLY = True
-HEADLESS_CLIENTS = ("browser",)  # keine Token-basierten App-Clients
+HEADLESS_CLIENTS = ("browser",)  # no token-based app clients
 HEADLESS_FRONTEND_URLS: dict[str, str] = {}
 ACCOUNT_SIGNUP_ENABLED = False
 ACCOUNT_LOGIN_METHODS = {"username"}
 
-# Origins, deren POST-Anfragen den CSRF-Origin-Check bestehen (z. B. das SSR-Frontend).
+# Origins whose POST requests pass Django's CSRF origin check (e.g. the SSR frontend).
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", [])
 
-# Test-only-Probe für den SSR-Durchstich (AP 0.4). In Produktion nie installiert.
+# Test-only probe for the SSR spike (WP 0.4). Never installed in production.
 ENABLE_SSR_PROBE = False
 
-# Für Drittanbieter-Modelle; eigene Modelle verwenden UUIDv4 (siehe apps.core.models).
+# For third-party models; our own models use UUIDv4 (see apps.core.models).
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# --- Internationalisierung ---
+# --- Internationalization ---
 LANGUAGE_CODE = "en"
 TIME_ZONE = "UTC"
 USE_I18N = True
@@ -125,7 +125,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# --- Sicherheits-Grundwerte (gelten überall; prod.py verschärft) ---
+# --- Security baseline (applies everywhere; prod.py tightens it) ---
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
@@ -140,7 +140,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
-    # Sicherer Standard: alles erfordert Anmeldung, öffentliche Endpunkte erlauben es explizit.
+    # Secure default: everything requires authentication; public endpoints opt out explicitly.
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
@@ -158,7 +158,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-# Der Schema-Endpunkt ist nur in der Entwicklung erreichbar (siehe dev.py / config/urls.py).
+# The schema endpoint is only served in development (see dev.py / config/urls.py).
 SERVE_API_SCHEMA = False
 
 LOGGING = {

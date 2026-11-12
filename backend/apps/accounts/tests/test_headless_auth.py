@@ -1,6 +1,6 @@
-"""Minimale allauth-Headless-Prüfung für den SSR-Durchstich (AP 0.4).
+"""Minimal allauth headless checks for the SSR spike (WP 0.4).
 
-Registrierung ist bis Phase 1 bewusst deaktiviert.
+Signup is deliberately disabled until phase 1.
 """
 
 import secrets
@@ -20,7 +20,7 @@ def user(db):
 
 
 def csrf_client() -> tuple[APIClient, str]:
-    """Client mit erzwungener CSRF-Prüfung; holt das Token wie ein Browser über ein GET."""
+    """Client with enforced CSRF checks; obtains the token via a GET, like a browser."""
     client = APIClient(enforce_csrf_checks=True)
     client.get(f"{BASE}/config")
     token = client.cookies["csrftoken"].value
@@ -59,9 +59,9 @@ def test_login_with_csrf_sets_session_and_logout_clears_it(user):
     assert session.status_code == 200
     assert session.json()["data"]["user"]["username"] == user.username
 
-    token = client.cookies["csrftoken"].value  # Token rotiert beim Login
+    token = client.cookies["csrftoken"].value  # token rotates on login
     logout = client.delete(f"{BASE}/auth/session", HTTP_X_CSRFTOKEN=token)
-    assert logout.status_code == 401  # allauth: nach Logout ist man nicht mehr authentifiziert
+    assert logout.status_code == 401  # allauth: after logout the session is unauthenticated
     assert client.get(f"{BASE}/auth/session").status_code == 401
 
 

@@ -1,4 +1,4 @@
-"""Sicherheits-Standards, die ab dem ersten Tag gelten müssen."""
+"""Security defaults that must hold from day one."""
 
 import pytest
 from django.conf import settings
@@ -10,7 +10,7 @@ def test_api_requires_authentication_by_default():
     assert settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] == [
         "rest_framework.permissions.IsAuthenticated"
     ]
-    assert IsAuthenticated  # Klasse existiert und ist importierbar
+    assert IsAuthenticated  # class exists and is importable
 
 
 def test_browsable_api_not_enabled_outside_development():

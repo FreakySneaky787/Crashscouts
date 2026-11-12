@@ -5,7 +5,7 @@ export default [
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
   route("account", "routes/account.tsx"),
-  // Test-only-Probe für den SSR-Durchstich (AP 0.4). Ohne Probe-Backend (Produktion) immer 404.
+  // Test-only probe for the SSR spike (WP 0.4). Always 404 without the probe backend (production).
   route("probe/public/:id", "routes/probe-public.tsx"),
   route("probe/private/:id", "routes/probe-private.tsx"),
 ] satisfies RouteConfig;

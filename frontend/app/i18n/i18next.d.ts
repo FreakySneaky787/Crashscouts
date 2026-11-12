@@ -1,4 +1,4 @@
-// Typsichere Übersetzungsschlüssel: ein falscher oder fehlender Schlüssel ist ein TypeScript-Fehler.
+// Type-safe translation keys: a wrong or missing key is a TypeScript error.
 import "i18next";
 
 import type { defaultNamespace, resources } from "./index";

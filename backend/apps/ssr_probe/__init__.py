@@ -1,5 +1,5 @@
-"""Test-only-App für den SSR-Auth-Durchstich (AP 0.4).
+"""Test-only app for the SSR auth spike (WP 0.4).
 
-Nur in dev/test installiert; prod.py verweigert den Start, falls sie installiert ist.
-Sie wird entfernt, sobald die Regressionstests auf die echten Modelle (Phase 2/3) übertragen sind.
+Installed in dev/test only; prod.py refuses to start if it is installed.
+It will be removed once the regression tests have moved to the real models (phase 2/3).
 """

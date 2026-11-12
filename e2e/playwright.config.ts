@@ -1,13 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * End-to-End-Tests gegen den echten Stack: Django (dev-Settings, PostgreSQL 18) und den
- * PRODUKTIONS-Build des SSR-Frontends (react-router-serve). Voraussetzung: `docker compose up -d db`.
+ * End-to-end tests against the real stack: Django (dev settings, PostgreSQL 18) and the PRODUCTION
+ * build of the SSR frontend (react-router-serve). Prerequisite: `docker compose up -d db`.
  */
 export const FRONTEND_URL = "http://127.0.0.1:3000";
 export const BACKEND_URL = "http://127.0.0.1:8000";
 
-// Optional: vorinstallierter Chromium (z. B. Cloud-Umgebung), sonst der von Playwright installierte.
+// Optional: a preinstalled Chromium (e.g. cloud environment), otherwise the one Playwright installs.
 const executablePath = process.env.PW_CHROMIUM_EXECUTABLE || undefined;
 
 export default defineConfig({

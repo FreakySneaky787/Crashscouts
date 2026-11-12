@@ -1,7 +1,7 @@
 [project]
-name = "testhub-backend"  # Arbeitsname (Platzhalter), siehe docs/OPEN-QUESTIONS.md (K)
+name = "testhub-backend"  # working name (placeholder), see docs/OPEN-QUESTIONS.md (K)
 version = "0.0.0"
-description = "Backend (Django) der Software-Testing-Community-Plattform"
+description = "Backend (Django) of the software testing community platform"
 readme = "README.md"
 license = "AGPL-3.0-only"
 requires-python = ">=3.14,<3.15"
@@ -41,7 +41,7 @@ select = [
     "I",             # isort
     "B",             # bugbear
     "UP",            # pyupgrade
-    "S",             # bandit (Sicherheit)
+    "S",             # bandit (security)
     "DJ",            # django
     "SIM", "PT", "RUF",
 ]

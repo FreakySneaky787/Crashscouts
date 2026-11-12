@@ -1,7 +1,7 @@
-"""Gemeinsame abstrakte Basismodelle.
+"""Shared abstract base models.
 
-Entscheidung (2026-11-12): Alle eigenen Modelle verwenden eine zufällige UUID (Version 4) als
-Primärschlüssel. Sie verrät weder Anzahl noch Erstellzeitpunkt und ist nicht erratbar.
+Decision (2026-11-12): all our own models use a random UUID (version 4) as primary key. It reveals
+neither record counts nor creation time and cannot be guessed.
 """
 
 import uuid
@@ -25,7 +25,7 @@ class TimeStampedModel(models.Model):
 
 
 class BaseModel(UUIDModel, TimeStampedModel):
-    """Standard-Basis für fachliche Modelle: UUIDv4-Primärschlüssel und Zeitstempel."""
+    """Default base for domain models: UUIDv4 primary key and timestamps."""
 
     class Meta:
         abstract = True

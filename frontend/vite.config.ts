@@ -9,11 +9,11 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   server: {
-    // Nur lokal erreichbar; in Codespaces wird der Port privat weitergeleitet.
+    // Local only; in Codespaces the port is forwarded privately.
     host: "127.0.0.1",
     port: 5173,
     strictPort: true,
-    // Same-Origin wie später hinter dem Reverse Proxy: /api und /_allauth gehen an Django.
+    // Same origin as behind the production reverse proxy: /api and /_allauth go to Django.
     proxy: {
       "/api": backend,
       "/_allauth": backend,

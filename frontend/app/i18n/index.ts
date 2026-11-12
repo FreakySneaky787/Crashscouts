@@ -8,8 +8,8 @@ export const defaultNamespace = "translation";
 export const resources = { en: { translation: en } } as const;
 
 /**
- * Erzeugt für jeden Render-Baum eine EIGENE i18next-Instanz. Im SSR-Server bedeutet das: eine
- * Instanz pro Anfrage, kein zwischen Nutzern geteilter Zustand (docs/SECURITY.md §8).
+ * Creates a SEPARATE i18next instance per render tree. In the SSR server this means one instance
+ * per request – no state shared between users (docs/SECURITY.md §8).
  */
 export function createI18n(language: string = defaultLanguage): I18n {
   const instance = createInstance();
@@ -19,7 +19,7 @@ export function createI18n(language: string = defaultLanguage): I18n {
     defaultNS: defaultNamespace,
     resources,
     initAsync: false,
-    // React escapt selbst; doppeltes Escaping würde Texte verfälschen.
+    // React escapes on its own; double escaping would corrupt texts.
     interpolation: { escapeValue: false },
   });
   return instance;

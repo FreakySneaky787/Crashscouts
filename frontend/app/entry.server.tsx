@@ -1,5 +1,5 @@
-// Basis: Standard-entry.server.tsx von React Router 8 (`react-router reveal entry.server`).
-// Ergänzt um: CSP mit Nonce (nur Produktions-Build), Sicherheits-Header und sichere Cache-Defaults.
+// Based on React Router 8's default entry.server.tsx (`react-router reveal entry.server`).
+// Added: nonce-based CSP (production build only), security headers and safe cache defaults.
 import { randomBytes } from "node:crypto";
 import { PassThrough } from "node:stream";
 
@@ -32,11 +32,11 @@ function applySecurityHeaders(headers: Headers, nonce: string): void {
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "same-origin");
   headers.set("Cross-Origin-Opener-Policy", "same-origin");
-  // Im Dev-Server (Vite/HMR) würden Inline-Skripte blockiert; CSP gilt daher für den Build.
+  // The dev server (Vite/HMR) needs inline scripts, so the CSP applies to the production build.
   if (import.meta.env.PROD) {
     headers.set("Content-Security-Policy", contentSecurityPolicy(nonce));
   }
-  // Sicherer Standard: Was eine Route nicht ausdrücklich als cachebar markiert, wird nie gespeichert.
+  // Safe default: anything a route does not explicitly mark as cacheable is never stored.
   if (!headers.has("Cache-Control")) {
     headers.set("Cache-Control", "private, no-store");
   }
@@ -67,7 +67,7 @@ export default function handleRequest(
     let shellRendered = false;
     const userAgent = request.headers.get("user-agent");
 
-    // Bots und SPA-Mode warten auf den vollständigen Inhalt.
+    // Bots and SPA mode wait for the complete content.
     const readyOption: keyof RenderToPipeableStreamOptions =
       (userAgent && isbot(userAgent)) || routerContext.isSpaMode ? "onAllReady" : "onShellReady";
 

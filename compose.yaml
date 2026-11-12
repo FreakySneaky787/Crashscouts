@@ -1,21 +1,21 @@
-# Entwicklungsdienste. Wird in AP 0.5 um Backend, SSR-Frontend und Worker erweitert.
-# Start:  docker compose up -d db      (Werte aus .env, siehe .env.example)
+# Development services. Extended with backend, SSR frontend and worker in WP 0.5.
+# Start:  docker compose up -d db      (values from .env, see .env.example)
 name: testhub-dev
 
 services:
   db:
-    # Offizielles Image, per Digest fixiert (PostgreSQL 18.6, geprüft am 2026-11-12).
+    # Official image, pinned by digest (PostgreSQL 18.6, verified on 2026-11-12).
     image: postgres:18@sha256:e3d24f6906d0760bf4da0dae872415391ededefad23fd471c47dc53b0ddf3c42
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-testhub}
       POSTGRES_USER: ${POSTGRES_USER:-testhub}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD in .env setzen (siehe .env.example)}
-    # Nur lokal erreichbar – niemals öffentlich exponieren.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (see .env.example)}
+    # Reachable locally only – never expose publicly.
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
-      # Ab PostgreSQL 18 liegt PGDATA unter /var/lib/postgresql/18/docker; das Image deklariert
-      # /var/lib/postgresql als Volume.
+      # From PostgreSQL 18 on, PGDATA is /var/lib/postgresql/18/docker; the image declares
+      # /var/lib/postgresql as its volume.
       - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]

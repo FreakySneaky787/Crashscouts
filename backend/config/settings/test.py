@@ -1,9 +1,9 @@
-"""Einstellungen für automatisierte Tests (pytest). Läuft gegen echtes PostgreSQL."""
+"""Settings for automated tests (pytest). Runs against a real PostgreSQL."""
 
 from .base import *  # noqa: F403
 
 DEBUG = False
-# Absichtlich unsicherer, öffentlicher Testschlüssel (kein Geheimnis).
+# Deliberately insecure, public test key (not a secret).
 SECRET_KEY = "test-only-insecure-key-do-not-use-in-production"  # noqa: S105
 ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
 SERVE_API_SCHEMA = False

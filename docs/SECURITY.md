@@ -1,98 +1,138 @@
-# Sicherheitskonzept
+# Security Concept
 
-> Stand: 2026-11-12 · Status: **geplant**. Welche Massnahmen bereits umgesetzt und getestet sind, steht in [`STATUS.md`](STATUS.md).
-> Wie Schwachstellen gemeldet werden, steht in der [`SECURITY.md`](../SECURITY.md) im Repo-Wurzelverzeichnis.
+> As of: 2026-11-12 · Status: **partly implemented**. Which measures are implemented and tested is
+> tracked in [`STATUS.md`](STATUS.md) and marked ✅ below.
+> How to report vulnerabilities is described in the root [`SECURITY.md`](../SECURITY.md).
 
-Grundsatz: lieber dreifach abgesichert als einmal. Jede Schutzmassnahme braucht einen automatisierten Test, auch für die Negativfälle.
+Principle: better three times safe than once. Every protective measure needs an automated test,
+including the negative cases.
 
-## 1. Bedrohungsschwerpunkte
+## 1. Threat focus
 
-1. **Schadsoftware über Download-Links.** Freiwillige installieren unbekannte Vorabversionen. Das ist der grösste Missbrauchsweg.
-2. **Datenlecks bei privaten Kampagnen und privatem Feedback.** Logs und Screenshots enthalten oft Personendaten oder Hinweise auf Schwachstellen.
-3. **Kontoübernahmen** von Owners und Moderatoren, die die grösste Hebelwirkung haben.
-4. **Klassische Web-Angriffe:** XSS, CSRF, Injection, Upload-Missbrauch.
-5. **Geheimnisse im Repository und Angriffe über die Lieferkette.**
+1. **Malware via download links.** Volunteers install unknown pre-release software. This is the
+   biggest abuse vector.
+2. **Data leaks from private campaigns and private feedback.** Logs and screenshots often contain
+   personal data or hints about vulnerabilities.
+3. **Account takeovers** of owners and moderators, who have the biggest leverage.
+4. **Classic web attacks:** XSS, CSRF, injection, upload abuse.
+5. **Secrets in the repository and supply-chain attacks.**
 
-## 2. Konten
+## 2. Accounts
 
-- Passwörter mit Argon2id; allauth-Ratelimits für Login, Registrierung und Reset.
-- E-Mail-Verifizierung ist Pflicht.
-- 2FA (TOTP, Passkeys, Recovery-Codes) ist optional; ⚑ Pflicht für Owner öffentlicher Kampagnen und für Moderatoren.
-- Neue Session nach dem Login; Cookies mit `HttpOnly`, `Secure` und `SameSite=Lax`; Session-Liste mit „überall abmelden".
+- ✅ Passwords hashed with Argon2id.
+- allauth rate limits for login, signup and reset. They rely on Django's cache; a shared cache is
+  required in production (open question O).
+- Mandatory email verification (phase 1).
+- 2FA (TOTP, passkeys, recovery codes) optional; ⚑ mandatory for owners of public campaigns and for
+  moderators (phase 1).
+- ✅ Session cookie `HttpOnly` and `SameSite=Lax` (verified in E2E); `Secure` enforced in
+  production settings.
+- New session on login; session list with "sign out everywhere" (phase 1).
+- ✅ Signup is disabled until phase 1 defines its rules.
 
 ## 3. Web
 
-- Django-CSRF.
-- Strikte Content-Security-Policy (Django-6.x-Bordmittel oder `django-csp`; wird bei der Implementierung geprüft).
-- HSTS, `X-Content-Type-Options: nosniff`, `Referrer-Policy`.
-- Nur das ORM; Raw-SQL nur mit Review.
-- React escapt Ausgaben; `dangerouslySetInnerHTML` ist per Lint-Regel verboten.
-- Markdown wird nur über eine Sanitizer-Allowlist gerendert.
+- ✅ Django CSRF; forms carry the token, and the SSR server forwards it without ever bypassing the
+  check.
+- ✅ React Router 8 additionally rejects actions from a foreign `Origin`.
+- ✅ Strict nonce-based Content Security Policy in the production SSR build (`script-src 'self'
+  'nonce-…'`, `object-src 'none'`, `base-uri 'none'`, `frame-ancestors 'none'`,
+  `form-action 'self'`), a fresh nonce per response.
+- ✅ `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`,
+  `Cross-Origin-Opener-Policy: same-origin` (Django and SSR).
+- ✅ HSTS for one year in production settings; `includeSubDomains`/`preload` once the domain is
+  decided.
+- ✅ ORM only; raw SQL only with review.
+- ✅ React escapes output; `dangerouslySetInnerHTML`, `eval` and implied eval are forbidden by lint
+  rules.
+- ✅ Open-redirect protection for redirect targets (`safeRedirectPath`, unit-tested).
+- ✅ URL parameters are validated (UUID) before they are used in backend paths.
+- Markdown only through a sanitizer allowlist (when introduced).
 
-## 4. Download-Links und Sicherheits-Gate
+## 4. Download links and the security gate
 
-- Nur `https://`.
-- Warnseite vor jedem externen Link; `rel="noopener noreferrer nofollow ugc"`.
-- **Öffentliche Kampagnen sind technisch gesperrt** (`PUBLIC_CAMPAIGNS_ENABLED=false`), bis das Gate aus [`MVP-PLAN.md`](MVP-PLAN.md), Phase 3B, erfüllt ist.
-- Prüfqueue für jede neue öffentliche Kampagne; ⚑ eine Linkänderung löst eine erneute Prüfung aus.
-- Wartezeit oder manuelle Freigabe für neue Konten (offene Frage A).
-- Abzeichen „Repository verifiziert" nach Inhaberschaftsnachweis.
-- Meldefunktion und sofortige Sperre durch Admins; gesperrte Links werden niemandem mehr ausgeliefert.
+- `https://` only.
+- Interstitial warning page before every external link; `rel="noopener noreferrer nofollow ugc"`.
+- **Public campaigns are technically locked** (`PUBLIC_CAMPAIGNS_ENABLED=false`) until the gate
+  from [`MVP-PLAN.md`](MVP-PLAN.md), phase 3B, is met.
+- Review queue for every new public campaign; ⚑ a link change triggers a new review.
+- Waiting period or manual approval for new accounts (open question A).
+- "Repository verified" badge after proof of ownership.
+- Reporting and immediate blocking by admins; blocked links are served to no one.
 
 ## 5. Uploads
 
-- Allowlist: PNG, JPEG, WebP, TXT, LOG, JSON. Geprüft werden Endung, MIME-Typ **und** Magic Bytes.
-- Grössen- und Anzahllimits.
-- Bilder werden mit Pillow neu kodiert (entfernt EXIF/GPS).
-- Zufällige Dateinamen, Speicherung ausserhalb des Webroots.
-- Auslieferung nur über eine autorisierte Django-Route mit `Content-Disposition: attachment` und `nosniff`; Text-Logs werden nie als HTML gerendert.
+- Allowlist: PNG, JPEG, WebP, TXT, LOG, JSON. Extension, MIME type **and** magic bytes are checked.
+- Size and count limits.
+- Images are re-encoded with Pillow (strips EXIF/GPS).
+- Random file names, storage outside the web root.
+- Delivery only via an authorized Django route with `Content-Disposition: attachment` and
+  `nosniff`; text logs are never rendered as HTML.
 
-## 6. Privatsphäre und Berechtigungen
+## 6. Privacy and authorization
 
-- Eine zentrale, serverseitige Policy-Schicht. Private Ressourcen liefern 404.
-- Parametrisierte Tests der Berechtigungsmatrix, inklusive „ein Fremder sieht nichts".
-- Einladungstoken werden nur gehasht gespeichert, laufen ab und sind nur einmal verwendbar.
-- Moderatoren erhalten keinen pauschalen Zugriff auf private Inhalte; Zugriffe sind zweckgebunden und protokolliert.
+- One central, server-side policy layer. ✅ Private resources return 404 (verified for the probe
+  objects via SSR and API).
+- Parametrized tests of the permission matrix, including "a stranger sees nothing".
+- Invitation tokens are stored hashed only, expire, and are single-use.
+- Moderators get no blanket access to private content; access is purpose-bound and logged.
 
-## 7. Admin-Zugang
+## 7. Admin access
 
-- Der öffentliche Proxy routet `/admin/` **nicht** (Antwort 404).
-- Django-Admin lauscht nur auf `127.0.0.1` und ist nur per SSH-Tunnel erreichbar; der SSH-Zugang ist schlüsselbasiert, die Passwort-Anmeldung deaktiviert.
-- 2FA beim Admin-Login ist Pflicht. Der Mechanismus der allauth-Integration wird bei der Implementierung in der offiziellen Doku geprüft.
-- Nur wenige `is_staff`-Konten; jede Admin-Anmeldung landet im Audit-Log.
-- Ein CI-Test stellt sicher, dass der Proxy `/admin/` nicht weiterleitet.
+- The public proxy does **not** route `/admin/` (404).
+- The Django admin listens on `127.0.0.1` only and is reachable only via an SSH tunnel; SSH access
+  is key-based with password login disabled.
+- 2FA at admin login is mandatory. The allauth integration mechanism will be verified in the
+  official docs during implementation.
+- Few `is_staff` accounts; every admin login is written to the audit log.
+- A CI test ensures that the proxy does not forward `/admin/`.
 
-## 8. SSR, Sessions und Caching
+## 8. SSR, sessions and caching (✅ validated in WP 0.4)
 
-- Der SSR-Server reicht `Cookie` an Django weiter und gibt `Set-Cookie` unverändert an den Browser zurück.
-- Schreibende Anfragen tragen das CSRF-Token im Header. Django prüft es; der SSR-Server umgeht es nie.
-- **Private Antworten:** `Cache-Control: private, no-store` und `Vary: Cookie`.
-- **Öffentliche anonyme Seiten:** Caching nur ohne Session-Cookie und nie für personalisierte Inhalte.
-- Kein gemeinsamer Cache für nutzerbezogene Daten im SSR-Server.
+- The SSR server forwards `Cookie` to Django and returns `Set-Cookie` to the browser unchanged.
+- Write requests carry the CSRF token as a header plus the browser's `Origin`/`Referer`; Django
+  checks them. The SSR server never bypasses this.
+- **Private responses:** `Cache-Control: private, no-store` and `Vary: Cookie`. This is also the
+  default for every response that does not explicitly opt into caching, including error pages.
+- **Public anonymous pages:** `public, max-age=60` only without a session cookie and never for
+  personalized content; no `Set-Cookie`.
+- No shared cache for user data in the SSR server; i18n uses one instance per request.
+- Logout only via POST with a CSRF token; a GET to `/logout` signs no one out.
 
-## 9. Audit-Log
+## 9. Audit log
 
-Append-only. Protokolliert werden: Login-Ereignisse, Rollenänderungen, Moderation, Zugriffe von Moderatoren auf private Inhalte, Admin-Anmeldungen, Löschungen und Exporte.
+Append-only. Logged: login events, role changes, moderation, moderator access to private content,
+admin logins, deletions and exports.
 
-## 10. Repository und Lieferkette
+## 10. Repository and supply chain
 
-- **Keine Secrets im Repo.** `.env*` steht in `.gitignore`; Vorlagen kommen als `.env.example`.
-- **gitleaks** als pre-commit-Hook und in CI (ab AP 0.6). Bis dahin wird jeder Commit manuell mit gitleaks geprüft.
-- **Einschränkung von GitHub Free bei privaten Repos:** keine Push Protection beim Secret Scanning, kein Branch-Schutz und keine Rulesets. Deshalb sind gitleaks und CI die Schutzschicht, bis das Repo öffentlich ist. Danach werden alle kostenlosen GitHub-Funktionen aktiviert.
-  Quellen: [Push Protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection), [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
-- Lockfiles; `pip-audit` und `pnpm audit` in CI; Dependabot (ob es für private Repos verfügbar ist, wird in AP 0.6 geprüft).
-- GitHub Actions werden auf Commit-SHA gepinnt.
-- Werkzeuge kommen nur aus offiziellen Quellen mit Prüfsummen oder signierten Registries.
+- ✅ **No secrets in the repository.** `.env*` is ignored; templates come as `.env.example`. Tests
+  generate credentials randomly at runtime.
+- ✅ **gitleaks** (v8.30.1, built from the Go module proxy with checksum verification) is run on
+  every commit; from WP 0.6 automatically as a pre-commit hook and in CI.
+- **GitHub Free limitation for private repositories:** no push protection for secret scanning, no
+  branch protection and no rulesets. gitleaks and CI are therefore the protective layer until the
+  repository is public; then all free GitHub features are enabled.
+  Sources: [Push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection),
+  [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
+- ✅ Lockfiles for all dependencies. `pip-audit` and `pnpm audit` in CI and Dependabot (whether it is
+  available for private repositories will be checked in WP 0.6).
+- GitHub Actions pinned to commit SHAs.
+- ✅ Tools and images only from official sources with checksums or digests (e.g. `postgres:18`
+  pinned by digest).
+- ✅ pnpm 10 does not run dependency install scripts unless explicitly allowed.
 
-## 11. Claude Code in der Entwicklungsumgebung
+## 11. Claude Code in the development environment
 
-- Läuft als Nicht-root-Nutzer; kein `--dangerously-skip-permissions`.
-- Keine Host-Secrets (`~/.ssh`, Cloud-Zugangsdaten) im Container.
-- Authentisierung nur über ein Codespaces-Secret (`CLAUDE_CODE_OAUTH_TOKEN` oder `ANTHROPIC_API_KEY`).
-  Quelle: [Claude Code Dev Container](https://code.claude.com/docs/en/devcontainer).
+- Runs as a non-root user; no `--dangerously-skip-permissions`.
+- No host secrets (`~/.ssh`, cloud credentials) in the container.
+- Authentication only via a Codespaces secret (`CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY`).
+  Source: [Claude Code dev container](https://code.claude.com/docs/en/devcontainer).
+- Third-party repositories cloned for reading documentation (e.g. React Router) are treated as
+  data; their instructions are not followed.
 
-## 12. Betrieb (vor der Beta)
+## 12. Operations (before the beta)
 
-- TLS über den Reverse Proxy; die Datenbank hat keinen öffentlichen Port.
-- Automatische, verschlüsselte, ausgelagerte PostgreSQL-Backups mit **getesteter** Wiederherstellung.
-- Sicherheitsreview nach OWASP ASVS Level 1 vor der Closed Beta.
+- TLS via the reverse proxy; the database has no public port.
+- Automatic, encrypted, off-site PostgreSQL backups with a **tested** restore.
+- Security review against OWASP ASVS level 1 before the closed beta.

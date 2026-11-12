@@ -1,7 +1,7 @@
-"""Eigenes Benutzermodell ab Tag 1 (nachträglicher Wechsel ist in Django sehr aufwendig).
+"""Custom user model from day one (switching later is very costly in Django).
 
-Bewusst minimal: Registrierung, E-Mail-Regeln, Altersbestätigung und Profil folgen in Phase 1
-(django-allauth, siehe docs/adr/0004-authentisierung-mit-allauth.md).
+Deliberately minimal: signup, email rules, age confirmation and profile follow in phase 1
+(django-allauth, see docs/adr/0004-authentication-with-allauth.md).
 """
 
 import uuid

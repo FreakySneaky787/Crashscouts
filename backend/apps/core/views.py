@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class HealthView(APIView):
-    """Betriebsstatus inklusive Datenbankverbindung.
+    """Operational status including the database connection.
 
-    Gibt bewusst keine Fehlerdetails, Versionen oder Hostnamen preis.
+    Deliberately reveals no error details, versions or host names.
     """
 
     permission_classes = (AllowAny,)

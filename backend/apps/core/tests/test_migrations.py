@@ -9,5 +9,5 @@ def test_no_missing_migrations():
     output = StringIO()
     try:
         call_command("makemigrations", "--check", "--dry-run", stdout=output, stderr=output)
-    except SystemExit as exc:  # makemigrations --check beendet mit Code 1, wenn etwas fehlt
-        pytest.fail(f"Fehlende Migrationen:\n{output.getvalue()} (exit {exc.code})")
+    except SystemExit as exc:  # makemigrations --check exits with code 1 if anything is missing
+        pytest.fail(f"Missing migrations:\n{output.getvalue()} (exit {exc.code})")

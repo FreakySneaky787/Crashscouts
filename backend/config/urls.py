@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    # In Produktion routet der öffentliche Reverse Proxy /admin/ NICHT (docs/SECURITY.md, §7).
+    # In production the public reverse proxy does NOT route /admin/ (docs/SECURITY.md, §7).
     path("admin/", admin.site.urls),
     path("api/v1/", include("apps.core.urls")),
     # django-allauth headless: /_allauth/browser/v1/...

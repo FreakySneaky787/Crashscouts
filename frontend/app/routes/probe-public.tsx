@@ -16,7 +16,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (result.status !== 200 || !result.data) {
     throw data(null, { status: 404, headers: privateNoStoreHeaders() });
   }
-  // Anonym: öffentlich cachebar. Mit Session: privat. Backend-Cookies werden hier NIE weitergegeben.
+  // Anonymous: publicly cacheable. With a session: private. Backend cookies are NEVER passed on here.
   return data(result.data, { headers: cacheHeadersFor(request) });
 }
 

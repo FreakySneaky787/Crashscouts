@@ -1,251 +1,253 @@
 # MASTER PROMPT – SOFTWARE TESTING COMMUNITY PLATFORM
 ## Initial Project Planning, Product Strategy, Cloud Development & Technical Architecture
 
-> Archivierte Originalfassung des Master-Prompts, mit dem die Planungsphase am 2026-11-12 gestartet wurde.
-> Abweichungen und Präzisierungen, die danach gemeinsam entschieden wurden, stehen in
-> [`PRD.md`](PRD.md), [`MVP-PLAN.md`](MVP-PLAN.md) und den ADRs unter [`adr/`](adr/).
-> Bei Widersprüchen gelten die neueren, ausdrücklich freigegebenen Entscheidungen.
+> **English translation.** The authoritative original is the German version
+> [`MASTER-PROMPT.de.md`](MASTER-PROMPT.de.md); if the two differ, the German original applies.
+>
+> Archived brief with which the planning phase started on 2026-11-12. Deviations and refinements
+> decided afterwards are recorded in [`PRD.md`](PRD.md), [`MVP-PLAN.md`](MVP-PLAN.md) and the ADRs
+> under [`adr/`](adr/). Where they conflict, the newer, explicitly approved decisions apply.
 
-**WICHTIG: Dieser Prompt startet die erste Planungsphase des gesamten Projekts. Du befindest dich zunächst im Plan Mode von Claude Code.**
+**IMPORTANT: This prompt starts the first planning phase of the entire project. You are initially in Claude Code's Plan Mode.**
 
-Du sollst das vorhandene Projekt zunächst vollständig verstehen, untersuchen, hinterfragen und planen.
+You shall first fully understand, examine, question and plan the existing project.
 
-Du sollst noch keine Implementierung beginnen.
+You shall not start any implementation yet.
 
-Du übernimmst die Rolle eines technischen Mitgründers, Softwarearchitekten, Product Managers, Senior Full-Stack Developers, Security Engineers und technischen Projektleiters.
+You take on the role of a technical co-founder, software architect, product manager, senior full-stack developer, security engineer and technical project lead.
 
-Dein Ziel ist es, mich systematisch von einer Produktidee zu einer professionellen, funktionierenden Open-Source-Plattform zu führen.
-
----
-
-# 1. PROJEKTIDENTITÄT
-
-## 1.1 Vorläufiger Projektname
-
-Der bisher verwendete Name lautet **TestHub**.
-
-WICHTIG: TestHub ist ausschliesslich ein vorläufiger Variablenname und kein endgültiger Produktname.
-
-Der endgültige Name wird zu einem späteren Zeitpunkt von mir selbst bestimmt.
-
-Du darfst:
-- TestHub als interne Projektbezeichnung verwenden.
-- Den Platzhalternamen vorübergehend in technischen Dokumentationen benutzen.
-- Die technische Architektur auf einen späteren Namenswechsel vorbereiten.
-
-Du darfst NICHT:
-- Den Namen als endgültige Marke behandeln.
-- Eigenständig einen endgültigen Namen festlegen.
-- Ein endgültiges Logo oder Corporate Design erstellen.
-- Domains oder Social-Media-Auftritte unter diesem Namen festlegen.
-- Den Namen ohne meine Zustimmung als endgültige Produktidentität verwenden.
-
-Der Projektname soll später zentral austauschbar sein.
-
-## 1.2 Produktvision
-
-Das Projekt ist eine soziale Plattform für Softwareentwickler und freiwillige Softwaretester.
-
-Die Plattform verbindet Menschen, die Software entwickeln, mit Menschen, die neue Software ausprobieren und bei deren Verbesserung helfen möchten.
-
-Das grundlegende Problem:
-
-Viele Open-Source-Entwickler und unabhängige Softwareentwickler haben Schwierigkeiten, genügend externe Tester zu finden.
-
-Sie entwickeln Software, testen diese auf ihren eigenen Geräten und veröffentlichen neue Versionen. Dabei wissen sie häufig nicht, ob ihre Anwendung auch auf anderen Systemen, mit anderer Hardware oder unter anderen Nutzungsbedingungen funktioniert.
-
-Gleichzeitig gibt es viele Menschen, die:
-- Neue Software ausprobieren möchten.
-- Beta-Versionen testen möchten.
-- Fehler entdecken und melden.
-- Entwicklern helfen möchten.
-- Neue Open-Source-Projekte kennenlernen möchten.
-- Teil einer technischen Community sein möchten.
-
-Diese beiden Gruppen sollen zusammenfinden.
-
-**Die zentrale Idee: Entwickler sollen Tester finden können, und Tester sollen interessante Software entdecken können.**
-
-Die Plattform ist eine Kombination aus:
-1. Sozialem Netzwerk.
-2. Open-Source-Projektverzeichnis.
-3. Beta-Testing-Plattform.
-4. Feedback- und Bug-Reporting-System.
-5. Community für Softwareentwicklung und Softwaretests.
-
-Sie soll sich wie ein modernes soziales Netzwerk anfühlen und nicht wie eine klassische Unternehmensverwaltungssoftware.
-
-## 1.3 Produktversprechen
-
-Für Entwickler:
-- Neue Tester finden.
-- Software präsentieren.
-- Beta-Versionen testen lassen.
-- Feedback sammeln.
-- Fehler erkennen.
-- Eine Community aufbauen.
-
-Für Tester:
-- Neue Software entdecken.
-- Freiwillig an Testkampagnen teilnehmen.
-- Fehler melden.
-- Verbesserungsvorschläge einreichen.
-- Neue Technologien ausprobieren.
-- Anerkennung für hilfreiche Beiträge erhalten.
-
-Für die Community:
-- Open-Source-Projekte sichtbarer machen.
-- Zusammenarbeit fördern.
-- Softwarequalität verbessern.
-- Entwickler und Nutzer direkt miteinander verbinden.
-
-Leitgedanke:
-
-**Software gemeinsam testen. Gemeinsam besser machen.**
+Your goal is to guide me systematically from a product idea to a professional, working open-source platform.
 
 ---
 
-# 2. VERBINDLICHE PRODUKTENTSCHEIDUNGEN
+# 1. PROJECT IDENTITY
 
-Diese Entscheidungen wurden bereits getroffen. Ändere sie nicht eigenständig.
+## 1.1 Provisional project name
 
-## 2.1 Open-Source-first
+The name used so far is **TestHub**.
 
-Open-Source-Projekte stehen im Mittelpunkt.
+IMPORTANT: TestHub is exclusively a provisional variable name and not a final product name.
 
-- Open-Source-Projekte sollen besonders sichtbar sein.
-- Auch kleine Projekte sollen entdeckt werden können.
-- Die Plattform selbst wird Open Source.
-- Kommerzielle und Closed-Source-Projekte dürfen ebenfalls teilnehmen.
-- Andere Projekte müssen klar gekennzeichnet sein.
+The final name will be decided by me at a later point.
 
-## 2.2 Sichtbarkeit von Testkampagnen
+You may:
+- Use TestHub as the internal project designation.
+- Use the placeholder name temporarily in technical documentation.
+- Prepare the technical architecture for a later name change.
 
-Es gibt zwei Modi.
+You may NOT:
+- Treat the name as a final brand.
+- Decide a final name on your own.
+- Create a final logo or corporate design.
+- Register domains or social media presences under this name.
+- Use the name as the final product identity without my consent.
 
-**Public Campaigns:**
-- Öffentlich sichtbar.
-- Im Discover-Bereich auffindbar.
-- Im öffentlichen Feed darstellbar.
-- Teilnahme direkt oder nach Freigabe.
+The project name shall later be replaceable centrally.
 
-**Private Campaigns:**
-- Nicht öffentlich sichtbar.
-- Nur für eingeladene Personen zugänglich.
-- Nicht in Discover oder öffentlichen Feeds sichtbar.
-- Private Inhalte, Dateien und Diskussionen geschützt.
+## 1.2 Product vision
 
-## 2.3 Testmethoden
+The project is a social platform for software developers and volunteer software testers.
 
-Die Plattform unterstützt:
+The platform connects people who develop software with people who want to try new software and help improve it.
 
-**Free Testing:** Freies Ausprobieren der Software mit allgemeinem Feedback.
+The fundamental problem:
 
-**Structured Testing:** Entwickler stellen konkrete Aufgaben bereit.
+Many open-source developers and independent software developers have difficulty finding enough external testers.
 
-**Combined Testing:** Kombination beider Methoden.
+They develop software, test it on their own devices and publish new versions. In doing so, they often do not know whether their application also works on other systems, with other hardware or under other usage conditions.
 
-## 2.4 Plattformstruktur
+At the same time, there are many people who:
+- Want to try new software.
+- Want to test beta versions.
+- Discover and report bugs.
+- Want to help developers.
+- Want to get to know new open-source projects.
+- Want to be part of a technical community.
 
-- Eine zentrale Community-Plattform.
-- Keine Föderation im MVP.
-- Self-Hosting nicht im MVP.
-- Architektur soll spätere Erweiterungen ermöglichen.
+These two groups shall come together.
 
-## 2.5 Freiwilligkeit
+**The central idea: developers shall be able to find testers, and testers shall be able to discover interesting software.**
 
-Die Teilnahme ist freiwillig und kostenlos.
+The platform is a combination of:
+1. A social network.
+2. An open-source project directory.
+3. A beta testing platform.
+4. A feedback and bug reporting system.
+5. A community for software development and software testing.
 
-Keine verpflichtenden Mitgliedschaften, Abonnements oder Zahlungen.
+It shall feel like a modern social network and not like classic enterprise management software.
 
-Keine Monetarisierung durch den Verkauf persönlicher Nutzerdaten.
+## 1.3 Product promise
 
-## 2.6 Lizenz
+For developers:
+- Find new testers.
+- Present software.
+- Have beta versions tested.
+- Collect feedback.
+- Detect bugs.
+- Build a community.
 
-AGPL-3.0 ist die bevorzugte Lizenz.
+For testers:
+- Discover new software.
+- Voluntarily take part in test campaigns.
+- Report bugs.
+- Submit improvement suggestions.
+- Try new technologies.
+- Receive recognition for helpful contributions.
 
-Prüfe die Lizenzwahl später kritisch, bevor sie endgültig veröffentlicht wird.
+For the community:
+- Make open-source projects more visible.
+- Foster collaboration.
+- Improve software quality.
+- Connect developers and users directly.
+
+Guiding idea:
+
+**Test software together. Make it better together.**
 
 ---
 
-# 3. FUNKTIONSUMFANG
+# 2. BINDING PRODUCT DECISIONS
 
-Die folgende Beschreibung ist die bestehende Produktbasis.
+These decisions have already been made. Do not change them on your own.
 
-Du sollst sie überprüfen, strukturieren und auf Vollständigkeit untersuchen.
+## 2.1 Open-source first
 
-Erfinde keine zusätzlichen Produktanforderungen, ohne mich vorher zu fragen.
+Open-source projects are at the center.
 
-## 3.1 Benutzerkonten und Profile
+- Open-source projects shall be particularly visible.
+- Small projects shall also be discoverable.
+- The platform itself will be open source.
+- Commercial and closed-source projects may also take part.
+- Other projects must be clearly labeled.
 
-- Registrierung.
-- E-Mail-Verifizierung.
-- Login und Logout.
-- Passwortzurücksetzung.
-- Benutzername und Profilbild.
-- Biografie.
-- Interessen.
-- Bevorzugte Betriebssysteme.
-- Technische Kenntnisse.
-- Datenschutzeinstellungen.
-- Öffentliche Aktivitäten.
-- Follower.
+## 2.2 Visibility of test campaigns
 
-Ein Nutzer kann gleichzeitig Tester und Entwickler sein.
+There are two modes.
 
-## 3.2 Home – Social Feed
+**Public campaigns:**
+- Publicly visible.
+- Findable in the Discover area.
+- Can be shown in the public feed.
+- Participation directly or after approval.
 
-- Neue Projekte.
-- Neue Testkampagnen.
-- Neue Releases.
-- Projektupdates.
-- Diskussionen.
-- Community-Aktivitäten.
-- Interessante Testergebnisse.
-- Personalisierte Empfehlungen.
-- Chronologische Ansicht.
+**Private campaigns:**
+- Not publicly visible.
+- Accessible only to invited people.
+- Not visible in Discover or public feeds.
+- Private content, files and discussions are protected.
 
-Kleine Open-Source-Projekte dürfen nicht grundsätzlich von populären Projekten verdrängt werden.
+## 2.3 Testing methods
+
+The platform supports:
+
+**Free testing:** freely trying out the software with general feedback.
+
+**Structured testing:** developers provide concrete tasks.
+
+**Combined testing:** a combination of both methods.
+
+## 2.4 Platform structure
+
+- One central community platform.
+- No federation in the MVP.
+- Self-hosting not in the MVP.
+- The architecture shall allow later extensions.
+
+## 2.5 Voluntariness
+
+Participation is voluntary and free of charge.
+
+No mandatory memberships, subscriptions or payments.
+
+No monetization through selling personal user data.
+
+## 2.6 License
+
+AGPL-3.0 is the preferred license.
+
+Review the license choice critically later, before it is finally published.
+
+---
+
+# 3. FEATURE SCOPE
+
+The following description is the existing product basis.
+
+You shall review it, structure it and examine it for completeness.
+
+Do not invent additional product requirements without asking me first.
+
+## 3.1 User accounts and profiles
+
+- Registration.
+- Email verification.
+- Login and logout.
+- Password reset.
+- Username and profile picture.
+- Biography.
+- Interests.
+- Preferred operating systems.
+- Technical skills.
+- Privacy settings.
+- Public activities.
+- Followers.
+
+A user can be tester and developer at the same time.
+
+## 3.2 Home – social feed
+
+- New projects.
+- New test campaigns.
+- New releases.
+- Project updates.
+- Discussions.
+- Community activities.
+- Interesting test results.
+- Personalized recommendations.
+- Chronological view.
+
+Small open-source projects must not be fundamentally crowded out by popular projects.
 
 ## 3.3 Discover
 
-Filtermöglichkeiten:
+Filter options:
 
-- Betriebssystem.
-- Kategorie.
-- Programmiersprache.
-- Softwaretyp.
-- Lizenz.
-- Entwicklungsstatus.
-- Aktive Testkampagnen.
+- Operating system.
+- Category.
+- Programming language.
+- Software type.
+- License.
+- Development status.
+- Active test campaigns.
 
-Beispiele:
+Examples:
 
-Linux, Windows, macOS, Android, Web, Desktop, CLI, Gaming und Developer Tools.
+Linux, Windows, macOS, Android, Web, Desktop, CLI, Gaming and Developer Tools.
 
-## 3.4 Projekte
+## 3.4 Projects
 
-Jedes Projekt besitzt eine eigene Projektseite.
+Every project has its own project page.
 
-Mögliche Informationen:
+Possible information:
 
 - Name.
-- Beschreibung.
+- Description.
 - Logo.
 - Screenshots.
-- Kategorie.
-- Betriebssysteme.
-- Programmiersprachen.
-- Lizenz.
-- Repository-Link.
+- Category.
+- Operating systems.
+- Programming languages.
+- License.
+- Repository link.
 - Releases.
-- Projektstatus.
-- Maintainer.
-- Testkampagnen.
-- Diskussionen.
+- Project status.
+- Maintainers.
+- Test campaigns.
+- Discussions.
 - Feedback.
 
-Statuswerte:
+Status values:
 
 - Development.
 - Alpha.
@@ -253,24 +255,24 @@ Statuswerte:
 - Stable.
 - Archived.
 
-## 3.5 Testkampagnen
+## 3.5 Test campaigns
 
-Entwickler können Kampagnen mit folgenden Informationen erstellen:
+Developers can create campaigns with the following information:
 
-- Titel und Beschreibung.
-- Zugehöriges Projekt.
-- Softwareversion.
+- Title and description.
+- Associated project.
+- Software version.
 - Changelog.
-- Testzeitraum.
-- Gewünschte Testeranzahl.
-- Zielbetriebssysteme.
-- Hardwareanforderungen.
-- Voraussetzungen.
-- Testmethodik.
-- Testaufgaben.
-- Downloadlinks.
+- Test period.
+- Desired number of testers.
+- Target operating systems.
+- Hardware requirements.
+- Prerequisites.
+- Testing methodology.
+- Test tasks.
+- Download links.
 
-Statuswerte:
+Status values:
 
 - Draft.
 - Open.
@@ -279,24 +281,24 @@ Statuswerte:
 - Completed.
 - Cancelled.
 
-Teilnahme:
+Participation:
 
-- Direkte Teilnahme.
-- Teilnahme nach Freigabe.
-- Private Einladungen.
+- Direct participation.
+- Participation after approval.
+- Private invitations.
 
-## 3.6 Testaufgaben
+## 3.6 Test tasks
 
-Entwickler können Aufgaben definieren.
+Developers can define tasks.
 
-Beispiele:
-- Software installieren.
-- Anwendung starten.
-- Datei importieren.
-- Bestimmte Funktion testen.
-- Einstellungen ändern.
-- Daten exportieren.
-- Ergebnis dokumentieren.
+Examples:
+- Install the software.
+- Start the application.
+- Import a file.
+- Test a specific function.
+- Change settings.
+- Export data.
+- Document the result.
 
 Status:
 
@@ -307,7 +309,7 @@ Status:
 
 ## 3.7 Feedback
 
-Feedbacktypen:
+Feedback types:
 
 - Bug Report.
 - UX Feedback.
@@ -315,19 +317,19 @@ Feedbacktypen:
 - Compatibility Report.
 - General Feedback.
 
-Bug Reports können enthalten:
+Bug reports can contain:
 
-- Titel.
-- Beschreibung.
-- Reproduktionsschritte.
-- Erwartetes Verhalten.
-- Tatsächliches Verhalten.
-- Betriebssystem.
-- Softwareversion.
+- Title.
+- Description.
+- Reproduction steps.
+- Expected behavior.
+- Actual behavior.
+- Operating system.
+- Software version.
 - Screenshots.
 - Logs.
 
-Feedbackstatus:
+Feedback status:
 
 - New.
 - Reviewed.
@@ -339,21 +341,21 @@ Feedbackstatus:
 - Cannot Reproduce.
 - Rejected.
 
-Private Feedbackmeldungen bleiben standardmässig privat.
+Private feedback reports remain private by default.
 
 ## 3.8 Community
 
-- Kommentare.
-- Antworten.
-- Diskussionen.
+- Comments.
+- Replies.
+- Discussions.
 - Following.
-- Projektupdates.
-- Benachrichtigungen.
-- Community-Aktivitäten.
+- Project updates.
+- Notifications.
+- Community activities.
 
 ## 3.9 Reputation
 
-Spätere mögliche Auszeichnungen:
+Possible later awards:
 
 - Helpful Tester.
 - Reliable Tester.
@@ -361,170 +363,170 @@ Spätere mögliche Auszeichnungen:
 - Early Contributor.
 - Community Helper.
 
-Qualität ist wichtiger als reine Anzahl von Beiträgen.
+Quality is more important than the mere number of contributions.
 
 ## 3.10 Moderation
 
-- Benutzer melden.
-- Projekte melden.
-- Kampagnen melden.
-- Kommentare melden.
-- Spam entfernen.
-- Verwarnungen.
-- Kontosperrungen.
-- Moderationsprotokolle.
+- Report users.
+- Report projects.
+- Report campaigns.
+- Report comments.
+- Remove spam.
+- Warnings.
+- Account suspensions.
+- Moderation logs.
 
-Private Inhalte dürfen nicht pauschal für alle Moderatoren zugänglich sein.
-
----
-
-# 4. PRODUKTGRENZEN
-
-Die Plattform soll zunächst NICHT:
-
-- GitHub ersetzen.
-- GitLab ersetzen.
-- Codeberg ersetzen.
-- Ein CI/CD-System sein.
-- Fremde Software automatisiert ausführen.
-- Ein Software-Download-Portal sein.
-- Eine bezahlte Crowdtesting-Agentur sein.
-- Ein allgemeines Entwicklerforum sein.
-
-Der Schwerpunkt ist die Vermittlung und Organisation menschlicher Softwaretests.
+Private content must not be accessible to all moderators across the board.
 
 ---
 
-# 5. CLOUD-ENTWICKLUNGSUMGEBUNG
+# 4. PRODUCT BOUNDARIES
 
-**Diese Vorgabe ist verbindlich. Die Entwicklung soll primär in der Cloud stattfinden.**
+Initially, the platform shall NOT:
 
-Ich möchte das Projekt von verschiedenen Standorten und Geräten aus vollständig im Browser bearbeiten können.
+- Replace GitHub.
+- Replace GitLab.
+- Replace Codeberg.
+- Be a CI/CD system.
+- Automatically execute third-party software.
+- Be a software download portal.
+- Be a paid crowdtesting agency.
+- Be a general developer forum.
 
-Ich möchte nicht darauf angewiesen sein, meinen privaten Computer oder eine lokal installierte Entwicklungsumgebung zu verwenden.
+The focus is on brokering and organizing human software testing.
 
-## 5.1 Gewünschte Infrastruktur
+---
 
-Die vorgesehene Lösung:
+# 5. CLOUD DEVELOPMENT ENVIRONMENT
 
-- GitHub als zentrale Versionsverwaltung.
-- GitHub Repository als dauerhafte Quelle des Projekts.
-- GitHub Codespaces als Cloud-Entwicklungsumgebung.
-- VS-Code-Weboberfläche im Browser.
-- Claude Code direkt im Codespace.
-- Docker für die Entwicklungsumgebung.
-- PostgreSQL als Projektdatenbank.
+**This requirement is binding. Development shall primarily take place in the cloud.**
 
-Die Entwicklung erfolgt browserbasiert.
+I want to be able to work on the project entirely in the browser from different locations and devices.
 
-Keine lokale VS-Code-Installation ist vorausgesetzt.
+I do not want to depend on my private computer or a locally installed development environment.
 
-## 5.2 Bestehendes Repository untersuchen
+## 5.1 Desired infrastructure
 
-Untersuche zunächst:
-- Welches Repository geöffnet ist.
-- Welcher Git-Branch aktiv ist.
-- Ob bereits Dateien existieren.
-- Ob die Codespace-Umgebung korrekt eingerichtet ist.
-- Welche Tools bereits installiert sind.
-- Welche Python-, Node.js- und Git-Versionen vorhanden sind.
-- Welche Ressourcen verfügbar sind.
-- Ob Dev-Container-Konfigurationen existieren.
+The intended solution:
 
-Erstelle keine neue Umgebung, wenn eine geeignete Umgebung bereits vorhanden ist.
+- GitHub as the central version control.
+- A GitHub repository as the permanent source of the project.
+- GitHub Codespaces as the cloud development environment.
+- The VS Code web interface in the browser.
+- Claude Code directly in the Codespace.
+- Docker for the development environment.
+- PostgreSQL as the project database.
 
-## 5.3 Cloud-Persistenz
+Development is browser-based.
 
-Die Projektdateien befinden sich im persistenten Repository-Verzeichnis des Codespaces.
+No local VS Code installation is required.
 
-Wichtige Regeln:
+## 5.2 Examine the existing repository
 
-- Änderungen regelmässig mit Git versionieren.
-- Änderungen auf GitHub pushen.
-- Keine wichtigen Dateien ausserhalb des Projektverzeichnisses speichern.
-- Keine Zugangsdaten in Git-Dateien speichern.
-- GitHub Codespaces Secrets verwenden, wenn geheime Zugangsdaten notwendig sind.
-- Den bestehenden Codespace möglichst geräteübergreifend weiterverwenden.
-- Nicht für jedes Gerät einen neuen unabhängigen Entwicklungsstand anlegen.
+First examine:
+- Which repository is open.
+- Which Git branch is active.
+- Whether files already exist.
+- Whether the Codespace environment is set up correctly.
+- Which tools are already installed.
+- Which Python, Node.js and Git versions are present.
+- Which resources are available.
+- Whether dev container configurations exist.
 
-Der GitHub-Remote ist die dauerhafte und massgebliche Quelle des Quellcodes.
+Do not create a new environment if a suitable environment already exists.
 
-Ein Codespace allein ist kein Backup. Nicht gepushte Änderungen dürfen niemals als dauerhaft gesichert betrachtet werden.
+## 5.3 Cloud persistence
 
-## 5.4 Entwicklungsumgebung
+The project files are located in the persistent repository directory of the Codespace.
 
-Der vorgeschlagene Technologie-Stack:
+Important rules:
 
-| Bereich | Technologie |
+- Version changes regularly with Git.
+- Push changes to GitHub.
+- Do not store important files outside the project directory.
+- Do not store credentials in Git files.
+- Use GitHub Codespaces secrets when secret credentials are needed.
+- Reuse the existing Codespace across devices where possible.
+- Do not create a new independent development state for every device.
+
+The GitHub remote is the permanent and authoritative source of the source code.
+
+A Codespace alone is not a backup. Unpushed changes must never be considered permanently saved.
+
+## 5.4 Development environment
+
+The proposed technology stack:
+
+| Area | Technology |
 |---|---|
 | Frontend | React |
-| Sprache | TypeScript |
+| Language | TypeScript |
 | Build | Vite |
 | Backend | Python |
-| Backend-Framework | Django |
+| Backend framework | Django |
 | API | Django REST Framework |
-| Datenbank | PostgreSQL |
-| Cache | Redis, bei Bedarf |
-| Background Jobs | Celery, bei Bedarf |
+| Database | PostgreSQL |
+| Cache | Redis, if needed |
+| Background jobs | Celery, if needed |
 | Container | Docker |
 | Deployment | Docker Compose |
 
-Entwickle die Anwendung als modularen Monolithen.
+Develop the application as a modular monolith.
 
-Microservices sind für das MVP nicht vorgesehen.
+Microservices are not intended for the MVP.
 
-Prüfe aktuelle stabile Versionen und offizielle Dokumentation zum Implementierungszeitpunkt.
+Check current stable versions and official documentation at the time of implementation.
 
-## 5.5 Dev-Container
+## 5.5 Dev container
 
-Eine reproduzierbare `.devcontainer/devcontainer.json` soll langfristig die Entwicklungsumgebung beschreiben.
+A reproducible `.devcontainer/devcontainer.json` shall describe the development environment in the long term.
 
-Mögliche Inhalte:
+Possible contents:
 
-- Entwicklungsimage.
+- Development image.
 - Python.
 - Node.js.
 - Git.
-- Docker-Unterstützung.
-- Notwendige Tools.
-- Portkonfiguration.
-- Setup-Skripte.
+- Docker support.
+- Necessary tools.
+- Port configuration.
+- Setup scripts.
 
-**In der aktuellen Planungsphase darfst du diese Datei nicht erstellen oder ändern.**
+**In the current planning phase you may not create or change this file.**
 
-Untersuche zuerst die bestehende Umgebung und präsentiere eine konkrete Konfiguration als Vorschlag.
+First examine the existing environment and present a concrete configuration as a proposal.
 
-Ich muss sie freigeben, bevor sie implementiert wird.
+I must approve it before it is implemented.
 
-## 5.6 Ports und Sicherheit
+## 5.6 Ports and security
 
-Während der Entwicklung können beispielsweise folgende Ports verwendet werden:
+During development, for example, the following ports may be used:
 
 - Frontend: 5173.
 - Backend: 8000.
 - PostgreSQL: 5432.
 
-Prüfe die tatsächliche Konfiguration.
+Check the actual configuration.
 
-Webserver-Ports dürfen zunächst nur privat über Codespaces erreichbar sein.
+Web server ports may initially only be reachable privately via Codespaces.
 
-Die Datenbank darf nicht öffentlich exponiert werden.
+The database must not be exposed publicly.
 
-## 5.7 Entwicklungsumgebung und Produktivbetrieb
+## 5.7 Development environment and production operation
 
-Die Cloud-Entwicklungsumgebung ist nicht das spätere Produktivhosting.
+The cloud development environment is not the later production hosting.
 
-Plane diese Systeme getrennt.
+Plan these systems separately.
 
-Die produktive Plattform soll später unabhängig vom Codespace betrieben werden können.
+The production platform shall later be operable independently of the Codespace.
 
 ---
 
-# 6. PROJEKTSTRUKTUR UND DOKUMENTATION
+# 6. PROJECT STRUCTURE AND DOCUMENTATION
 
-Die endgültige Struktur ist noch nicht festgelegt.
+The final structure has not been decided yet.
 
-Eine mögliche Struktur:
+A possible structure:
 
 ```text
 project/
@@ -550,54 +552,54 @@ project/
 └── docker-compose.yml
 ```
 
-Dies ist nur ein Vorschlag.
+This is only a proposal.
 
-Untersuche zuerst, ob eine andere Struktur besser geeignet ist.
+First examine whether another structure is more suitable.
 
-Die Dokumentation soll langfristig folgende Aufgaben erfüllen:
+In the long term, the documentation shall serve the following purposes:
 
-- Produktvision festhalten.
-- Produktanforderungen dokumentieren.
-- Entwicklungsplan verwalten.
-- Architekturentscheidungen nachvollziehbar machen.
-- Offene Fragen festhalten.
-- Tatsächlichen Entwicklungsstand dokumentieren.
-- Entwicklungsumgebung beschreiben.
-- Zusammenarbeit erleichtern.
+- Record the product vision.
+- Document product requirements.
+- Manage the development plan.
+- Make architecture decisions traceable.
+- Record open questions.
+- Document the actual development state.
+- Describe the development environment.
+- Make collaboration easier.
 
-Der aktuelle Prompt darf später als `MASTER-PROMPT.md` im Repository abgelegt werden.
+The current prompt may later be stored in the repository as `MASTER-PROMPT.md`.
 
-Dokumentiere Architekturentscheidungen in ADRs.
+Document architecture decisions in ADRs.
 
-Die Dokumentation muss mit der tatsächlichen Implementierung übereinstimmen.
+The documentation must match the actual implementation.
 
 ---
 
-# 7. SICHERHEIT UND DATENSCHUTZ
+# 7. SECURITY AND PRIVACY
 
-Sicherheit ist von Anfang an zu berücksichtigen.
+Security must be considered from the start.
 
-Insbesondere:
+In particular:
 
-- Sichere Passwortspeicherung.
+- Secure password storage.
 - HTTPS.
-- CSRF-Schutz.
-- XSS-Schutz.
-- SQL-Injection-Schutz.
-- Rate Limiting.
-- Sichere Session-Verwaltung.
-- Serverseitige Berechtigungsprüfung.
-- Sichere Dateiuploads.
-- Audit-Logs.
-- Backup und Wiederherstellung.
-- Sichere private Kampagnen.
-- Datenschutzkonforme Behandlung von Testerinformationen.
+- CSRF protection.
+- XSS protection.
+- SQL injection protection.
+- Rate limiting.
+- Secure session management.
+- Server-side authorization checks.
+- Secure file uploads.
+- Audit logs.
+- Backup and recovery.
+- Secure private campaigns.
+- Privacy-compliant handling of tester information.
 
-Downloads erfolgen im MVP über offizielle Projektquellen.
+In the MVP, downloads go through official project sources.
 
-TestHub soll keine ausführbaren Programme hosten oder fremde Software automatisch ausführen.
+TestHub shall not host executable programs or automatically execute third-party software.
 
-Zugelassene Feedbackanhänge sollen zunächst auf notwendige Dateiformate beschränkt sein:
+Permitted feedback attachments shall initially be limited to necessary file formats:
 
 - PNG.
 - JPEG.
@@ -606,35 +608,35 @@ Zugelassene Feedbackanhänge sollen zunächst auf notwendige Dateiformate beschr
 - LOG.
 - JSON.
 
-Schutzanforderungen:
-- Keine unberechtigten Zugriffe auf private Kampagnen.
-- Keine Veröffentlichung privater Feedbackmeldungen ohne Freigabe.
-- Keine Offenlegung von Benutzerdaten.
-- Keine Geheimnisse im Repository.
+Protection requirements:
+- No unauthorized access to private campaigns.
+- No publication of private feedback reports without approval.
+- No disclosure of user data.
+- No secrets in the repository.
 
-Berücksichtige das Schweizer DSG und gegebenenfalls die europäische DSGVO.
+Take the Swiss FADP (DSG) and, where applicable, the European GDPR into account.
 
 ---
 
-# 8. UI/UX-RICHTUNG
+# 8. UI/UX DIRECTION
 
-Die Plattform soll wie ein modernes soziales Netzwerk wirken.
+The platform shall look like a modern social network.
 
-Gewünschte Eigenschaften:
+Desired properties:
 
-- Professionell.
+- Professional.
 - Modern.
-- Übersichtlich.
-- Responsiv.
-- Dark Mode.
-- Light Mode.
-- Einheitliche Komponenten.
-- Gute Lesbarkeit.
-- Sinnvolle Informationshierarchie.
-- Dezente Animationen.
-- Intuitive Bedienung.
+- Clear.
+- Responsive.
+- Dark mode.
+- Light mode.
+- Consistent components.
+- Good readability.
+- Sensible information hierarchy.
+- Subtle animations.
+- Intuitive operation.
 
-Hauptnavigation als Vorschlag:
+Main navigation as a proposal:
 
 - Home.
 - Discover.
@@ -644,417 +646,417 @@ Hauptnavigation als Vorschlag:
 - Community.
 - Profile.
 
-Kopiere nicht einfach das Design von Reddit, GitHub oder Discord.
+Do not simply copy the design of Reddit, GitHub or Discord.
 
-Entwickle eine eigenständige Designrichtung.
+Develop an independent design direction.
 
-**Wichtig:** Falls Details der visuellen Gestaltung oder des Nutzerverhaltens noch unklar sind, frage mich zuerst, bevor du dich auf ein verbindliches Design festlegst.
+**Important:** If details of the visual design or user behavior are still unclear, ask me first before committing to a binding design.
 
 ---
 
-# 9. MVP-ENTWICKLUNGSSTRATEGIE
+# 9. MVP DEVELOPMENT STRATEGY
 
-Die Entwicklung erfolgt schrittweise.
+Development proceeds step by step.
 
-Die geplanten Phasen:
+The planned phases:
 
 ### Phase 0 – Foundation
 - Repository.
-- Entwicklungsumgebung.
+- Development environment.
 - Frontend.
 - Backend.
-- Datenbank.
-- Dokumentation.
-- Testumgebung.
+- Database.
+- Documentation.
+- Test environment.
 
 ### Phase 1 – Accounts
-- Registrierung.
-- E-Mail-Verifizierung.
+- Registration.
+- Email verification.
 - Login.
-- Profile.
-- Datenschutzeinstellungen.
+- Profiles.
+- Privacy settings.
 
 ### Phase 2 – Projects
-- Projekte erstellen.
-- Projektseiten.
-- Maintainer.
-- Repository-Links.
-- Kategorien.
-- Betriebssysteme.
+- Create projects.
+- Project pages.
+- Maintainers.
+- Repository links.
+- Categories.
+- Operating systems.
 
-### Phase 3 – Discover und Feed
-- Home-Feed.
+### Phase 3 – Discover and feed
+- Home feed.
 - Discover.
-- Suche.
-- Filter.
+- Search.
+- Filters.
 - Following.
 
 ### Phase 4 – Campaigns
-- Testkampagnen.
-- Öffentliche und private Kampagnen.
-- Einladungen.
-- Teilnahmeverwaltung.
+- Test campaigns.
+- Public and private campaigns.
+- Invitations.
+- Participation management.
 
 ### Phase 5 – Testing
-- Freies Testen.
-- Strukturierte Aufgaben.
-- Kombinierte Tests.
+- Free testing.
+- Structured tasks.
+- Combined tests.
 
 ### Phase 6 – Feedback
-- Bug Reports.
-- UX Feedback.
-- Feature Suggestions.
-- Compatibility Reports.
-- Anhänge.
-- Feedbackstatus.
+- Bug reports.
+- UX feedback.
+- Feature suggestions.
+- Compatibility reports.
+- Attachments.
+- Feedback status.
 
 ### Phase 7 – Community
-- Kommentare.
-- Diskussionen.
-- Projektupdates.
-- Benachrichtigungen.
+- Comments.
+- Discussions.
+- Project updates.
+- Notifications.
 
-### Phase 8 – Moderation und Sicherheit
-- Meldefunktion.
+### Phase 8 – Moderation and security
+- Reporting function.
 - Moderation.
-- Kontosperrungen.
-- Audit-Logs.
-- Sicherheitsprüfungen.
+- Account suspensions.
+- Audit logs.
+- Security reviews.
 
 ### Phase 9 – Release
-- Integrationstests.
+- Integration tests.
 - Performance.
-- Barrierefreiheit.
-- Dokumentation.
-- Closed Beta.
-- Öffentlicher MVP.
+- Accessibility.
+- Documentation.
+- Closed beta.
+- Public MVP.
 
-Überspringe keine Phase ohne Begründung und meine Zustimmung.
+Do not skip any phase without a justification and my consent.
 
 ---
 
-# 10. DEINE VERBINDLICHE ARBEITSWEISE
+# 10. YOUR BINDING WAY OF WORKING
 
-Dies ist eine der wichtigsten Anforderungen.
+This is one of the most important requirements.
 
-Du sollst kritisch, systematisch und eigenständig arbeiten.
+You shall work critically, systematically and independently.
 
-Gleichzeitig behalte ich die Kontrolle über wichtige Entscheidungen.
+At the same time, I keep control over important decisions.
 
-## 10.1 IMMER FRAGEN, WENN DETAILS UNGEKLÄRT SIND
+## 10.1 ALWAYS ASK WHEN DETAILS ARE UNCLEAR
 
-Wenn eine relevante Information nicht eindeutig festgelegt ist, musst du mich zuerst fragen.
+If relevant information has not been clearly defined, you must ask me first.
 
-Keine eigenständigen Annahmen bei offenen Anforderungen.
+No independent assumptions about open requirements.
 
-Das gilt insbesondere für:
+This applies in particular to:
 
-- Produktfunktionen.
-- UI/UX-Verhalten.
-- Designentscheidungen.
-- Benutzerabläufe.
-- Berechtigungen.
-- Datenbankverhalten.
-- Datenschutz.
-- Sicherheit.
-- API-Verhalten.
-- Integrationen.
-- Architekturänderungen.
-- Technologien.
-- Projektumfang.
-- Naming und Branding.
+- Product features.
+- UI/UX behavior.
+- Design decisions.
+- User flows.
+- Permissions.
+- Database behavior.
+- Privacy.
+- Security.
+- API behavior.
+- Integrations.
+- Architecture changes.
+- Technologies.
+- Project scope.
+- Naming and branding.
 
-Der Ablauf lautet:
+The procedure is:
 
-1. Erkennen, welche Information fehlt.
-2. Erklären, warum sie benötigt wird.
-3. Konkrete Frage stellen.
-4. Zusammenhängende Fragen bündeln.
-5. Auf meine Antwort warten.
-6. Erst anschliessend die davon abhängige Planung konkretisieren oder Implementierung beginnen.
+1. Recognize which information is missing.
+2. Explain why it is needed.
+3. Ask a concrete question.
+4. Bundle related questions.
+5. Wait for my answer.
+6. Only then refine the dependent planning or start implementation.
 
-**Nicht raten. Nicht stillschweigend entscheiden. Nicht auf Basis ungeklärter Anforderungen implementieren.**
+**Do not guess. Do not decide silently. Do not implement on the basis of unclear requirements.**
 
-Bereits verbindlich getroffene Produktentscheidungen müssen nicht erneut erfragt werden.
+Product decisions that have already been made bindingly need not be asked again.
 
-Routineentscheidungen, die durch freigegebene Anforderungen und etablierte Projektkonventionen eindeutig bestimmt sind, können nachvollziehbar getroffen werden.
+Routine decisions that are clearly determined by approved requirements and established project conventions may be made traceably.
 
-Wenn eine technische Entscheidung wesentliche Auswirkungen auf Kosten, Sicherheit, Datenstruktur oder spätere Erweiterbarkeit hat, musst du sie vorher mit mir klären.
+If a technical decision has a significant impact on cost, security, data structure or later extensibility, you must clarify it with me beforehand.
 
-## 10.2 Kritisch hinterfragen
+## 10.2 Question critically
 
-Stimme meinen Vorschlägen nicht automatisch zu.
+Do not agree with my proposals automatically.
 
-Prüfe:
-- Ist die Funktion tatsächlich nützlich?
-- Ist sie bereits ausreichend gelöst?
-- Existieren bessere Technologien?
-- Entsteht unnötige Komplexität?
-- Ist die Lösung sicher?
-- Passt sie zum Open-Source-Konzept?
-- Ist sie für das MVP wirklich notwendig?
+Check:
+- Is the feature actually useful?
+- Is it already solved sufficiently?
+- Do better technologies exist?
+- Does unnecessary complexity arise?
+- Is the solution secure?
+- Does it fit the open-source concept?
+- Is it really necessary for the MVP?
 
-Wenn du Verbesserungen erkennst, stelle sie als Vorschlag vor.
+If you recognize improvements, present them as a proposal.
 
-Wichtige Änderungen benötigen meine Zustimmung.
+Important changes require my consent.
 
-## 10.3 Schrittweise Entwicklung
+## 10.3 Step-by-step development
 
-Jede Entwicklungsaufgabe benötigt:
+Every development task requires:
 
-- Ziel.
-- Anforderungen.
-- Betroffene Komponenten.
-- Technische Umsetzung.
-- Abhängigkeiten.
-- Akzeptanzkriterien.
+- Goal.
+- Requirements.
+- Affected components.
+- Technical implementation.
+- Dependencies.
+- Acceptance criteria.
 - Tests.
-- Definition of Done.
+- Definition of done.
 
-Arbeite in überprüfbaren Arbeitspaketen.
+Work in verifiable work packages.
 
-Schreibe nicht unkontrolliert grosse Teile der Anwendung.
+Do not write large parts of the application in an uncontrolled way.
 
 ## 10.4 Tests
 
-Teste jede relevante Funktion.
+Test every relevant feature.
 
-Unterscheide zwischen:
-- Unit Tests.
-- API Tests.
-- Integration Tests.
-- End-to-End Tests.
-- Sicherheitsprüfungen.
+Distinguish between:
+- Unit tests.
+- API tests.
+- Integration tests.
+- End-to-end tests.
+- Security checks.
 
-Behaupte niemals, dass ein Test erfolgreich war, ohne ihn tatsächlich ausgeführt zu haben.
+Never claim that a test succeeded without actually having run it.
 
-## 10.5 Dokumentation
+## 10.5 Documentation
 
-Dokumentiere:
-- Architekturentscheidungen.
-- Änderungen.
-- API-Verträge.
-- Datenbankänderungen.
-- Offene Probleme.
-- Sicherheitsentscheidungen.
-- Entwicklungsstatus.
+Document:
+- Architecture decisions.
+- Changes.
+- API contracts.
+- Database changes.
+- Open problems.
+- Security decisions.
+- Development status.
 
-Die Dokumentation muss aktuell bleiben.
+The documentation must stay current.
 
-## 10.6 Kommunikation
+## 10.6 Communication
 
-Erkläre technische Entscheidungen verständlich.
+Explain technical decisions in an understandable way.
 
-Ich möchte wissen:
-- Was wird entwickelt?
-- Warum?
-- Wie funktioniert es?
-- Welche Alternativen existieren?
-- Welche Nachteile gibt es?
-- Welche Entscheidung muss ich treffen?
+I want to know:
+- What is being developed?
+- Why?
+- How does it work?
+- Which alternatives exist?
+- What are the disadvantages?
+- Which decision do I have to make?
 
-Stelle bei unklaren Anforderungen konkrete, verständliche und möglichst gebündelte Fragen.
+For unclear requirements, ask concrete, understandable and preferably bundled questions.
 
 ---
 
-# 11. AKTUELLER PLAN-MODE-AUFTRAG
+# 11. CURRENT PLAN MODE ASSIGNMENT
 
-**Du befindest dich zu Beginn in Claude Code Plan Mode. Diese erste Sitzung dient ausschliesslich der Bestandsaufnahme, Klärung und Planung.**
+**You are initially in Claude Code Plan Mode. This first session serves exclusively for inventory, clarification and planning.**
 
-Plane den folgenden Ablauf.
+Plan the following procedure.
 
-## Schritt 1 – Umgebung untersuchen
+## Step 1 – Examine the environment
 
-Untersuche read-only:
+Examine read-only:
 
-- Aktuelles Repository.
-- Git-Status.
-- Aktuellen Branch.
-- Vorhandene Dateien.
-- Verzeichnisstruktur.
-- Codespace-Konfiguration.
-- Vorhandene `.devcontainer`-Dateien.
-- Installierte Entwicklungswerkzeuge.
-- Python-Version.
-- Node.js-Version.
-- Git-Version.
-- Verfügbare Ressourcen.
-- Vorhandene Dokumentation.
-- Vorhandene Claude-Konfiguration.
+- Current repository.
+- Git status.
+- Current branch.
+- Existing files.
+- Directory structure.
+- Codespace configuration.
+- Existing `.devcontainer` files.
+- Installed development tools.
+- Python version.
+- Node.js version.
+- Git version.
+- Available resources.
+- Existing documentation.
+- Existing Claude configuration.
 
-Untersuche auch, ob das Repository bereits Projektinhalte enthält.
+Also examine whether the repository already contains project content.
 
-Verändere nichts.
+Do not change anything.
 
-## Schritt 2 – Projektanforderungen analysieren
+## Step 2 – Analyze the project requirements
 
-Untersuche die gesamte Produktvision und identifiziere:
+Examine the entire product vision and identify:
 
-- Bereits geklärte Anforderungen.
-- Fehlende Anforderungen.
-- Widersprüche.
-- Technische Risiken.
-- Produktentscheidungen, die noch fehlen.
-- Sicherheitsfragen.
-- Architekturfragen.
-- Abhängigkeiten zwischen Funktionen.
+- Requirements that are already clarified.
+- Missing requirements.
+- Contradictions.
+- Technical risks.
+- Product decisions that are still missing.
+- Security questions.
+- Architecture questions.
+- Dependencies between features.
 
-Trenne klar zwischen verbindlichen Anforderungen und deinen eigenen Vorschlägen.
+Clearly separate binding requirements from your own proposals.
 
-## Schritt 3 – Technische Recherche
+## Step 3 – Technical research
 
-Wenn Internetzugriff vorhanden ist:
+If internet access is available:
 
-- Prüfe aktuelle stabile Versionen des Technologie-Stacks.
-- Verwende möglichst offizielle Dokumentation.
-- Untersuche geeignete Alternativen.
-- Prüfe die Integration von Claude Code in GitHub Codespaces.
-- Prüfe passende Dev-Container-Konfigurationen.
-- Identifiziere technische Risiken.
+- Check current stable versions of the technology stack.
+- Use official documentation wherever possible.
+- Examine suitable alternatives.
+- Check the integration of Claude Code into GitHub Codespaces.
+- Check suitable dev container configurations.
+- Identify technical risks.
 
-Erfinde keine Versionsnummern oder Kompatibilitätsangaben.
+Do not invent version numbers or compatibility statements.
 
-## Schritt 4 – Architektur vorbereiten
+## Step 4 – Prepare the architecture
 
-Erstelle einen Vorschlag für:
+Create a proposal for:
 
-- Systemarchitektur.
-- Frontend-Struktur.
-- Backend-Struktur.
-- Module.
-- Datenbankmodell.
-- ER-Diagramm.
-- API-Struktur.
-- Berechtigungsmodell.
-- Cloud-Entwicklungsumgebung.
-- Dev-Container.
-- Entwicklungsworkflow.
+- System architecture.
+- Frontend structure.
+- Backend structure.
+- Modules.
+- Database model.
+- ER diagram.
+- API structure.
+- Permission model.
+- Cloud development environment.
+- Dev container.
+- Development workflow.
 - Tests.
 - Deployment.
 
-Achte darauf, dass die Architektur zum MVP passt und nicht unnötig komplex ist.
+Make sure the architecture fits the MVP and is not unnecessarily complex.
 
-## Schritt 5 – Offene Fragen stellen
+## Step 5 – Ask open questions
 
-Stelle mir alle wichtigen noch offenen Fragen.
+Ask me all important questions that are still open.
 
-Beispielsweise:
-- Wie genau sollen bestimmte Nutzerabläufe funktionieren?
-- Welche Details des Feed-Systems sind gewünscht?
-- Wie soll die Testerzuordnung funktionieren?
-- Wie sollen Projektverantwortliche verwaltet werden?
-- Welche Informationen sollen öffentlich sichtbar sein?
-- Welche Anforderungen gelten für Benachrichtigungen?
-- Wie sollen verschiedene Kampagnen konfiguriert werden?
+For example:
+- How exactly should certain user flows work?
+- Which details of the feed system are desired?
+- How should tester assignment work?
+- How should project owners be managed?
+- Which information should be publicly visible?
+- Which requirements apply to notifications?
+- How should different campaigns be configured?
 
-Diese Fragen sind nur Beispiele. Stelle tatsächlich nur die Fragen, die du nach der Bestandsaufnahme als notwendig erkennst.
+These questions are only examples. Ask only the questions you actually recognize as necessary after the inventory.
 
-Bündle zusammenhängende Fragen und erkläre die jeweiligen Auswirkungen.
+Bundle related questions and explain their respective impact.
 
-Warte auf meine Antworten.
+Wait for my answers.
 
-## Schritt 6 – Vollständigen Entwicklungsplan erstellen
+## Step 6 – Create the complete development plan
 
-Erst nachdem die wichtigen Fragen geklärt sind, erstelle einen vollständigen Plan mit:
+Only after the important questions have been clarified, create a complete plan with:
 
-1. Finalisierter Produktanforderungsspezifikation.
-2. Technischer Architektur.
-3. Datenbankmodell.
-4. API-Konzept.
-5. Berechtigungsmodell.
-6. Cloud-Entwicklungsumgebung.
-7. Projektstruktur.
-8. Dev-Container-Konfiguration.
-9. Detailliertem MVP-Plan.
-10. Entwicklungsaufgaben.
-11. Teststrategie.
-12. Sicherheitskonzept.
-13. Abnahmekriterien.
+1. Finalized product requirements specification.
+2. Technical architecture.
+3. Database model.
+4. API concept.
+5. Permission model.
+6. Cloud development environment.
+7. Project structure.
+8. Dev container configuration.
+9. Detailed MVP plan.
+10. Development tasks.
+11. Test strategy.
+12. Security concept.
+13. Acceptance criteria.
 
-## Schritt 7 – Auf Freigabe warten
+## Step 7 – Wait for approval
 
-Präsentiere den vollständigen Plan.
+Present the complete plan.
 
-Weise auf offene Punkte und Risiken hin.
+Point out open items and risks.
 
-**Beginne nicht mit der Implementierung, bevor ich den Plan ausdrücklich freigegeben habe.**
+**Do not start the implementation before I have explicitly approved the plan.**
 
-Auch nach der Freigabe gilt die Pflicht, bei neuen unklaren Produktdetails zuerst nachzufragen.
-
----
-
-# 12. ABSOLUTE EINSCHRÄNKUNGEN FÜR DIE ERSTE SITZUNG
-
-Während dieser ersten Planungsphase:
-
-- Keine Dateien erstellen.
-- Keine Dateien bearbeiten.
-- Keine Dateien löschen.
-- Keine Abhängigkeiten installieren.
-- Keine Dev-Container-Konfiguration ändern.
-- Keine Datenbank erstellen oder migrieren.
-- Keine Git-Commits erstellen.
-- Keine Git-Pushes durchführen.
-- Keine GitHub-Einstellungen verändern.
-- Keine Secrets anlegen oder verändern.
-- Keine Produktivdienste einrichten.
-- Keine Implementation beginnen.
-- Keine endgültigen Designentscheidungen treffen.
-- Keine endgültige Namensentscheidung treffen.
-
-Du darfst bestehende Dateien lesen und die Umgebung analysieren.
-
-Falls eine Information nur durch eine Änderung oder Installation ermittelt werden könnte, frage mich zuerst.
-
-Alle Ergebnisse der ersten Sitzung präsentierst du zunächst im Gespräch.
-
-Erst nach meiner Freigabe dürfen Dokumente oder technische Konfigurationen im Repository erstellt beziehungsweise geändert werden.
+Even after approval, the obligation to ask first about new unclear product details remains.
 
 ---
 
-# 13. LANGFRISTIGE VISION
+# 12. ABSOLUTE RESTRICTIONS FOR THE FIRST SESSION
 
-Die Plattform soll langfristig mehr sein als ein einfacher Beta-Downloadbereich.
+During this first planning phase:
 
-Mögliche Erweiterungen:
+- Do not create files.
+- Do not edit files.
+- Do not delete files.
+- Do not install dependencies.
+- Do not change the dev container configuration.
+- Do not create or migrate a database.
+- Do not create Git commits.
+- Do not perform Git pushes.
+- Do not change GitHub settings.
+- Do not create or change secrets.
+- Do not set up production services.
+- Do not start the implementation.
+- Do not make final design decisions.
+- Do not make a final naming decision.
 
-- GitHub-Integration.
-- GitLab-Integration.
-- Forgejo- und Codeberg-Integration.
-- Tester-Matching.
-- Erweiterte Reputation.
-- Mehrere Testphasen.
-- Release-Vergleiche.
-- Teststatistiken.
-- Öffentliche API.
-- Self-Hosting.
-- Föderation.
-- Mobile Apps.
+You may read existing files and analyze the environment.
 
-Diese Funktionen sind nicht Teil des ersten MVP.
+If information could only be obtained through a change or installation, ask me first.
 
-Konzentriere dich auf das Kernprodukt.
+Present all results of the first session in the conversation first.
+
+Only after my approval may documents or technical configurations be created or changed in the repository.
 
 ---
 
-# 14. ABSCHLIESSENDE ANWEISUNG
+# 13. LONG-TERM VISION
 
-Behandle das Projekt als ernstzunehmendes, langfristiges Open-Source-Produkt.
+In the long term, the platform shall be more than a simple beta download area.
 
-Du sollst nicht möglichst viel Code produzieren.
+Possible extensions:
 
-Du sollst eine hochwertige, sichere, wartbare und tatsächlich nützliche Plattform ermöglichen.
+- GitHub integration.
+- GitLab integration.
+- Forgejo and Codeberg integration.
+- Tester matching.
+- Extended reputation.
+- Several testing phases.
+- Release comparisons.
+- Test statistics.
+- Public API.
+- Self-hosting.
+- Federation.
+- Mobile apps.
 
-Arbeite systematisch, kritisch und innerhalb der von mir freigegebenen Anforderungen.
+These features are not part of the first MVP.
 
-Ich möchte die wichtigen Entscheidungen selbst treffen und gleichzeitig von deiner technischen Expertise profitieren.
+Focus on the core product.
 
-Die wichtigste Regel lautet:
+---
 
-**Wenn eine relevante Anforderung, ein Detail oder eine Entscheidung unklar ist, frage mich immer zuerst, bevor du davon abhängige Änderungen vornimmst.**
+# 14. FINAL INSTRUCTION
 
-Der endgültige Produktname bleibt offen.
+Treat the project as a serious, long-term open-source product.
 
-Die erste Sitzung ist ausschliesslich zur Analyse und Planung bestimmt.
+You shall not produce as much code as possible.
 
-**Beginne jetzt mit Schritt 1: Untersuche das aktuelle GitHub-Codespace-Repository und die verfügbare Entwicklungsumgebung im Plan Mode. Verändere dabei nichts. Identifiziere anschliessend offene Fragen und stelle sie mir, bevor du den endgültigen Entwicklungsplan erstellst.**
+You shall enable a high-quality, secure, maintainable and genuinely useful platform.
+
+Work systematically, critically and within the requirements I have approved.
+
+I want to make the important decisions myself and at the same time benefit from your technical expertise.
+
+The most important rule is:
+
+**If a relevant requirement, detail or decision is unclear, always ask me first before making dependent changes.**
+
+The final product name remains open.
+
+The first session is intended exclusively for analysis and planning.
+
+**Now start with step 1: examine the current GitHub Codespace repository and the available development environment in Plan Mode. Do not change anything. Then identify open questions and ask them before you create the final development plan.**

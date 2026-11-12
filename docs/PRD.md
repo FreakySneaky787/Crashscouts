@@ -1,120 +1,144 @@
-# Produktanforderungen (PRD) – Kern-MVP
+# Product Requirements (PRD) – Core MVP
 
-> Stand: 2026-11-12 · Status: **freigegeben** (Planungsphase) · Arbeitsname: „TestHub" (Platzhalter, nicht final)
+> As of: 2026-11-12 · Status: **approved** (planning phase) · Working name: "TestHub" (placeholder,
+> not final)
 >
-> Grundlage: [`MASTER-PROMPT.md`](MASTER-PROMPT.md) plus die in der Planungssitzung getroffenen Entscheidungen.
-> Markierung **⚑** = Vorschlag, mit dem Gesamtplan freigegeben; Details werden vor der jeweiligen Phase nochmals bestätigt.
+> Basis: [`MASTER-PROMPT.md`](MASTER-PROMPT.md) plus the decisions made in the planning session.
+> Marker **⚑** = proposal approved together with the overall plan; details are confirmed again
+> before the respective phase.
 
-## 1. Problem und Ziel
+## 1. Problem and goal
 
-Open-Source- und unabhängige Entwickler finden schwer externe Tester. Gleichzeitig gibt es Menschen, die freiwillig neue Software ausprobieren und Feedback geben möchten.
-Die Plattform bringt beide Gruppen zusammen und organisiert **menschliche** Softwaretests: Kampagnen, Aufgaben, strukturiertes Feedback.
+Open-source and independent developers struggle to find external testers. At the same time,
+there are people who would like to try new software voluntarily and give feedback.
+The platform brings both groups together and organizes **human** software testing: campaigns,
+tasks and structured feedback.
 
-Leitgedanke: *Software gemeinsam testen. Gemeinsam besser machen.*
+Guiding idea: *Test software together. Make it better together.*
 
-## 2. Zielgruppen
+## 2. Target groups
 
-| Rolle | Ziel auf der Plattform |
+| Role | Goal on the platform |
 |---|---|
-| Entwickler / Maintainer | Projekt präsentieren, Tester finden, Kampagnen durchführen, Feedback verwalten |
-| Tester | Software entdecken, freiwillig teilnehmen, Fehler und Verbesserungen melden |
-| Moderation / Admin | Missbrauch verhindern, Meldungen bearbeiten |
+| Developer / maintainer | Present the project, find testers, run campaigns, manage feedback |
+| Tester | Discover software, take part voluntarily, report bugs and improvements |
+| Moderation / admin | Prevent abuse, handle reports |
 
-Ein Konto kann gleichzeitig Entwickler und Tester sein.
+One account can be developer and tester at the same time.
 
-## 3. Verbindliche Rahmenentscheidungen
+## 3. Binding framework decisions
 
-- Open-Source-first; kommerzielle und Closed-Source-Projekte sind erlaubt, aber klar gekennzeichnet (automatisch aus der SPDX-Lizenz).
-- Öffentliche und private Kampagnen.
-- Testmethoden: frei, strukturiert und kombiniert.
-- Eine zentrale Plattform: keine Föderation und kein Self-Hosting im MVP.
-- Teilnahme freiwillig und kostenlos; kein Verkauf von Nutzerdaten.
-- Die Plattform ist Open Source unter AGPL-3.0 (siehe [ADR 0006](adr/0006-lizenz-agpl-3.0.md)).
-- Keine Hosting-Funktion für ausführbare Dateien, keine automatische Ausführung fremder Software. Downloads laufen ausschliesslich über externe, offizielle Projektquellen.
+- Open-source first; commercial and closed-source projects are allowed but clearly labeled
+  (derived automatically from the SPDX license).
+- Public and private campaigns.
+- Testing methods: free, structured and combined.
+- One central platform: no federation and no self-hosting in the MVP.
+- Participation is voluntary and free of charge; no selling of user data.
+- The platform itself is open source under AGPL-3.0 (see [ADR 0006](adr/0006-license-agpl-3.0.md)).
+- No hosting of executables and no automatic execution of third-party software. Downloads go
+  exclusively through external, official project sources.
 
-## 4. In der Planungssitzung getroffene Entscheidungen
+## 4. Decisions made in the planning session
 
-| Thema | Entscheidung |
+| Topic | Decision |
 |---|---|
-| MVP-Umfang | **Kern-MVP:** Konten, Projekte, Kampagnen, Testaufgaben, Feedback, einfache Discover-Suche, Meldefunktion und Moderations-Grundlagen. Feed, Following, Diskussionen und Empfehlungen folgen nach der Closed Beta. |
-| Auffindbarkeit | Öffentliche Seiten werden serverseitig gerendert (SEO, Link-Vorschauen). |
-| Feedback-Sichtbarkeit | Feedback ist **standardmässig privat** (meldende Person und Maintainer). Maintainer können einzelne Meldungen veröffentlichen. |
-| Anmeldung | E-Mail und Passwort sowie GitHub-Login. 2FA (TOTP, Passkeys) ist optional. ⚑ Für Owner öffentlicher Kampagnen und für Moderatoren ist 2FA Pflicht. |
-| Download-Schutz | Mehrstufig: nur HTTPS-Links, Warnseite, kontrollierte Freigabe öffentlicher Kampagnen, optionaler Nachweis der Repository-Inhaberschaft. |
-| Sprache | Die Oberfläche ist auf Englisch; die i18n-Struktur ist von Anfang an vorhanden. |
-| Mindestalter | 16 Jahre, per Selbstbestätigung bei der Registrierung. |
-| Hosting | Schweiz oder EU; der Anbieter wird vor der Closed Beta gewählt. |
-| Betreiber | Privatperson (rechtliche Folgen siehe [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)). |
+| MVP scope | **Core MVP:** accounts, projects, campaigns, test tasks, feedback, simple Discover search, reporting and moderation basics. Feed, following, discussions and recommendations follow after the closed beta. |
+| Discoverability | Public pages are server-side rendered (SEO, link previews). |
+| Feedback visibility | Feedback is **private by default** (reporter and maintainers). Maintainers can publish individual reports. |
+| Sign-in | Email and password plus GitHub login. 2FA (TOTP, passkeys) is optional. ⚑ 2FA is mandatory for owners of public campaigns and for moderators. |
+| Download protection | Multi-layered: HTTPS links only, interstitial warning page, controlled approval of public campaigns, optional proof of repository ownership. |
+| Language | The UI is in English; i18n structure from day one. All documentation, code comments and commit messages are in English. |
+| Minimum age | 16 years, by self-confirmation at signup. |
+| Hosting | Switzerland or EU; provider chosen before the closed beta. |
+| Operator | Private individual (legal implications in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)). |
 
-## 5. Funktionale Anforderungen (Kern-MVP)
+## 5. Functional requirements (core MVP)
 
-### 5.1 Konten und Profile
+### 5.1 Accounts and profiles
 
-- Registrierung mit Bestätigung des Mindestalters, E-Mail-Verifizierung, Login und Logout, Passwort-Reset.
-- Login mit GitHub. Das Datenmodell trennt Konto und Login-Identität, damit später weitere Anbieter wie Codeberg oder GitLab möglich sind.
-- Optionale 2FA (TOTP, Passkeys, Recovery-Codes).
-- Profil mit Benutzername, Profilbild, Biografie, Interessen, bevorzugten Betriebssystemen und technischen Kenntnissen.
-- Datenschutz-Einstellungen: was öffentlich sichtbar ist.
-- ⚑ Konto löschen (Feedback wird anonymisiert, nicht gelöscht) und Datenexport (JSON).
-- *Nach der Beta:* Follower und öffentliche Aktivitäten.
+- Signup with minimum-age confirmation, email verification, login and logout, password reset.
+- Login with GitHub. The data model separates account and login identity so that further
+  providers (Codeberg, GitLab) are possible later.
+- Optional 2FA (TOTP, passkeys, recovery codes).
+- Profile with username, avatar, bio, interests, preferred operating systems and technical skills.
+- Privacy settings: what is publicly visible.
+- ⚑ Account deletion (feedback is anonymized, not deleted) and data export (JSON).
+- *After the beta:* followers and public activity.
 
-### 5.2 Projekte
+### 5.2 Projects
 
-- Projekt anlegen und bearbeiten mit Name, Beschreibung, Logo, Screenshots, Kategorie, Betriebssystemen, Programmiersprachen, Lizenz (SPDX), Repository-Link, Status (Development, Alpha, Beta, Stable, Archived) und Maintainern.
-- Rollen Owner und Maintainer.
-- Optionaler Nachweis der Repository-Inhaberschaft, angezeigt als Abzeichen „verifiziert".
-- Öffentliche, serverseitig gerenderte Projektseite.
-- *Nach der Beta:* Releases als eigenes Objekt, Diskussionen.
+- Create and edit projects with name, description, logo, screenshots, category, operating
+  systems, programming languages, license (SPDX), repository link, status (Development, Alpha,
+  Beta, Stable, Archived) and maintainers.
+- Roles owner and maintainer.
+- Optional proof of repository ownership, shown as a "verified" badge.
+- Public, server-side rendered project page.
+- *After the beta:* releases as separate objects, discussions.
 
-### 5.3 Testkampagnen
+### 5.3 Test campaigns
 
-- Felder: Titel, Beschreibung, Projekt, Softwareversion, Changelog, Testzeitraum, gewünschte Testeranzahl, Zielbetriebssysteme, Hardwareanforderungen, Voraussetzungen, Testmethode, Testaufgaben, Download-Links.
+- Fields: title, description, project, software version, changelog, test period, desired number
+  of testers, target operating systems, hardware requirements, prerequisites, testing method, test
+  tasks, download links.
 - Status: Draft, Open, Full, In Progress, Completed, Cancelled.
-- Sichtbarkeit öffentlich oder privat. Private Kampagnen sind nur für Eingeladene sichtbar und erscheinen nirgends öffentlich.
-- Teilnahme direkt, nach Freigabe oder per Einladung.
-- Download-Links nur als `https://`, mit einer Warnseite vor dem Verlassen der Plattform.
-- **Öffentliche Kampagnen werden erst sichtbar, wenn das Sicherheits-Gate erfüllt ist** (siehe [`MVP-PLAN.md`](MVP-PLAN.md), Phase 3B), und nur nach Freigabe in der Prüfqueue. ⚑ Ändern sich die Links einer bereits freigegebenen Kampagne, wird sie erneut geprüft.
+- Visibility public or private. Private campaigns are visible to invitees only and never appear
+  publicly.
+- Participation directly, after approval, or by invitation.
+- Download links `https://` only, with an interstitial warning page before leaving the platform.
+- **Public campaigns only become visible once the security gate is met** (see
+  [`MVP-PLAN.md`](MVP-PLAN.md), phase 3B), and only after approval in the review queue. ⚑ If the
+  links of an approved campaign change, it is reviewed again.
 
-### 5.4 Testaufgaben
+### 5.4 Test tasks
 
-- Maintainer definieren geordnete Aufgaben.
-- Status pro Teilnehmer: Not Started, In Progress, Completed, Blocked.
+- Maintainers define ordered tasks.
+- Status per participant: Not Started, In Progress, Completed, Blocked.
 
 ### 5.5 Feedback
 
-- Typen: Bug Report, UX Feedback, Feature Suggestion, Compatibility Report, General Feedback.
-- Bug Reports enthalten Titel, Beschreibung, Reproduktionsschritte, erwartetes und tatsächliches Verhalten, Betriebssystem, Softwareversion, Screenshots und Logs.
-- Status: New, Reviewed, Confirmed, In Progress, Fixed, Verified, Duplicate, Cannot Reproduce, Rejected.
-- Anhänge nur als PNG, JPEG, WebP, TXT, LOG oder JSON.
-- Standardmässig privat; Maintainer veröffentlichen einzeln.
+- Types: Bug Report, UX Feedback, Feature Suggestion, Compatibility Report, General Feedback.
+- Bug reports contain title, description, reproduction steps, expected and actual behavior,
+  operating system, software version, screenshots and logs.
+- Status: New, Reviewed, Confirmed, In Progress, Fixed, Verified, Duplicate, Cannot Reproduce,
+  Rejected.
+- Attachments only as PNG, JPEG, WebP, TXT, LOG or JSON.
+- Private by default; maintainers publish individually.
 
 ### 5.6 Discover
 
-- Suche und Filter nach Betriebssystem, Kategorie, Programmiersprache, Softwaretyp, Lizenz, Entwicklungsstatus und aktiven Kampagnen.
-- Kleine Projekte dürfen nicht systematisch von populären verdrängt werden. Die Standard-Sortierung ist deshalb neu oder aktiv, nicht Popularität.
+- Search and filters by operating system, category, programming language, software type, license,
+  development status and active campaigns.
+- Small projects must not be systematically crowded out by popular ones. The default sort order
+  is therefore "new" or "active", not popularity.
 
-### 5.7 Meldungen und Moderation (Grundlagen)
+### 5.7 Reporting and moderation (basics)
 
-- Projekte, Kampagnen und einzelne Download-Links melden.
-- Admins können Kampagnen und Projekte sofort sperren (begründet, protokolliert, reversibel).
-- Prüfqueue für öffentliche Kampagnen.
-- Moderationsablauf mit Status und Audit-Log.
-- Moderatoren erhalten **keinen** pauschalen Zugriff auf private Inhalte; nur zweckgebunden und protokolliert.
+- Report projects, campaigns and individual download links.
+- Admins can block campaigns and projects immediately (with a reason, logged, reversible).
+- Review queue for public campaigns.
+- Moderation workflow with statuses and an audit log.
+- Moderators get **no** blanket access to private content; only purpose-bound and logged.
 
-### 5.8 Benachrichtigungen (minimal)
+### 5.8 Notifications (minimal)
 
-- In der App und per E-Mail, nur für wesentliche Ereignisse: Einladung, Teilnahme freigegeben oder abgelehnt, Statusänderung am eigenen Feedback, Ergebnis einer Moderationsentscheidung.
+- In-app and by email, only for essential events: invitation, participation approved or rejected,
+  status change of one's own feedback, outcome of a moderation decision.
 
-## 6. Nicht-funktionale Anforderungen
+## 6. Non-functional requirements
 
-- **Sicherheit und Datenschutz:** siehe [`SECURITY.md`](SECURITY.md); Schweizer DSG und voraussichtlich DSGVO.
-- **Barrierefreiheit:** Ziel WCAG 2.2 AA.
-- **Responsiv**, mit Dark Mode und Light Mode. Die visuelle Richtung ist **noch nicht entschieden** (offene Frage E).
-- **i18n:** Alle Texte stehen von Anfang an in Übersetzungsdateien.
-- **Austauschbarer Name:** Name und Branding sind zentral konfiguriert und nicht im Code verstreut.
+- **Security and privacy:** see [`SECURITY.md`](SECURITY.md); Swiss FADP and presumably GDPR.
+- **Accessibility:** target WCAG 2.2 AA.
+- **Responsive**, with dark mode and light mode. The visual direction is **not decided yet**
+  (open question E).
+- **i18n:** all UI texts live in translation files from the start.
+- **Replaceable name:** name and branding are configured centrally and not scattered through the
+  code.
 
-## 7. Ausdrücklich nicht im Umfang
+## 7. Explicitly out of scope
 
-Die Plattform ersetzt weder GitHub, GitLab noch Codeberg. Sie ist kein CI/CD-System, kein Download-Portal, keine bezahlte Crowdtesting-Agentur und kein allgemeines Entwicklerforum. Sie führt keine fremde Software aus.
+The platform does not replace GitHub, GitLab or Codeberg. It is not a CI/CD system, not a download
+portal, not a paid crowdtesting agency and not a general developer forum. It does not execute
+third-party software.
 
-Im Kern-MVP fehlen ausserdem: Home-Feed, Following, Kommentare und Diskussionen, Projekt-Updates, Reputation und personalisierte Empfehlungen (siehe [`ROADMAP.md`](ROADMAP.md)).
+The core MVP also excludes: home feed, following, comments and discussions, project updates,
+reputation and personalized recommendations (see [`ROADMAP.md`](ROADMAP.md)).

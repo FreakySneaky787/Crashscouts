@@ -10,15 +10,15 @@ export default tseslint.config(
     plugins: { "react-hooks": reactHooks },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // Sicherheitsregel (docs/SECURITY.md §3): kein ungeprüftes HTML.
+      // Security rule (docs/SECURITY.md §3): no unchecked HTML.
       "no-restricted-syntax": [
         "error",
         {
           selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
-          message: "dangerouslySetInnerHTML ist verboten (XSS-Risiko).",
+          message: "dangerouslySetInnerHTML is forbidden (XSS risk).",
         },
       ],
-      // Bewusst ungenutzte Parameter werden mit "_" gekennzeichnet.
+      // Intentionally unused parameters are prefixed with "_".
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

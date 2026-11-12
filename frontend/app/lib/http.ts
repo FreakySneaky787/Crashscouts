@@ -1,13 +1,13 @@
 /**
- * Reine Hilfsfunktionen für HTTP-Header, Cookies und Weiterleitungen.
- * Bewusst ohne Seiteneffekte, damit sie isoliert getestet werden können (http.test.ts).
+ * Pure helper functions for HTTP headers, cookies and redirects.
+ * Deliberately side-effect free so they can be tested in isolation (http.test.ts).
  */
 
-/** Cookie-Namen von Django (Standardwerte). */
+/** Django's cookie names (defaults). */
 export const SESSION_COOKIE = "sessionid";
 export const CSRF_COOKIE = "csrftoken";
 
-/** Liest einen Cookie-Wert aus einem `Cookie`-Request-Header. */
+/** Reads a cookie value from a `Cookie` request header. */
 export function readCookie(cookieHeader: string | null, name: string): string | null {
   if (!cookieHeader) return null;
   for (const part of cookieHeader.split(";")) {
@@ -22,7 +22,7 @@ export function readCookie(cookieHeader: string | null, name: string): string | 
   return null;
 }
 
-/** Liest den Wert eines Cookies aus einer Liste von `Set-Cookie`-Headern. */
+/** Reads a cookie value from a list of `Set-Cookie` headers. */
 export function readSetCookie(setCookies: readonly string[], name: string): string | null {
   for (const header of setCookies) {
     const first = header.split(";", 1)[0] ?? "";
@@ -38,17 +38,17 @@ export function readSetCookie(setCookies: readonly string[], name: string): stri
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Prüft URL-Parameter, bevor sie in Backend-Pfade eingesetzt werden (kein Pfad-Trick wie "../"). */
+/** Validates URL params before they are used in backend paths (no path tricks such as "../"). */
 export function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_PATTERN.test(value);
 }
 
-/** Hat die Anfrage eine (mögliche) Session? Dann darf die Antwort nie gemeinsam gecacht werden. */
+/** Does the request carry a (possible) session? Then the response must never be shared-cached. */
 export function hasSessionCookie(request: Request): boolean {
   return readCookie(request.headers.get("Cookie"), SESSION_COOKIE) !== null;
 }
 
-/** Header für Antworten mit nutzerbezogenen oder privaten Daten (docs/SECURITY.md §8). */
+/** Headers for responses with user-specific or private data (docs/SECURITY.md §8). */
 export function privateNoStoreHeaders(): Headers {
   return new Headers({
     "Cache-Control": "private, no-store",
@@ -56,7 +56,7 @@ export function privateNoStoreHeaders(): Headers {
   });
 }
 
-/** Header für anonyme, öffentliche Seiten: kurzzeitig cachebar, aber nur ohne Session. */
+/** Headers for anonymous public pages: briefly cacheable, but only without a session. */
 export function publicCacheHeaders(maxAgeSeconds = 60): Headers {
   return new Headers({
     "Cache-Control": `public, max-age=${maxAgeSeconds}`,
@@ -64,12 +64,12 @@ export function publicCacheHeaders(maxAgeSeconds = 60): Headers {
   });
 }
 
-/** Wählt die Cache-Header passend zur Anfrage: mit Session-Cookie immer privat. */
+/** Picks cache headers for the request: always private when a session cookie is present. */
 export function cacheHeadersFor(request: Request, maxAgeSeconds = 60): Headers {
   return hasSessionCookie(request) ? privateNoStoreHeaders() : publicCacheHeaders(maxAgeSeconds);
 }
 
-/** Überträgt alle `Set-Cookie`-Header einer Backend-Antwort in neue Header. */
+/** Copies all `Set-Cookie` headers of a backend response into new headers. */
 export function setCookieHeaders(setCookies: readonly string[], base?: HeadersInit): Headers {
   const headers = new Headers(base);
   for (const cookie of setCookies) headers.append("Set-Cookie", cookie);
@@ -85,8 +85,8 @@ function hasControlCharacter(value: string): boolean {
 }
 
 /**
- * Schützt vor offenen Weiterleitungen: nur lokale, absolute Pfade (z. B. "/account").
- * Alles andere ("//evil.example", "https://…", "javascript:…", "/\\evil") wird zum Fallback.
+ * Protects against open redirects: only local absolute paths (e.g. "/account").
+ * Anything else ("//evil.example", "https://…", "javascript:…", "/\\evil") becomes the fallback.
  */
 export function safeRedirectPath(target: unknown, fallback = "/"): string {
   if (typeof target !== "string" || target.length === 0 || target.length > 2048) return fallback;

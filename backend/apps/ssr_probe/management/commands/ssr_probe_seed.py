@@ -1,7 +1,7 @@
-"""Legt Testdaten für die SSR-E2E-Tests an (nur dev/test).
+"""Creates test data for the SSR E2E tests (dev/test only).
 
-Passwörter kommen ausschliesslich aus Umgebungsvariablen (nie aus Argumenten, damit sie nicht in
-Prozesslisten oder der Shell-Historie landen). Ausgabe: JSON mit den IDs der Probe-Objekte.
+Passwords come exclusively from environment variables (never from arguments, so they do not end
+up in process lists or shell history). Output: JSON with the IDs of the probe objects.
 """
 
 import json

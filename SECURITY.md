@@ -1,17 +1,19 @@
-# Sicherheitsrichtlinie
+# Security Policy
 
-> **Vorläufige Fassung.** Das Repository ist derzeit privat, und es gibt noch keinen produktiven Dienst.
+> **Provisional version.** The repository is currently private, and there is no production service
+> yet.
 
-## Sicherheitslücken melden
+## Reporting a vulnerability
 
-- Melde Sicherheitslücken **nicht** über öffentliche Issues.
-- Bis das Repository öffentlich ist, gehen Meldungen direkt an den Projektverantwortlichen.
-- Vor dem Öffentlichschalten wird hier ein vertraulicher Meldeweg eingerichtet und dokumentiert, voraussichtlich die private Schwachstellenmeldung von GitHub.
+- Please do **not** report vulnerabilities through public issues.
+- Until the repository is public, reports go directly to the project owner.
+- Before the repository goes public, a confidential reporting channel will be set up and documented
+  here, presumably GitHub's private vulnerability reporting.
 
-## Unterstützte Versionen
+## Supported versions
 
-Es gibt noch keine veröffentlichte Version.
+There is no released version yet.
 
-## Sicherheitskonzept
+## Security concept
 
-Das technische Sicherheitskonzept steht in [`docs/SECURITY.md`](docs/SECURITY.md).
+The technical security concept is described in [`docs/SECURITY.md`](docs/SECURITY.md).

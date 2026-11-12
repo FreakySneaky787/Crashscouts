@@ -1,13 +1,13 @@
 /**
- * Serverseitiger Zugriff auf die Django-API (nur im SSR-Server, nie im Browser-Bundle: `.server.ts`).
+ * Server-side access to the Django API (SSR server only, never in the browser bundle: `.server.ts`).
  *
- * Grundsätze (docs/SECURITY.md §8):
- * - Die Cookies des Browsers werden unverändert an Django weitergereicht; Django entscheidet über
- *   Authentisierung und Berechtigung. Der SSR-Server enthält keine eigene Berechtigungslogik.
- * - `Set-Cookie` aus Django-Antworten wird unverändert an den Browser zurückgegeben.
- * - Schreibende Anfragen tragen das CSRF-Token des Browsers als Header sowie dessen `Origin`/`Referer`;
- *   Django prüft beides. Der SSR-Server umgeht die Prüfung nie.
- * - Jeder Aufruf ist an genau eine Browser-Anfrage gebunden; es gibt keinen geteilten Zustand.
+ * Principles (docs/SECURITY.md §8):
+ * - The browser's cookies are forwarded unchanged to Django; Django decides on authentication and
+ *   authorization. The SSR server contains no authorization logic of its own.
+ * - `Set-Cookie` from Django responses is passed back to the browser unchanged.
+ * - Write requests carry the browser's CSRF token as a header plus its `Origin`/`Referer`;
+ *   Django checks both. The SSR server never bypasses these checks.
+ * - Every call is bound to exactly one browser request; there is no shared state.
  */
 import { CSRF_COOKIE, readCookie, readSetCookie } from "./http";
 
@@ -38,8 +38,8 @@ export async function backendFetch<T = unknown>(
   const cookie = request.headers.get("Cookie");
   if (cookie) headers.set("Cookie", cookie);
 
-  // Für Django hinter dem Proxy (SECURE_PROXY_SSL_HEADER); in Produktion setzt der Reverse Proxy
-  // das Protokoll der Browser-Anfrage.
+  // For Django behind the proxy (SECURE_PROXY_SSL_HEADER); in production the reverse proxy sets
+  // the protocol of the browser request.
   headers.set("X-Forwarded-Proto", new URL(request.url).protocol.replace(":", ""));
 
   if (method !== "GET") {
@@ -75,7 +75,7 @@ export async function backendFetch<T = unknown>(
 
 export type SessionUser = { username: string };
 
-/** Fragt Django nach der aktuellen Session. `null` = nicht angemeldet. */
+/** Asks Django for the current session. `null` = not signed in. */
 export async function getSessionUser(request: Request): Promise<SessionUser | null> {
   const result = await backendFetch<{ data?: { user?: { username?: string } } }>(
     request,
@@ -86,8 +86,8 @@ export async function getSessionUser(request: Request): Promise<SessionUser | nu
 }
 
 /**
- * Liefert das CSRF-Token für Formulare. Hat der Browser noch kein Token-Cookie, wird eines bei
- * Django angefordert; das zugehörige `Set-Cookie` muss an den Browser weitergegeben werden.
+ * Returns the CSRF token for forms. If the browser has no token cookie yet, one is requested from
+ * Django; the corresponding `Set-Cookie` must be passed on to the browser.
  */
 export async function ensureCsrfToken(
   request: Request,

@@ -4,8 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /**
- * Migriert die Datenbank und legt Testdaten über das test-only-Kommando `ssr_probe_seed` an.
- * Passwörter werden pro Lauf zufällig erzeugt und nur über Umgebungsvariablen weitergegeben.
+ * Migrates the database and creates test data via the test-only command `ssr_probe_seed`.
+ * Passwords are generated randomly per run and only passed on via environment variables.
  */
 export default function globalSetup(): void {
   const backendDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../backend");
@@ -26,7 +26,7 @@ export default function globalSetup(): void {
   const output = manage("ssr_probe_seed").trim().split("\n").pop() ?? "";
   const ids = JSON.parse(output) as { public_id: string; private_id: string };
 
-  // Workers erben process.env aus dem Global Setup.
+  // Workers inherit process.env from the global setup.
   process.env.PROBE_OWNER_PASSWORD = env.PROBE_OWNER_PASSWORD;
   process.env.PROBE_STRANGER_PASSWORD = env.PROBE_STRANGER_PASSWORD;
   process.env.PROBE_PUBLIC_ID = ids.public_id;
