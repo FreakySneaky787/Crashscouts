@@ -84,7 +84,7 @@ create projects, maintainers by accepted invitation, repository verification by 
 
 | WP | Content | State |
 |---|---|---|
-| 2.1 | Catalog: programming languages, SPDX licences from the official SPDX list (open-source label from OSI approval) | planned |
+| 2.1 | Catalog: programming languages, SPDX licences from the official SPDX list (open-source label from OSI approval) | ✅ done |
 | 2.2 | Projects: model, permissions (owner/maintainer, public/private with 404), create/edit, public SSR page with Open Graph, daily limit, export/purge integration | planned |
 | 2.3 | Maintainer invitations (invite by username, accept/decline, leave, remove) | planned |
 | 2.4 | Logo and screenshots via the image upload pipeline (ADR 0010) | planned |

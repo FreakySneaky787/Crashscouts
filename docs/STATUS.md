@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 1.5) · **Current phase:** 1 – Accounts (complete)
+**Last update:** 2026-11-12 (WP 2.1) · **Current phase:** 2 – Projects
 
 ## Work packages
 
@@ -336,6 +336,20 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
 
 **Phase 1 (accounts) is complete.** Still open: trying the real GitHub login on the first test
 server (open question U).
+
+## Phase 2 – Projects (started 2026-11-12)
+
+Decisions: public or private projects, every confirmed account may create projects, maintainers by
+accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
+
+### WP 2.1 – Catalog: programming languages and licences (2026-11-12) ✅
+
+- 23 programming languages (curated) and the official SPDX License List 3.29.0: 708 non-deprecated
+  licences plus `LicenseRef-Proprietary`; "open source" = OSI-approved (141)
+  ([ADR 0014](adr/0014-spdx-licence-catalog.md)). API: `/api/v1/catalog/` (now with languages),
+  `/api/v1/catalog/licenses/`; command `sync_spdx_licenses` for updates.
+- **Verification (run on 2026-11-12):** pytest **149 passed** (4 new: languages, licence count and
+  labels incl. BUSL/SSPL not open source, deprecated identifiers absent, idempotent sync).
 
 ## Known limitations
 

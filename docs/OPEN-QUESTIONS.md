@@ -45,6 +45,8 @@
   occasional, low-risk processing.
 - The terms of use need a disclaimer for links to third-party software and a reporting procedure.
 - AGPL-3.0: the hosted version must link to its source code (footer).
+- The SPDX License List data (identifiers, names, OSI flag) is used without a stated data licence
+  in the SPDX repositories; confirm in the legal review ([ADR 0014](adr/0014-spdx-licence-catalog.md)).
 
 Sources: [FADP (Fedlex)](https://www.fedlex.admin.ch/eli/cc/2022/491/de) ·
 [GDPR (EUR-Lex)](https://eur-lex.europa.eu/eli/reg/2016/679/oj)
