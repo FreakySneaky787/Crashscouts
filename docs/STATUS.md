@@ -213,6 +213,10 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
   - allauth's per-address cooldown also suppresses the "account already exists" notice within
     3 minutes – desired protection against mail floods; tested in E2E.
   - Rate-limit counters persist in the test cache; every test now starts with an empty cache.
+  - First CI run: the reset E2E test filled "Email address" before the client-side navigation
+    from `/login` to `/password/forgot` had finished (both pages have such a field), so the
+    request went out empty (400). A test race, not an application bug; the test now waits for
+    each navigation. Verified with repeated runs (account tests 3× in a row, then the full suite).
 
 ## Known limitations
 

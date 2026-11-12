@@ -130,15 +130,19 @@ test("password reset by email link", async ({ page, request }) => {
   await signUp(page, account);
   await page.goto(await linkFromMail(request, account.email, "verify-email"));
   await page.getByRole("button", { name: "Confirm email address" }).click();
+  // Wait for each navigation to finish: login and reset pages both have an "Email address" field.
+  await expect(page).toHaveURL(/\/login\?verified=1$/);
 
-  await page.goto("/login");
   await page.getByRole("link", { name: "Forgot your password?" }).click();
+  await expect(page).toHaveURL(/\/password\/forgot$/);
+  await expect(page.getByRole("heading", { name: "Reset your password" })).toBeVisible();
   await page.getByLabel("Email address").fill(account.email);
   await page.getByRole("button", { name: "Send link" }).click();
   await expect(page.getByRole("status")).toContainText("Check your inbox");
 
   const resetLink = await linkFromMail(request, account.email, "password/reset");
   await page.goto(resetLink);
+  await expect(page.getByRole("heading", { name: "Choose a new password" })).toBeVisible();
   await page.getByLabel("New password", { exact: true }).fill("too-short");
   await page.getByRole("button", { name: "Save password" }).click();
   await expect(page.getByText("The password must be at least 12 characters long.")).toBeVisible();
