@@ -18,6 +18,9 @@
 | I | Sprache der Repo-Doku (aktuell Deutsch) | vor dem Öffentlichschalten | README, CONTRIBUTING und SECURITY auf Englisch für die internationale Community; interne Planungsdoku darf deutsch bleiben |
 | J | Verhaltenskodex (Code of Conduct) | vor dem Öffentlichschalten | etablierte Vorlage, Auswahl durch den Projektverantwortlichen |
 | K | Endgültiger Produktname, Logo, Domain | offen | Entscheidung ausschliesslich durch den Projektverantwortlichen |
+| L | Passwortregeln (Mindestlänge usw.) | Phase 1 | bei der Registrierung festlegen; bis dahin Django-Standard |
+| M | Ist die E-Mail-Adresse pro Konto eindeutig, und wie werden Gross- und Kleinschreibung behandelt? | Phase 1 | zusammen mit dem allauth-Setup festlegen |
+| N | HSTS `includeSubDomains` und `preload` | nach der Domainwahl | erst aktivieren, wenn alle Subdomains dauerhaft nur über HTTPS laufen |
 
 ## Recht (keine Rechtsberatung; vor der Beta juristisch prüfen lassen)
 

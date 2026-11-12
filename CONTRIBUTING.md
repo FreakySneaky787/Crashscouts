@@ -15,4 +15,5 @@ Wird mit AP 0.5 beschrieben: Dev-Container für GitHub Codespaces und ein Setup 
 
 ## Tests
 
-Wird mit AP 0.3 bis 0.7 beschrieben: pytest, Vitest und Playwright, ausgeführt in CI.
+- Backend: siehe [`backend/README.md`](backend/README.md). pytest läuft gegen echtes PostgreSQL 18; Ruff übernimmt Lint und Formatierung.
+- Frontend und E2E (Vitest, Playwright) folgen mit AP 0.4 bis 0.7.

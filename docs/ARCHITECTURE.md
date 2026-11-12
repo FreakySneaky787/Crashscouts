@@ -94,7 +94,7 @@ erDiagram
   User ||--o{ Notification : "recipient"
 ```
 
-- Nach aussen werden nur **UUIDs** verwendet (keine fortlaufenden IDs).
+- **Primärschlüssel: zufällige UUID v4** (entschieden am 2026-11-12, umgesetzt in `apps.core.models.BaseModel` und `apps.accounts.models.User`). Sie verrät weder Anzahl noch Erstellzeitpunkt. Es gibt keine fortlaufenden IDs.
 - Alle Modelle haben `created_at` und `updated_at`.
 - Soft-Delete nur, wo es nötig ist (Moderation, Anonymisierung).
 - Das endgültige Schema wird in `DATABASE.md` dokumentiert, sobald die Modelle existieren.
