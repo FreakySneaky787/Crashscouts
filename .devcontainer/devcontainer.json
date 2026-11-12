@@ -30,10 +30,11 @@
 
   // Only the web servers are forwarded; Codespaces forwards ports privately by default.
   // PostgreSQL is reachable inside the container network only.
-  "forwardPorts": [5173, 8000],
+  "forwardPorts": [5173, 8000, 8025],
   "portsAttributes": {
     "5173": { "label": "frontend (Vite dev server)", "onAutoForward": "notify" },
-    "8000": { "label": "backend (Django)", "onAutoForward": "silent" }
+    "8000": { "label": "backend (Django)", "onAutoForward": "silent" },
+    "8025": { "label": "mail catcher (Mailpit)", "onAutoForward": "silent" }
   },
   "otherPortsAttributes": { "onAutoForward": "ignore" },
 

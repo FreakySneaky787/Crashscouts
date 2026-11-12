@@ -116,6 +116,34 @@ export function ChoiceGroup({
   );
 }
 
+/** Single checkbox with a label, e.g. a confirmation. The error is linked via aria-describedby. */
+export function CheckboxField({
+  id,
+  label,
+  error,
+  ...input
+}: { id: string; label: ReactNode; error?: string } & Omit<ComponentPropsWithoutRef<"input">, "type">) {
+  return (
+    <div className={styles.field}>
+      <label htmlFor={id} className={styles.checkbox}>
+        <input
+          id={id}
+          type="checkbox"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          {...input}
+        />
+        <span>{label}</span>
+      </label>
+      {error ? (
+        <p id={`${id}-error`} className={styles.error}>
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 /** Inline note below form fields, e.g. privacy or attachment rules. */
 export function FormNote({ icon: Icon, children }: { icon?: IconComponent; children: ReactNode }) {
   return (

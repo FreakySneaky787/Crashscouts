@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (design system) · **Current phase:** 0 – Foundation
+**Last update:** 2026-11-12 (WP 1.1) · **Current phase:** 1 – Accounts
 
 ## Work packages
 
@@ -174,9 +174,45 @@
 
 ## Phase 1 – Accounts (started 2026-11-12)
 
-- Product decisions for phase 1 recorded in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (D, L, M,
-  GitHub linking, 2FA methods, account deletion). Email provider (F) stays open until the beta;
-  development uses Mailpit. No phase 1 code yet.
+Decisions: [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (D, F, L, M, GitHub linking, 2FA methods,
+account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md). Work packages:
+[`MVP-PLAN.md`](MVP-PLAN.md).
+
+### WP 1.1 – Account core (2026-11-12) ✅
+
+- **Backend:** login by email only; email and username unique case-insensitively (database
+  constraints); username rules and reserved names; password validators (12 to 256 characters,
+  blocklist, no numeric-only, similarity); signup form with 16+ self-declaration (timestamp only);
+  mandatory email verification; email links to the SSR frontend (`FRONTEND_URL`, https enforced in
+  production); no account enumeration and no mail to unknown addresses; signup switch
+  `DJANGO_SIGNUP_ENABLED`; email via Django 6.1 `MAILERS` (the `EMAIL_*` settings are deprecated);
+  emails name the platform, not the internal backend host.
+- **Audit log** (`apps.audit`): signup, email confirmation, login, failed login, logout, password
+  change and reset; append-only at the ORM level; read-only admin; no IP addresses or typed-in
+  identifiers.
+- **Frontend:** pages for signup, "check your inbox", email confirmation (button, not on opening
+  the link), login by email, forgot password and new password; new components `Notice` and
+  `CheckboxField`; backend messages are mapped to i18n texts, never shown raw.
+- **Mailpit** v1.33.1 (MIT) pinned by digest in `compose.yaml`, the dev container and CI; no
+  outbound calls (version check and remote CSS/fonts disabled).
+- **Verification (run on 2026-11-12):**
+  - pytest **77 passed** (PostgreSQL 18.6): signup, verification, login, reset, rate limit,
+    enumeration protection, field rules, database constraints, audit log incl. immutability,
+    production settings (mail and `FRONTEND_URL` required, https only).
+  - Vitest **47 passed**; ESLint, `tsc`, Ruff (check and format) clean; migrations complete;
+    OpenAPI validation passes.
+  - Playwright **25 passed**, including 7 account flows with real emails through Mailpit (signup →
+    confirmation → login → logout; field errors without echoing the password; no enumeration;
+    reset with single-use link; invalid links; signup without JavaScript) and axe-core checks for
+    the new pages in both themes and widths.
+- **Findings during the work:**
+  - Django 6.1 deprecates `EMAIL_*`; switched to `MAILERS` before building on it.
+  - allauth used the request host ("testserver", in production the internal backend host) as the
+    site name in emails; the adapter now sets the platform name and the frontend host.
+  - The verification key in links is URL-encoded; handled in tests, React Router decodes it.
+  - allauth's per-address cooldown also suppresses the "account already exists" notice within
+    3 minutes – desired protection against mail floods; tested in E2E.
+  - Rate-limit counters persist in the test cache; every test now starts with an empty cache.
 
 ## Known limitations
 

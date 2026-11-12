@@ -6,7 +6,8 @@ the SSR frontend. Playwright starts both servers itself (ports 8000 and 3000, bo
 
 ## Prerequisites
 
-- `docker compose up -d db` (in the repository root, `.env` present).
+- `docker compose up -d db mailpit` (in the repository root, `.env` present). The account tests
+  read real emails from Mailpit's API.
 - Backend dependencies installed (`cd backend && uv sync`) and frontend dependencies installed
   (`cd frontend && pnpm install`).
 - Ports 3000 and 8000 free.

@@ -31,8 +31,10 @@ cp .env.example .env
 Set a local `POSTGRES_PASSWORD` in `.env`. The file is ignored by Git.
 
 ```bash
-docker compose up -d db
+docker compose up -d db mailpit
 ```
+
+Mailpit catches all emails locally (web UI: http://127.0.0.1:8025); nothing leaves the machine.
 
 ```bash
 cd backend && uv sync

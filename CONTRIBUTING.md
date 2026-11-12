@@ -21,9 +21,9 @@
   store `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`) or `ANTHROPIC_API_KEY` as a
   Codespaces secret – never in the repository.
 - **Claude Code cloud sessions:** the environment's setup script runs `scripts/cloud-setup.sh`.
-  Start the database per session: `dockerd` (if `docker info` fails), then `docker compose up -d db`.
+  Start the database per session: `dockerd` (if `docker info` fails), then `docker compose up -d db mailpit`.
 - **Elsewhere:** Docker, Python 3.14 with uv 0.13.7, Node ≥ 22.22 with pnpm 10.34.9;
-  `cp .env.example .env`, set `POSTGRES_PASSWORD`, `docker compose up -d db`.
+  `cp .env.example .env`, set `POSTGRES_PASSWORD`, `docker compose up -d db mailpit`.
 
 ## Tests
 

@@ -46,7 +46,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | App | Responsibility | State |
 |---|---|---|
 | `core` | Base models (UUIDv4, timestamps), health endpoint, permission helpers | implemented (basics) |
-| `accounts` | Custom user, allauth, age confirmation, deletion and export | user model and allauth login |
+| `accounts` | Custom user, allauth, age confirmation, deletion and export | email login, signup, verification, password reset (WP 1.1) |
 | `ssr_probe` | **Test only**: probe objects for the SSR spike; never installed in production | implemented |
 | `profiles` | Profile, interests, operating systems, skills, privacy | planned |
 | `catalog` | Taxonomies: categories, platforms, languages, software type, SPDX licenses | planned |
@@ -56,7 +56,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `feedback` | Feedback, attachments, status, publishing | planned |
 | `moderation` | Reports, review queue, actions, blocks | planned |
 | `notifications` | In-app and email notifications (via tasks) | planned |
-| `audit` | Append-only audit log | planned |
+| `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
 | `discover` | Search and filters (PostgreSQL full text) | planned |
 
 **Convention:** logic lives in `services.py` (writes) and `selectors.py` (reads). Views stay thin.
@@ -175,12 +175,13 @@ React Router's data requests.
 - **Claude cloud session:** `scripts/cloud-setup.sh` (stored as the environment's setup script)
   installs the pinned tools and dependencies. Background processes are stopped after their time
   limit, so `dockerd` is started per session when needed (`dockerd`, then
-  `docker compose up -d db`).
+  `docker compose up -d db mailpit`).
 - **Git workflow (decided):** commits go directly to `main`, authored by the project owner, with
   English commit messages. Because GitHub Free offers no branch protection and no push protection
   for private repositories, gitleaks and CI are the protective layer.
 - **Local ports:** Django 8000, Vite dev server 5173 (proxies `/api` and `/_allauth` to Django),
-  production SSR build 3000 (E2E tests). All bound to `127.0.0.1`.
+  production SSR build 3000 (E2E tests), Mailpit SMTP 1025 and web UI 8025. All bound to
+  `127.0.0.1`.
 
 ## 10. Deployment (target, before the beta)
 

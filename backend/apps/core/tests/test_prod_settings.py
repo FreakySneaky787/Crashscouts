@@ -28,7 +28,9 @@ print(json.dumps({
     "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
     "ENABLE_SSR_PROBE": settings.ENABLE_SSR_PROBE,
     "PROBE_INSTALLED": "apps.ssr_probe" in settings.INSTALLED_APPS,
-    "ACCOUNT_SIGNUP_ENABLED": settings.ACCOUNT_SIGNUP_ENABLED,
+    "SIGNUP_ENABLED": settings.SIGNUP_ENABLED,
+    "EMAIL_USE_TLS": settings.MAILERS["default"]["OPTIONS"]["use_tls"],
+    "CONFIRM_URL": settings.HEADLESS_FRONTEND_URLS["account_confirm_email"],
 }))
 """
 
@@ -55,6 +57,9 @@ def _prod_env(**overrides: str) -> dict[str, str]:
         "DJANGO_SECRET_KEY": VALID_KEY,
         "DJANGO_ALLOWED_HOSTS": "example.invalid",
         "POSTGRES_PASSWORD": "irrelevant-for-this-test",
+        "FRONTEND_URL": "https://example.invalid",
+        "DJANGO_EMAIL_HOST": "smtp.example.invalid",
+        "DJANGO_DEFAULT_FROM_EMAIL": "no-reply@example.invalid",
         **overrides,
     }
 
@@ -74,7 +79,9 @@ def test_prod_settings_are_secure():
         "ALLOWED_HOSTS": ["example.invalid"],
         "ENABLE_SSR_PROBE": False,
         "PROBE_INSTALLED": False,
-        "ACCOUNT_SIGNUP_ENABLED": False,
+        "SIGNUP_ENABLED": False,
+        "EMAIL_USE_TLS": True,
+        "CONFIRM_URL": "https://example.invalid/verify-email/{key}",
     }
 
 
@@ -105,6 +112,23 @@ def test_prod_refuses_to_start_without_allowed_hosts():
 
     assert result.returncode != 0
     assert "DJANGO_ALLOWED_HOSTS" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "missing", ["FRONTEND_URL", "DJANGO_EMAIL_HOST", "DJANGO_DEFAULT_FROM_EMAIL"]
+)
+def test_prod_refuses_to_start_without_mail_configuration(missing):
+    result = _run(PROBE, _prod_env(), drop=(missing,))
+
+    assert result.returncode != 0
+    assert missing in result.stderr
+
+
+def test_prod_refuses_plain_http_frontend_url():
+    result = _run(PROBE, _prod_env(FRONTEND_URL="http://example.invalid"))
+
+    assert result.returncode != 0
+    assert "FRONTEND_URL" in result.stderr
 
 
 def test_prod_deploy_check_has_only_documented_warnings():

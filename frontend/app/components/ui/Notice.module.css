@@ -1,0 +1,60 @@
+.notice {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  font-size: var(--text-body);
+}
+
+.icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.125rem;
+}
+
+.body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font-weight: var(--weight-semibold);
+}
+
+.text {
+  color: var(--color-fg-secondary);
+}
+
+.info {
+  background: var(--color-info-soft);
+  border-color: var(--color-info);
+}
+
+.info .icon,
+.info .title {
+  color: var(--color-info);
+}
+
+.ok {
+  background: var(--color-ok-soft);
+  border-color: var(--color-ok);
+}
+
+.ok .icon,
+.ok .title {
+  color: var(--color-ok);
+}
+
+.danger {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+}
+
+.danger .icon,
+.danger .title {
+  color: var(--color-danger);
+}

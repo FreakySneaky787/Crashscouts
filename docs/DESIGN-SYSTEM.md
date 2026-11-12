@@ -94,6 +94,8 @@ module.
 | `Avatar`, `ProjectIcon` | identity | initials on a hue derived from the ID |
 | `Chips`, `FactList`, `RowList` | data display | list semantics (`ul`/`dl`) |
 | `TextField`, `TextAreaField`, `SelectField`, `ChoiceGroup`, `FormNote` | forms | visible labels, hints and errors via `aria-describedby`, `aria-invalid` |
+| `CheckboxField` | single confirmation | label next to the box; error via `aria-describedby` |
+| `Notice` | inline message | tones `ok`, `info` (role `status`), `danger` (role `alert`); icon + text |
 | `EmptyState` | empty and error states | kinds `first-use` (with action), `empty`, `error` |
 | `ThemeToggle` | system / light / dark | see section 6 |
 

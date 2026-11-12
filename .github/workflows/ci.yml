@@ -123,6 +123,13 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U testhub -d testhub"
           --health-interval 5s --health-timeout 3s --health-retries 20
+      # Local mail catcher for the account flows (same pinned image as compose.yaml).
+      mailpit:
+        image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+        env:
+          MP_DISABLE_VERSION_CHECK: "true"
+          MP_BLOCK_REMOTE_CSS_AND_FONTS: "true"
+        ports: ["1025:1025", "8025:8025"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

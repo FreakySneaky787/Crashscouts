@@ -12,15 +12,22 @@
     "account": "Account",
     "login": "Log in",
     "logout": "Log out",
-    "designSystem": "Design system"
+    "designSystem": "Design system",
+    "signup": "Sign up"
   },
   "login": {
     "title": "Log in",
-    "username": "Username",
+    "panel": "Sign in with your account",
+    "email": "Email address",
     "password": "Password",
     "submit": "Log in",
-    "error": "The username or password is incorrect.",
-    "panel": "Sign in with your account"
+    "error": "The email address or password is incorrect.",
+    "unverified": "Confirm your email address first. We sent you a link when you signed up.",
+    "forgot": "Forgot your password?",
+    "noAccount": "New here?",
+    "createAccount": "Create an account",
+    "verified": "Email address confirmed. You can log in now.",
+    "resetDone": "Your password was changed. Log in with the new password."
   },
   "account": {
     "title": "Your account",
@@ -54,5 +61,68 @@
     "system": "Use system setting",
     "light": "Light theme",
     "dark": "Dark theme"
+  },
+  "signup": {
+    "title": "Create an account",
+    "panel": "Your account",
+    "intro": "Test software, report what you find, and help open-source projects improve.",
+    "email": "Email address",
+    "emailHint": "Used to sign in. Never shown publicly.",
+    "username": "Username",
+    "usernameHint": "Your public name on profiles: 3 to 30 characters, lowercase letters, digits, hyphens and underscores.",
+    "password": "Password",
+    "passwordHint": "At least 12 characters. A few unrelated words make a strong, memorable password.",
+    "age": "I am at least 16 years old.",
+    "submit": "Create account",
+    "haveAccount": "Already have an account?",
+    "login": "Log in",
+    "closed": "Signing up is not possible right now.",
+    "closedText": "New accounts are currently not accepted. Please try again later.",
+    "checkTitle": "Check your inbox",
+    "checkText": "If the address can be used, we sent a confirmation link to it. Open the link to activate your account. It expires after 3 days.",
+    "checkHint": "No email? Check your spam folder. You can also try signing up again in a few minutes."
+  },
+  "verify": {
+    "title": "Confirm your email address",
+    "panel": "Confirmation",
+    "text": "Confirm that {{email}} belongs to you.",
+    "submit": "Confirm email address",
+    "invalidTitle": "This link is invalid or has expired",
+    "invalidText": "Sign up again or log in to request a new link."
+  },
+  "forgot": {
+    "title": "Reset your password",
+    "panel": "Request a reset link",
+    "text": "Enter the email address of your account. We will send you a link to choose a new password.",
+    "email": "Email address",
+    "submit": "Send link",
+    "sentTitle": "Check your inbox",
+    "sentText": "If an account uses this address, we sent a link to it. The link can be used once."
+  },
+  "reset": {
+    "title": "Choose a new password",
+    "panel": "Your account",
+    "password": "New password",
+    "submit": "Save password",
+    "invalidTitle": "This link is invalid or has expired",
+    "invalidText": "Request a new link to reset your password.",
+    "requestNew": "Request a new link"
+  },
+  "formError": {
+    "required": "This field is required.",
+    "invalid": "Enter a valid value.",
+    "invalid_username": "Use 3 to 30 characters: lowercase letters, digits, hyphens and underscores. Start with a letter or digit.",
+    "username_taken": "This username is already taken.",
+    "username_blacklisted": "This username is reserved. Choose another one.",
+    "password_too_short": "The password must be at least 12 characters long.",
+    "password_too_long": "The password is too long (at most 256 characters).",
+    "password_too_common": "This password is too common. Choose a less predictable one.",
+    "password_entirely_numeric": "The password cannot consist of digits only.",
+    "password_too_similar": "The password is too similar to your username or email address.",
+    "age_required": "You must be at least 16 years old to sign up.",
+    "other": "Check this field.",
+    "forbidden": "Your session has expired. Reload the page and try again.",
+    "rateLimited": "Too many attempts. Wait a few minutes and try again.",
+    "generic": "Something went wrong. Please try again."
   }
 }

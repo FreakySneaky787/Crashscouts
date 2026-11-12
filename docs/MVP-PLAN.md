@@ -58,7 +58,16 @@ regression tests.
 - Profile and privacy settings.
 - ⚑ Account deletion and data export.
 - Audit log foundation.
-- **To clarify first:** visual direction (E) and email delivery (F).
+- Decisions: see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (D, F, L, M and the resolved phase 1
+  items) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
+
+| WP | Content | State |
+|---|---|---|
+| 1.1 | Account core: email login, public username, password rules, signup with 16+ confirmation, email verification (Mailpit), password reset, audit log foundation | ✅ done |
+| 1.2 | Profile and privacy settings (minimally public by default) | planned |
+| 1.3 | 2FA: TOTP, recovery codes, passkeys, passwordless passkey login | planned |
+| 1.4 | GitHub login, linking only manually (the owner creates a GitHub OAuth app) | planned |
+| 1.5 | Account deletion with a 14-day grace period, data export (JSON) | planned |
 
 ## Phase 2 – Projects
 

@@ -14,14 +14,14 @@ const env = (name: string): string => {
   return value;
 };
 
-const owner = () => ({ username: "probe-owner", password: env("PROBE_OWNER_PASSWORD") });
-const stranger = () => ({ username: "probe-stranger", password: env("PROBE_STRANGER_PASSWORD") });
+const owner = () => ({ email: "probe-owner@example.test", password: env("PROBE_OWNER_PASSWORD") });
+const stranger = () => ({ email: "probe-stranger@example.test", password: env("PROBE_STRANGER_PASSWORD") });
 const publicPath = () => `/probe/public/${env("PROBE_PUBLIC_ID")}`;
 const privatePath = () => `/probe/private/${env("PROBE_PRIVATE_ID")}`;
 
-async function login(page: Page, user: { username: string; password: string }) {
+async function login(page: Page, user: { email: string; password: string }) {
   await page.goto("/login");
-  await page.getByLabel("Username").fill(user.username);
+  await page.getByLabel("Email address").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page).toHaveURL(/\/account$/);
@@ -37,7 +37,7 @@ function watchConsole(page: Page): string[] {
   return problems;
 }
 
-async function loggedInPage(browser: Browser, user: { username: string; password: string }) {
+async function loggedInPage(browser: Browser, user: { email: string; password: string }) {
   const context = await browser.newContext();
   const page = await context.newPage();
   await login(page, user);

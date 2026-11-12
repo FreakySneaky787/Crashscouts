@@ -11,19 +11,20 @@
 | A | Waiting period for new accounts before they may submit public campaigns | phase 3B | 7 days plus verified email plus 2FA, or manual approval by an admin |
 | B | Method of repository verification | phase 2 | token file in the repository (independent of the code host), plus a check via GitHub OAuth |
 | C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
-| F | Provider for transactional email (Switzerland/EU) | before the beta | **Decided for development:** Mailpit, provider-neutral SMTP. Owner's constraint: free or very cheap. Proposal: Scaleway Transactional Email (France; 300 emails/month free, then pay per use), fallback Brevo free plan; verify on the official pages before signing up |
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | H | Who moderates initially? | phase 3B | the project owner only |
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
+| T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
 ### Resolved
 
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
+| F | Provider for transactional email | **Scaleway Transactional Email** (France; free allowance, then pay per use – owner's constraint: free or very cheap). Development and CI use Mailpit; the code speaks provider-neutral SMTP. Limits and prices are verified on the official pages before signing up. |
 | D | Default visibility of profiles | **Minimally public:** username and initials avatar; bio, interests, operating systems and skills optional and individually switchable; email never visible; profiles not indexed unless the user opts in. What participants see of each other is decided in phase 3A. |
-| L | Password rules | **Minimum 12 characters**, at least 64 allowed, no composition rules, blocklist of common passwords, similarity check against username/email. Deliberately below NIST SP 800-63B-4 (15 characters for single-factor passwords); recorded in an ADR in phase 1. |
+| L | Password rules | **Minimum 12 characters**, at least 64 allowed, no composition rules, blocklist of common passwords, similarity check against username/email. Deliberately below NIST SP 800-63B-4 (15 characters for single-factor passwords); recorded in [ADR 0009](adr/0009-account-rules-and-password-policy.md). |
 | M | Login and email uniqueness | **Login with email only**; one account per email, case-insensitive; separate unique public username (case-insensitive) for profiles. |
 | – | GitHub login with an email that already exists | **No automatic linking.** The user signs in normally and connects GitHub in the settings (allauth default `SOCIALACCOUNT_EMAIL_AUTHENTICATION=False`). |
 | – | 2FA methods in phase 1 | TOTP, passkeys/security keys and recovery codes; **plus passwordless passkey login**. 2FA stays optional. |

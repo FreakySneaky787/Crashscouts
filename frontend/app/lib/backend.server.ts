@@ -19,6 +19,8 @@ type BackendInit = {
   method?: "GET" | "POST" | "DELETE";
   json?: unknown;
   csrfToken?: string | null;
+  /** Extra request headers, e.g. allauth's X-Email-Verification-Key. Values must be validated. */
+  headers?: Record<string, string>;
 };
 
 export type BackendResult<T> = {
@@ -33,7 +35,7 @@ export async function backendFetch<T = unknown>(
   init: BackendInit = {},
 ): Promise<BackendResult<T>> {
   const method = init.method ?? "GET";
-  const headers = new Headers({ Accept: "application/json" });
+  const headers = new Headers({ ...init.headers, Accept: "application/json" });
 
   const cookie = request.headers.get("Cookie");
   if (cookie) headers.set("Cookie", cookie);

@@ -2,7 +2,7 @@
 
 from .base import *  # noqa: F403
 from .base import REST_FRAMEWORK
-from .env import env_list, env_str
+from .env import env_bool, env_list, env_str
 
 DEBUG = True
 
@@ -16,6 +16,9 @@ SERVE_API_SCHEMA = True
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS", ["http://localhost:5173", "http://127.0.0.1:5173"]
 )
+
+# Signup is open locally unless switched off; emails go to Mailpit (docker compose up -d mailpit).
+SIGNUP_ENABLED = env_bool("DJANGO_SIGNUP_ENABLED", True)
 
 ENABLE_SSR_PROBE = True
 INSTALLED_APPS = [*INSTALLED_APPS, "apps.ssr_probe"]  # noqa: F405

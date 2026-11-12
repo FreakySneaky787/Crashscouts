@@ -6,7 +6,7 @@ import { brand } from "~/config/brand";
 import type { Theme } from "~/lib/theme";
 import { Avatar } from "~/components/ui/Data";
 import { ThemeToggle } from "~/components/ui/ThemeToggle";
-import { HouseIcon, ListIcon, PaletteIcon, SignInIcon, UserCircleIcon, type IconComponent } from "~/components/ui/icons";
+import { HouseIcon, ListIcon, PaletteIcon, SignInIcon, UserCircleIcon, UserPlusIcon, type IconComponent } from "~/components/ui/icons";
 
 import styles from "./AppShell.module.css";
 
@@ -38,7 +38,12 @@ export function AppShell({ user, theme, children }: { user: ShellUser; theme: Th
   const { t } = useTranslation();
   const items: NavItem[] = [
     { to: "/", label: t("nav.home"), icon: HouseIcon, end: true },
-    user ? { to: "/account", label: t("nav.account"), icon: UserCircleIcon } : { to: "/login", label: t("nav.login"), icon: SignInIcon },
+    ...(user
+      ? [{ to: "/account", label: t("nav.account"), icon: UserCircleIcon }]
+      : [
+          { to: "/login", label: t("nav.login"), icon: SignInIcon },
+          { to: "/signup", label: t("nav.signup"), icon: UserPlusIcon },
+        ]),
   ];
   const secondary: NavItem[] = [{ to: "/design-system", label: t("nav.designSystem"), icon: PaletteIcon }];
 

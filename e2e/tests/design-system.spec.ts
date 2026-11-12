@@ -6,7 +6,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 const ORIGIN = "http://127.0.0.1:3000";
-const PAGES = ["/", "/design-system", "/login"];
+const PAGES = ["/", "/design-system", "/login", "/signup", "/signup/check-email", "/password/forgot"];
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 async function setThemeCookie(context: BrowserContext, theme: "light" | "dark") {

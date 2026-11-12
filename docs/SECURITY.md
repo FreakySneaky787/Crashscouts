@@ -22,13 +22,19 @@ including the negative cases.
 - ✅ Passwords hashed with Argon2id.
 - allauth rate limits for login, signup and reset. They rely on Django's cache; a shared cache is
   required in production (open question O).
-- Mandatory email verification (phase 1).
+- ✅ Login by email only; email and username unique case-insensitively (database constraints).
+- ✅ Password policy: at least 12 characters, no composition rules, blocklist and similarity check
+  ([ADR 0009](adr/0009-account-rules-and-password-policy.md); deliberately below NIST's 15).
+- ✅ Mandatory email verification by link; confirmation only via POST (mail scanners open links).
+- ✅ No account enumeration: signup with a registered address and reset requests for unknown
+  addresses answer like the success case; no mail to unknown addresses; per-address cooldown.
+- ✅ Rate limits verified in tests (e.g. signup 20/min per IP).
 - 2FA (TOTP, passkeys, recovery codes) optional; ⚑ mandatory for owners of public campaigns and for
   moderators (phase 1).
 - ✅ Session cookie `HttpOnly` and `SameSite=Lax` (verified in E2E); `Secure` enforced in
   production settings.
 - New session on login; session list with "sign out everywhere" (phase 1).
-- ✅ Signup is disabled until phase 1 defines its rules.
+- ✅ Signup can be closed with `DJANGO_SIGNUP_ENABLED` (production default: closed).
 
 ## 3. Web
 
@@ -103,6 +109,11 @@ including the negative cases.
 
 Append-only. Logged: login events, role changes, moderation, moderator access to private content,
 admin logins, deletions and exports.
+
+- ✅ Foundation in WP 1.1 (`apps.audit`): signup, email confirmation, login, failed login, logout,
+  password change and reset. Updates and deletes through the ORM raise an error; the admin view is
+  read-only. No IP addresses and no typed-in identifiers are stored (open question T).
+- A database-level guard against raw-SQL changes follows with the production setup.
 
 ## 10. Repository and supply chain
 

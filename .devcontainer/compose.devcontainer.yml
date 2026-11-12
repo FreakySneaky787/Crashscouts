@@ -16,6 +16,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  # Mailpit joins the same network namespace, so SMTP is on 127.0.0.1:1025 as everywhere else.
+  mailpit:
+    network_mode: service:db
+    ports: !reset []
 
 volumes:
   claude-code-config:

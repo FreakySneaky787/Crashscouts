@@ -8,7 +8,7 @@ import type { Route } from "./+types/design-system";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { Avatar, Chips, FactList, KeyFigures, ProjectIcon, Progress, RowList } from "~/components/ui/Data";
 import { EmptyState } from "~/components/ui/EmptyState";
-import { ChoiceGroup, FormNote, SelectField, TextAreaField, TextField } from "~/components/ui/Form";
+import { CheckboxField, ChoiceGroup, FormNote, SelectField, TextAreaField, TextField } from "~/components/ui/Form";
 import {
   ArrowSquareOutIcon,
   BugIcon,
@@ -24,6 +24,7 @@ import {
   PlusIcon,
   TagIcon,
 } from "~/components/ui/icons";
+import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { StatusPill } from "~/components/ui/StatusPill";
@@ -200,6 +201,7 @@ export default function DesignSystem() {
           <TextField id="ds-title-error" name="title2" label="Title (with error)" defaultValue="" error="Add a title so maintainers can find your report." />
           <TextAreaField id="ds-steps" name="steps" label="Steps to reproduce" hint="Numbered steps help maintainers reproduce the problem." rows={3} />
           <SelectField id="ds-device" name="device" label="Device" options={[{ value: "fedora", label: "Fedora 41 · ThinkPad T14" }, { value: "android", label: "Android 15 · Pixel 7a" }]} />
+          <CheckboxField id="ds-public" name="public" label="Publish this report after review" />
           <FormNote icon={PaperclipIcon}>Attachments: PNG, JPEG, WebP, TXT, LOG or JSON. Remove personal data first.</FormNote>
           <FormNote icon={LockSimpleIcon}>Private until a maintainer publishes it.</FormNote>
           <div className={styles.row}>
@@ -207,6 +209,14 @@ export default function DesignSystem() {
             <Button variant="quiet" type="button">Cancel</Button>
           </div>
         </form>
+      </Panel>
+
+      <Panel title="Notices">
+        <div className={styles.statusGroups}>
+          <Notice tone="ok" title="Email address confirmed. You can log in now." />
+          <Notice tone="info" title="Signing up is not possible right now.">New accounts are currently not accepted.</Notice>
+          <Notice tone="danger" title="The email address or password is incorrect." />
+        </div>
       </Panel>
 
       <div className={styles.grid3}>

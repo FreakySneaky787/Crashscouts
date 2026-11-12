@@ -5,7 +5,7 @@
 #
 # Not done here on purpose:
 # - Starting the Docker daemon (no background daemons in setup scripts). Start it per session
-#   with `dockerd` when `docker info` cannot reach it, then `docker compose up -d db`.
+#   with `dockerd` when `docker info` cannot reach it, then `docker compose up -d db mailpit`.
 # - Installing Playwright browsers: the environment provides Chromium at /opt/pw-browsers.
 set -euo pipefail
 

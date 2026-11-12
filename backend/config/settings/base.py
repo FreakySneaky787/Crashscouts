@@ -5,7 +5,7 @@ Security-relevant production values live in prod.py and are enforced there.
 
 from pathlib import Path
 
-from .env import env_int, env_list, env_str
+from .env import env_bool, env_int, env_list, env_str
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "allauth.headless",
     "apps.core",
     "apps.accounts",
+    "apps.audit",
 ]
 
 MIDDLEWARE = [
@@ -85,10 +86,15 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
-# Password rules are decided in phase 1 (registration); Django defaults until then.
+# Password rules (owner's decision, 2026-11-12; ADR 0009): at least 12 characters, at least 64
+# allowed, no composition rules, blocklist of common passwords, similarity to account data.
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
+    {"NAME": "apps.accounts.validators.MaximumLengthValidator", "OPTIONS": {"max_length": 256}},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -98,14 +104,72 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# --- django-allauth (headless, browser sessions; ADR 0004) ---
-# PROVISIONAL (WP 0.4, SSR spike): login/logout/session only. Signup, login method, email rules
-# and GitHub login are decided in phase 1 together with the project owner.
+# --- django-allauth (headless, browser sessions; ADR 0004, decisions D/L/M in OPEN-QUESTIONS) ---
 HEADLESS_ONLY = True
 HEADLESS_CLIENTS = ("browser",)  # no token-based app clients
-HEADLESS_FRONTEND_URLS: dict[str, str] = {}
-ACCOUNT_SIGNUP_ENABLED = False
-ACCOUNT_LOGIN_METHODS = {"username"}
+ACCOUNT_ADAPTER = "apps.accounts.adapter.AccountAdapter"
+ACCOUNT_SIGNUP_FORM_CLASS = "apps.accounts.forms.SignupForm"
+# Signup can be closed (e.g. closed beta); off unless explicitly enabled.
+SIGNUP_ENABLED = env_bool("DJANGO_SIGNUP_ENABLED", False)
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*"]
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+ACCOUNT_USERNAME_MIN_LENGTH = 3
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+# Never reveal whether an email address has an account (signup, login, password reset).
+ACCOUNT_PREVENT_ENUMERATION = True
+# Do not send mail to addresses without an account (abuse: mail bombing via password reset).
+ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = f"[{PLATFORM_NAME}] "
+
+
+def _usernames_reserved() -> list[str]:
+    from apps.accounts.validators import RESERVED_USERNAMES
+
+    return [*RESERVED_USERNAMES, PLATFORM_NAME.lower()]
+
+
+ACCOUNT_USERNAME_BLACKLIST = _usernames_reserved()
+
+# Links in emails point to the SSR frontend, never to Django.
+FRONTEND_URL = env_str("FRONTEND_URL", "http://127.0.0.1:5173").rstrip("/")
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": f"{FRONTEND_URL}/verify-email/{{key}}",
+    "account_reset_password": f"{FRONTEND_URL}/password/forgot",
+    "account_reset_password_from_key": f"{FRONTEND_URL}/password/reset/{{key}}",
+    "account_signup": f"{FRONTEND_URL}/signup",
+}
+
+
+# --- Email: provider-neutral SMTP via MAILERS (Django 6.1; the EMAIL_* settings are deprecated).
+# Provider: open question F (proposal Scaleway). Development: Mailpit on 127.0.0.1:1025.
+def smtp_mailer(*, host: str, port: int, use_tls: bool) -> dict:
+    return {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": host,
+            "port": port,
+            "username": env_str("DJANGO_EMAIL_HOST_USER", "") or None,
+            "password": env_str("DJANGO_EMAIL_HOST_PASSWORD", "") or None,
+            "use_tls": use_tls,
+            "timeout": 10,
+        },
+    }
+
+
+MAILERS = {
+    "default": smtp_mailer(
+        host=env_str("DJANGO_EMAIL_HOST", "127.0.0.1"),
+        port=env_int("DJANGO_EMAIL_PORT", 1025),
+        use_tls=env_bool("DJANGO_EMAIL_USE_TLS", False),
+    )
+}
+DEFAULT_FROM_EMAIL = env_str("DJANGO_DEFAULT_FROM_EMAIL", f"{PLATFORM_NAME} <no-reply@localhost>")
 
 # Origins whose POST requests pass Django's CSRF origin check (e.g. the SSR frontend).
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", [])

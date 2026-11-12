@@ -35,6 +35,26 @@ SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
 
 SERVE_API_SCHEMA = False
 
+# --- Links in emails and outgoing mail (provider: open question F) ---
+FRONTEND_URL = env_str("FRONTEND_URL").rstrip("/")
+if not FRONTEND_URL.startswith("https://"):
+    raise ImproperlyConfigured("FRONTEND_URL must be an https:// URL in production.")
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": f"{FRONTEND_URL}/verify-email/{{key}}",
+    "account_reset_password": f"{FRONTEND_URL}/password/forgot",
+    "account_reset_password_from_key": f"{FRONTEND_URL}/password/reset/{{key}}",
+    "account_signup": f"{FRONTEND_URL}/signup",
+}
+MAILERS = {
+    "default": smtp_mailer(  # noqa: F405
+        host=env_str("DJANGO_EMAIL_HOST"),
+        port=env_int("DJANGO_EMAIL_PORT", 587),
+        use_tls=env_bool("DJANGO_EMAIL_USE_TLS", True),
+    )
+}
+DEFAULT_FROM_EMAIL = env_str("DJANGO_DEFAULT_FROM_EMAIL")
+
+
 # The SSR probe is a pure test tool and must never be active in production.
 ENABLE_SSR_PROBE = False
 if "apps.ssr_probe" in INSTALLED_APPS:  # noqa: F405

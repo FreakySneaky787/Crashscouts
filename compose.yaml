@@ -1,5 +1,5 @@
 # Development services. Extended with backend, SSR frontend and worker in WP 0.5.
-# Start:  docker compose up -d db      (values from .env, see .env.example)
+# Start:  docker compose up -d db mailpit      (values from .env, see .env.example)
 name: testhub-dev
 
 services:
@@ -22,6 +22,20 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
+
+  mailpit:
+    # Local mail catcher (MIT, github.com/axllent/mailpit), pinned by digest (v1.33.1, verified on
+    # 2026-11-12). Emails never leave the machine. Web UI: http://127.0.0.1:8025
+    # Start:  docker compose up -d mailpit
+    image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    environment:
+      # No calls to the internet: no update check, no remote CSS/fonts from viewed emails.
+      MP_DISABLE_VERSION_CHECK: "true"
+      MP_BLOCK_REMOTE_CSS_AND_FONTS: "true"
+    ports:
+      - "127.0.0.1:1025:1025"   # SMTP
+      - "127.0.0.1:8025:8025"   # web UI and API
     restart: unless-stopped
 
 volumes:

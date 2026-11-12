@@ -7,6 +7,7 @@ up in process lists or shell history). Output: JSON with the IDs of the probe ob
 import json
 import os
 
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
@@ -49,9 +50,14 @@ class Command(BaseCommand):
 
     @staticmethod
     def _user(user_model, username: str, password: str):
+        # Reserved test domain (RFC 2606); the address is marked as verified so the user can log in.
+        email = f"{username}@example.test"
         user, _ = user_model.objects.get_or_create(username=username)
+        user.email = email
         user.set_password(password)
         user.is_staff = False
         user.is_superuser = False
         user.save()
+        EmailAddress.objects.filter(user=user).delete()
+        EmailAddress.objects.create(user=user, email=email, verified=True, primary=True)
         return user
