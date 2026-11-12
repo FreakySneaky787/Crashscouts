@@ -17,6 +17,10 @@ export default tseslint.config(
           selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
           message: "dangerouslySetInnerHTML is forbidden (XSS risk).",
         },
+        {
+          selector: "JSXAttribute[name.name='style']",
+          message: "Inline styles are blocked by the CSP (style-src 'self'). Use a CSS Module class.",
+        },
       ],
       // Intentionally unused parameters are prefixed with "_".
       "@typescript-eslint/no-unused-vars": [

@@ -2,6 +2,9 @@ import { useTranslation } from "react-i18next";
 import { data } from "react-router";
 
 import type { Route } from "./+types/probe-public";
+import { PageHeader } from "~/components/ui/PageHeader";
+import { Panel } from "~/components/ui/Panel";
+import { StatusPill } from "~/components/ui/StatusPill";
 import { brand } from "~/config/brand";
 import { backendFetch } from "~/lib/backend.server";
 import { cacheHeadersFor, isUuid, privateNoStoreHeaders } from "~/lib/http";
@@ -40,10 +43,11 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export default function ProbePublic({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation();
   return (
-    <article>
-      <p>{t("probe.public")}</p>
-      <h1>{loaderData.title}</h1>
-      <p>{loaderData.description}</p>
-    </article>
+    <>
+      <PageHeader title={loaderData.title} meta={<StatusPill tone="neutral" label={t("probe.public")} />} />
+      <Panel title={t("probe.about")}>
+        <p>{loaderData.description}</p>
+      </Panel>
+    </>
   );
 }

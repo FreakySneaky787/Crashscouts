@@ -78,8 +78,12 @@ Authorization is checked by a central, server-side policy layer.
     defaults.
   - `app/i18n/` – react-i18next with one instance per request and type-safe keys.
   - `app/config/brand.ts` – central brand name.
-- **Styling and component library are open** (open question E). The current UI is deliberately
-  unstyled.
+  - `app/styles/` – design tokens (light and dark) and base styles.
+  - `app/components/ui/`, `app/components/layout/` – design system components with CSS Modules
+    ([`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), [ADR 0008](adr/0008-design-system-implementation.md)).
+- **Styling:** visual direction "Developer Workbench" ([ADR 0007](adr/0007-visual-direction-developer-workbench.md));
+  CSS custom properties and CSS Modules, no component library; self-hosted fonts and icons; theme
+  preference in a cookie, rendered on the server.
 
 ## 5. Data model (draft)
 

@@ -1,35 +1,58 @@
 {
   "home": {
-    "title": "Welcome",
-    "intro": "This is an early development build. The SSR probe pages below validate the architecture."
+    "title": "Home",
+    "intro": "Early development build. Product features arrive phase by phase.",
+    "activity": "Activity",
+    "emptyTitle": "Nothing to show yet",
+    "emptyText": "Projects, campaigns and feedback will appear here once they exist. Meanwhile you can look at the building blocks of the interface.",
+    "emptyAction": "Open the design system"
   },
   "nav": {
     "home": "Home",
     "account": "Account",
     "login": "Log in",
-    "logout": "Log out"
+    "logout": "Log out",
+    "designSystem": "Design system"
   },
   "login": {
     "title": "Log in",
     "username": "Username",
     "password": "Password",
     "submit": "Log in",
-    "error": "The username or password is incorrect."
+    "error": "The username or password is incorrect.",
+    "panel": "Sign in with your account"
   },
   "account": {
     "title": "Your account",
-    "signedInAs": "Signed in as {{username}}"
+    "signedInAs": "Signed in as {{username}}",
+    "session": "Session",
+    "sessionText": "You are signed in on this device. Log out when you use a shared computer."
   },
   "probe": {
     "touch": "Touch",
     "touchCount": "Touched {{count}} times",
     "private": "Private item",
-    "public": "Public item"
+    "public": "Public item",
+    "about": "About"
   },
   "error": {
     "notFoundTitle": "Page not found",
     "notFound": "The requested page could not be found.",
     "genericTitle": "Error",
     "generic": "An unexpected error occurred."
+  },
+  "shell": {
+    "skip": "Skip to content",
+    "workingName": "working name",
+    "mainNav": "Main",
+    "resourcesNav": "Resources",
+    "menu": "Menu",
+    "signedInAs": "Signed in as {{username}}"
+  },
+  "theme": {
+    "label": "Colour theme",
+    "system": "Use system setting",
+    "light": "Light theme",
+    "dark": "Dark theme"
   }
 }

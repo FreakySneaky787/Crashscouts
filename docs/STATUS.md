@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 0.6) · **Current phase:** 0 – Foundation
+**Last update:** 2026-11-12 (design system) · **Current phase:** 0 – Foundation
 
 ## Work packages
 
@@ -148,10 +148,34 @@
   key figures as large tabular numbers, sentence-case labels instead of letter-spaced capitals,
   three distinct text levels. Re-verified: 60 checks, 0 violations.
 
+## Design system (2026-11-12)
+
+- Concept A implemented in the production frontend: [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md),
+  [ADR 0008](adr/0008-design-system-implementation.md).
+  - Tokens for light and dark (`app/styles/tokens.css`), CSS Modules, own component set
+    (buttons, status pills, panels, page header, tabs as links, key figures, rows, identity,
+    forms, empty states), app shell with sidebar, top bar and a no-JS mobile menu.
+  - Theme switch system/light/dark in the top bar: cookie `theme`, rendered on the server (no
+    flash), works without JavaScript.
+  - New dependencies: `@fontsource/source-sans-3` 5.3.1, `@fontsource/jetbrains-mono` 5.3.0
+    (OFL-1.1, self-hosted), `@phosphor-icons/react` 2.1.10 (MIT); E2E: `@axe-core/playwright`
+    4.14.0 (MPL-2.0, test only).
+  - Existing pages (home, login, account, probes) moved to the components; living reference at
+    `/design-system`.
+- **Findings during the work:** the CSP blocked fonts that Vite inlined as `data:` URIs
+  (`font-src 'self'`) → fonts are excluded from inlining; a missing favicon caused a console 404 →
+  neutral placeholder `favicon.svg` (not a brand mark).
+- **Verification (run on 2026-11-12):** ESLint and `tsc` clean; Vitest **40 passed**; build OK;
+  pytest 39 passed, Ruff clean (backend unchanged); Playwright **18 passed** (8 SSR/security + 10
+  design system: axe-core WCAG 2.2 A/AA with 0 violations on three pages × light/dark × 1280/390px,
+  no overflow, no console errors, theme switch with and without JavaScript, `/theme` validation,
+  self-hosted fonts, no-JS mobile menu); `pnpm audit`: only the known moderate `minimatch` finding.
+  Visual review of screenshots in both themes and on a phone.
+
 ## Known limitations
 
 - GitHub Free for private repositories: no push protection and no branch protection (see
   [`SECURITY.md`](SECURITY.md), section 10).
 - allauth rate limits use the per-process memory cache; a shared cache is required before the beta
   (open question O).
-- The UI is deliberately unstyled until the visual direction is decided (open question E).
+- The design system covers the pages that exist so far; product pages (projects, campaigns, feedback) adopt it as they are built.

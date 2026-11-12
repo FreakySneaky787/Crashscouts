@@ -2,6 +2,11 @@ import { useTranslation } from "react-i18next";
 import { data, Form } from "react-router";
 
 import type { Route } from "./+types/probe-private";
+import { Button } from "~/components/ui/Button";
+import { LockSimpleIcon } from "~/components/ui/icons";
+import { PageHeader } from "~/components/ui/PageHeader";
+import { Panel } from "~/components/ui/Panel";
+import { StatusPill } from "~/components/ui/StatusPill";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken } from "~/lib/backend.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
@@ -61,16 +66,21 @@ export default function ProbePrivate({ loaderData, actionData }: Route.Component
   const { t } = useTranslation();
   const count = actionData?.touchCount ?? loaderData.item.touch_count;
   return (
-    <article>
-      <p>{t("probe.private")}</p>
-      <h1>{loaderData.item.title}</h1>
-      <p>{loaderData.item.description}</p>
-      <p data-testid="touch-count">{t("probe.touchCount", { count })}</p>
-      {actionData?.error && <p role="alert">{actionData.error}</p>}
-      <Form method="post">
-        <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
-        <button type="submit">{t("probe.touch")}</button>
-      </Form>
-    </article>
+    <>
+      <PageHeader title={loaderData.item.title} meta={<StatusPill tone="neutral" icon={LockSimpleIcon} label={t("probe.private")} />} />
+      <Panel title={t("probe.about")}>
+        <p>{loaderData.item.description}</p>
+        <p data-testid="touch-count" className="tabular">
+          {t("probe.touchCount", { count })}
+        </p>
+        {actionData?.error ? <p role="alert">{actionData.error}</p> : null}
+        <Form method="post">
+          <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+          <Button type="submit" variant="primary">
+            {t("probe.touch")}
+          </Button>
+        </Form>
+      </Panel>
+    </>
   );
 }

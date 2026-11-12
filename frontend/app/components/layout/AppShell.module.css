@@ -1,0 +1,209 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.skip {
+  position: absolute;
+  left: var(--space-2);
+  top: -4rem;
+  z-index: 100;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+}
+
+.skip:focus {
+  top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
+}
+
+/* Sidebar (dimmed: it supports orientation, the content area has the focus) */
+.sidebar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-2);
+  padding-left: max(var(--space-2), env(safe-area-inset-left, 0px));
+  border-right: 1px solid var(--color-line);
+  background: var(--color-bg);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  font-weight: var(--weight-bold);
+}
+
+.mark {
+  display: inline-grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.working {
+  font-weight: var(--weight-regular);
+  font-size: var(--text-meta);
+  color: var(--color-fg-muted);
+}
+
+.secondary {
+  margin-top: auto;
+}
+
+.navList {
+  display: grid;
+  gap: 1px;
+  list-style: none;
+  padding: 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 2rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-nav);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.navLink:hover {
+  background: var(--color-surface-sunken);
+  color: var(--color-fg);
+}
+
+.navLink[aria-current="page"] {
+  background: var(--color-nav-active-bg);
+  color: var(--color-fg);
+}
+
+.navIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+}
+
+/* Top bar */
+.column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.25rem;
+  padding: var(--space-2) var(--space-5);
+  padding-right: max(var(--space-5), env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.me {
+  display: inline-flex;
+  border-radius: 50%;
+}
+
+.menu,
+.mobileBrand {
+  display: none;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+  width: 100%;
+  max-width: var(--content-max);
+  padding: var(--space-5) var(--space-6) var(--space-12);
+  padding-right: max(var(--space-6), env(safe-area-inset-right, 0px));
+}
+
+.main > * {
+  min-width: 0;
+}
+
+/* Narrow screens: navigation moves into the menu */
+@media (max-width: 56rem) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .menu {
+    display: block;
+    position: relative;
+  }
+
+  .mobileBrand {
+    display: inline;
+    font-weight: var(--weight-bold);
+  }
+
+  .menuButton {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    list-style: none;
+    cursor: pointer;
+    color: var(--color-fg-secondary);
+  }
+
+  .menuButton::-webkit-details-marker {
+    display: none;
+  }
+
+  .menuPanel {
+    position: absolute;
+    left: 0;
+    top: calc(100% + var(--space-2));
+    z-index: 30;
+    width: min(16rem, calc(100vw - 2rem));
+    padding: var(--space-2);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .topbar {
+    padding-left: max(var(--space-4), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, 0px));
+  }
+
+  .main {
+    padding-left: max(var(--space-4), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, 0px));
+  }
+}

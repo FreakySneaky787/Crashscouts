@@ -14,6 +14,10 @@ frontend/
 │   ├── entry.server.tsx       CSP with nonce (production build), security headers, cache defaults
 │   ├── lib/backend.server.ts  server-only access to the Django API
 │   ├── lib/http.ts            pure helpers: cache headers, cookies, redirects, UUIDs (+ tests)
+│   ├── lib/theme.ts           theme cookie (system/light/dark) (+ tests)
+│   ├── styles/                design tokens (light/dark) and base styles
+│   ├── components/ui/         design system components, CSS Modules, icons.ts, statuses.ts
+│   ├── components/layout/     AppShell (sidebar, top bar, mobile menu)
 │   ├── i18n/                  react-i18next, one instance per request, typed keys (+ tests)
 │   └── config/brand.ts        central brand name (working name "TestHub")
 ├── react-router.config.ts     `ssr: true`
@@ -66,3 +70,15 @@ pnpm lint && pnpm typecheck && pnpm test
 - Forms that write carry the CSRF token (`ensureCsrfToken` in the loader, hidden field
   `csrf_token`).
 - No `dangerouslySetInnerHTML` (enforced by ESLint).
+
+## Rules for UI
+
+Full reference: [`docs/DESIGN-SYSTEM.md`](../docs/DESIGN-SYSTEM.md); living examples at
+`/design-system`.
+
+- Build pages from `app/components/ui/`; style with CSS Modules and tokens from
+  `app/styles/tokens.css` – no literal colours.
+- No `style` attribute (blocked by the CSP; enforced by ESLint).
+- Icons only from `app/components/ui/icons.ts`; status always as icon + text (`StatusPill`).
+- Tabs and filters are links; every list has an `EmptyState`.
+- UI texts go into `app/i18n/locales/en.json`.

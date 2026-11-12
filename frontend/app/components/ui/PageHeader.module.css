@@ -1,0 +1,93 @@
+.wrap {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  list-style: none;
+  padding: 0;
+  font-size: var(--text-sec);
+  color: var(--color-fg-muted);
+}
+
+.crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.crumbs a {
+  color: var(--color-fg-secondary);
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  text-decoration: underline;
+}
+
+.sep {
+  width: 0.9em;
+  height: 0.9em;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.text {
+  min-width: 0;
+  flex: 1 1 20rem;
+}
+
+.title {
+  font-size: var(--text-page);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.012em;
+}
+
+.version {
+  font-family: var(--font-mono);
+  font-size: 0.6em;
+  font-weight: 500;
+  color: var(--color-fg-muted);
+  letter-spacing: 0;
+  margin-left: var(--space-2);
+  vertical-align: 0.15em;
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  font-size: var(--text-panel);
+  color: var(--color-fg-secondary);
+  max-width: 70ch;
+}
+
+.meta {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-sec);
+  color: var(--color-fg-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+@media (max-width: 35rem) {
+  .actions {
+    width: 100%;
+  }
+}

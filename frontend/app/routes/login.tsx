@@ -2,9 +2,16 @@ import { useTranslation } from "react-i18next";
 import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/login";
+import { Button } from "~/components/ui/Button";
+import { TextField } from "~/components/ui/Form";
+import { SignInIcon } from "~/components/ui/icons";
+import { PageHeader } from "~/components/ui/PageHeader";
+import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { AUTH_BASE, backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, safeRedirectPath, setCookieHeaders } from "~/lib/http";
+
+import styles from "./forms.module.css";
 
 export function meta(_: Route.MetaArgs) {
   return [{ title: `Log in · ${brand.name}` }, { name: "robots", content: "noindex" }];
@@ -53,22 +60,26 @@ export function headers({ actionHeaders, loaderHeaders }: Route.HeadersArgs) {
 export default function Login({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
   return (
-    <section>
-      <h1>{t("login.title")}</h1>
-      {actionData?.error && <p role="alert">{t("login.error")}</p>}
-      <Form method="post">
-        <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
-        <input type="hidden" name="next" value={loaderData.next} />
-        <label>
-          {t("login.username")}
-          <input name="username" autoComplete="username" required />
-        </label>
-        <label>
-          {t("login.password")}
-          <input name="password" type="password" autoComplete="current-password" required />
-        </label>
-        <button type="submit">{t("login.submit")}</button>
-      </Form>
-    </section>
+    <div className={styles.narrow}>
+      <PageHeader title={t("login.title")} />
+      <Panel title={t("login.panel")}>
+        {actionData?.error ? (
+          <p role="alert" className={styles.alert}>
+            {t("login.error")}
+          </p>
+        ) : null}
+        <Form method="post" className={styles.form}>
+          <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+          <input type="hidden" name="next" value={loaderData.next} />
+          <TextField id="username" name="username" label={t("login.username")} autoComplete="username" required />
+          <TextField id="password" name="password" type="password" label={t("login.password")} autoComplete="current-password" required />
+          <div>
+            <Button type="submit" variant="primary" icon={SignInIcon}>
+              {t("login.submit")}
+            </Button>
+          </div>
+        </Form>
+      </Panel>
+    </div>
   );
 }

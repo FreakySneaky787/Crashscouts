@@ -8,6 +8,10 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  build: {
+    // Never inline fonts as data: URIs – the CSP only allows fonts from our own origin (font-src 'self').
+    assetsInlineLimit: (filePath) => (/\.(woff2?|ttf|otf)$/.test(filePath) ? false : undefined),
+  },
   server: {
     // Local only; in Codespaces the port is forwarded privately.
     host: "127.0.0.1",

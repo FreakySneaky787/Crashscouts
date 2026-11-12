@@ -1,0 +1,165 @@
+/* =================================================================================================
+   Design tokens – visual direction "Developer Workbench" (ADR 0007, docs/DESIGN-SYSTEM.md).
+   Every token is defined on :root (light). Dark values are redefined for
+   - an explicit choice: html[data-theme="dark"]
+   - the system setting: prefers-color-scheme: dark, unless the user explicitly chose light.
+   Components use tokens only – never literal colours.
+   ================================================================================================= */
+:root {
+  /* Neutrals (graphite, slightly biased towards the accent) */
+  --color-bg: #f5f6f6;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #eceeee;
+  --color-line: #dde1e1;
+  --color-line-strong: #c3c9c9;
+  --color-fg: #1a2021;
+  --color-fg-secondary: #475153;
+  --color-fg-muted: #5f696b;
+  --color-nav: #5a6466;
+  --color-nav-active-bg: #e3e7e7;
+
+  /* Accent (one hue only) */
+  --color-accent: #0e6767;
+  --color-accent-fg: #ffffff;
+  --color-accent-soft: #dfefee;
+  --color-accent-text: #0b5a5a;
+  --color-focus: #0e6767;
+
+  /* Semantic status colours – always paired with an icon and a text label */
+  --color-ok: #1b6a39;
+  --color-ok-soft: #e1f1e6;
+  --color-warn: #845000;
+  --color-warn-soft: #f9edd6;
+  --color-danger: #a1262a;
+  --color-danger-soft: #f9e3e2;
+  --color-info: #1e53a4;
+  --color-info-soft: #e3ebf9;
+  --color-neutral: #4c545a;
+  --color-neutral-soft: #e9ecee;
+
+  --shadow-popover: 0 10px 30px rgb(10 14 15 / 0.18);
+  --backdrop: rgb(10 14 15 / 0.5);
+  /* Identity colours (avatars, project icons): hue from --hue-N, these set saturation/lightness */
+  --identity-sat: 45%;
+  --identity-bg-l: 90%;
+  --identity-fg-l: 22%;
+  --identity-line-l: 80%;
+
+  /* Typography */
+  --font-ui: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  /* Type scale: meta / secondary / body / panel title / section / page title */
+  --text-meta: 0.78125rem;   /* 12.5px */
+  --text-sec: 0.84375rem;    /* 13.5px */
+  --text-body: 0.90625rem;   /* 14.5px */
+  --text-panel: 1rem;        /* 16px   */
+  --text-section: 1.25rem;   /* 20px   */
+  --text-page: 1.75rem;      /* 28px   */
+  --text-figure: 1.625rem;   /* 26px   */
+  --leading-body: 1.45;
+  --leading-tight: 1.15;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Spacing (4px grid) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Shape and layout */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+  --sidebar-width: 14rem;
+  --content-max: 80rem;
+  --control-height: 2rem;
+  --target-min: 1.5rem; /* WCAG 2.2 target size (24px) */
+
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #111516;
+    --color-surface: #171c1d;
+    --color-surface-sunken: #1f2628;
+    --color-line: #283033;
+    --color-line-strong: #3a4448;
+    --color-fg: #e2e7e7;
+    --color-fg-secondary: #b3bcbd;
+    --color-fg-muted: #959fa1;
+    --color-nav: #8f999b;
+    --color-nav-active-bg: #222a2c;
+    --color-accent: #52b5ae;
+    --color-accent-fg: #071a19;
+    --color-accent-soft: #15302e;
+    --color-accent-text: #6cc7c0;
+    --color-focus: #6cc7c0;
+    --color-ok: #7ed29a;
+    --color-ok-soft: #163222;
+    --color-warn: #efb45a;
+    --color-warn-soft: #382910;
+    --color-danger: #ff8d88;
+    --color-danger-soft: #3b1a1a;
+    --color-info: #8db5ff;
+    --color-info-soft: #172842;
+    --color-neutral: #b8bfc4;
+    --color-neutral-soft: #252a2e;
+    --shadow-popover: 0 10px 30px rgb(0 0 0 / 0.45);
+    --backdrop: rgb(0 0 0 / 0.6);
+    --identity-sat: 30%;
+    --identity-bg-l: 24%;
+    --identity-fg-l: 88%;
+    --identity-line-l: 34%;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #111516;
+  --color-surface: #171c1d;
+  --color-surface-sunken: #1f2628;
+  --color-line: #283033;
+  --color-line-strong: #3a4448;
+  --color-fg: #e2e7e7;
+  --color-fg-secondary: #b3bcbd;
+  --color-fg-muted: #959fa1;
+  --color-nav: #8f999b;
+  --color-nav-active-bg: #222a2c;
+  --color-accent: #52b5ae;
+  --color-accent-fg: #071a19;
+  --color-accent-soft: #15302e;
+  --color-accent-text: #6cc7c0;
+  --color-focus: #6cc7c0;
+  --color-ok: #7ed29a;
+  --color-ok-soft: #163222;
+  --color-warn: #efb45a;
+  --color-warn-soft: #382910;
+  --color-danger: #ff8d88;
+  --color-danger-soft: #3b1a1a;
+  --color-info: #8db5ff;
+  --color-info-soft: #172842;
+  --color-neutral: #b8bfc4;
+  --color-neutral-soft: #252a2e;
+  --shadow-popover: 0 10px 30px rgb(0 0 0 / 0.45);
+  --backdrop: rgb(0 0 0 / 0.6);
+  --identity-sat: 30%;
+  --identity-bg-l: 24%;
+  --identity-fg-l: 88%;
+  --identity-line-l: 34%;
+  color-scheme: dark;
+}
+
+/* Identity hues for avatars and project icons (8 steps, chosen by a stable hash). */
+:root {
+  --hue-0: 200; --hue-1: 160; --hue-2: 30; --hue-3: 340; --hue-4: 270; --hue-5: 110; --hue-6: 50; --hue-7: 230;
+}

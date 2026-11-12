@@ -1,0 +1,23 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 1px var(--space-2) 1px 6px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.icon {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+
+.ok { color: var(--color-ok); background: var(--color-ok-soft); }
+.warn { color: var(--color-warn); background: var(--color-warn-soft); }
+.danger { color: var(--color-danger); background: var(--color-danger-soft); }
+.info { color: var(--color-info); background: var(--color-info-soft); }
+.neutral { color: var(--color-neutral); background: var(--color-neutral-soft); }

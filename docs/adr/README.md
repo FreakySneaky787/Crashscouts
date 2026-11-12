@@ -13,6 +13,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0005](0005-typescript-6.md) | TypeScript 6.0 instead of 7.0 | Accepted |
 | [0006](0006-license-agpl-3.0.md) | License AGPL-3.0 | Accepted; re-check before going public |
 | [0007](0007-visual-direction-developer-workbench.md) | Visual direction: Developer Workbench (concept A) | Accepted (direction) |
+| [0008](0008-design-system-implementation.md) | Design system implementation: CSS tokens, CSS Modules, self-hosted assets | Accepted |
 
 ## Template
 

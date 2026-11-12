@@ -2,9 +2,16 @@ import { useTranslation } from "react-i18next";
 import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/account";
+import { Button } from "~/components/ui/Button";
+import { Avatar } from "~/components/ui/Data";
+import { SignOutIcon } from "~/components/ui/icons";
+import { PageHeader } from "~/components/ui/PageHeader";
+import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+
+import styles from "./forms.module.css";
 
 export function meta(_: Route.MetaArgs) {
   return [{ title: `Account · ${brand.name}` }, { name: "robots", content: "noindex" }];
@@ -29,13 +36,21 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
 export default function Account({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation();
   return (
-    <section>
-      <h1>{t("account.title")}</h1>
-      <p data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</p>
-      <Form method="post" action="/logout">
-        <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
-        <button type="submit">{t("nav.logout")}</button>
-      </Form>
-    </section>
+    <div className={styles.narrow}>
+      <PageHeader
+        title={t("account.title")}
+        leading={<Avatar name={loaderData.username} id={loaderData.username} size="lg" />}
+        subtitle={<span data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</span>}
+      />
+      <Panel title={t("account.session")}>
+        <p>{t("account.sessionText")}</p>
+        <Form method="post" action="/logout">
+          <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+          <Button type="submit" icon={SignOutIcon}>
+            {t("nav.logout")}
+          </Button>
+        </Form>
+      </Panel>
+    </div>
   );
 }

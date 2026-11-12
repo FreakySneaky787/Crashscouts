@@ -1,0 +1,109 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 40rem;
+}
+
+/* Colour swatches */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+}
+
+.swatchItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--text-meta);
+}
+
+.swatch {
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line-strong);
+}
+
+.bg { background: var(--color-bg); }
+.surface { background: var(--color-surface); }
+.sunken { background: var(--color-surface-sunken); }
+.line { background: var(--color-line); }
+.fg { background: var(--color-fg); }
+.fgSecondary { background: var(--color-fg-secondary); }
+.fgMuted { background: var(--color-fg-muted); }
+.accent { background: var(--color-accent); }
+.ok { background: var(--color-ok); }
+.warn { background: var(--color-warn); }
+.danger { background: var(--color-danger); }
+.info { background: var(--color-info); }
+
+/* Type scale */
+.type {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.typeRow {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: baseline;
+}
+
+.typeLabel {
+  font-size: var(--text-meta);
+  color: var(--color-fg-muted);
+}
+
+.t_page { font-size: var(--text-page); font-weight: var(--weight-bold); letter-spacing: -0.012em; line-height: var(--leading-tight); }
+.t_section { font-size: var(--text-section); font-weight: var(--weight-bold); }
+.t_panel { font-size: var(--text-panel); font-weight: var(--weight-bold); }
+.t_body { font-size: var(--text-body); }
+.t_sec { font-size: var(--text-sec); color: var(--color-fg-secondary); }
+.t_meta { font-size: var(--text-meta); color: var(--color-fg-muted); }
+
+.statusGroups {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.statusGroup {
+  display: grid;
+  gap: var(--space-1);
+}
+
+@media (max-width: 64rem) {
+  .grid,
+  .grid3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .typeRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+}

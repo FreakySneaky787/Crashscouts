@@ -25,7 +25,7 @@
 
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
-| E | Visual direction | **Concept A – Developer Workbench**, with light/dark mode in the product UI ([ADR 0007](adr/0007-visual-direction-developer-workbench.md)). Refinement continues in the design system. |
+| E | Visual direction | **Concept A – Developer Workbench**, with light/dark mode in the product UI ([ADR 0007](adr/0007-visual-direction-developer-workbench.md)). Implemented as the design system ([`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), [ADR 0008](adr/0008-design-system-implementation.md)). |
 | I | Language of the repository documentation | **English** for all documentation, code comments and commit messages. The original master prompt stays available in German as [`MASTER-PROMPT.de.md`](MASTER-PROMPT.de.md). |
 
 ## Legal (not legal advice; have it reviewed before the beta)

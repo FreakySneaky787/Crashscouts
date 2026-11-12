@@ -48,7 +48,7 @@ test("(1) a public page is server-side rendered", async ({ browser, request }) =
   const response = await request.get(publicPath());
   expect(response.status()).toBe(200);
   const html = await response.text();
-  expect(html).toContain("<h1>Public probe item</h1>");
+  expect(html).toMatch(/<h1[^>]*>Public probe item<\/h1>/);
 
   // The content is fully visible even without JavaScript.
   const context = await browser.newContext({ javaScriptEnabled: false });
@@ -204,7 +204,7 @@ test("(6) curl without JavaScript receives complete HTML with title and Open Gra
     '<meta property="og:description" content="A public item rendered on the server."/>',
   );
   expect(html).toContain('<meta name="description" content="A public item rendered on the server."/>');
-  expect(html).toContain("<h1>Public probe item</h1>");
+  expect(html).toMatch(/<h1[^>]*>Public probe item<\/h1>/);
 });
 
 test("security headers and CSP are set in the production build", async ({ request }) => {
