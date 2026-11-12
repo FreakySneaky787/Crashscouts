@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The owner of the project "{{ project_name }}" deleted their account. As its longest-serving maintainer you are now the owner.
+
+You can invite other maintainers or hand the project over in its settings.{% endautoescape %}{% endblock content %}

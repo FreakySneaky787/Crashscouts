@@ -50,7 +50,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `ssr_probe` | **Test only**: probe objects for the SSR spike; never installed in production | implemented |
 | `profiles` | Profile, interests, operating systems, skills, privacy, avatar | implemented (WP 1.2) |
 | `catalog` | Taxonomies: categories, platforms, languages, software type, SPDX licenses | categories, platforms, skills (WP 1.2); the rest in phase 2 |
-| `projects` | Projects, memberships (owner/maintainer), verification, screenshots | planned |
+| `projects` | Project, membership (owner/maintainer), short names with history, verification, screenshots, status | model, policies, API (WP 2.2a) |
 | `campaigns` | Campaigns, links, invitations, participations, status machine | planned |
 | `testing` | Test tasks, progress | planned |
 | `feedback` | Feedback, attachments, status, publishing | planned |

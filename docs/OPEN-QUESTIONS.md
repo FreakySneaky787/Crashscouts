@@ -25,6 +25,9 @@
 | – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |
 | – | Who may create projects | **Every account with a confirmed email address**, with a daily limit; abuse is handled by reporting and blocking (phase 3B). |
 | – | Adding maintainers | **Invitation that the person must accept**; nobody is added to a project without consent. |
+| – | Project when the owner's account is deleted | **Handed over** to the longest-serving maintainer (with email); without maintainers the project is deleted. Owners are told during the 14-day grace period and can hand over earlier. |
+| – | Format of project descriptions | **Markdown with a fixed allowlist** (headings, lists, links, code; no raw HTML, no images from other servers). |
+| – | Project URL | **`/p/<project-name>`**: a readable, unique short name chosen at creation; old names redirect after a rename. |
 | F | Provider for transactional email | **Scaleway Transactional Email** (France; free allowance, then pay per use – owner's constraint: free or very cheap). Development and CI use Mailpit; the code speaks provider-neutral SMTP. Limits and prices are verified on the official pages before signing up. |
 | D | Default visibility of profiles | **Minimally public:** username and initials avatar; bio, interests, operating systems and skills optional and individually switchable; email never visible; profiles not indexed unless the user opts in. What participants see of each other is decided in phase 3A. |
 | L | Password rules | **Minimum 12 characters**, at least 64 allowed, no composition rules, blocklist of common passwords, similarity check against username/email. Deliberately below NIST SP 800-63B-4 (15 characters for single-factor passwords); recorded in [ADR 0009](adr/0009-account-rules-and-password-policy.md). |

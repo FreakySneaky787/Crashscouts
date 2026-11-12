@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.catalog",
     "apps.profiles",
+    "apps.projects",
 ]
 
 MIDDLEWARE = [
@@ -292,6 +293,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "avatar_upload": "10/hour",
         "account_sensitive": "10/hour",
+        "project_create": "10/day",
     },
 }
 

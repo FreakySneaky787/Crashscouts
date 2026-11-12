@@ -20,6 +20,8 @@ from apps.audit.models import AuditEvent
 from apps.audit.services import record
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
+from apps.projects.models import Membership
+from apps.projects.services import hand_over_or_delete_owned_projects, owned_projects
 
 GRACE_PERIOD = timedelta(days=14)
 
@@ -48,7 +50,12 @@ def request_deletion(user) -> None:
     user.save(update_fields=["deletion_scheduled_for"])
     end_all_sessions(user)
     record(AuditEvent.Kind.DELETION_REQUESTED, actor=user, subject=user)
-    _mail("deletion_scheduled", user, deletion_date=f"{deletion_date:%Y-%m-%d %H:%M}")
+    _mail(
+        "deletion_scheduled",
+        user,
+        deletion_date=f"{deletion_date:%Y-%m-%d %H:%M}",
+        owned_projects=[p.name for p in owned_projects(user)],
+    )
 
 
 def cancel_deletion(user) -> bool:
@@ -71,6 +78,8 @@ def purge_due_accounts(now=None) -> int:
         avatar_key = profile.avatar_key if profile else None
         _mail("account_deleted", user)
         with transaction.atomic():
+            # Projects go to their longest-serving maintainer, or are deleted without one.
+            hand_over_or_delete_owned_projects(user)
             user.delete()  # cascades: profile, email addresses, 2FA, GitHub links
             # The event keeps no reference to the person.
             record(AuditEvent.Kind.ACCOUNT_DELETED)
@@ -126,6 +135,10 @@ def export_data(user) -> dict:
             },
             "has_avatar": profile.avatar_key is not None,
         },
+        "projects": [
+            {"slug": m.project.slug, "name": m.project.name, "role": m.role}
+            for m in Membership.objects.filter(user=user).select_related("project")
+        ],
         "connected_accounts": [
             {"provider": a.provider, "uid": a.uid, "date_joined": _iso(a.date_joined)}
             for a in SocialAccount.objects.filter(user=user)

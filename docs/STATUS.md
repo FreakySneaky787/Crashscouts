@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 2.1) · **Current phase:** 2 – Projects
+**Last update:** 2026-11-12 (WP 2.2a) · **Current phase:** 2 – Projects
 
 ## Work packages
 
@@ -350,6 +350,25 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
   `/api/v1/catalog/licenses/`; command `sync_spdx_licenses` for updates.
 - **Verification (run on 2026-11-12):** pytest **149 passed** (4 new: languages, licence count and
   labels incl. BUSL/SSPL not open source, deprecated identifiers absent, idempotent sync).
+
+### WP 2.2a – Projects backend (2026-11-12) ✅
+
+- **Model:** project (short name, name, summary, Markdown description up to 10,000 characters,
+  status, public/private – default private, licence, https repository link, categories,
+  platforms, languages), membership with exactly one owner (database constraint), former short
+  names for redirects.
+- **Permissions in one policy module:** public projects visible to all; private ones only to the
+  team (404 for everyone else, also under former names); team edits, owner deletes.
+- **API:** `POST /api/v1/projects/` (confirmed email, 10 per day), `GET/PATCH/DELETE
+  /api/v1/projects/<slug>/`, `GET /api/v1/me/projects/`; audit events for owner change,
+  deletion and visibility change.
+- **Account deletion:** owned projects go to the longest-serving maintainer (email), or are
+  deleted without one; the deletion email lists owned projects; the data export lists project
+  memberships.
+- **Verification (run on 2026-11-12):** pytest **181 passed** (32 new incl. the full permission
+  matrix anonymous/stranger/maintainer/owner × public/private × view/edit/delete). Mutation
+  checks: making private projects visible to all, and letting maintainers delete, were each
+  caught.
 
 ## Known limitations
 

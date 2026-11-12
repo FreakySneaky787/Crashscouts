@@ -43,6 +43,9 @@ class AuditEvent(models.Model):
         DELETION_CANCELLED = "account.deletion_cancelled", "Account deletion cancelled"
         ACCOUNT_DELETED = "account.deleted", "Account deleted"
         DATA_EXPORTED = "account.data_exported", "Personal data exported"
+        PROJECT_OWNER_CHANGED = "project.owner_changed", "Project owner changed"
+        PROJECT_DELETED = "project.deleted", "Project deleted"
+        PROJECT_VISIBILITY_CHANGED = "project.visibility_changed", "Project visibility changed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)
