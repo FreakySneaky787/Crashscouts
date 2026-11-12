@@ -1,0 +1,63 @@
+# --- Secrets & local configuration (never commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# --- Django ---
+backend/media/
+backend/staticfiles/
+*.sqlite3
+
+# --- Node / Frontend ---
+node_modules/
+frontend/build/
+frontend/.react-router/
+*.tsbuildinfo
+.vite/
+.pnpm-store/
+
+# --- Playwright ---
+e2e/test-results/
+e2e/playwright-report/
+e2e/.auth/
+playwright-report/
+test-results/
+
+# --- Editors / OS ---
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# --- Logs & dumps ---
+*.log
+!**/fixtures/**/*.log
+*.dump
+*.sql.gz
+
+# --- Claude Code (local, per-user) ---
+.claude/settings.local.json

@@ -1,0 +1,15 @@
+# Normalize line endings in the repository
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Lockfiles: do not show diffs by default, treat as generated
+uv.lock linguist-generated=true -diff
+pnpm-lock.yaml linguist-generated=true -diff
