@@ -12,7 +12,6 @@
 | B | Method of repository verification | phase 2 | token file in the repository (independent of the code host), plus a check via GitHub OAuth |
 | C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
 | D | What do participants see of each other? Default visibility of profiles | phase 1 / 3A | participants do not see each other; profiles minimally public by default |
-| E | **Visual direction, component library, styling** | before phase 1 | **in progress:** three clickable directions in [`design/prototypes/`](../design/prototypes/README.md); the project owner decides. Prior recommendation: B with A's structured-data components |
 | F | Provider for transactional email (Switzerland/EU) | phase 1 | Mailpit or console in development; provider before the beta |
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | H | Who moderates initially? | phase 3B | the project owner only |
@@ -26,6 +25,7 @@
 
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
+| E | Visual direction | **Concept A – Developer Workbench**, with light/dark mode in the product UI ([ADR 0007](adr/0007-visual-direction-developer-workbench.md)). Refinement continues in the design system. |
 | I | Language of the repository documentation | **English** for all documentation, code comments and commit messages. The original master prompt stays available in German as [`MASTER-PROMPT.de.md`](MASTER-PROMPT.de.md). |
 
 ## Legal (not legal advice; have it reviewed before the beta)

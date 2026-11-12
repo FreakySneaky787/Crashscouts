@@ -17,8 +17,13 @@
   };
 
   const state = {
-    concept: "b", page: "home", id: null, theme: store.get("proto-theme") || "system",
-    tabs: {}, feedTab: "following", notes: false, menu: false,
+    concept: "a", page: "home", id: null, theme: store.get("proto-theme") || "system",
+    tabs: {}, feedTab: "following", notes: false, menu: false, notifOpen: false,
+    notifications: [
+      { id: 1, unread: true, icon: "bug", text: "Ines Kovač confirmed your report #214", detail: "Sync stops after importing 300+ feeds", to: ["campaign", "tidewater-sync"], when: "3 hours ago" },
+      { id: 2, unread: true, icon: "flask", text: "pgsnap is looking for Windows testers", detail: "Matches your device: Windows 11", to: ["campaign", "pgsnap-windows"], when: "2 hours ago" },
+      { id: 3, unread: false, icon: "tag", text: "Lumen Notes 2.0.0-rc.1 is out", detail: "Campaign “2.0 release candidate” continues", to: ["campaign", "lumen-2"], when: "4 hours ago" },
+    ],
     follows: new Set(["tidewater", "kestrel", "pgsnap"]), joined: new Set(DATA.joined), requested: new Set(),
     f: { q: "", platform: "", type: "", license: "", status: "", active: false },
   };
@@ -143,6 +148,8 @@
       return `<a class="${cls || ""}" href="${href(page, id)}"${cur ? ' aria-current="page"' : ""}>${ic(icon)}${label}</a>`;
     }).join("");
   }
+  const THEMES = [["system", "monitor", "Use system setting"], ["light", "sun", "Light theme"], ["dark", "moon", "Dark theme"]];
+  const themeToggle = () => `<div class="theme-toggle" role="group" aria-label="Colour theme">${THEMES.map(([v, i, l]) => `<button type="button" data-act="theme" data-value="${v}" aria-pressed="${state.theme === v}" title="${l}">${ic(i)}<span class="visually-hidden">${l}</span></button>`).join("")}</div>`;
   const searchField = (placeholder) => `<label class="field" for="q">${ic("magnifying-glass")}<span class="visually-hidden">Search</span><input id="q" type="search" autocomplete="off" placeholder="${esc(placeholder)}" value="${esc(state.f.q)}"></label>`;
 
   // ================================================================ CONCEPT A
@@ -161,11 +168,19 @@
             <button class="btn quiet a-menu" data-act="menu" aria-expanded="${state.menu}" aria-controls="a-side">${ic("list")}<span class="visually-hidden">Menu</span></button>
             ${searchField("Search projects, languages, categories")}<kbd aria-hidden="true">/</kbd>
             <span style="flex:1"></span>
-            <a href="${href("profile", DATA.me)}" class="btn quiet">${avatar(U(DATA.me))}<span class="visually-hidden">Your profile</span></a>
+            ${themeToggle()}
+            ${A.notifications()}
+            <a href="${href("profile", DATA.me)}" class="btn quiet a-me">${avatar(U(DATA.me))}<span class="visually-hidden">Your profile</span></a>
           </div>
           <main id="main" class="a-content" tabindex="-1">${content}</main>
         </div>
       </div>`;
+    },
+    notifications() {
+      const unread = state.notifications.filter((n) => n.unread).length;
+      return `<div class="a-notif"><button class="btn quiet" data-act="notif" aria-expanded="${state.notifOpen}" aria-controls="a-notif-pop">${ic("bell")}<span class="visually-hidden">Notifications</span>${unread ? `<span class="a-badge num" aria-label="${unread} unread">${unread}</span>` : ""}</button>
+        <div class="a-pop" id="a-notif-pop" ${state.notifOpen ? "" : "hidden"}><header><strong>Notifications</strong>${unread ? '<button class="btn quiet" data-act="notif-read">Mark all as read</button>' : ""}</header>
+        <ul class="a-rows">${state.notifications.map((n) => `<li class="${n.unread ? "unread" : ""}">${ic(n.icon)}<span class="t"><a href="${href(n.to[0], n.to[1])}" data-act="notif-go" data-id="${n.id}">${esc(n.text)}</a><span class="d">${esc(n.detail)}</span></span><time>${esc(n.when)}</time></li>`).join("")}</ul></div></div>`;
     },
     rowsFeed(items) {
       const groups = [["Today", (w) => /hour/.test(w)], ["Yesterday", (w) => w === "yesterday"], ["Earlier", () => true]];
@@ -272,16 +287,40 @@
           <dt>Hardware</dt><dd>${esc(c.hardware)}</dd><dt>Changes</dt><dd>${c.changelog.map(esc).join("<br>")}</dd></dl></div></section>`;
       }
       return `<nav class="a-crumbs" aria-label="Breadcrumb"><a href="${href("testing")}">Testing</a>${ic("caret-right")}<a href="${href("project", p.id)}">${esc(p.name)}</a>${ic("caret-right")}<span aria-current="page">${esc(c.title)}</span></nav>
-        <div class="a-head"><div style="min-width:0"><h1 class="a-h1">${esc(c.title)} <span class="mono sec">${esc(c.version)}</span></h1><div class="meta">${campStatus(c)}<span>${esc(c.method)} testing</span><span>${ic(c.visibility === "Public" ? "globe" : "lock-simple")} ${esc(c.visibility)}</span><span>${esc(c.participation)}</span><span class="num">${esc(c.starts)} – ${esc(c.ends)}</span></div></div><div class="actions">${joinButton(c)}</div></div>
+        <div class="a-head"><div style="min-width:0"><h1 class="a-h1">${esc(c.title)} <span class="mono sec">${esc(c.version)}</span></h1><div class="meta">${campStatus(c)}<span>${esc(c.method)} testing</span><span>${ic(c.visibility === "Public" ? "globe" : "lock-simple")} ${esc(c.visibility)}</span><span>${esc(c.participation)}</span><span class="num">${esc(c.starts)} – ${esc(c.ends)}</span></div></div><div class="actions">${state.joined.has(c.id) ? `${pill("ok", "check", "You're testing this")}<button class="btn primary" data-act="report" data-id="${c.id}">${ic("bug")}Report feedback</button>` : joinButton(c)}</div></div>
         <div class="a-split"><div style="display:grid;gap:12px;min-width:0">
           ${tabs("campaign", [...(c.tasks.length ? [["tasks", "Tasks", c.tasks.length]] : []), ["feedback", "Feedback", fb.length], ["participants", "Participants", c.testers], ["details", "Details"]], tab)}
           ${panel("campaign", tab, body)}
+          ${state.joined.has(c.id) ? A.myReports(c) : ""}
         </div>
         <div style="display:grid;gap:16px">
           <section class="a-panel" aria-labelledby="a-part"><header><h2 id="a-part">Participation</h2></header><div class="body">${meter(c.testers, c.target, "Testers")}<div class="num">${c.testers} of ${c.target} testers · ${c.daysLeft} days left</div>${pr.total && state.joined.has(c.id) ? `${meter(pr.done, pr.total, "Your tasks")}<div class="num sec">Your tasks: ${pr.done} of ${pr.total}</div>` : ""}</div></section>
           <section class="a-panel" aria-labelledby="a-env"><header><h2 id="a-env">Test on</h2></header><div class="body"><div class="chips">${c.platforms.map((x) => `<span class="chip">${esc(x)}</span>`).join("")}</div></div></section>
           <section class="a-panel" aria-labelledby="a-dl"><header><h2 id="a-dl">Downloads</h2></header><div class="body">${c.downloads.map((d) => `<a href="#" data-act="ext" class="btn">${ic("download-simple")}${esc(d.label)} <span class="mono muted">${esc(d.host)}</span></a>`).join("")}<p class="ext-note">${ic("warning")}Downloads come from the project's own sources. You will see a warning before leaving.</p></div></section>
-        </div></div>`;
+        </div></div>${state.joined.has(c.id) ? A.reportDialog(c) : ""}`;
+    },
+    myReports(c) {
+      const mine = DATA.feedback.filter((f) => f.campaign === c.id && f.author === DATA.me);
+      return `<section class="a-panel" aria-labelledby="a-mine"><header><h2 id="a-mine">Your reports</h2><span class="aside num">${mine.length}</span></header>${mine.length ? `<ul class="a-rows">${mine.map((f) => `<li>${ic(FB_ICON[f.type])}<span class="t"><strong>${esc(f.title)}</strong><span class="d"><span class="mono">#${f.id}</span> · ${esc(f.type)} · ${esc(f.os)} · ${esc(f.when)}</span></span><span class="a-repmeta">${f.published ? "" : `<span class="lic">${ic("lock-simple")}Private</span>`}${fbStatus(f)}</span></li>`).join("")}</ul>` : `<div class="body"><p class="empty">You have not reported anything in this campaign yet.</p></div>`}</section>`;
+    },
+    reportDialog(c) {
+      const me = U(DATA.me);
+      const types = ["Bug Report", "UX Feedback", "Feature Suggestion", "Compatibility Report", "General Feedback"];
+      return `<dialog class="a-dialog" id="report-dialog" aria-labelledby="rd-title">
+        <form id="report-form" data-campaign="${c.id}" novalidate>
+          <header><h2 id="rd-title">Report feedback</h2><span class="muted">${esc(P(c.project).name)} · <span class="mono">${esc(c.version)}</span></span><button type="button" class="btn quiet" data-act="report-close">${ic("x")}<span class="visually-hidden">Close</span></button></header>
+          <div class="a-form">
+            <fieldset class="a-types"><legend>Type</legend>${types.map((t, i) => `<label><input type="radio" name="type" value="${t}"${i === 0 ? " checked" : ""}>${ic(FB_ICON[t])}${esc(t.replace(" Report", "").replace(" Feedback", "").replace(" Suggestion", ""))}</label>`).join("")}</fieldset>
+            <label for="rf-title">Title</label><input id="rf-title" name="title" required maxlength="140" placeholder="What happened, in one line">
+            <p class="a-err" id="rf-title-err" hidden>Add a title so maintainers can find your report.</p>
+            <label for="rf-steps">Steps to reproduce</label><textarea id="rf-steps" name="steps" rows="3" placeholder="1. …&#10;2. …"></textarea>
+            <div class="a-two"><div><label for="rf-exp">Expected</label><textarea id="rf-exp" name="expected" rows="2"></textarea></div><div><label for="rf-act">Actual</label><textarea id="rf-act" name="actual" rows="2"></textarea></div></div>
+            <div class="a-two"><div><label for="rf-env">Device</label><select id="rf-env" name="env">${me.devices.map((d) => `<option>${esc(d)}</option>`).join("")}</select></div><div><label for="rf-ver">Version</label><input id="rf-ver" name="version" class="mono" value="${esc(c.version)}"></div></div>
+            <p class="ext-note">${ic("paperclip")}Attachments: PNG, JPEG, WebP, TXT, LOG or JSON. Remove personal data from logs and screenshots.</p>
+            <p class="ext-note">${ic("lock-simple")}Private until a maintainer publishes it. Only you and the maintainers can see it.</p>
+          </div>
+          <footer><button type="button" class="btn" data-act="report-close">Cancel</button><button type="submit" class="btn primary">Send report</button></footer>
+        </form></dialog>`;
     },
     profile(u) {
       const fb = feedbackBy(u.id); const rate = Math.round((u.stats.confirmed / u.stats.reports) * 100);
@@ -304,6 +343,7 @@
         <aside class="b-left" aria-label="Sidebar">
           <div class="b-brand"><span class="dot" aria-hidden="true"></span>TestHub <small>working name</small></div>
           <nav class="b-nav" aria-label="Main">${navLinks()}</nav>
+          ${themeToggle()}
         </aside>
         <main id="main" class="b-center" tabindex="-1">
           ${content}
@@ -408,6 +448,7 @@
           <a class="c-brand" href="${href("home")}">TestHub<small>working name</small></a>
           <nav class="c-nav" aria-label="Main">${navLinks()}</nav>
           ${searchField("Search software")}
+          ${themeToggle()}
         </div></header>
         <main id="main" class="c-main" tabindex="-1">${content}</main>`;
     },
@@ -505,7 +546,7 @@
   function protoBar() {
     const seg = (act, items, cur) => `<span class="seg" role="group">${items.map(([v, l]) => `<button data-act="${act}" data-value="${v}" aria-pressed="${cur === v}">${l}</button>`).join("")}</span>`;
     return `<strong>Prototyp</strong><span class="label">Konzept</span>${seg("concept", [["a", "A Workbench"], ["b", "B Community"], ["c", "C Independent"]], state.concept)}
-      <span class="label">Darstellung</span>${seg("theme", [["system", "System"], ["light", "Hell"], ["dark", "Dunkel"]], state.theme)}
+      <span class="label">Gewählt: A · B und C zum Vergleich</span>
       <span class="grow"></span><button class="notes-btn" data-act="notes" aria-expanded="${state.notes}" aria-controls="notes">Konzept-Notizen</button>`;
   }
   function notesHtml() {
@@ -567,7 +608,11 @@
   // ---------------------------------------------------------------- events
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("[data-act]");
-    if (!t) { if (state.menu && !ev.target.closest(".a-side")) { state.menu = false; render(); } return; }
+    if (!t) {
+      if (state.menu && !ev.target.closest(".a-side")) { state.menu = false; render(); }
+      if (state.notifOpen && !ev.target.closest(".a-notif")) { state.notifOpen = false; render(); }
+      return;
+    }
     const act = t.dataset.act;
     if (act === "concept") { state.concept = t.dataset.value; state.tabs = {}; location.hash = href(state.page, state.id); return; }
     if (act === "theme") { state.theme = t.dataset.value; store.set("proto-theme", state.theme); render(); return; }
@@ -587,7 +632,24 @@
     }
     if (act === "chip") { const k = t.dataset.key; const v = t.dataset.value; state.f[k] = state.f[k] === v ? "" : v; render(); return; }
     if (act === "filter-toggle") { state.f.active = !state.f.active; render(); return; }
+    if (act === "notif") { state.notifOpen = !state.notifOpen; render({ focusId: undefined }); document.querySelector('[data-act="notif"]')?.focus(); return; }
+    if (act === "notif-read") { state.notifications.forEach((n) => { n.unread = false; }); render(); document.querySelector('[data-act="notif"]')?.focus(); return; }
+    if (act === "notif-go") { const n = state.notifications.find((x) => x.id === Number(t.dataset.id)); if (n) n.unread = false; state.notifOpen = false; return; }
+    if (act === "report") { document.getElementById("report-dialog")?.showModal(); document.getElementById("rf-title")?.focus(); return; }
+    if (act === "report-close") { document.getElementById("report-dialog")?.close(); return; }
     if (act === "ext") { ev.preventDefault(); toast("Prototype: here you would see a warning before leaving for the external site."); }
+  });
+  document.addEventListener("submit", (ev) => {
+    if (ev.target.id !== "report-form") return;
+    ev.preventDefault();
+    const form = ev.target; const data = new FormData(form); const title = String(data.get("title") || "").trim();
+    const err = document.getElementById("rf-title-err"); const input = document.getElementById("rf-title");
+    if (!title) { err.hidden = false; input.setAttribute("aria-invalid", "true"); input.setAttribute("aria-describedby", "rf-title-err"); input.focus(); return; }
+    const id = Math.max(...DATA.feedback.map((f) => f.id)) + 1;
+    DATA.feedback.unshift({ id, campaign: form.dataset.campaign, type: String(data.get("type")), title, author: DATA.me, status: "New", published: false,
+      os: String(data.get("env")).split(" · ")[0], version: String(data.get("version")), comments: 0, when: "just now" });
+    document.getElementById("report-dialog").close(); render();
+    toast(`Report #${id} sent. It stays private until a maintainer publishes it.`);
   });
   document.addEventListener("change", (ev) => {
     const t = ev.target;
@@ -603,6 +665,7 @@
   document.addEventListener("keydown", (ev) => {
     if (ev.key === "/" && !/input|select|textarea/i.test(document.activeElement?.tagName || "")) { ev.preventDefault(); document.getElementById("q")?.focus(); return; }
     if (ev.key === "Escape" && state.menu) { state.menu = false; render(); return; }
+    if (ev.key === "Escape" && state.notifOpen) { state.notifOpen = false; render(); document.querySelector('[data-act="notif"]')?.focus(); return; }
     const tab = ev.target.closest?.('[role="tab"]');
     if (tab && (ev.key === "ArrowRight" || ev.key === "ArrowLeft" || ev.key === "Home" || ev.key === "End")) {
       ev.preventDefault();

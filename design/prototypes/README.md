@@ -1,5 +1,8 @@
 # Design prototypes (open question E)
 
+> **Decision (2026-11-12): concept A – Developer Workbench** ([ADR 0007](../../docs/adr/0007-visual-direction-developer-workbench.md)).
+> B and C stay in the prototype for reference only.
+
 Clickable prototype comparing three visual directions over **the same fictional data and flows**.
 It is a decision aid only: it does not replace production components and is not part of the
 application build.
@@ -12,7 +15,9 @@ application build.
 
 Pages: Home, Discover, project page, campaign page, tester profile (plus Testing and Your
 projects). Simulated: navigation, tabs (arrow keys), follow, join/request, search, filters,
-light/dark/system theme, concept switch, concept notes. Private campaigns behave like missing
+light/dark/system theme (in the product UI of every concept), concept switch, concept notes.
+Concept A additionally shows in-app notifications and the feedback report dialog (validation,
+private by default, listed under "Your reports"). Private campaigns behave like missing
 pages (404 rule).
 
 ## Files

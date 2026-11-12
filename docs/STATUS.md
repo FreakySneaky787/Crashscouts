@@ -137,7 +137,12 @@
 - Research on generic "AI design" patterns and on Primer, Linear, Discourse and Mozilla Protocol;
   three clickable directions built under [`design/prototypes/`](../design/prototypes/README.md)
   (open question E). Verified with axe-core: 60 checks, 0 WCAG A/AA violations, no overflow, no
-  script errors. Awaiting the project owner's choice; no production UI has been changed.
+  script errors.
+- **Decision:** concept A (Developer Workbench) – [ADR 0007](adr/0007-visual-direction-developer-workbench.md).
+  Iteration 2 of the prototype: theme switch (system/light/dark) in the product top bar, in-app
+  notifications, the tester's feedback report dialog (private by default) and "Your reports" on
+  the campaign page; phone fixes. Re-verified: 60 checks with 0 violations, dialog without axe
+  findings, all interaction checks passed. No production UI has been changed yet.
 
 ## Known limitations
 
