@@ -4,7 +4,7 @@ import { data, Form, redirect } from "react-router";
 import type { Route } from "./+types/account";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { Avatar } from "~/components/ui/Data";
-import { EyeIcon, PencilSimpleIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
+import { DatabaseIcon, EyeIcon, PencilSimpleIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
@@ -61,6 +61,16 @@ export default function Account({ loaderData }: Route.ComponentProps) {
           <div>
             <ButtonLink to="/settings/security" icon={ShieldCheckIcon}>
               {t("account.editSecurity")}
+            </ButtonLink>
+          </div>
+        </div>
+      </Panel>
+      <Panel title={t("account.data")}>
+        <div className={styles.stack}>
+          <p>{t("account.dataText")}</p>
+          <div>
+            <ButtonLink to="/settings/account" icon={DatabaseIcon}>
+              {t("account.editData")}
             </ButtonLink>
           </div>
         </div>

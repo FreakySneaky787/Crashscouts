@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}You signed in to your account "{{ username }}", so its deletion was cancelled. Your profile is visible again as before.
+
+If this was not you, change your password now.{% endautoescape %}{% endblock content %}

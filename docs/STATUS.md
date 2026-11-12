@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 1.4) · **Current phase:** 1 – Accounts
+**Last update:** 2026-11-12 (WP 1.5) · **Current phase:** 1 – Accounts (complete)
 
 ## Work packages
 
@@ -319,10 +319,30 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
   - Playwright cannot intercept redirects of a navigation; the tests capture the server's
     redirect target at the form POST instead, so they never load github.com.
 
+### WP 1.5 – Account deletion and data export (2026-11-12) ✅
+
+- **Deletion:** password and checkbox; the account is hidden at once, all sessions end, email
+  confirmation; signing in within 14 days cancels it (email, audit); `manage.py
+  purge_deleted_accounts` deletes due accounts with their avatar files and records the deletion
+  without personal reference ([ADR 0013](adr/0013-account-deletion-and-data-export.md)).
+- **Export:** JSON download after password confirmation with all stored data about the user and no
+  secrets.
+- **Frontend:** `/settings/account`, `/account/export` (download), `/goodbye`; button variant
+  `danger`. Everything works without JavaScript.
+- **Verification (run on 2026-11-12):** pytest **145 passed** (11 new: login and password required,
+  confirmation, no-password accounts, hidden and signed out everywhere, cancel by signing in,
+  throttling, purge only when due incl. avatar and audit anonymity, export without secrets or other
+  people's data); Playwright **47 passed** (4 new incl. a real download and the real emails).
+
+**Phase 1 (accounts) is complete.** Still open: trying the real GitHub login on the first test
+server (open question U).
+
 ## Known limitations
 
 - GitHub Free for private repositories: no push protection and no branch protection (see
   [`SECURITY.md`](SECURITY.md), section 10).
+- Signing out everywhere scans all sessions (no index from users to sessions); fine at the current
+  scale, to be revisited when sessions grow (ADR 0013).
 - allauth rate limits use the per-process memory cache; a shared cache is required before the beta
   (open question O).
 - The design system covers the pages that exist so far; product pages (projects, campaigns, feedback) adopt it as they are built.

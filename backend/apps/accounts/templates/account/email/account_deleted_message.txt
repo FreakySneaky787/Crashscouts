@@ -1,0 +1,2 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}Your account "{{ username }}" and its personal data have now been deleted, as you asked. This is the last email we send to this address.{% endautoescape %}{% endblock content %}

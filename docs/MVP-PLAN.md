@@ -68,7 +68,7 @@ regression tests.
 | 1.3a | 2FA: authenticator app (TOTP), recovery codes, second login step, password confirmation | ✅ done |
 | 1.3b | Passkeys and passwordless passkey login | ✅ done |
 | 1.4 | GitHub login, linking only manually (the owner creates a GitHub OAuth app) | ✅ done (real login with the owner's app still to be tried) |
-| 1.5 | Account deletion with a 14-day grace period, data export (JSON) | planned |
+| 1.5 | Account deletion with a 14-day grace period, data export (JSON) | ✅ done |
 
 ## Phase 2 – Projects
 
@@ -122,6 +122,10 @@ and only by the project owner.
 - Status workflow.
 - Private by default, publishable individually.
 - Maintainer inbox.
+
+> Phase 5 requirement from WP 1.5: `purge_deleted_accounts` must anonymise feedback of deleted
+> accounts instead of deleting it, and the data export must include the user's own feedback
+> ([ADR 0013](adr/0013-account-deletion-and-data-export.md)).
 
 ## Phase 6 – Discover
 

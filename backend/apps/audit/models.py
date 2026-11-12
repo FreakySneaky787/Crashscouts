@@ -39,6 +39,10 @@ class AuditEvent(models.Model):
         MFA_REMOVED = "mfa.removed", "Two-factor method removed"
         MFA_RESET = "mfa.reset", "Recovery codes regenerated"
         MFA_FAILED = "mfa.failed", "Failed two-factor check"
+        DELETION_REQUESTED = "account.deletion_requested", "Account deletion requested"
+        DELETION_CANCELLED = "account.deletion_cancelled", "Account deletion cancelled"
+        ACCOUNT_DELETED = "account.deleted", "Account deleted"
+        DATA_EXPORTED = "account.data_exported", "Personal data exported"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

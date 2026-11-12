@@ -18,6 +18,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0010](0010-image-upload-pipeline.md) | Image upload pipeline (avatars first) | Accepted |
 | [0011](0011-two-factor-authentication.md) | Two-factor authentication | Accepted |
 | [0012](0012-github-login.md) | GitHub login | Accepted |
+| [0013](0013-account-deletion-and-data-export.md) | Account deletion and personal data export | Accepted |
 
 ## Template
 

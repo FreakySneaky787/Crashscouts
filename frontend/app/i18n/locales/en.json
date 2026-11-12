@@ -40,7 +40,10 @@
     "editProfile": "Edit profile",
     "security": "Security",
     "securityText": "Protect your account with a second factor such as an authenticator app.",
-    "editSecurity": "Security settings"
+    "editSecurity": "Security settings",
+    "data": "Your data",
+    "dataText": "Download everything we store about you, or delete your account.",
+    "editData": "Data and account"
   },
   "probe": {
     "touch": "Touch",
@@ -265,5 +268,29 @@
     "disconnect": "Disconnect",
     "disconnectNamed": "Disconnect GitHub account {{name}}",
     "notConfigured": "Signing in with GitHub is not available right now."
+  },
+  "accountSettings": {
+    "title": "Data and account",
+    "exportTitle": "Download your data",
+    "exportText": "A JSON file with everything stored about you: account, email addresses, profile, connected accounts, the kind of two-factor methods (no secrets) and your security log.",
+    "exportSubmit": "Download data",
+    "deleteTitle": "Delete your account",
+    "deleteText": "Your profile disappears at once and you are signed out everywhere. After 14 days your account and personal data are deleted for good. Sign in before then to cancel.",
+    "deleteConfirm": "I understand that my account will be deleted after 14 days.",
+    "deleteSubmit": "Delete account",
+    "noPasswordHint": "Signed up with GitHub and have no password?",
+    "problem": {
+      "wrongPassword": "The password is incorrect.",
+      "noPassword": "Your account has no password yet. Set one with \"Forgot your password?\" first.",
+      "confirm": "Tick the box to confirm.",
+      "rateLimited": "Too many attempts. Try again later.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "goodbye": {
+    "title": "Account deletion",
+    "scheduled": "Your account will be deleted in 14 days.",
+    "text": "You were signed out everywhere and your profile is hidden. We sent you a confirmation by email.",
+    "changedMind": "Changed your mind? Sign in to cancel the deletion."
   }
 }

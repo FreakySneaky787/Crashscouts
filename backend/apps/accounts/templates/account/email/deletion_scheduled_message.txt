@@ -1,0 +1,8 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}You asked us to delete your account "{{ username }}".
+
+Your profile is hidden now and you were signed out everywhere. On {{ deletion_date }} (UTC) the account and its data will be deleted for good.
+
+Changed your mind? Sign in before that date and the deletion is cancelled.
+
+If you did not ask for this, sign in now and change your password.{% endautoescape %}{% endblock content %}

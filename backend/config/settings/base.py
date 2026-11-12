@@ -291,6 +291,7 @@ REST_FRAMEWORK = {
     # Rates for views that opt in with ScopedRateThrottle (cache-based, see open question O).
     "DEFAULT_THROTTLE_RATES": {
         "avatar_upload": "10/hour",
+        "account_sensitive": "10/hour",
     },
 }
 

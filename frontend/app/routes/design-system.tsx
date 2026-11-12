@@ -123,6 +123,7 @@ export default function DesignSystem() {
             <Button variant="primary" icon={BugIcon}>Report feedback</Button>
             <Button icon={PlusIcon}>Join campaign</Button>
             <Button variant="quiet">Cancel</Button>
+            <Button variant="danger">Delete account</Button>
           </div>
           <div className={styles.row}>
             <Button size="sm" icon={DownloadSimpleIcon}>Download</Button>

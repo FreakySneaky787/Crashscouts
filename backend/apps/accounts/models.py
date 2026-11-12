@@ -32,6 +32,11 @@ class User(AbstractUser):
         blank=True,
         help_text="When the user confirmed being at least 16 years old (self-declaration).",
     )
+    # Account deletion with a grace period (owner's decision): hidden at once, deleted for good
+    # after this point in time by `manage.py purge_deleted_accounts`, cancelled by signing in.
+    deletion_scheduled_for = models.DateTimeField(
+        "deletion scheduled for", null=True, blank=True, db_index=True
+    )
 
     class Meta:
         verbose_name = "user"

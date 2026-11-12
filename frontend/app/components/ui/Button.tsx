@@ -4,7 +4,8 @@ import { Link, type LinkProps } from "react-router";
 import type { IconComponent } from "./icons";
 import styles from "./Button.module.css";
 
-type Variant = "primary" | "secondary" | "quiet";
+/** "danger" only for irreversible actions such as deleting the account. */
+type Variant = "primary" | "secondary" | "quiet" | "danger";
 type Size = "md" | "sm";
 
 type Common = { variant?: Variant; size?: Size; icon?: IconComponent; children?: ReactNode };

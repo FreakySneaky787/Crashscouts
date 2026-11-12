@@ -99,6 +99,10 @@ including the negative cases.
 - Invitation tokens are stored hashed only, expire, and are single-use.
 - Moderators get no blanket access to private content; access is purpose-bound and logged.
 
+- ✅ Account deletion with a 14-day grace period and personal data export, both confirmed by the
+  password and throttled; export contains no secrets; final deletion keeps audit events without
+  any reference to the person ([ADR 0013](adr/0013-account-deletion-and-data-export.md)).
+
 ## 7. Admin access
 
 - The public proxy does **not** route `/admin/` (404).

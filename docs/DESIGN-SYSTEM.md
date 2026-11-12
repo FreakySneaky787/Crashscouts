@@ -85,7 +85,7 @@ module.
 
 | Component | Purpose | Notes |
 |---|---|---|
-| `Button`, `ButtonLink` | actions and link buttons | variants `primary` (one per area), `secondary`, `quiet`; size `sm`; optional icon; `aria-pressed` for toggles |
+| `Button`, `ButtonLink` | actions and link buttons | variants `primary` (one per area), `secondary`, `quiet`, `danger` (irreversible actions only); size `sm`; optional icon; `aria-pressed` for toggles |
 | `StatusPill` | status | tone + icon + text; status maps in `statuses.ts` (campaign, feedback, task, project) |
 | `Panel` | grouped content | title, optional aside, `flush` for lists |
 | `PageHeader` | top of each page | breadcrumbs, title, subtitle, meta line, actions, leading avatar/icon |

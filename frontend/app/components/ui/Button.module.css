@@ -39,6 +39,16 @@
   filter: brightness(1.08);
 }
 
+.danger {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.danger:hover {
+  filter: brightness(0.97);
+}
+
 .quiet {
   border-color: transparent;
   background: transparent;
