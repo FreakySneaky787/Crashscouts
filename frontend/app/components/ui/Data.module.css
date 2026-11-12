@@ -79,6 +79,7 @@
   letter-spacing: 0.02em;
 }
 
+.picon.photo,
 .avatar.photo {
   object-fit: cover;
   background: var(--color-surface-sunken);

@@ -34,6 +34,17 @@ images, so that screenshots (phase 2) and feedback attachments (phase 5) reuse t
 Avatars are images meant to be displayed, so they are served `inline`; other attachment types
 (phase 5) keep `Content-Disposition: attachment`.
 
+## Extension in WP 2.4 (project logos and screenshots)
+
+- The pipeline lives in `apps/core/images.py` and is shared by avatars, project logos (256×256)
+  and screenshots (at most 5 MB, scaled down to 1600 px on the longer side, aspect ratio kept,
+  never scaled up; at most 8 per project; a description is required for accessibility).
+- Images of **private projects** are delivered only to the team: the SSR resource route
+  `/project-images/<key>` forwards the browser's session, Django checks the project's visibility
+  on every request and answers `private, no-store`; public projects' images may be cached.
+- Files are deleted together with their database rows (also when a project or account is
+  deleted).
+
 ## Alternatives
 
 - Store the original and convert on the fly: rejected; the original may carry metadata or

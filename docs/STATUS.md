@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 2.3) · **Current phase:** 2 – Projects
+**Last update:** 2026-11-12 (WP 2.4) · **Current phase:** 2 – Projects
 
 ## Work packages
 
@@ -412,6 +412,20 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
   Playwright **57 passed** (4 new incl. the invitation email in Mailpit, handover and leaving,
   axe in both themes; the team tests also passed 3 times in a row after fixing two test races
   where a click was not awaited).
+
+### WP 2.4 – Logo and screenshots (2026-11-12) ✅
+
+- Shared image pipeline `apps/core/images.py` (avatars refactored onto it; all avatar tests
+  unchanged and green). Logo 256×256; up to 8 screenshots, 5 MB, scaled to at most 1600 px,
+  description required; files removed with their rows.
+- Delivery `/project-images/<key>` checks visibility on every request (private projects: team only,
+  `private, no-store`); the SSR route forwards the session for this check.
+- **Verification (run on 2026-11-12):** pytest **204 passed** (7 new; mutation check "deliver
+  without visibility check" caught); Playwright **58 passed** (logo, screenshot with description,
+  private images 404 for anonymous visitors and strangers).
+- **Findings during the work:** two fields on the edit page were both labelled "Description"
+  (project and screenshot) – renamed to "Screenshot description"; another test race with a stale
+  success notice, fixed by waiting for the new image itself.
 
 ## Known limitations
 

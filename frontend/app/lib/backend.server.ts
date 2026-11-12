@@ -93,11 +93,15 @@ export async function backendFetch<T = unknown>(
 export type SessionUser = { username: string };
 
 /**
- * Fetches a binary resource (e.g. an avatar) from Django for streaming it to the browser.
- * No cookies are forwarded: only public resources go through here.
+ * Fetches a binary resource (e.g. an image) from Django for streaming it to the browser.
+ * Without `request` no cookies are forwarded (public resources such as avatars); with it the
+ * browser's session goes along, so Django can check access (e.g. images of private projects).
  */
-export async function backendFetchBinary(path: string): Promise<Response> {
-  return fetch(new URL(path, BACKEND_URL), { headers: { Accept: "image/webp,image/*" }, redirect: "manual" });
+export async function backendFetchBinary(path: string, request?: Request): Promise<Response> {
+  const headers = new Headers({ Accept: "image/webp,image/*" });
+  const cookie = request?.headers.get("Cookie");
+  if (cookie) headers.set("Cookie", cookie);
+  return fetch(new URL(path, BACKEND_URL), { headers, redirect: "manual" });
 }
 
 /** Login providers that are configured (e.g. ["github"]); empty without credentials. */

@@ -1,5 +1,11 @@
 from django.urls import path
 
+from .image_views import (
+    ProjectLogoView,
+    ScreenshotCreateView,
+    ScreenshotDeleteView,
+    project_image,
+)
 from .team_views import (
     InvitationAnswerView,
     InvitationCreateView,
@@ -29,6 +35,14 @@ urlpatterns = [
     ),
     path("projects/<str:slug>/transfer/", TransferView.as_view(), name="project-transfer"),
     path("me/invitations/", MyInvitationsView.as_view(), name="my-invitations"),
+    path("projects/<str:slug>/logo/", ProjectLogoView.as_view(), name="project-logo"),
+    path("projects/<str:slug>/screenshots/", ScreenshotCreateView.as_view(), name="screenshots"),
+    path(
+        "projects/<str:slug>/screenshots/<uuid:key>/",
+        ScreenshotDeleteView.as_view(),
+        name="screenshot-delete",
+    ),
+    path("project-images/<uuid:key>/", project_image, name="project-image"),
     path(
         "me/invitations/<uuid:invitation_id>/<str:answer>/",
         InvitationAnswerView.as_view(),

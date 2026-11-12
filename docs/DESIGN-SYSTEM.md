@@ -91,7 +91,7 @@ module.
 | `PageHeader` | top of each page | breadcrumbs, title, subtitle, meta line, actions, leading avatar/icon |
 | `TabNav` | sections of a page | **links** with `aria-current="page"`, bookmarkable |
 | `KeyFigures`, `Progress` | figures and progress | native `<progress>` with label |
-| `Avatar`, `ProjectIcon` | identity | initials on a hue derived from the ID; `Avatar` shows an uploaded image when `src` is set (decorative, the name is always next to it) |
+| `Avatar`, `ProjectIcon` | identity | initials on a hue derived from the ID; `Avatar` and `ProjectIcon` show an uploaded image when `src` is set (decorative, the name is always next to it) |
 | `Chips`, `FactList`, `RowList` | data display | list semantics (`ul`/`dl`) |
 | `TextField`, `TextAreaField`, `SelectField` (optional option groups), `ChoiceGroup`, `FormNote` | forms | visible labels, hints and errors via `aria-describedby`, `aria-invalid` |
 | `CheckboxGroup` | multiple choice from a fixed list | fieldset with legend, hint and error; e.g. platforms |

@@ -14,7 +14,7 @@ import { PROJECT_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch } from "~/lib/backend.server";
 import { cacheHeadersFor, privateNoStoreHeaders } from "~/lib/http";
-import { isValidProjectSlug, statusLabel, type Project } from "~/lib/projects";
+import { isValidProjectSlug, projectImageSrc, statusLabel, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
 
@@ -66,7 +66,7 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
       <PageHeader
         title={project.name}
         subtitle={project.summary}
-        leading={<ProjectIcon name={project.name} id={project.slug} size="lg" />}
+        leading={<ProjectIcon name={project.name} id={project.slug} size="lg" src={projectImageSrc(project.logo_key)} />}
         meta={
           <>
             <StatusPill tone={PROJECT_STATUS[status].tone} label={t(`projects.statuses.${project.status}`)} />
@@ -87,6 +87,17 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
           ) : null
         }
       />
+      {project.screenshots.length ? (
+        <Panel title={t("projects.screenshots")}>
+          <ul className={styles.gallery} aria-label={t("projects.screenshots")}>
+            {project.screenshots.map((shot) => (
+              <li key={shot.key}>
+                <img src={projectImageSrc(shot.key)!} alt={shot.alt_text} width={shot.width} height={shot.height} loading="lazy" className={styles.screenshot} />
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
       <div className={styles.split}>
         <Panel title={t("projects.about")}>
           {project.description ? <Markdown>{project.description}</Markdown> : <p className={styles.muted}>{t("projects.noDescription")}</p>}

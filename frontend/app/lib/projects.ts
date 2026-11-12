@@ -23,6 +23,8 @@ export type Project = {
   languages: CatalogItem[];
   team: { username: string; role: "owner" | "maintainer" }[];
   role: "owner" | "maintainer" | null;
+  logo_key: string | null;
+  screenshots: { key: string; alt_text: string; width: number; height: number }[];
   created_at: string;
   updated_at: string;
 };
@@ -88,4 +90,9 @@ export function projectErrorCodes(body: unknown): Record<string, string> {
     if (Array.isArray(codes) && typeof codes[0] === "string") result[field] = codes[0];
   }
   return result;
+}
+
+/** Browser URL of a project logo or screenshot (SSR resource route). */
+export function projectImageSrc(key: string | null | undefined): string | null {
+  return key ? `/project-images/${key}` : null;
 }

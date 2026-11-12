@@ -295,6 +295,7 @@ REST_FRAMEWORK = {
         "account_sensitive": "10/hour",
         "project_create": "10/day",
         "project_invite": "30/day",
+        "project_image": "30/hour",
     },
 }
 

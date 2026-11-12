@@ -48,6 +48,8 @@ class Project(BaseModel):
     categories = models.ManyToManyField(Category, blank=True, related_name="+")
     platforms = models.ManyToManyField(Platform, blank=True, related_name="+")
     languages = models.ManyToManyField(ProgrammingLanguage, blank=True, related_name="+")
+    # Random name of the stored logo (projects/logos/<key>.webp); a new upload gets a new key.
+    logo_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
 
     class Meta:
         constraints = [
@@ -60,6 +62,25 @@ class Project(BaseModel):
     @property
     def is_open_source(self) -> bool:
         return self.license.is_open_source
+
+
+class Screenshot(BaseModel):
+    """A re-encoded screenshot (projects/screenshots/<key>.webp) with a required description."""
+
+    MAX_PER_PROJECT = 8
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="screenshots")
+    key = models.UUIDField(unique=True, editable=False)
+    alt_text = models.CharField(max_length=200)
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "created_at"]
+
+    def __str__(self) -> str:
+        return f"Screenshot of {self.project}: {self.alt_text}"
 
 
 class Membership(BaseModel):

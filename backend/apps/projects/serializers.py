@@ -20,6 +20,13 @@ class TeamMemberSerializer(serializers.Serializer):
     role = serializers.CharField()
 
 
+class ScreenshotSerializer(serializers.Serializer):
+    key = serializers.UUIDField()
+    alt_text = serializers.CharField()
+    width = serializers.IntegerField()
+    height = serializers.IntegerField()
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     """Read view. `role` is the viewer's own role (null for visitors)."""
 
@@ -30,6 +37,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     languages = CatalogItemSerializer(many=True)
     team = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
+    logo_key = serializers.UUIDField(allow_null=True)
+    screenshots = ScreenshotSerializer(many=True)
 
     class Meta:
         model = Project
@@ -48,6 +57,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "languages",
             "team",
             "role",
+            "logo_key",
+            "screenshots",
             "created_at",
             "updated_at",
         )

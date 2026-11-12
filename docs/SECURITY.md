@@ -95,6 +95,8 @@ including the negative cases.
   profiles with `nosniff` and a sandbox CSP (inline, because avatars are displayed), upload rate
   limit. Tested against SVG with script, disguised GIF/HTML/text, truncated PNG, oversized files
   and a decompression bomb; GPS data verifiably removed.
+- ✅ Project logos and screenshots (WP 2.4) use the same pipeline; images of private projects are
+  delivered only to the team, checked on every request, never cached.
 
 ## 6. Privacy and authorization
 

@@ -7,7 +7,7 @@ import { expect, test } from "@playwright/test";
 
 import { FRONTEND_URL } from "../playwright.config";
 
-import { createProject, createSignedInAccount } from "./helpers";
+import { createProject, createSignedInAccount, png } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -96,6 +96,41 @@ test("creating a project works without JavaScript and shows field errors", async
   await expect(page.getByText("Enter a complete link that starts with https://.")).toBeVisible();
   await expect(page.getByLabel("Name", { exact: true })).toHaveValue("No JS");
   await context.close();
+});
+
+test("logo and screenshots: description required, private images only for the team", async ({ page, request, browser }) => {
+  await createSignedInAccount(page, request);
+  const slug = await createProject(page, { visibility: "private" });
+  await page.goto(`/p/${slug}/edit`);
+
+  await page.getByLabel("Logo", { exact: true }).setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: png(300, 300) });
+  await page.getByRole("button", { name: "Upload logo" }).click();
+  await expect(page.getByRole("status").first()).toContainText("Image saved.");
+
+  // Only spaces pass the browser's required check; the server still refuses.
+  await page.getByLabel("Screenshot", { exact: true }).setInputFiles({ name: "shot.png", mimeType: "image/png", buffer: png(1200, 800) });
+  await page.getByLabel("Screenshot description").fill("   ");
+  await page.getByRole("button", { name: "Add screenshot" }).click();
+  await expect(page.getByRole("alert")).toContainText("Describe the screenshot");
+
+  await page.getByLabel("Screenshot", { exact: true }).setInputFiles({ name: "shot.png", mimeType: "image/png", buffer: png(1200, 800) });
+  await page.getByLabel("Screenshot description").fill("Feed list in dark mode");
+  await page.getByRole("button", { name: "Add screenshot" }).click();
+  // The earlier "Image saved." of the logo is still on screen: wait for the screenshot itself.
+  await expect(page.getByRole("img", { name: "Feed list in dark mode" })).toBeVisible();
+
+  await page.goto(`/p/${slug}`);
+  const shot = page.getByRole("img", { name: "Feed list in dark mode" });
+  await expect(shot).toBeVisible();
+  const src = (await shot.getAttribute("src"))!;
+  expect((await page.request.get(src)).status()).toBe(200);
+  // Not for anonymous visitors or strangers: the project is private.
+  expect((await request.get(src)).status()).toBe(404);
+  const stranger = await browser.newContext();
+  const strangerPage = await stranger.newPage();
+  await createSignedInAccount(strangerPage, request);
+  expect((await strangerPage.request.get(src)).status()).toBe(404);
+  await stranger.close();
 });
 
 test("project pages have no WCAG A/AA violations in light and dark", async ({ page, request, context }) => {

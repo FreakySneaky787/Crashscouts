@@ -40,7 +40,12 @@ export function Avatar({ name, id, size = "md", src }: { name: string; id: strin
 }
 
 /** Project icon: square, two letters, identity hue. Distinct from round person avatars. */
-export function ProjectIcon({ name, id, size = "md" }: { name: string; id: string; size?: "sm" | "md" | "lg" }) {
+export function ProjectIcon({ name, id, size = "md", src }: { name: string; id: string; size?: "sm" | "md" | "lg"; src?: string | null }) {
+  if (src) {
+    // Decorative: the project name is always shown next to it.
+    const px = size === "lg" ? 64 : size === "md" ? 40 : 24;
+    return <img src={src} alt="" width={px} height={px} className={`${styles.picon} ${styles.photo} ${styles[size]}`} />;
+  }
   return (
     <span className={`${styles.picon} ${styles[`hue${hueIndex(id)}`]} ${styles[size]}`} aria-hidden="true">
       {Array.from(name).slice(0, 2).join("")}
