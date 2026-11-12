@@ -87,6 +87,38 @@ class Membership(BaseModel):
         return f"{self.user} ({self.role}) in {self.project}"
 
 
+class Invitation(BaseModel):
+    """Invitation to become a maintainer; nobody joins a project without accepting (decision)."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ACCEPTED = "accepted", "Accepted"
+        DECLINED = "declined", "Declined"
+        REVOKED = "revoked", "Revoked"
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="invitations")
+    invitee = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="project_invitations"
+    )
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["project", "invitee"],
+                condition=models.Q(status="pending"),
+                name="projects_one_pending_invitation",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.invitee} to {self.project} ({self.status})"
+
+
 class SlugHistory(BaseModel):
     """Former short names; /p/<old> redirects to the current name."""
 

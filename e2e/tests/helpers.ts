@@ -68,3 +68,32 @@ export async function createSignedInAccount(page: Page, request: APIRequestConte
   await expect(page).toHaveURL(/\/account$/);
   return account;
 }
+
+export const DESCRIPTION = [
+  "## Features",
+  "",
+  "- Offline first",
+  "",
+  "<script>window.__xss = 1</script>",
+  "",
+  "![pixel](https://tracker.example/pixel.png)",
+  "",
+  "[safe link](https://example.test/docs) [bad link](javascript:alert(1))",
+].join("\n");
+
+export async function createProject(page: Page, { visibility = "public" as "public" | "private" } = {}) {
+  const slug = `app-${randomBytes(4).toString("hex")}`;
+  await page.goto("/projects/new");
+  await page.getByLabel("Name", { exact: true }).fill("Tidewater Sync");
+  await page.getByLabel("Short name").fill(slug);
+  await page.getByLabel("Summary").fill("Sync feeds between your devices.");
+  await page.getByLabel("Description").fill(DESCRIPTION);
+  await page.getByLabel("Repository").fill("https://example.test/tidewater");
+  await page.getByLabel("Status").selectOption("beta");
+  await page.getByLabel("Licence").selectOption("AGPL-3.0-only");
+  await page.getByRole("group", { name: "Operating systems and devices" }).getByLabel("Linux").check();
+  await page.getByLabel(visibility === "public" ? "Public" : "Private", { exact: true }).check();
+  await page.getByRole("button", { name: "Create project" }).click();
+  await expect(page).toHaveURL(new RegExp(`/p/${slug}$`));
+  return slug;
+}

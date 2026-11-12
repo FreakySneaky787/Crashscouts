@@ -2,45 +2,14 @@
  * WP 2.2b – project pages: create, public page with link previews and safe Markdown,
  * private projects invisible, rename with redirect, team-only editing, owner-only deletion.
  */
-import { randomBytes } from "node:crypto";
-
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { FRONTEND_URL } from "../playwright.config";
 
-import { createSignedInAccount } from "./helpers";
+import { createProject, createSignedInAccount } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
-
-const DESCRIPTION = [
-  "## Features",
-  "",
-  "- Offline first",
-  "",
-  "<script>window.__xss = 1</script>",
-  "",
-  "![pixel](https://tracker.example/pixel.png)",
-  "",
-  "[safe link](https://example.test/docs) [bad link](javascript:alert(1))",
-].join("\n");
-
-async function createProject(page: Page, { visibility = "public" as "public" | "private" } = {}) {
-  const slug = `app-${randomBytes(4).toString("hex")}`;
-  await page.goto("/projects/new");
-  await page.getByLabel("Name", { exact: true }).fill("Tidewater Sync");
-  await page.getByLabel("Short name").fill(slug);
-  await page.getByLabel("Summary").fill("Sync feeds between your devices.");
-  await page.getByLabel("Description").fill(DESCRIPTION);
-  await page.getByLabel("Repository").fill("https://example.test/tidewater");
-  await page.getByLabel("Status").selectOption("beta");
-  await page.getByLabel("Licence").selectOption("AGPL-3.0-only");
-  await page.getByRole("group", { name: "Operating systems and devices" }).getByLabel("Linux").check();
-  await page.getByLabel(visibility === "public" ? "Public" : "Private", { exact: true }).check();
-  await page.getByRole("button", { name: "Create project" }).click();
-  await expect(page).toHaveURL(new RegExp(`/p/${slug}$`));
-  return slug;
-}
 
 test("create a public project: server-rendered page with previews and safe Markdown", async ({ page, request }) => {
   await createSignedInAccount(page, request);

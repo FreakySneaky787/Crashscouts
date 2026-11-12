@@ -25,6 +25,8 @@ export default [
   route("projects/new", "routes/project-new.tsx"),
   route("p/:slug", "routes/project.tsx"),
   route("p/:slug/edit", "routes/project-edit.tsx"),
+  route("p/:slug/team", "routes/project-team.tsx"),
+  route("invitations/:id/:answer", "routes/invitation-answer.tsx"),
   route("u/:username", "routes/profile.tsx"),
   route("avatars/:key", "routes/avatar.tsx"),
   route("theme", "routes/theme.tsx"),

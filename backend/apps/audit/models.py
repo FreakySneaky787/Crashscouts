@@ -46,6 +46,8 @@ class AuditEvent(models.Model):
         PROJECT_OWNER_CHANGED = "project.owner_changed", "Project owner changed"
         PROJECT_DELETED = "project.deleted", "Project deleted"
         PROJECT_VISIBILITY_CHANGED = "project.visibility_changed", "Project visibility changed"
+        PROJECT_MEMBER_ADDED = "project.member_added", "Project maintainer added"
+        PROJECT_MEMBER_REMOVED = "project.member_removed", "Project maintainer removed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

@@ -20,7 +20,7 @@ from apps.audit.models import AuditEvent
 from apps.audit.services import record
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
-from apps.projects.models import Membership
+from apps.projects.models import Invitation, Membership
 from apps.projects.services import hand_over_or_delete_owned_projects, owned_projects
 
 GRACE_PERIOD = timedelta(days=14)
@@ -138,6 +138,10 @@ def export_data(user) -> dict:
         "projects": [
             {"slug": m.project.slug, "name": m.project.name, "role": m.role}
             for m in Membership.objects.filter(user=user).select_related("project")
+        ],
+        "project_invitations": [
+            {"project": i.project.name, "status": i.status, "created_at": _iso(i.created_at)}
+            for i in Invitation.objects.filter(invitee=user).select_related("project")
         ],
         "connected_accounts": [
             {"provider": a.provider, "uid": a.uid, "date_joined": _iso(a.date_joined)}

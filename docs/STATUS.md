@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 2.2b) · **Current phase:** 2 – Projects
+**Last update:** 2026-11-12 (WP 2.3) · **Current phase:** 2 – Projects
 
 ## Work packages
 
@@ -395,6 +395,23 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
     that only the E2E run sets; production and pytest keep the limits.
   - The Docker daemon of the cloud session stops after its time limit; it is now started inside
     the check commands instead of as a long-running background task.
+
+### WP 2.3 – Project team (2026-11-12) ✅
+
+- **Invitations:** the owner invites by username; the invitee gets an email and accepts or
+  declines on the account page; private projects stay invisible until accepted; invitations
+  expire after 14 days; unconfirmed accounts and accounts waiting for deletion count as "not
+  found". Withdraw, remove, leave, and **hand over ownership** with password confirmation.
+- **Provisional rules (open question V, to be confirmed by the owner):** only the owner invites,
+  removes and hands over; at most 20 pending invitations per project; 30 invitations per day.
+- **Data protection:** received invitations are part of the data export.
+- **Verification (run on 2026-11-12):** pytest **197 passed** (15 new: invite/accept/decline,
+  nobody else can answer an invitation, owner-only actions, error codes, expiry and renewal,
+  limit, revoke, team view for the team only, removal and leaving, transfer with password).
+  Mutation checks (anyone may remove members; anyone may answer an invitation) were caught.
+  Playwright **57 passed** (4 new incl. the invitation email in Mailpit, handover and leaving,
+  axe in both themes; the team tests also passed 3 times in a row after fixing two test races
+  where a click was not awaited).
 
 ## Known limitations
 

@@ -294,6 +294,7 @@ REST_FRAMEWORK = {
         "avatar_upload": "10/hour",
         "account_sensitive": "10/hour",
         "project_create": "10/day",
+        "project_invite": "30/day",
     },
 }
 

@@ -87,7 +87,7 @@ create projects, maintainers by accepted invitation, repository verification by 
 | 2.1 | Catalog: programming languages, SPDX licences from the official SPDX list (open-source label from OSI approval) | ✅ done |
 | 2.2a | Projects backend: model, permissions (owner/maintainer, public/private with 404), API, short names with redirects, daily limit, export/purge integration (handover to maintainers) | ✅ done |
 | 2.2b | Projects frontend: create/edit pages, public SSR page with Open Graph and Markdown (allowlist), my projects | ✅ done |
-| 2.3 | Maintainer invitations (invite by username, accept/decline, leave, remove) | planned |
+| 2.3 | Maintainer invitations (invite by username, accept/decline, leave, remove), ownership handover | ✅ done |
 | 2.4 | Logo and screenshots via the image upload pipeline (ADR 0010) | planned |
 | 2.5 | Repository verification: check file in the repository or connected GitHub account | planned |
 

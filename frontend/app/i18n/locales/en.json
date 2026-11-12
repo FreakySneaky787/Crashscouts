@@ -374,5 +374,54 @@
       "ownerOnly": "Only the owner can delete the project.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "team": {
+    "title": "Team",
+    "intro": "Owner and maintainers can edit the project. Only the owner invites, removes and hands over.",
+    "members": "Members",
+    "remove": "Remove",
+    "removeNamed": "Remove {{name}} from the team",
+    "leave": "Leave project",
+    "inviteTitle": "Invite a maintainer",
+    "inviteText": "The person gets an email and must accept the invitation on their account page. Invitations expire after 14 days.",
+    "invite": "Send invitation",
+    "pending": "Pending invitations",
+    "pendingUntil": "invited, valid until {{date}}",
+    "revoke": "Withdraw",
+    "revokeNamed": "Withdraw the invitation for {{name}}",
+    "transferTitle": "Hand over the project",
+    "transferText": "The chosen maintainer becomes owner and you become a maintainer. Confirm with your password.",
+    "newOwner": "New owner",
+    "transfer": "Hand over",
+    "done": {
+      "invited": "Invitation sent.",
+      "revoked": "Invitation withdrawn.",
+      "removed": "Maintainer removed.",
+      "left": "You left the project.",
+      "transferred": "The project was handed over."
+    },
+    "problem": {
+      "user_not_found": "No account with this username can be invited.",
+      "already_member": "This person is already in the team.",
+      "already_invited": "This person is already invited.",
+      "too_many_invitations": "Too many open invitations. Withdraw some first.",
+      "owner_cannot_leave": "The owner cannot leave. Hand the project over first.",
+      "not_a_maintainer": "Choose a maintainer of this project.",
+      "wrong_password": "The password is incorrect.",
+      "no_password": "Your account has no password yet. Set one with \"Forgot your password?\" first.",
+      "forbidden": "Only the owner can do this.",
+      "rateLimited": "Too many invitations today. Try again tomorrow.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "invitations": {
+    "title": "Invitations",
+    "text": "{{inviter}} invited you to maintain {{project}}.",
+    "textNoInviter": "You were invited to maintain {{project}}.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "You joined the project.",
+    "declined": "Invitation declined.",
+    "gone": "This invitation is no longer valid."
   }
 }

@@ -15,6 +15,7 @@
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
+| V | Team rules set provisionally in WP 2.3 (conservative): only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day | confirm with the owner | keep as is; loosen later if maintainers should also invite |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
 ### Resolved

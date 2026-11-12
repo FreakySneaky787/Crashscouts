@@ -23,13 +23,25 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects] = await Promise.all([
+  const [csrf, projects, invitations] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
+    backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
   ]);
-  const deleted = new URL(request.url).searchParams.get("project") === "deleted";
+  const params = new URL(request.url).searchParams;
+  const deleted = params.get("project") === "deleted";
+  const answered = params.get("invitation");
+  const invitationResult: "accepted" | "declined" | "gone" | null =
+    answered === "accepted" || answered === "declined" || answered === "gone" ? answered : null;
   return data(
-    { username: user.username, csrfToken: csrf.token, projects: projects.data ?? [], deleted },
+    {
+      username: user.username,
+      csrfToken: csrf.token,
+      projects: projects.data ?? [],
+      invitations: invitations.data ?? [],
+      deleted,
+      invitationResult,
+    },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
@@ -48,6 +60,38 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         subtitle={<span data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</span>}
       />
       {loaderData.deleted ? <Notice tone="ok" title={t("projects.deleted")} /> : null}
+      {loaderData.invitationResult ? (
+        <Notice tone={loaderData.invitationResult === "gone" ? "danger" : "ok"} title={t(`invitations.${loaderData.invitationResult}`)} />
+      ) : null}
+      {loaderData.invitations.length ? (
+        <Panel title={t("invitations.title")}>
+          <ul className={styles.plainList} aria-label={t("invitations.title")}>
+            {loaderData.invitations.map((invitation) => (
+              <li key={invitation.id} className={styles.listRow}>
+                <span>
+                  {invitation.invited_by
+                    ? t("invitations.text", { inviter: invitation.invited_by, project: invitation.project_name })
+                    : t("invitations.textNoInviter", { project: invitation.project_name })}
+                </span>
+                <span className={styles.buttonRow}>
+                  <Form method="post" action={`/invitations/${invitation.id}/accept`}>
+                    <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+                    <Button type="submit" size="sm" variant="primary">
+                      {t("invitations.accept")}
+                    </Button>
+                  </Form>
+                  <Form method="post" action={`/invitations/${invitation.id}/decline`}>
+                    <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+                    <Button type="submit" size="sm" variant="quiet">
+                      {t("invitations.decline")}
+                    </Button>
+                  </Form>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
       <Panel title={t("projects.mine")}>
         <div className={styles.stack}>
           {loaderData.projects.length ? (

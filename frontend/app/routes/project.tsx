@@ -4,7 +4,7 @@ import { data, redirect } from "react-router";
 
 import type { Route } from "./+types/project";
 import { Chips, FactList, ProjectIcon } from "~/components/ui/Data";
-import { ArrowSquareOutIcon, LockSimpleIcon, PencilSimpleIcon } from "~/components/ui/icons";
+import { ArrowSquareOutIcon, LockSimpleIcon, PencilSimpleIcon, UsersIcon } from "~/components/ui/icons";
 import { ButtonLink } from "~/components/ui/Button";
 import { Markdown } from "~/components/ui/Markdown";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -76,9 +76,14 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
         }
         actions={
           project.role ? (
-            <ButtonLink to={`/p/${project.slug}/edit`} icon={PencilSimpleIcon}>
-              {t("projects.edit")}
-            </ButtonLink>
+            <>
+              <ButtonLink to={`/p/${project.slug}/team`} variant="quiet" icon={UsersIcon}>
+                {t("team.title")}
+              </ButtonLink>
+              <ButtonLink to={`/p/${project.slug}/edit`} icon={PencilSimpleIcon}>
+                {t("projects.edit")}
+              </ButtonLink>
+            </>
           ) : null
         }
       />
