@@ -12,7 +12,7 @@
 | B | Method of repository verification | phase 2 | token file in the repository (independent of the code host), plus a check via GitHub OAuth |
 | C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
 | D | What do participants see of each other? Default visibility of profiles | phase 1 / 3A | participants do not see each other; profiles minimally public by default |
-| E | **Visual direction, component library, styling** | before phase 1 | present 2–3 directions as mockups; the project owner decides |
+| E | **Visual direction, component library, styling** | before phase 1 | **in progress:** three clickable directions in [`design/prototypes/`](../design/prototypes/README.md); the project owner decides. Prior recommendation: B with A's structured-data components |
 | F | Provider for transactional email (Switzerland/EU) | phase 1 | Mailpit or console in development; provider before the beta |
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | H | Who moderates initially? | phase 3B | the project owner only |

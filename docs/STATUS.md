@@ -132,6 +132,13 @@
   tool ESLint; not part of the shipped application. Not force-upgraded across a major version;
   left to Dependabot/ESLint updates and tracked in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
 
+## Design exploration (2026-11-12)
+
+- Research on generic "AI design" patterns and on Primer, Linear, Discourse and Mozilla Protocol;
+  three clickable directions built under [`design/prototypes/`](../design/prototypes/README.md)
+  (open question E). Verified with axe-core: 60 checks, 0 WCAG A/AA violations, no overflow, no
+  script errors. Awaiting the project owner's choice; no production UI has been changed.
+
 ## Known limitations
 
 - GitHub Free for private repositories: no push protection and no branch protection (see

@@ -13,3 +13,6 @@
 # Lockfiles: do not show diffs by default, treat as generated
 uv.lock linguist-generated=true -diff
 pnpm-lock.yaml linguist-generated=true -diff
+
+# Generated prototype bundles
+design/prototypes/dist/** linguist-generated=true -diff
