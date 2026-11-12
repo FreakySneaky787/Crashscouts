@@ -1,5 +1,6 @@
 from django.db.models import F, QuerySet
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -29,6 +30,7 @@ def visible_items(request: Request) -> QuerySet[ProbeItem]:
 class ProbeItemDetailView(APIView):
     permission_classes = (AllowAny,)
 
+    @extend_schema(responses=ProbeItemSerializer)
     def get(self, request: Request, pk) -> Response:
         item = get_object_or_404(visible_items(request), pk=pk)
         return Response(ProbeItemSerializer(item).data)
@@ -39,6 +41,7 @@ class ProbeItemTouchView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    @extend_schema(request=None, responses=ProbeItemSerializer)
     def post(self, request: Request, pk) -> Response:
         item = get_object_or_404(visible_items(request), pk=pk)
         ProbeItem.objects.filter(pk=item.pk).update(touch_count=F("touch_count") + 1)

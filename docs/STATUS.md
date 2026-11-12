@@ -122,6 +122,12 @@
   Dependabot parses, all actions pinned to SHAs; gitleaks Docker scan of the full history: no
   leaks; `pip-audit` (hashed requirements): no known vulnerabilities; `pnpm audit`: e2e clean,
   frontend one **moderate** finding (see below).
+- **First GitHub run:** the CI caught a real regression from WP 0.4 – the probe endpoints lacked
+  OpenAPI schema annotations, so `spectacular --validate --fail-on-warn` failed (it had not been
+  re-run locally in WP 0.4). Fixed with `@extend_schema`; validation passes locally with the same
+  command. Lesson: always run the full CI command set locally before pushing.
+- **Dependabot** started immediately on the private repository (GitHub Free), so version updates
+  are available here.
 - **Known finding:** `minimatch` (GHSA-g3hv-75wg-m249, moderate, denial of service) via the dev-only
   tool ESLint; not part of the shipped application. Not force-upgraded across a major version;
   left to Dependabot/ESLint updates and tracked in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
