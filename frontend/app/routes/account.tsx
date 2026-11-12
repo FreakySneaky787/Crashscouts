@@ -2,9 +2,9 @@ import { useTranslation } from "react-i18next";
 import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/account";
-import { Button } from "~/components/ui/Button";
+import { Button, ButtonLink } from "~/components/ui/Button";
 import { Avatar } from "~/components/ui/Data";
-import { SignOutIcon } from "~/components/ui/icons";
+import { EyeIcon, PencilSimpleIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
@@ -42,6 +42,19 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         leading={<Avatar name={loaderData.username} id={loaderData.username} size="lg" />}
         subtitle={<span data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</span>}
       />
+      <Panel title={t("account.profile")}>
+        <div className={styles.stack}>
+          <p>{t("account.profileText")}</p>
+          <div className={styles.buttonRow}>
+            <ButtonLink to="/settings/profile" icon={PencilSimpleIcon}>
+              {t("account.editProfile")}
+            </ButtonLink>
+            <ButtonLink to={`/u/${loaderData.username}`} variant="quiet" icon={EyeIcon}>
+              {t("settings.viewPublic")}
+            </ButtonLink>
+          </div>
+        </div>
+      </Panel>
       <Panel title={t("account.session")}>
         <p>{t("account.sessionText")}</p>
         <Form method="post" action="/logout">

@@ -6,6 +6,8 @@ urlpatterns = [
     # In production the public reverse proxy does NOT route /admin/ (docs/SECURITY.md, §7).
     path("admin/", admin.site.urls),
     path("api/v1/", include("apps.core.urls")),
+    path("api/v1/", include("apps.catalog.urls")),
+    path("api/v1/", include("apps.profiles.urls")),
     # django-allauth headless: /_allauth/browser/v1/...
     path("_allauth/", include("allauth.headless.urls")),
 ]

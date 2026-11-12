@@ -13,7 +13,8 @@
     "login": "Log in",
     "logout": "Log out",
     "designSystem": "Design system",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "profile": "Profile"
   },
   "login": {
     "title": "Log in",
@@ -33,7 +34,10 @@
     "title": "Your account",
     "signedInAs": "Signed in as {{username}}",
     "session": "Session",
-    "sessionText": "You are signed in on this device. Log out when you use a shared computer."
+    "sessionText": "You are signed in on this device. Log out when you use a shared computer.",
+    "profile": "Profile",
+    "profileText": "Your public profile shows your username and avatar. You decide which other details appear.",
+    "editProfile": "Edit profile"
   },
   "probe": {
     "touch": "Touch",
@@ -124,5 +128,50 @@
     "forbidden": "Your session has expired. Reload the page and try again.",
     "rateLimited": "Too many attempts. Wait a few minutes and try again.",
     "generic": "Something went wrong. Please try again."
+  },
+  "profile": {
+    "about": "About",
+    "interests": "Interests",
+    "platforms": "Operating systems and devices",
+    "skills": "Testing skills",
+    "opensNewTab": "(opens in a new tab)",
+    "nothingPublic": "This person has not shared any details yet."
+  },
+  "settings": {
+    "title": "Profile settings",
+    "intro": "Choose what others can see. Everything except your username and avatar stays private until you switch it on.",
+    "viewPublic": "View public profile",
+    "avatar": "Avatar",
+    "avatarFile": "Image file",
+    "avatarHint": "PNG, JPEG or WebP, at most 2 MB. It is cropped to a square and metadata such as location is removed.",
+    "avatarUpload": "Upload avatar",
+    "avatarRemove": "Remove avatar",
+    "details": "About you",
+    "privacyNote": "Your username and avatar are public. Each detail below is only shown on your profile when you tick its box.",
+    "bio": "Bio",
+    "bioHint": "A few sentences about you and what you like to test. At most 500 characters.",
+    "link": "Link",
+    "linkHint": "One https link, for example your website or code hosting profile.",
+    "showOnProfile": "Show on my public profile",
+    "searchEngines": "Search engines",
+    "indexable": "Allow search engines to list my public profile",
+    "save": "Save profile",
+    "feedback": {
+      "saved": "Your profile was saved.",
+      "avatarSaved": "Your avatar was updated.",
+      "avatarRemoved": "Your avatar was removed."
+    },
+    "problem": {
+      "invalid": "Some entries need your attention.",
+      "forbidden": "Your session has expired. Reload the page and try again.",
+      "rateLimited": "Too many uploads. Try again later.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "errors": {
+      "bioTooLong": "The bio can have at most 500 characters.",
+      "httpsLink": "Enter a complete link that starts with https://.",
+      "listInvalid": "Choose from the listed options.",
+      "avatarInvalid": "Upload a PNG, JPEG or WebP image of at most 2 MB."
+    }
   }
 }

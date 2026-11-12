@@ -48,8 +48,8 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `core` | Base models (UUIDv4, timestamps), health endpoint, permission helpers | implemented (basics) |
 | `accounts` | Custom user, allauth, age confirmation, deletion and export | email login, signup, verification, password reset (WP 1.1) |
 | `ssr_probe` | **Test only**: probe objects for the SSR spike; never installed in production | implemented |
-| `profiles` | Profile, interests, operating systems, skills, privacy | planned |
-| `catalog` | Taxonomies: categories, platforms, languages, software type, SPDX licenses | planned |
+| `profiles` | Profile, interests, operating systems, skills, privacy, avatar | implemented (WP 1.2) |
+| `catalog` | Taxonomies: categories, platforms, languages, software type, SPDX licenses | categories, platforms, skills (WP 1.2); the rest in phase 2 |
 | `projects` | Projects, memberships (owner/maintainer), verification, screenshots | planned |
 | `campaigns` | Campaigns, links, invitations, participations, status machine | planned |
 | `testing` | Test tasks, progress | planned |
@@ -187,5 +187,9 @@ React Router's data requests.
 
 - Docker Compose on a server in Switzerland or the EU: proxy, Django, SSR, worker, PostgreSQL.
 - Database without a public port.
-- Encrypted, off-site backups with a tested restore.
-- The provider is still open.
+- Encrypted, off-site backups with a tested restore (database **and** uploaded files in
+  `DJANGO_MEDIA_ROOT`).
+- The reverse proxy limits request bodies (a few MB) in front of the SSR server and Django
+  ([ADR 0010](adr/0010-image-upload-pipeline.md)); `/media` is never routed.
+- Transactional email via Scaleway (open question F), configured through `DJANGO_EMAIL_*`.
+- The hosting provider is still open.

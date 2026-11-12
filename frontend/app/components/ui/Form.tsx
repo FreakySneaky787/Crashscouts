@@ -144,6 +144,48 @@ export function CheckboxField({
   );
 }
 
+/** Group of checkboxes for a multiple choice from a fixed list (e.g. platforms). */
+export function CheckboxGroup({
+  name,
+  legend,
+  hint,
+  options,
+  selected,
+  error,
+}: {
+  name: string;
+  legend: string;
+  hint?: string;
+  options: { value: string; label: string }[];
+  selected: readonly string[];
+  error?: string;
+}) {
+  const describedBy = [hint ? `${name}-hint` : "", error ? `${name}-error` : ""].filter(Boolean).join(" ") || undefined;
+  return (
+    <fieldset className={styles.choices} aria-describedby={describedBy}>
+      <legend className={styles.label}>{legend}</legend>
+      {hint ? (
+        <p id={`${name}-hint`} className={styles.hint}>
+          {hint}
+        </p>
+      ) : null}
+      <div className={styles.choiceRow}>
+        {options.map(({ value, label }) => (
+          <label key={value} className={styles.choice}>
+            <input type="checkbox" name={name} value={value} defaultChecked={selected.includes(value)} />
+            {label}
+          </label>
+        ))}
+      </div>
+      {error ? (
+        <p id={`${name}-error`} className={styles.error}>
+          {error}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
+
 /** Inline note below form fields, e.g. privacy or attachment rules. */
 export function FormNote({ icon: Icon, children }: { icon?: IconComponent; children: ReactNode }) {
   return (

@@ -10,6 +10,9 @@ export default [
   route("password/reset/:key", "routes/password-reset.tsx"),
   route("logout", "routes/logout.tsx"),
   route("account", "routes/account.tsx"),
+  route("settings/profile", "routes/settings-profile.tsx"),
+  route("u/:username", "routes/profile.tsx"),
+  route("avatars/:key", "routes/avatar.tsx"),
   route("theme", "routes/theme.tsx"),
   route("design-system", "routes/design-system.tsx"),
   // Test-only probe for the SSR spike (WP 0.4). Always 404 without the probe backend (production).

@@ -74,6 +74,12 @@ including the negative cases.
 - Random file names, storage outside the web root.
 - Delivery only via an authorized Django route with `Content-Disposition: attachment` and
   `nosniff`; text logs are never rendered as HTML.
+- ✅ Implemented for avatars (WP 1.2, [ADR 0010](adr/0010-image-upload-pipeline.md)): size limit
+  before parsing, content type, magic bytes, Pillow format and pixel-count checks, re-encoding to
+  256×256 WebP without metadata, random names outside the web root, delivery only for visible
+  profiles with `nosniff` and a sandbox CSP (inline, because avatars are displayed), upload rate
+  limit. Tested against SVG with script, disguised GIF/HTML/text, truncated PNG, oversized files
+  and a decompression bomb; GPS data verifiably removed.
 
 ## 6. Privacy and authorization
 

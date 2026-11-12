@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 1.1) · **Current phase:** 1 – Accounts
+**Last update:** 2026-11-12 (WP 1.2) · **Current phase:** 1 – Accounts
 
 ## Work packages
 
@@ -217,6 +217,36 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
     from `/login` to `/password/forgot` had finished (both pages have such a field), so the
     request went out empty (400). A test race, not an application bug; the test now waits for
     each navigation. Verified with repeated runs (account tests 3× in a row, then the full suite).
+
+### WP 1.2 – Profile and privacy (2026-11-12) ✅
+
+- Owner's decisions: fields bio (500), link (https), interests, operating systems and devices,
+  testing skills; fixed lists instead of free tags; **avatar upload now**; profile URL `/u/<name>`.
+- **Privacy by default:** only username and avatar are public; every other field appears only
+  after its own switch is turned on; indexing only after opt-in (`noindex` otherwise). Profiles of
+  unconfirmed or deactivated accounts are 404.
+- **Backend:** apps `catalog` (categories, platforms, skills; seeded by a data migration, editable
+  by staff) and `profiles` (profile per user, own-profile API, public profile API, avatar API);
+  Pillow 13.0.0 added.
+- **Avatar pipeline** ([ADR 0010](adr/0010-image-upload-pipeline.md)): size, type, magic bytes,
+  pixel count before decoding, re-encoding to 256×256 WebP without metadata, random names outside
+  the web root, safe delivery, 10 uploads per hour.
+- **Frontend:** `/u/:username` (public, SSR), `/settings/profile` (works without JavaScript,
+  multipart upload with a size check before reading the body), resource route `/avatars/:key`;
+  components `CheckboxGroup` and `Avatar` with image.
+- **Verification (run on 2026-11-12):** pytest **115 passed**; Vitest **52 passed**; ESLint,
+  `tsc`, Ruff clean; migrations complete; OpenAPI valid; pip-audit no known vulnerabilities;
+  Playwright **30 passed** (5 new: privacy by default incl. hidden fields absent from the HTML,
+  https-only links, real avatar upload with header checks and a disguised script, login
+  requirement and 404s, axe-core in light and dark).
+- **Findings during the work:**
+  - DRF replaces a model's URL validator with its own, so `http://` and `ftp://` links were
+    accepted despite the model rule. Caught by a negative test; the https rule is now declared on
+    the serializer.
+  - DRF answered the SSR server's `Accept: image/*` with 406; the image view is now a plain Django
+    view (found by E2E, covered by a backend test).
+  - E2E race: a previous success notice was still visible after the second save; the tests now
+    wait for the POST response.
 
 ## Known limitations
 

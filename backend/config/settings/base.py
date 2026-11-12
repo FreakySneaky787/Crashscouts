@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.audit",
+    "apps.catalog",
+    "apps.profiles",
 ]
 
 MIDDLEWARE = [
@@ -189,6 +191,19 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# --- Uploaded files (avatars). Stored outside any web root and NEVER served directly: there is
+# no MEDIA_URL route; Django views check permissions and serve files (docs/SECURITY.md, "Uploads").
+MEDIA_ROOT = Path(env_str("DJANGO_MEDIA_ROOT", str(BASE_DIR / "media")))
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {"location": MEDIA_ROOT, "base_url": None},
+    },
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+FILE_UPLOAD_PERMISSIONS = 0o640
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o750
+
 # --- Security baseline (applies everywhere; prod.py tightens it) ---
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -214,6 +229,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
     ],
+    # Rates for views that opt in with ScopedRateThrottle (cache-based, see open question O).
+    "DEFAULT_THROTTLE_RATES": {
+        "avatar_upload": "10/hour",
+    },
 }
 
 SPECTACULAR_SETTINGS = {

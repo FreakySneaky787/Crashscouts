@@ -79,6 +79,11 @@
   letter-spacing: 0.02em;
 }
 
+.avatar.photo {
+  object-fit: cover;
+  background: var(--color-surface-sunken);
+}
+
 .avatar.lg {
   width: 4rem;
   height: 4rem;

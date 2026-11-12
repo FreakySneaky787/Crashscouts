@@ -91,9 +91,10 @@ module.
 | `PageHeader` | top of each page | breadcrumbs, title, subtitle, meta line, actions, leading avatar/icon |
 | `TabNav` | sections of a page | **links** with `aria-current="page"`, bookmarkable |
 | `KeyFigures`, `Progress` | figures and progress | native `<progress>` with label |
-| `Avatar`, `ProjectIcon` | identity | initials on a hue derived from the ID |
+| `Avatar`, `ProjectIcon` | identity | initials on a hue derived from the ID; `Avatar` shows an uploaded image when `src` is set (decorative, the name is always next to it) |
 | `Chips`, `FactList`, `RowList` | data display | list semantics (`ul`/`dl`) |
 | `TextField`, `TextAreaField`, `SelectField`, `ChoiceGroup`, `FormNote` | forms | visible labels, hints and errors via `aria-describedby`, `aria-invalid` |
+| `CheckboxGroup` | multiple choice from a fixed list | fieldset with legend, hint and error; e.g. platforms |
 | `CheckboxField` | single confirmation | label next to the box; error via `aria-describedby` |
 | `Notice` | inline message | tones `ok`, `info` (role `status`), `danger` (role `alert`); icon + text |
 | `EmptyState` | empty and error states | kinds `first-use` (with action), `empty`, `error` |

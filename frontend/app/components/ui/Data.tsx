@@ -27,7 +27,11 @@ export function Progress({ value, max, label }: { value: number; max: number; la
 }
 
 /** Person avatar with initials and a stable identity hue. */
-export function Avatar({ name, id, size = "md" }: { name: string; id: string; size?: "md" | "lg" }) {
+export function Avatar({ name, id, size = "md", src }: { name: string; id: string; size?: "md" | "lg"; src?: string | null }) {
+  if (src) {
+    // Decorative: the name is always shown next to it.
+    return <img src={src} alt="" width={size === "lg" ? 64 : 32} height={size === "lg" ? 64 : 32} className={`${styles.avatar} ${styles.photo} ${size === "lg" ? styles.lg : ""}`} />;
+  }
   return (
     <span className={`${styles.avatar} ${styles[`hue${hueIndex(id)}`]} ${size === "lg" ? styles.lg : ""}`} aria-hidden="true">
       {initials(name)}

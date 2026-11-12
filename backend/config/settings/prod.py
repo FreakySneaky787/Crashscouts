@@ -4,6 +4,8 @@ Assumption (see docs/ARCHITECTURE.md): Django runs behind a reverse proxy that t
 sets the X-Forwarded-Proto header itself and overwrites any value sent by clients.
 """
 
+from pathlib import Path
+
 from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F403
@@ -34,6 +36,16 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS
 SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
 
 SERVE_API_SCHEMA = False
+
+# --- Uploaded files: an explicit, persistent location outside the code checkout ---
+MEDIA_ROOT = Path(env_str("DJANGO_MEDIA_ROOT"))
+STORAGES = {
+    **STORAGES,  # noqa: F405
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {"location": MEDIA_ROOT, "base_url": None},
+    },
+}
 
 # --- Links in emails and outgoing mail (provider: open question F) ---
 FRONTEND_URL = env_str("FRONTEND_URL").rstrip("/")

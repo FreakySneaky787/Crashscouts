@@ -16,11 +16,13 @@ const BACKEND_URL = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";
 export const AUTH_BASE = "/_allauth/browser/v1";
 
 type BackendInit = {
-  method?: "GET" | "POST" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   json?: unknown;
   csrfToken?: string | null;
   /** Extra request headers, e.g. allauth's X-Email-Verification-Key. Values must be validated. */
   headers?: Record<string, string>;
+  /** Multipart body (file uploads); fetch sets the Content-Type with the boundary itself. */
+  form?: FormData;
 };
 
 export type BackendResult<T> = {
@@ -52,10 +54,12 @@ export async function backendFetch<T = unknown>(
     if (init.csrfToken) headers.set("X-CSRFToken", init.csrfToken);
   }
 
-  let body: string | undefined;
+  let body: string | FormData | undefined;
   if (init.json !== undefined) {
     headers.set("Content-Type", "application/json");
     body = JSON.stringify(init.json);
+  } else if (init.form !== undefined) {
+    body = init.form;
   }
 
   const response = await fetch(new URL(path, BACKEND_URL), {
@@ -76,6 +80,14 @@ export async function backendFetch<T = unknown>(
 }
 
 export type SessionUser = { username: string };
+
+/**
+ * Fetches a binary resource (e.g. an avatar) from Django for streaming it to the browser.
+ * No cookies are forwarded: only public resources go through here.
+ */
+export async function backendFetchBinary(path: string): Promise<Response> {
+  return fetch(new URL(path, BACKEND_URL), { headers: { Accept: "image/webp,image/*" }, redirect: "manual" });
+}
 
 /** Asks Django for the current session. `null` = not signed in. */
 export async function getSessionUser(request: Request): Promise<SessionUser | null> {

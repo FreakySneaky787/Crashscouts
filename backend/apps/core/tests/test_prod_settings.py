@@ -60,6 +60,7 @@ def _prod_env(**overrides: str) -> dict[str, str]:
         "FRONTEND_URL": "https://example.invalid",
         "DJANGO_EMAIL_HOST": "smtp.example.invalid",
         "DJANGO_DEFAULT_FROM_EMAIL": "no-reply@example.invalid",
+        "DJANGO_MEDIA_ROOT": "/srv/example-media",
         **overrides,
     }
 
@@ -115,7 +116,8 @@ def test_prod_refuses_to_start_without_allowed_hosts():
 
 
 @pytest.mark.parametrize(
-    "missing", ["FRONTEND_URL", "DJANGO_EMAIL_HOST", "DJANGO_DEFAULT_FROM_EMAIL"]
+    "missing",
+    ["FRONTEND_URL", "DJANGO_EMAIL_HOST", "DJANGO_DEFAULT_FROM_EMAIL", "DJANGO_MEDIA_ROOT"],
 )
 def test_prod_refuses_to_start_without_mail_configuration(missing):
     result = _run(PROBE, _prod_env(), drop=(missing,))
