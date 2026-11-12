@@ -23,6 +23,7 @@ export {
   DownloadSimpleIcon,
   EnvelopeSimpleIcon,
   EyeIcon,
+  FingerprintIcon,
   FlaskIcon,
   GlobeIcon,
   HourglassMediumIcon,

@@ -1,8 +1,8 @@
-import { useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { useFetcher, useLocation } from "react-router";
 
 import { isTheme, type Theme } from "~/lib/theme";
+import { useHydrated } from "~/lib/use-hydrated";
 
 import { MonitorIcon, MoonIcon, SunIcon } from "./icons";
 import styles from "./ThemeToggle.module.css";
@@ -13,9 +13,6 @@ const OPTIONS = [
   { value: "dark", icon: MoonIcon },
 ] as const;
 
-const noopSubscribe = () => () => {};
-/** true after hydration, false during server rendering. */
-const useHydrated = () => useSyncExternalStore(noopSubscribe, () => true, () => false);
 
 /**
  * Theme switch (system / light / dark). A plain form posting to /theme, so it works without

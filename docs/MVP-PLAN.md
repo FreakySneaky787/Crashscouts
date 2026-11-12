@@ -66,7 +66,7 @@ regression tests.
 | 1.1 | Account core: email login, public username, password rules, signup with 16+ confirmation, email verification (Mailpit), password reset, audit log foundation | ✅ done |
 | 1.2 | Profile and privacy settings (minimally public by default), avatar upload | ✅ done |
 | 1.3a | 2FA: authenticator app (TOTP), recovery codes, second login step, password confirmation | ✅ done |
-| 1.3b | Passkeys and passwordless passkey login | planned |
+| 1.3b | Passkeys and passwordless passkey login | ✅ done |
 | 1.4 | GitHub login, linking only manually (the owner creates a GitHub OAuth app) | planned |
 | 1.5 | Account deletion with a 14-day grace period, data export (JSON) | planned |
 

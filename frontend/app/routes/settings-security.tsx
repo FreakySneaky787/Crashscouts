@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/settings-security";
+import { PasskeyRegister } from "~/components/auth/Passkeys";
 import { Button } from "~/components/ui/Button";
 import { TextField } from "~/components/ui/Form";
 import { ArrowsClockwiseIcon, EyeIcon, ShieldCheckIcon, XIcon } from "~/components/ui/icons";
@@ -40,6 +41,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const authenticators = list.data?.data ?? [];
   const totp = authenticators.find((a) => a.type === "totp") ?? null;
   const recovery = authenticators.find((a) => a.type === "recovery_codes") ?? null;
+  const passkeys = authenticators.filter((a) => a.type === "webauthn");
 
   // Not active yet: allauth hands out a fresh secret for the setup (404 with meta).
   let setup: { secret: string; url: string } | null = null;
@@ -53,13 +55,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     if (secret && url) setup = { secret, url };
   }
   return data(
-    { csrfToken: csrf.token, totp, recovery, setup },
+    { csrfToken: csrf.token, totp, recovery, setup, passkeys },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
 
 type ActionResult = {
-  done?: "activated" | "deactivated" | "regenerated";
+  done?: "activated" | "deactivated" | "regenerated" | "passkeyRemoved";
   codes?: string[];
   error?: "incorrect" | "forbidden" | "rateLimited" | "generic";
 };
@@ -68,14 +70,22 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const csrfToken = String(form.get("csrf_token") ?? "");
   const intent = String(form.get("intent") ?? "");
-  const path = intent === "activate" || intent === "deactivate" ? "totp" : "recovery-codes";
-  const method = intent === "activate" || intent === "regenerate" ? "POST" : intent === "deactivate" ? "DELETE" : "GET";
-  const json = intent === "activate" ? { code: String(form.get("code") ?? "").replace(/\s+/g, "") } : undefined;
+  const path =
+    intent === "activate" || intent === "deactivate" ? "totp" : intent === "passkey-remove" ? "webauthn" : "recovery-codes";
+  const method =
+    intent === "activate" || intent === "regenerate" ? "POST" : intent === "deactivate" || intent === "passkey-remove" ? "DELETE" : "GET";
+  const passkeyId = Number(form.get("id"));
+  const json =
+    intent === "activate"
+      ? { code: String(form.get("code") ?? "").replace(/\s+/g, "") }
+      : intent === "passkey-remove"
+        ? { authenticators: Number.isInteger(passkeyId) ? [passkeyId] : [] }
+        : undefined;
 
   const result = await backendFetch<{ data?: { unused_codes?: string[] } }>(request, `${AUTH_BASE}/account/authenticators/${path}`, {
     method,
     csrfToken,
-    json: method === "POST" ? (json ?? {}) : undefined,
+    json: method === "GET" ? undefined : json,
   });
   const headers = setCookieHeaders(result.setCookies, privateNoStoreHeaders());
 
@@ -89,6 +99,7 @@ export async function action({ request }: Route.ActionArgs) {
     if (intent === "activate") return data<ActionResult>({ done: "activated" }, { headers });
     if (intent === "deactivate") return data<ActionResult>({ done: "deactivated" }, { headers });
     if (intent === "regenerate") return data<ActionResult>({ done: "regenerated", codes }, { headers });
+    if (intent === "passkey-remove") return data<ActionResult>({ done: "passkeyRemoved" }, { headers });
     return data<ActionResult>({ codes }, { headers });
   }
   const error: ActionResult["error"] =
@@ -111,7 +122,7 @@ function Hidden({ csrfToken, intent }: { csrfToken: string; intent: string }) {
 
 export default function SettingsSecurity({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { csrfToken, totp, recovery, setup } = loaderData;
+  const { csrfToken, totp, recovery, setup, passkeys } = loaderData;
 
   return (
     <div className={styles.stack}>
@@ -172,6 +183,29 @@ export default function SettingsSecurity({ loaderData, actionData }: Route.Compo
         ) : (
           <Notice tone="danger" title={t("formError.generic")} />
         )}
+      </Panel>
+
+      <Panel title={t("passkeys.title")} aside={t("passkeys.count", { count: passkeys.length })}>
+        <div className={styles.stack}>
+          <p>{t("passkeys.text")}</p>
+          {passkeys.length ? (
+            <ul className={styles.plainList} aria-label={t("passkeys.title")}>
+              {passkeys.map((passkey) => (
+                <li key={passkey.id} className={styles.listRow}>
+                  <span>{passkey.name}</span>
+                  <Form method="post">
+                    <Hidden csrfToken={csrfToken} intent="passkey-remove" />
+                    <input type="hidden" name="id" value={passkey.id} />
+                    <Button type="submit" variant="quiet" size="sm" icon={XIcon} aria-label={t("passkeys.removeNamed", { name: passkey.name })}>
+                      {t("passkeys.remove")}
+                    </Button>
+                  </Form>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <PasskeyRegister csrfToken={csrfToken} />
+        </div>
       </Panel>
 
       {recovery ? (

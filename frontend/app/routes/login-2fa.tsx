@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/login-2fa";
+import { PasskeySignIn } from "~/components/auth/Passkeys";
 import { Button } from "~/components/ui/Button";
 import { TextField } from "~/components/ui/Form";
 import { ShieldCheckIcon } from "~/components/ui/icons";
@@ -27,8 +28,14 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!(session.status === 401 && isFlowPending(session.data, "mfa_authenticate"))) {
     throw redirect(session.status === 200 ? next : "/login", { headers: privateNoStoreHeaders() });
   }
+  // Which second factors this account has (e.g. "totp", "recovery_codes", "webauthn").
+  const flows = (session.data as { data?: { flows?: { id?: string; types?: string[] }[] } } | null)?.data?.flows ?? [];
+  const types = flows.find((flow) => flow.id === "mfa_authenticate")?.types ?? [];
   const csrf = await ensureCsrfToken(request);
-  return data({ csrfToken: csrf.token, next }, { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) });
+  return data(
+    { csrfToken: csrf.token, next, passkey: types.includes("webauthn"), code: types.some((type) => type !== "webauthn") },
+    { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
+  );
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -57,6 +64,12 @@ export default function LoginTwoFactor({ loaderData, actionData }: Route.Compone
   return (
     <div className={styles.narrow}>
       <PageHeader title={t("mfa.loginTitle")} subtitle={t("mfa.loginIntro")} />
+      {loaderData.passkey ? (
+        <Panel title={t("passkeys.secondPanel")}>
+          <PasskeySignIn mode="2fa" csrfToken={loaderData.csrfToken} next={loaderData.next} />
+        </Panel>
+      ) : null}
+      {loaderData.code ? (
       <Panel title={t("mfa.codePanel")}>
         <Form method="post" className={styles.form}>
           {actionData?.error === "incorrect" ? <Notice tone="danger" title={t("mfa.incorrect")} /> : null}
@@ -83,6 +96,7 @@ export default function LoginTwoFactor({ loaderData, actionData }: Route.Compone
           </div>
         </Form>
       </Panel>
+      ) : null}
       <p className={styles.aside}>
         <Link to="/login">{t("mfa.startOver")}</Link>
       </p>

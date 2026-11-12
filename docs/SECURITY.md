@@ -35,7 +35,8 @@ including the negative cases.
     code reuse, one step of clock tolerance, single-use recovery codes; second login step.
   - ✅ Security changes need a fresh confirmation by password or second factor only (not by an
     emailed code); security notifications by email; 2FA events in the audit log.
-  - Passkeys and passwordless login: WP 1.3b.
+  - ✅ Passkeys and passwordless login (WP 1.3b): relying party = public frontend host; adding
+    and removing need a fresh confirmation; tested with Chromium's virtual authenticator.
 - ✅ Session cookie `HttpOnly` and `SameSite=Lax` (verified in E2E); `Secure` enforced in
   production settings.
 - New session on login; session list with "sign out everywhere" (phase 1).

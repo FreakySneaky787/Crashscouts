@@ -1,7 +1,8 @@
 # End-to-end tests (Playwright)
 
 Tests against the real stack: Django (dev settings, PostgreSQL 18) and the **production build** of
-the SSR frontend. Playwright starts both servers itself (ports 8000 and 3000, bound to `127.0.0.1`);
+the SSR frontend. Playwright starts both servers itself (ports 8000 and 3000, bound to `127.0.0.1`;
+the browser opens the frontend as `http://localhost:3000`, because passkeys reject IP addresses);
 `global-setup.ts` migrates the database and creates test data with randomly generated passwords.
 
 ## Prerequisites

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/login";
+import { PasskeySignIn } from "~/components/auth/Passkeys";
 import { Button } from "~/components/ui/Button";
 import { TextField } from "~/components/ui/Form";
 import { SignInIcon } from "~/components/ui/icons";
@@ -92,6 +93,9 @@ export default function Login({ loaderData, actionData }: Route.ComponentProps) 
             </Button>
           </div>
         </Form>
+      </Panel>
+      <Panel title={t("passkeys.loginPanel")}>
+        <PasskeySignIn mode="login" csrfToken={loaderData.csrfToken} next={loaderData.next} />
       </Panel>
       <p className={styles.aside}>
         <Link to="/password/forgot">{t("login.forgot")}</Link>

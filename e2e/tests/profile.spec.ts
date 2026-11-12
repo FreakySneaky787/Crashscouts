@@ -8,6 +8,8 @@ import { crc32, deflateSync } from "node:zlib";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { FRONTEND_URL } from "../playwright.config";
+
 import { createSignedInAccount } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
@@ -132,7 +134,7 @@ test("settings need a login; unknown and malformed profiles are 404", async ({ r
 test("profile pages have no WCAG A/AA violations in light and dark", async ({ page, request, context }) => {
   const account = await createSignedInAccount(page, request);
   for (const theme of ["light", "dark"]) {
-    await context.addCookies([{ name: "theme", value: theme, url: "http://127.0.0.1:3000" }]);
+    await context.addCookies([{ name: "theme", value: theme, url: FRONTEND_URL }]);
     for (const path of ["/settings/profile", `/u/${account.username}`, "/account"]) {
       await page.goto(path);
       const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();

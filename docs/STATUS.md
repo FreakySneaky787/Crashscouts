@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 1.3a) · **Current phase:** 1 – Accounts
+**Last update:** 2026-11-12 (WP 1.3b) · **Current phase:** 1 – Accounts
 
 ## Work packages
 
@@ -271,6 +271,27 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
     when there is none. The adapter now builds the mail context itself.
   - Passkeys need the public frontend host as relying party and do not accept IP addresses;
     `FRONTEND_URL` defaults to `localhost` (relevant for WP 1.3b).
+
+### WP 1.3b – Passkeys and passwordless login (2026-11-12) ✅
+
+- **Frontend:** passkeys in the browser with the standard WebAuthn JSON helpers (no extra
+  library); resource route `/passkeys` forwards to allauth; "Sign in with a passkey" on `/login`,
+  "Confirm with a passkey" on `/login/2fa`, add and remove on `/settings/security` (removal also
+  works without JavaScript; the passkey buttons explain that they need JavaScript).
+- **Local development and E2E** now open the frontend as `localhost` (WebAuthn rejects IP
+  addresses); the backend stays on `127.0.0.1:8000` internally.
+- **Verification (run on 2026-11-12):** pytest **126 passed** (new: registration options need a
+  fresh confirmation and carry the frontend host as relying party with a discoverable credential);
+  Playwright **37 passed** (3 new: add passkey after password confirmation, passwordless login,
+  passkey as second factor, removal with confirmation, removed passkey rejected – with Chromium's
+  virtual authenticator; JavaScript-off note; endpoint input checks).
+- **Findings during the work:**
+  - allauth requires the fresh confirmation already for the passkey registration options and for
+    removal; a passkey or password login does not count as one.
+  - With the frontend on `localhost`, browser cookies no longer reach the backend on
+    `127.0.0.1:8000` directly; the SSR test that calls Django directly now sends them explicitly.
+  - Several test selectors matched panel titles such as "Sign in without a password"; the tests
+    now match field labels exactly.
 
 ## Known limitations
 

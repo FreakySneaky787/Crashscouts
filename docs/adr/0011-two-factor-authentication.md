@@ -1,6 +1,6 @@
 # 0011 – Two-factor authentication
 
-- Status: Accepted (WP 1.3a: authenticator app and recovery codes; WP 1.3b: passkeys)
+- Status: Accepted (WP 1.3a: authenticator app and recovery codes; WP 1.3b: passkeys – both done)
 - Date: 2026-11-12
 
 ## Context
@@ -34,6 +34,14 @@ gate (phase 3B, open question A).
    WebAuthn does not accept IP addresses as relying party, so local development and E2E use
    `localhost`.
 8. All steps except passkeys work **without JavaScript**; passkeys need the browser's WebAuthn API.
+9. **Passkeys in the frontend** use the standard WebAuthn JSON helpers
+   (`PublicKeyCredential.parse*OptionsFromJSON`, `credential.toJSON()`), whose format matches
+   allauth's (webauthn-json) and fido2's parser; no extra library. The browser talks only to the
+   SSR resource route `/passkeys`, which forwards to allauth with cookies, Origin and CSRF token.
+   Passkeys are registered as discoverable credentials, so they also allow passwordless login, and
+   count as a second factor after a password login. Adding or removing one needs a fresh
+   confirmation like every other 2FA change (allauth requires it already for the registration
+   options).
 
 ## Alternatives
 

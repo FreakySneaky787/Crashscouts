@@ -208,7 +208,8 @@
     "done": {
       "activated": "Two-factor authentication is on. Your recovery codes are ready.",
       "deactivated": "Two-factor authentication is off.",
-      "regenerated": "New recovery codes were created. The old ones no longer work."
+      "regenerated": "New recovery codes were created. The old ones no longer work.",
+      "passkeyRemoved": "The passkey was removed."
     }
   },
   "reauth": {
@@ -217,5 +218,31 @@
     "panel": "Confirm your password",
     "submit": "Confirm",
     "incorrect": "The password is incorrect."
+  },
+  "passkeys": {
+    "loginPanel": "Sign in without a password",
+    "secondPanel": "Use a passkey",
+    "signIn": "Sign in with a passkey",
+    "useAsSecond": "Confirm with a passkey",
+    "needsJs": "Passkeys need JavaScript in your browser.",
+    "title": "Passkeys",
+    "count": "{{count}} saved",
+    "text": "A passkey lets you sign in with your device's fingerprint, face or screen lock instead of a password. It also counts as a second factor.",
+    "name": "Name",
+    "nameHint": "For example the device it is on.",
+    "defaultName": "Passkey",
+    "add": "Add a passkey",
+    "added": "Passkey added.",
+    "remove": "Remove",
+    "removeNamed": "Remove passkey {{name}}",
+    "error": {
+      "unsupported": "This browser does not support passkeys.",
+      "cancelled": "The passkey dialog was closed. Nothing was changed.",
+      "failed": "The passkey could not be used. Try again or use another sign-in method.",
+      "unverified": "Confirm your email address first. We sent you a link when you signed up.",
+      "rateLimited": "Too many attempts. Wait a few minutes and try again.",
+      "forbidden": "Your session has expired. Reload the page and try again.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

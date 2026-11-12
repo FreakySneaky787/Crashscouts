@@ -44,14 +44,14 @@ export async function signUp(page: Page, account: ReturnType<typeof newAccount>)
   await page.goto("/signup");
   await page.getByLabel("Email address").fill(account.email);
   await page.getByLabel("Username").fill(account.username);
-  await page.getByLabel("Password").fill(account.password);
+  await page.getByLabel("Password", { exact: true }).fill(account.password);
   await page.getByLabel("I am at least 16 years old.").check();
   await page.getByRole("button", { name: "Create account" }).click();
 }
 
 export async function logIn(page: Page, email: string, password: string) {
   await page.getByLabel("Email address").fill(email);
-  await page.getByLabel("Password").fill(password);
+  await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Log in" }).click();
 }
 

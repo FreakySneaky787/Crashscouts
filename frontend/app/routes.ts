@@ -5,6 +5,7 @@ export default [
   route("login", "routes/login.tsx"),
   route("login/2fa", "routes/login-2fa.tsx"),
   route("reauthenticate", "routes/reauthenticate.tsx"),
+  route("passkeys", "routes/passkeys.tsx"),
   route("signup", "routes/signup.tsx"),
   route("signup/check-email", "routes/signup-check-email.tsx"),
   route("verify-email/:key", "routes/verify-email.tsx"),

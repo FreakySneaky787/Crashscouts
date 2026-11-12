@@ -45,15 +45,15 @@ test("signup errors are shown per field and the password is never echoed back", 
   await page.goto("/signup");
   await page.getByLabel("Email address").fill(account.email);
   await page.getByLabel("Username").fill("Admin");
-  await page.getByLabel("Password").fill("short-pass1");
+  await page.getByLabel("Password", { exact: true }).fill("short-pass1");
   await page.getByRole("button", { name: "Create account" }).click();
 
   await expect(page.getByText("This username is reserved. Choose another one.")).toBeVisible();
   await expect(page.getByText("The password must be at least 12 characters long.")).toBeVisible();
   await expect(page.getByText("You must be at least 16 years old to sign up.")).toBeVisible();
   await expect(page.getByLabel("Email address")).toHaveValue(account.email);
-  await expect(page.getByLabel("Password")).toHaveValue("");
-  await expect(page.getByLabel("Password")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByLabel("Password", { exact: true })).toHaveValue("");
+  await expect(page.getByLabel("Password", { exact: true })).toHaveAttribute("aria-invalid", "true");
   expect(await page.content()).not.toContain("short-pass1");
   await context.close();
 });

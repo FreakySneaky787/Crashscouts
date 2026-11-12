@@ -6,6 +6,8 @@ import { execFileSync } from "node:child_process";
 
 import { expect, test, type Browser, type Page } from "@playwright/test";
 
+import { FRONTEND_URL } from "../playwright.config";
+
 const BACKEND_URL = "http://127.0.0.1:8000";
 
 const env = (name: string): string => {
@@ -22,7 +24,7 @@ const privatePath = () => `/probe/private/${env("PROBE_PRIVATE_ID")}`;
 async function login(page: Page, user: { email: string; password: string }) {
   await page.goto("/login");
   await page.getByLabel("Email address").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
+  await page.getByLabel("Password", { exact: true }).fill(user.password);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
@@ -110,15 +112,18 @@ test("(3) the session persists; Set-Cookie and CSRF work", async ({ page, contex
   });
   expect(foreignOriginViaSsr.status()).toBe(400);
   // (c) Django also rejects a foreign Origin directly — even with a valid session and token.
+  // The browser's cookies belong to the frontend host, so they are sent explicitly here.
+  const sessionCookie = (await context.cookies()).find((c) => c.name === "sessionid")?.value ?? "";
+  const cookieHeader = `sessionid=${sessionCookie}; csrftoken=${csrf}`;
   const foreignOriginDirect = await page.request.post(
     `${BACKEND_URL}/api/v1/probe/items/${env("PROBE_PRIVATE_ID")}/touch/`,
-    { headers: { Origin: "https://evil.example", "X-CSRFToken": csrf } },
+    { headers: { Origin: "https://evil.example", "X-CSRFToken": csrf, Cookie: cookieHeader } },
   );
   expect(foreignOriginDirect.status()).toBe(403);
   // Control: the same direct request from the trusted origin works, so (c) failed only due to Origin.
   const trustedOriginDirect = await page.request.post(
     `${BACKEND_URL}/api/v1/probe/items/${env("PROBE_PRIVATE_ID")}/touch/`,
-    { headers: { Origin: "http://127.0.0.1:3000", "X-CSRFToken": csrf } },
+    { headers: { Origin: FRONTEND_URL, "X-CSRFToken": csrf, Cookie: cookieHeader } },
   );
   expect(trustedOriginDirect.status()).toBe(200);
   await page.reload();
@@ -195,7 +200,7 @@ test("(5) private responses are not cached; public ones set no cookies", async (
 });
 
 test("(6) curl without JavaScript receives complete HTML with title and Open Graph tags", () => {
-  const url = `http://127.0.0.1:3000${publicPath()}`;
+  const url = `${FRONTEND_URL}${publicPath()}`;
   const html = execFileSync("curl", ["-sS", "--fail", url], { encoding: "utf-8" });
 
   expect(html).toContain("<title>Public probe item · TestHub</title>");

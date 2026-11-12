@@ -4,7 +4,8 @@ import { defineConfig, devices } from "@playwright/test";
  * End-to-end tests against the real stack: Django (dev settings, PostgreSQL 18) and the PRODUCTION
  * build of the SSR frontend (react-router-serve). Prerequisite: `docker compose up -d db mailpit`.
  */
-export const FRONTEND_URL = "http://127.0.0.1:3000";
+// "localhost", not 127.0.0.1: passkeys (WebAuthn) reject IP addresses as relying party.
+export const FRONTEND_URL = "http://localhost:3000";
 export const BACKEND_URL = "http://127.0.0.1:8000";
 // Local mail catcher (compose service "mailpit"); account emails are read from its API.
 export const MAILPIT_URL = "http://127.0.0.1:8025";

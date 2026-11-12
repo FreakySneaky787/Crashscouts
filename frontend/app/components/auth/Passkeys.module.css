@@ -1,0 +1,9 @@
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.note {
+  font-size: var(--text-sec);
+  color: var(--color-fg-secondary);
+}

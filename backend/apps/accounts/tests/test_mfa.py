@@ -168,3 +168,25 @@ def test_mfa_changes_are_audited_and_notified(verified_user, django_capture_on_c
 def test_passkey_relying_party_is_the_public_frontend_host(rf, frontend_url, rp_id):
     with override_settings(FRONTEND_URL=frontend_url):
         assert MFAAdapter(rf.get("/")).get_public_key_credential_rp_entity()["id"] == rp_id
+
+
+def test_passkey_registration_needs_login_and_uses_the_frontend_host(verified_user, settings):
+    settings.FRONTEND_URL = "https://testing.example.org"
+    anonymous, _ = csrf_client()
+    assert anonymous.get(f"{BASE}/account/authenticators/webauthn").status_code == 401
+
+    user, password = verified_user
+    client = logged_in(user, password)
+    # Even the registration options need a fresh password confirmation.
+    unconfirmed = client.get(f"{BASE}/account/authenticators/webauthn?passwordless")
+    assert unconfirmed.status_code == 401
+    assert "reauthenticate" in flows(unconfirmed)
+
+    assert post(client, "/auth/reauthenticate", {"password": password}).status_code == 200
+    response = client.get(f"{BASE}/account/authenticators/webauthn?passwordless")
+
+    assert response.status_code == 200, response.content
+    public_key = response.json()["data"]["creation_options"]["publicKey"]
+    assert public_key["rp"]["id"] == "testing.example.org"
+    # Passwordless passkeys must be discoverable (resident) credentials.
+    assert public_key["authenticatorSelection"]["residentKey"] == "required"

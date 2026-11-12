@@ -37,7 +37,8 @@ pnpm install
 pnpm dev
 ```
 
-The dev server runs on `http://127.0.0.1:5173`. The CSP is only applied in the production build,
+The dev server runs on `http://127.0.0.1:5173`; open it as `http://localhost:5173` (passkeys reject
+IP addresses, and `FRONTEND_URL` defaults to localhost). The CSP is only applied in the production build,
 because the Vite dev server needs inline scripts.
 
 Production build (as used by the E2E tests):
@@ -51,7 +52,7 @@ HOST=127.0.0.1 PORT=3000 BACKEND_INTERNAL_URL=http://127.0.0.1:8000 pnpm start
 ```
 
 For a production build on another origin, Django must trust it:
-`DJANGO_CSRF_TRUSTED_ORIGINS=http://127.0.0.1:3000`.
+`DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:3000` and `FRONTEND_URL=http://localhost:3000`.
 
 ## Checks
 
@@ -70,6 +71,10 @@ pnpm lint && pnpm typecheck && pnpm test
 - Forms that write carry the CSRF token (`ensureCsrfToken` in the loader, hidden field
   `csrf_token`).
 - No `dangerouslySetInnerHTML` (enforced by ESLint).
+- Security settings answer 401 "reauthenticate" when a fresh password confirmation is due; send the
+  user to `/reauthenticate?next=…` (see `routes/settings-security.tsx`).
+- Passkeys run in the browser (`lib/passkeys.ts`) and talk only to the resource route `/passkeys`,
+  which forwards to allauth; controls render after hydration (`lib/use-hydrated.ts`).
 
 ## Rules for UI
 
