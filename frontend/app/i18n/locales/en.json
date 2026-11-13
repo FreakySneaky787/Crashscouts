@@ -546,7 +546,11 @@
       "removed": "The team removed you from this campaign.",
       "team_member": "You are part of the project team and test as a team member.",
       "not_participant": "You do not take part in this campaign.",
-      "confirmLeave": "Tick the box to confirm that you want to leave."
+      "confirmLeave": "Tick the box to confirm that you want to leave.",
+      "questions_locked": "Questions cannot change after publishing: applicants answer what was published.",
+      "too_many_questions": "A campaign can have at most 10 questions.",
+      "unknown_template": "This template does not exist.",
+      "no_applications": "Only campaigns that take applications have questions."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -678,6 +682,40 @@
       "leaveConfirm": "I want to leave “{{title}}”.",
       "leave": "Leave campaign",
       "left": "You left the campaign."
+    },
+    "questions": {
+      "title": "Application questions",
+      "intro": "People who apply answer these questions. Only your team sees the answers. Questions can change only while the campaign is a draft.",
+      "locked": "The campaign is published, so the questions can no longer change.",
+      "none": "No questions. Applicants can apply without answering anything.",
+      "templates": "Add a template",
+      "custom": "Your own question",
+      "templateNames": {
+        "short_message": "Short message",
+        "device": "Device and operating system",
+        "experience": "Testing experience",
+        "availability": "Availability"
+      },
+      "prompt": "Question",
+      "kind": "Answer type",
+      "kinds": {
+        "short_text": "Short text",
+        "long_text": "Long text",
+        "single_choice": "Single choice",
+        "yes_no": "Yes or no"
+      },
+      "options": "Choices",
+      "optionsHint": "For single choice only: one choice per line, 2 to 10.",
+      "requiredLabel": "Applicants must answer this question",
+      "required": "required",
+      "add": "Add question",
+      "remove": "Remove",
+      "removeNamed": "Remove the question “{{prompt}}”",
+      "errors": {
+        "prompt": "Enter a question (at most 200 characters).",
+        "options": "Give 2 to 10 different choices of at most 100 characters.",
+        "kind": "Choose an answer type."
+      }
     }
   },
   "team": {

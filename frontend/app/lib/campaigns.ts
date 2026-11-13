@@ -257,6 +257,10 @@ export const CAMPAIGN_PROBLEMS = [
   "removed",
   "team_member",
   "not_participant",
+  "questions_locked",
+  "too_many_questions",
+  "unknown_template",
+  "no_applications",
 ] as const;
 export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "generic";
 
@@ -277,4 +281,23 @@ export function canJoinDirectly(campaign: Campaign): boolean {
     !campaign.is_participant &&
     campaign.participant_count < campaign.target_testers
   );
+}
+
+export type QuestionKind = "short_text" | "long_text" | "single_choice" | "yes_no";
+export const QUESTION_KINDS: QuestionKind[] = ["short_text", "long_text", "single_choice", "yes_no"];
+export type ApplicationQuestion = { id: string; prompt: string; kind: QuestionKind; options: string[]; required: boolean };
+export const QUESTION_TEMPLATES = ["short_message", "device", "experience", "availability"] as const;
+
+/** The custom-question form as API payload: options one per line, only for single choice. */
+export function questionPayload(form: FormData) {
+  const raw = String(form.get("kind") ?? "");
+  const kind: QuestionKind = (QUESTION_KINDS as string[]).includes(raw) ? (raw as QuestionKind) : "short_text";
+  const options =
+    kind === "single_choice"
+      ? String(form.get("options") ?? "")
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean)
+      : [];
+  return { prompt: String(form.get("prompt") ?? "").trim(), kind, options, required: form.get("required") === "on" };
 }

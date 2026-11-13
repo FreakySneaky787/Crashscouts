@@ -311,3 +311,46 @@ test("participants leave; the team removes and removed people stay out", async (
   await expect(page.getByRole("alert")).toContainText("This person was removed from the campaign and cannot be invited again.");
   await testerContext.close();
 });
+
+test("the team builds application questions for a campaign with approval", async ({ page, request }) => {
+  await createSignedInAccount(page, request);
+  const project = await createProject(page);
+  await page.goto(`/p/${project}/c/new`);
+  await page.getByLabel("Title").fill("Open beta");
+  await page.getByLabel("Short name").fill("open-beta");
+  await page.getByLabel("Summary").fill("Apply to test the sync engine.");
+  await page.getByLabel("Software version").fill("2.0.0-beta.2");
+  await page.getByLabel("Start").fill("2027-03-01T09:00");
+  await page.getByLabel("End").fill("2027-03-15T18:00");
+  await page.getByLabel("Testers wanted").fill("5");
+  await page.getByLabel("Public", { exact: true }).check();
+  await page.getByLabel("Participation in public campaigns").selectOption("approval");
+  await page.getByRole("button", { name: "Create draft" }).click();
+  await expect(page).toHaveURL(new RegExp(`/p/${project}/c/open-beta$`));
+
+  await page.goto(`/p/${project}/c/open-beta/edit`);
+  const panel = page.getByRole("region", { name: "Application questions" });
+  const list = panel.getByRole("list", { name: "Application questions" });
+  await expect(list).toContainText("Short message to the team"); // default template
+  await panel.getByRole("button", { name: "Device and operating system" }).click();
+  await expect(list).toContainText("Which device and operating system will you test on?");
+
+  await panel.getByLabel("Question", { exact: true }).fill("Which browser do you use?");
+  await panel.getByLabel("Answer type").selectOption("single_choice");
+  await panel.getByLabel("Choices").fill("Firefox\nChrome\nSafari");
+  await panel.getByLabel("Applicants must answer this question").check();
+  await panel.getByRole("button", { name: "Add question" }).click();
+  await expect(list).toContainText("Firefox / Chrome / Safari");
+
+  await panel.getByLabel("Question", { exact: true }).fill("Pick one");
+  await panel.getByLabel("Answer type").selectOption("single_choice");
+  await panel.getByLabel("Choices").fill("Only one");
+  await panel.getByRole("button", { name: "Add question" }).click();
+  await expect(panel.getByText("Give 2 to 10 different choices")).toBeVisible();
+
+  await panel.getByRole("button", { name: "Remove the question “Short message to the team”" }).click();
+  await expect(list).not.toContainText("Short message to the team");
+  await expect(list.getByRole("listitem")).toHaveCount(2);
+  const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+});

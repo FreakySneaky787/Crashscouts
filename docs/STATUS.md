@@ -569,6 +569,22 @@ downloads" works in the real UI already.
   5); 4 mutation checks caught; Vitest **80 passed**; Playwright **71 passed** (1 new: leave with
   confirmation, access ends, re-invitation, removal, removed person cannot be invited, axe).
 
+### WP 3A.4b, part 1 – Metrics foundation and question builder (2026-11-13) ✅
+
+- `Campaign.published_at`, `completed_at`, `cancelled_at`, `published_by` (set on state
+  changes; data migration from the audit log, tested) – the foundation for
+  [`METRICS.md`](METRICS.md).
+- `ApplicationQuestion` (short text, long text, single choice with 2–10 options, yes/no;
+  required flag; at most 10; editable only in drafts of campaigns with approval); four templates,
+  "short message" added automatically; API under `…/questions/`; "Application questions" panel on
+  the edit page.
+- Owner confirmed open question W; new applications are shown on the team's pages instead of
+  emailed.
+- **Verification (run on 2026-11-13):** pytest **407 passed** (16 new); 2 mutation checks
+  caught (questions not frozen, anyone edits); Vitest **80 passed**; Playwright **72 passed**
+  (1 new: default template, template, own choice question, validation, removal, axe).
+- Part 2 (applications) follows.
+
 ## Handover – next session (written 2026-11-13)
 
 **Where we are:** phase 3A, WPs 3A.1, 3A.2, 3A.3, 3A.5 and 3A.4a done and pushed (CI

@@ -9,6 +9,7 @@ import { data, Form, redirect } from "react-router";
 import type { Route } from "./+types/campaign-edit";
 import { CampaignForm } from "~/components/campaigns/CampaignForm";
 import { LinksPanel } from "~/components/campaigns/LinksPanel";
+import { QuestionsPanel } from "~/components/campaigns/QuestionsPanel";
 import { Button } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { CheckCircleIcon, PaperPlaneTiltIcon, TrashIcon, XCircleIcon } from "~/components/ui/icons";
@@ -23,6 +24,8 @@ import {
   campaignPayload,
   campaignProblem,
   linkPayload,
+  questionPayload,
+  type ApplicationQuestion,
   type Campaign,
   type CampaignLink,
 } from "~/lib/campaigns";
@@ -57,9 +60,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (project.data.slug !== params.slug || campaign.data.slug !== params.campaign) {
     throw redirect(`/p/${project.data.slug}/c/${campaign.data.slug}/edit`, { headers: privateNoStoreHeaders() });
   }
-  const [{ platforms, timeZones, csrf }, links] = await Promise.all([
+  const [{ platforms, timeZones, csrf }, links, questions] = await Promise.all([
     loadCampaignFormData(request),
     backendFetch<CampaignLink[]>(request, `${api}links/`),
+    backendFetch<{ questions: ApplicationQuestion[] }>(request, `${api}questions/`),
   ]);
   const done = new URL(request.url).searchParams.get("done");
   return data(
@@ -71,6 +75,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       csrfToken: csrf.token,
       saved: done === "saved",
       links: links.data ?? [],
+      questions: questions.data?.questions ?? [],
       linkDone: done === "link-added" ? ("added" as const) : done === "link-removed" ? ("removed" as const) : null,
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
@@ -92,6 +97,25 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (result.status === 200 && result.data) throw redirect(`/p/${slug}/c/${result.data.slug}`, { headers });
     if (result.status === 404) throw data(null, { status: 404, headers });
     return data({ values: null, errors: {}, problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+  if (intent === "question-add" || intent === "question-template" || intent === "question-remove") {
+    let result;
+    if (intent === "question-add") {
+      result = await backendFetch(request, `${api}questions/`, { method: "POST", csrfToken, json: questionPayload(form) });
+    } else if (intent === "question-template") {
+      const key = String(form.get("template") ?? "");
+      if (!/^[a-z_]{1,40}$/.test(key)) throw data(null, { status: 400, headers });
+      result = await backendFetch(request, `${api}questions/template/${key}/`, { method: "POST", csrfToken });
+    } else {
+      const id = String(form.get("question") ?? "");
+      if (!isUuid(id)) throw data(null, { status: 404, headers });
+      result = await backendFetch(request, `${api}questions/${id}/`, { method: "DELETE", csrfToken });
+    }
+    if (result.status === 201 || result.status === 204) throw redirect(`/p/${slug}/c/${params.campaign}/edit?done=questions`, { headers });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    const body = result.data as Record<string, unknown> | null;
+    const questionErrors = body && typeof body.code === "string" ? { code: body.code } : projectErrorCodes(body);
+    return data({ values: null, errors: {}, problem: null, questionErrors }, { status: 400, headers });
   }
   if (intent === "link-add") {
     const linkValues = linkPayload(form);
@@ -198,6 +222,15 @@ export default function CampaignEdit({ loaderData, actionData }: Route.Component
           editableAccess={draft}
         />
       )}
+
+      {campaign.participation === "approval" ? (
+        <QuestionsPanel
+          questions={loaderData.questions}
+          csrfToken={csrfToken}
+          editable={draft}
+          errors={actionData && "questionErrors" in actionData ? actionData.questionErrors : {}}
+        />
+      ) : null}
 
       <LinksPanel
         links={loaderData.links}

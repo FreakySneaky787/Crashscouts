@@ -5,6 +5,7 @@ import {
   campaignProblem,
   campaignStatusStyleKey,
   canJoinDirectly,
+  questionPayload,
   groupedChecksum,
   linkPayload,
   formatInZone,
@@ -150,5 +151,23 @@ describe("canJoinDirectly", () => {
     expect(canJoinDirectly({ ...base, state: "completed" })).toBe(false);
     expect(canJoinDirectly({ ...base, can_edit: true })).toBe(false); // the team
     expect(canJoinDirectly({ ...base, is_participant: true })).toBe(false);
+  });
+});
+
+describe("questionPayload", () => {
+  const form = (entries: Record<string, string>) => {
+    const data = new FormData();
+    for (const [k, v] of Object.entries(entries)) data.set(k, v);
+    return data;
+  };
+  it("splits options by line for single choice only", () => {
+    expect(questionPayload(form({ prompt: " Browser? ", kind: "single_choice", options: "Firefox\r\n\n Chrome \n", required: "on" }))).toEqual({
+      prompt: "Browser?",
+      kind: "single_choice",
+      options: ["Firefox", "Chrome"],
+      required: true,
+    });
+    expect(questionPayload(form({ prompt: "Notes", kind: "long_text", options: "stray" })).options).toEqual([]);
+    expect(questionPayload(form({ prompt: "x", kind: "essay" })).kind).toBe("short_text");
   });
 });

@@ -65,6 +65,18 @@ class Campaign(BaseModel):
         max_length=12, choices=Participation.choices, default=Participation.INVITATION
     )
     state = models.CharField(max_length=12, choices=State.choices, default=State.DRAFT)
+    # When the team changed the state, and who published (metrics, docs/METRICS.md).
+    published_at = models.DateTimeField(null=True, blank=True, editable=False)
+    completed_at = models.DateTimeField(null=True, blank=True, editable=False)
+    cancelled_at = models.DateTimeField(null=True, blank=True, editable=False)
+    published_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        editable=False,
+    )
 
     class Meta:
         ordering = ["-starts_at", "title"]
@@ -191,3 +203,30 @@ class Participation(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.user} in {self.campaign} ({self.status})"
+
+
+class ApplicationQuestion(BaseModel):
+    """A question applicants answer (WP 3A.4b; owner's decision: per-campaign questions with
+    templates). Editable only while the campaign is a draft."""
+
+    MAX_PER_CAMPAIGN = 10
+    MAX_OPTIONS = 10
+
+    class Kind(models.TextChoices):
+        SHORT_TEXT = "short_text", "Short text"
+        LONG_TEXT = "long_text", "Long text"
+        SINGLE_CHOICE = "single_choice", "Single choice"
+        YES_NO = "yes_no", "Yes or no"
+
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="questions")
+    prompt = models.CharField(max_length=200)
+    kind = models.CharField(max_length=16, choices=Kind.choices)
+    options = models.JSONField(default=list, blank=True)  # single_choice only
+    required = models.BooleanField(default=False)
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.campaign}: {self.prompt}"

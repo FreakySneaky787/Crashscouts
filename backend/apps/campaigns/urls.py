@@ -9,6 +9,7 @@ from .invitation_views import (
 )
 from .link_views import CampaignLinksView, CampaignLinkView
 from .participation_views import JoinView, LeaveView, ParticipantRemoveView
+from .question_views import QuestionsView, QuestionTemplateView, QuestionView
 from .views import CampaignDetailView, CampaignListView, CampaignStateView
 
 urlpatterns = [
@@ -37,6 +38,21 @@ urlpatterns = [
         "projects/<str:slug>/campaigns/<str:campaign_slug>/invitations/<uuid:invitation_id>/",
         CampaignInvitationRevokeView.as_view(),
         name="campaign-invitation-revoke",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/questions/",
+        QuestionsView.as_view(),
+        name="campaign-questions",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/questions/template/<str:key>/",
+        QuestionTemplateView.as_view(),
+        name="campaign-question-template",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/questions/<uuid:question_id>/",
+        QuestionView.as_view(),
+        name="campaign-question",
     ),
     path(
         "projects/<str:slug>/campaigns/<str:campaign_slug>/join/",

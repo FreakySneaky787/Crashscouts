@@ -6,7 +6,7 @@ from apps.catalog.models import Platform
 from apps.catalog.serializers import CatalogItemSerializer
 
 from . import status
-from .models import MAX_TARGET_TESTERS, Campaign, CampaignSlugHistory
+from .models import MAX_TARGET_TESTERS, ApplicationQuestion, Campaign, CampaignSlugHistory
 from .policies import is_participant, is_team
 from .selectors import participant_count
 from .validators import (
@@ -202,3 +202,36 @@ class CampaignLinkWriteSerializer(serializers.Serializer):
             return normalize_sha256(value)
         except DjangoValidationError as exc:
             raise serializers.ValidationError(exc.messages[0], code="invalid_sha256") from None
+
+
+class ApplicationQuestionSerializer(serializers.Serializer):
+    id = serializers.UUIDField(read_only=True)
+    prompt = serializers.CharField(max_length=200)
+    kind = serializers.ChoiceField(choices=ApplicationQuestion.Kind.choices)
+    options = serializers.ListField(
+        child=serializers.CharField(max_length=100),
+        max_length=ApplicationQuestion.MAX_OPTIONS,
+        required=False,
+    )
+    required = serializers.BooleanField(required=False)
+
+    def validate_prompt(self, value: str) -> str:
+        return value.strip()
+
+    def validate_options(self, value: list[str]) -> list[str]:
+        cleaned = [option.strip() for option in value if option.strip()]
+        if len(set(cleaned)) != len(cleaned):
+            raise serializers.ValidationError("Options must differ.", code="duplicate_options")
+        return cleaned
+
+    def validate(self, attrs: dict) -> dict:
+        kind = attrs.get("kind", getattr(self.instance, "kind", None))
+        options = attrs.get("options", getattr(self.instance, "options", []))
+        if kind == ApplicationQuestion.Kind.SINGLE_CHOICE:
+            if len(options) < 2:
+                raise serializers.ValidationError(
+                    {"options": "Give at least two options."}, code="too_few_options"
+                )
+        else:
+            attrs["options"] = []  # only choice questions have options
+        return attrs

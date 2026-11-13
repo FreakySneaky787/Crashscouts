@@ -13,7 +13,6 @@
 | H | Who moderates initially? | phase 3B | the project owner only |
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
-| W | Invitation rules set provisionally in WP 3A.5 (conservative): the whole project team invites; only published, running private campaigns; invitations expire after 14 days; at most 100 open per campaign; 50 per day and person; removed participants cannot be invited again. Added in WP 3A.4a: joining directly needs a confirmed email; team members do not join their own campaigns; removal is final for that campaign; the removal email has no reason text | confirm with the owner | keep as is |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
@@ -35,6 +34,8 @@
 | – | Growth metrics | **Five metrics** (Time to First Tester, Campaign Completion Rate, Useful Feedback Rate, Returning Testers, Returning Developers), defined in [`METRICS.md`](METRICS.md). **Own data only** (no tracking cookies, no third-party analytics), **internal** for platform admins, aggregates only. First tester = first participation of any kind; useful feedback = every feedback not marked Duplicate, Cannot Reproduce or Rejected. Data foundation now (WP 3A.4b), statistics page after phase 5 (2026-11-13). |
 | – | Application answers | Visible to the team only; deleted at once on rejection, leaving or removal, otherwise **30 days after the campaign is completed or cancelled** (2026-11-13). |
 | – | Applications when a campaign is full | **Stay open**; the team approves only when a place is free; no new applications while full; applicants may withdraw at any time (2026-11-13). |
+| W | Invitation and participation rules | **Confirmed by the owner (2026-11-13):** the whole project team invites; only published, running private campaigns; invitations expire after 14 days; at most 100 open per campaign; 50 per day and person; removed participants cannot be invited again. Added in WP 3A.4a: joining directly needs a confirmed email; team members do not join their own campaigns; removal is final for that campaign; the removal email has no reason text. |
+| – | New applications | **No email per application**; the team sees "X open applications" on its pages; applicants get an email on approval or rejection (2026-11-13). |
 | V | Team rules | **Confirmed by the owner (2026-11-13):** only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day. |
 | – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |
 | – | Who may create projects | **Every account with a confirmed email address**, with a daily limit; abuse is handled by reporting and blocking (phase 3B). |

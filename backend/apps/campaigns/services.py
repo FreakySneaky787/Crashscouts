@@ -1,6 +1,7 @@
 """Writes for campaigns. Views stay thin; permissions are checked by the caller (policies)."""
 
 from django.db import transaction
+from django.utils import timezone
 
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
@@ -29,6 +30,9 @@ def create_campaign(user, project: Project, **fields) -> Campaign:
     platforms = fields.pop("platforms", [])
     campaign = Campaign.objects.create(project=project, **fields)
     campaign.platforms.set(platforms)
+    from .questions import ensure_default_question  # avoid an import cycle
+
+    ensure_default_question(campaign)
     record(
         AuditEvent.Kind.CAMPAIGN_CREATED,
         actor=user,
@@ -54,6 +58,10 @@ def update_campaign(user, campaign: Campaign, **fields) -> Campaign:
     campaign.save()
     if platforms is not None:
         campaign.platforms.set(platforms)
+    if "participation" in fields:
+        from .questions import ensure_default_question
+
+        ensure_default_question(campaign)
     _rename(campaign, new_slug)
     return campaign
 
@@ -88,7 +96,18 @@ def change_state(user, campaign: Campaign, new_state: str) -> Campaign:
         if campaign.project.visibility != Project.Visibility.PUBLIC:
             raise CampaignError("project_not_public")
     campaign.state = new_state
-    campaign.save(update_fields=["state", "updated_at"])
+    now = timezone.now()
+    fields = ["state", "updated_at"]
+    if new_state == status.PUBLISHED:
+        campaign.published_at, campaign.published_by = now, user
+        fields += ["published_at", "published_by"]
+    elif new_state == status.COMPLETED:
+        campaign.completed_at = now
+        fields.append("completed_at")
+    elif new_state == status.CANCELLED:
+        campaign.cancelled_at = now
+        fields.append("cancelled_at")
+    campaign.save(update_fields=fields)
     record(
         AUDIT_KINDS[new_state],
         actor=user,

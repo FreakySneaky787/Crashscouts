@@ -75,9 +75,10 @@ unless stated otherwise. Only published campaigns count; drafts never.
 
 ## Data foundation and implementation
 
-- **WP 3A.4b:** `Campaign.published_at`, `completed_at`, `cancelled_at` and `published_by`
-  (`SET_NULL`), set when the state changes; a migration fills them for existing campaigns from
-  the audit events.
+- **WP 3A.4b (✅ implemented):** `Campaign.published_at`, `completed_at`, `cancelled_at` and
+  `published_by` (`SET_NULL`), set in `services.change_state`; migration
+  `campaigns/0006_backfill_state_timestamps` fills them for existing campaigns from the audit
+  events (tested).
 - **Phase 5:** feedback with status (needed for metric 3).
 - **WP M.1 (after phase 5):** internal statistics page for platform admins, computed with
   aggregate database queries; tests with fixed example data per metric.
