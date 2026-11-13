@@ -3,11 +3,11 @@
  * sees open invitations (revocable) and current participants. 404 outside the team.
  */
 import { useTranslation } from "react-i18next";
-import { data, Form, redirect } from "react-router";
+import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign-testers";
 import { Button } from "~/components/ui/Button";
-import { TextField } from "~/components/ui/Form";
+import { CheckboxField, TextField } from "~/components/ui/Form";
 import { UserPlusIcon, XIcon } from "~/components/ui/icons";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -23,10 +23,14 @@ import styles from "./forms.module.css";
 
 type Testers = {
   invitations: { id: string; username: string; invited_by: string | null; expires_at: string }[];
-  participants: { username: string; joined_at: string }[];
+  participants: {
+    username: string;
+    joined_at: string;
+    profile: { platforms?: { slug: string; name: string }[]; skills?: { slug: string; name: string }[] };
+  }[];
 };
 
-const RESULTS = ["invited", "revoked"] as const;
+const RESULTS = ["invited", "revoked", "removed"] as const;
 const PROBLEMS = [
   "user_not_found",
   "already_team",
@@ -36,6 +40,8 @@ const PROBLEMS = [
   "too_many_invitations",
   "not_private",
   "not_published",
+  "not_participant",
+  "confirmRemove",
   "rateLimited",
   "generic",
 ] as const;
@@ -98,6 +104,12 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (!isUuid(id)) throw data(null, { status: 404 });
     result = await backendFetch(request, `${api}invitations/${id}/`, { method: "DELETE", csrfToken });
     success = "revoked";
+  } else if (intent === "remove") {
+    const username = String(form.get("username") ?? "").trim().toLowerCase();
+    if (!isValidUsername(username)) throw data(null, { status: 404 });
+    if (form.get("confirm") !== "on") return data({ problem: "confirmRemove" as Problem }, { status: 400, headers });
+    result = await backendFetch(request, `${api}participants/${username}/`, { method: "DELETE", csrfToken });
+    success = "removed";
   } else {
     throw data(null, { status: 400 });
   }
@@ -130,11 +142,26 @@ export default function CampaignTesters({ loaderData, actionData }: Route.Compon
       <Panel title={t("campaigns.testers.participants")} aside={t("campaigns.placesValue", { count: testers.participants.length, total: campaign.target_testers })}>
         {testers.participants.length ? (
           <ul className={styles.plainList} aria-label={t("campaigns.testers.participants")}>
-            {testers.participants.map((p) => (
-              <li key={p.username} className={styles.listRow}>
-                <span>{p.username}</span>
-              </li>
-            ))}
+            {testers.participants.map((p) => {
+              const details = [...(p.profile.platforms ?? []), ...(p.profile.skills ?? [])].map((i) => i.name);
+              return (
+                <li key={p.username} className={styles.listRow}>
+                  <span className={styles.stackTight}>
+                    <Link to={`/u/${p.username}`}>{p.username}</Link>
+                    <span className={styles.muted}>{details.length ? details.join(" · ") : t("campaigns.testers.noDetails")}</span>
+                  </span>
+                  <Form method="post" className={styles.buttonRow}>
+                    <input type="hidden" name="csrf_token" value={csrfToken} />
+                    <input type="hidden" name="intent" value="remove" />
+                    <input type="hidden" name="username" value={p.username} />
+                    <CheckboxField id={`confirm-remove-${p.username}`} name="confirm" label={t("campaigns.testers.removeConfirm", { username: p.username })} />
+                    <Button type="submit" size="sm" variant="danger" icon={XIcon}>
+                      {t("campaigns.testers.remove")}
+                    </Button>
+                  </Form>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className={styles.muted}>{t("campaigns.testers.noParticipants")}</p>

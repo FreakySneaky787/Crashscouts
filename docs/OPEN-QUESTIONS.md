@@ -13,7 +13,7 @@
 | H | Who moderates initially? | phase 3B | the project owner only |
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
-| W | Invitation rules set provisionally in WP 3A.5 (conservative): the whole project team invites; only published, running private campaigns; invitations expire after 14 days; at most 100 open per campaign; 50 per day and person; removed participants cannot be invited again | confirm with the owner | keep as is |
+| W | Invitation rules set provisionally in WP 3A.5 (conservative): the whole project team invites; only published, running private campaigns; invitations expire after 14 days; at most 100 open per campaign; 50 per day and person; removed participants cannot be invited again. Added in WP 3A.4a: joining directly needs a confirmed email; team members do not join their own campaigns; removal is final for that campaign; the removal email has no reason text | confirm with the owner | keep as is |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 

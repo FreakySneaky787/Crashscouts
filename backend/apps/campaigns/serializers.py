@@ -7,7 +7,7 @@ from apps.catalog.serializers import CatalogItemSerializer
 
 from . import status
 from .models import MAX_TARGET_TESTERS, Campaign, CampaignSlugHistory
-from .policies import is_team
+from .policies import is_participant, is_team
 from .selectors import participant_count
 from .validators import (
     normalize_sha256,
@@ -25,6 +25,7 @@ class CampaignSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     participant_count = serializers.SerializerMethodField()
     can_edit = serializers.SerializerMethodField()
+    is_participant = serializers.SerializerMethodField()
 
     class Meta:
         model = Campaign
@@ -50,6 +51,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             "status",
             "participant_count",
             "can_edit",
+            "is_participant",
             "created_at",
             "updated_at",
         )
@@ -68,6 +70,10 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     def get_can_edit(self, campaign) -> bool:
         return is_team(self.context["request"].user, campaign)
+
+    def get_is_participant(self, campaign) -> bool:
+        """The viewer's own participation only; never who else takes part."""
+        return is_participant(self.context["request"].user, campaign)
 
 
 class CampaignWriteSerializer(serializers.ModelSerializer):

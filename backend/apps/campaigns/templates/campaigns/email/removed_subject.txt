@@ -1,0 +1,1 @@
+{% autoescape off %}You no longer take part in {{ campaign_title }}{% endautoescape %}

@@ -3,12 +3,13 @@
  * exist only for those allowed to see them (404 for everyone else). Former short names redirect.
  */
 import { useTranslation } from "react-i18next";
-import { data, Link, redirect } from "react-router";
+import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign";
-import { ButtonLink } from "~/components/ui/Button";
+import { Button, ButtonLink } from "~/components/ui/Button";
+import { CheckboxField } from "~/components/ui/Form";
 import { Chips, FactList, RowList } from "~/components/ui/Data";
-import { DownloadSimpleIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
+import { DownloadSimpleIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, SignInIcon, SignOutIcon, UserPlusIcon, UsersIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -16,9 +17,9 @@ import { Panel } from "~/components/ui/Panel";
 import { StatusPill } from "~/components/ui/StatusPill";
 import { CAMPAIGN_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
-import { backendFetch } from "~/lib/backend.server";
-import { campaignStatusStyleKey, formatInZone, type Campaign, type CampaignLink } from "~/lib/campaigns";
-import { cacheHeadersFor, privateNoStoreHeaders } from "~/lib/http";
+import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
+import { campaignProblem, campaignStatusStyleKey, canJoinDirectly, formatInZone, type Campaign, type CampaignLink } from "~/lib/campaigns";
+import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -54,17 +55,50 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
   const downloadLinks = links.status === 200 ? (links.data ?? []) : null;
   const isPublic = campaign.visibility === "public" && project.data.visibility === "public" && !campaign.can_edit && downloadLinks === null;
-  const headers = isPublic ? cacheHeadersFor(request) : privateNoStoreHeaders();
-  return data({ campaign, project: { slug: project.data.slug, name: project.data.name }, links: downloadLinks }, { headers });
+  // Signed-in visitors get a CSRF token for "Join"/"Leave"; anonymous public pages set no cookies.
+  const signedIn = Boolean(await getSessionUser(request));
+  const csrf = signedIn ? await ensureCsrfToken(request) : null;
+  const headers = csrf ? setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) : isPublic ? cacheHeadersFor(request) : privateNoStoreHeaders();
+  const joined = new URL(request.url).searchParams.get("joined") === "1";
+  return data(
+    { campaign, project: { slug: project.data.slug, name: project.data.name }, links: downloadLinks, signedIn, csrfToken: csrf?.token ?? null, joined },
+    { headers },
+  );
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+  const slug = params.slug?.toLowerCase();
+  const campaignSlug = params.campaign?.toLowerCase();
+  if (!isValidProjectSlug(slug) || !isValidProjectSlug(campaignSlug)) throw data(null, { status: 404 });
+  const form = await request.formData();
+  const intent = String(form.get("intent") ?? "");
+  const csrfToken = String(form.get("csrf_token") ?? "");
+  const headers = privateNoStoreHeaders();
+  const api = `/api/v1/projects/${slug}/campaigns/${campaignSlug}/`;
+  if (intent === "join") {
+    const result = await backendFetch(request, `${api}join/`, { method: "POST", csrfToken });
+    if (result.status === 200) throw redirect(`/p/${slug}/c/${campaignSlug}?joined=1`, { headers });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    return data({ problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+  if (intent === "leave") {
+    if (form.get("confirm") !== "on") return data({ problem: "confirmLeave" as const }, { status: 400, headers });
+    const result = await backendFetch(request, `${api}leave/`, { method: "POST", csrfToken });
+    // Private campaigns are out of reach after leaving: continue on the account page.
+    if (result.status === 204) throw redirect("/account?participation=left", { headers });
+    return data({ problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+  throw data(null, { status: 400, headers });
 }
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
 }
 
-export default function CampaignPage({ loaderData }: Route.ComponentProps) {
+export default function CampaignPage({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { campaign, project, links } = loaderData;
+  const { campaign, project, links, signedIn, csrfToken } = loaderData;
+  const problem = actionData?.problem ?? null;
   const style = CAMPAIGN_STATUS[campaignStatusStyleKey(campaign.status)];
   const zone = campaign.timezone;
   const sections = [
@@ -99,6 +133,44 @@ export default function CampaignPage({ loaderData }: Route.ComponentProps) {
           ) : null
         }
       />
+      {loaderData.joined ? <Notice tone="ok" title={t("campaigns.join.joined")} /> : null}
+      {problem ? <Notice tone="danger" title={t(`campaigns.problem.${problem}`)} /> : null}
+      {campaign.is_participant ? (
+        <Panel title={t("campaigns.join.participatingTitle")}>
+          <Form method="post" className={styles.form}>
+            <p>{t("campaigns.join.participatingText")}</p>
+            <input type="hidden" name="csrf_token" value={csrfToken ?? ""} />
+            <input type="hidden" name="intent" value="leave" />
+            <CheckboxField id="confirm-leave" name="confirm" label={t("campaigns.join.leaveConfirm", { title: campaign.title })} />
+            <div>
+              <Button type="submit" variant="secondary" icon={SignOutIcon}>
+                {t("campaigns.join.leave")}
+              </Button>
+            </div>
+          </Form>
+        </Panel>
+      ) : canJoinDirectly(campaign) ? (
+        <Panel title={t("campaigns.join.title")}>
+          <div className={styles.stack}>
+            <p>{t("campaigns.join.text")}</p>
+            {signedIn ? (
+              <Form method="post">
+                <input type="hidden" name="csrf_token" value={csrfToken ?? ""} />
+                <input type="hidden" name="intent" value="join" />
+                <Button type="submit" variant="primary" icon={UserPlusIcon}>
+                  {t("campaigns.join.join")}
+                </Button>
+              </Form>
+            ) : (
+              <div>
+                <ButtonLink to={`/login?next=${encodeURIComponent(`/p/${project.slug}/c/${campaign.slug}`)}`} variant="primary" icon={SignInIcon}>
+                  {t("campaigns.join.signIn")}
+                </ButtonLink>
+              </div>
+            )}
+          </div>
+        </Panel>
+      ) : null}
       {campaign.can_edit && campaign.state === "draft" ? (
         <Notice tone="info" title={t("campaigns.draftNotice")}>
           {campaign.visibility === "public" ? t("campaigns.publicLockedNotice") : null}

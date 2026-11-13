@@ -36,6 +36,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
+  const participationLeft = params.get("participation") === "left";
   const campaignAnswer = params.get("campaign_invitation");
   const campaignInvitationResult: "joined" | "declined" | "full" | "closed" | "gone" | null =
     campaignAnswer === "joined" || campaignAnswer === "declined" || campaignAnswer === "full" || campaignAnswer === "closed" || campaignAnswer === "gone"
@@ -59,6 +60,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       campaignInvitations: campaignInvitations.data ?? [],
       participations: participations.data ?? [],
       campaignInvitationResult,
+      participationLeft,
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -82,6 +84,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
       {loaderData.invitationResult ? (
         <Notice tone={loaderData.invitationResult === "gone" ? "danger" : "ok"} title={t(`invitations.${loaderData.invitationResult}`)} />
       ) : null}
+      {loaderData.participationLeft ? <Notice tone="ok" title={t("campaigns.join.left")} /> : null}
       {loaderData.campaignInvitationResult ? (
         <Notice
           tone={["joined", "declined"].includes(loaderData.campaignInvitationResult) ? "ok" : "danger"}

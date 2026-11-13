@@ -4,6 +4,7 @@ import {
   campaignPayload,
   campaignProblem,
   campaignStatusStyleKey,
+  canJoinDirectly,
   groupedChecksum,
   linkPayload,
   formatInZone,
@@ -127,5 +128,27 @@ describe("links", () => {
     expect(linkPayload(form)).toEqual({ label: "AppImage", url: "https://downloads.example.org/app", platform: null, sha256: "ABC" });
     expect(groupedChecksum("a".repeat(16) + "b".repeat(4))).toBe("aaaaaaaa aaaaaaaa bbbb");
     expect(groupedChecksum("")).toBe("");
+  });
+});
+
+describe("canJoinDirectly", () => {
+  const base = {
+    visibility: "public",
+    participation: "direct",
+    state: "published",
+    can_edit: false,
+    is_participant: false,
+    participant_count: 1,
+    target_testers: 2,
+  } as Parameters<typeof canJoinDirectly>[0];
+
+  it("offers joining only for open public campaigns with direct participation", () => {
+    expect(canJoinDirectly(base)).toBe(true);
+    expect(canJoinDirectly({ ...base, participant_count: 2 })).toBe(false); // full
+    expect(canJoinDirectly({ ...base, participation: "approval" })).toBe(false);
+    expect(canJoinDirectly({ ...base, visibility: "private", participation: "invitation" })).toBe(false);
+    expect(canJoinDirectly({ ...base, state: "completed" })).toBe(false);
+    expect(canJoinDirectly({ ...base, can_edit: true })).toBe(false); // the team
+    expect(canJoinDirectly({ ...base, is_participant: true })).toBe(false);
   });
 });

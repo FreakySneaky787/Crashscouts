@@ -539,7 +539,14 @@
       "confirmDelete": "Tick the box to confirm the deletion.",
       "confirmCancel": "Tick the box to confirm the cancellation.",
       "generic": "Something went wrong. Please try again.",
-      "too_many_links": "A campaign can have at most 10 download links. Remove one first."
+      "too_many_links": "A campaign can have at most 10 download links. Remove one first.",
+      "not_direct": "This campaign does not take participants directly.",
+      "campaign_full": "The campaign is full.",
+      "already_participant": "You already take part.",
+      "removed": "The team removed you from this campaign.",
+      "team_member": "You are part of the project team and test as a team member.",
+      "not_participant": "You do not take part in this campaign.",
+      "confirmLeave": "Tick the box to confirm that you want to leave."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -625,7 +632,8 @@
       "publicNoInvites": "Public campaigns take part directly or after approval; invitations are for private campaigns.",
       "done": {
         "invited": "The invitation was sent.",
-        "revoked": "The invitation was revoked."
+        "revoked": "The invitation was revoked.",
+        "removed": "The participant was removed."
       },
       "problem": {
         "user_not_found": "There is no account with this username, or it cannot be invited yet.",
@@ -637,8 +645,13 @@
         "not_private": "Invitations are for private campaigns.",
         "not_published": "Only published, running campaigns take invitations.",
         "rateLimited": "You sent many invitations today. Try again tomorrow.",
-        "generic": "Something went wrong. Please try again."
-      }
+        "generic": "Something went wrong. Please try again.",
+        "not_participant": "This person no longer takes part.",
+        "confirmRemove": "Tick the box to confirm the removal."
+      },
+      "noDetails": "No public profile details.",
+      "remove": "Remove",
+      "removeConfirm": "Remove {{username}}; they cannot come back"
     },
     "invitations": {
       "title": "Campaign invitations",
@@ -653,6 +666,18 @@
         "closed": "The campaign has ended.",
         "gone": "This invitation is no longer valid."
       }
+    },
+    "join": {
+      "title": "Take part",
+      "text": "Join this campaign to get the downloads and test the new version.",
+      "join": "Join campaign",
+      "signIn": "Sign in to take part",
+      "joined": "You take part in this campaign now.",
+      "participatingTitle": "You take part",
+      "participatingText": "You can leave at any time. Your place becomes free for someone else.",
+      "leaveConfirm": "I want to leave “{{title}}”.",
+      "leave": "Leave campaign",
+      "left": "You left the campaign."
     }
   },
   "team": {

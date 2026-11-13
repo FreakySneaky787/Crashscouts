@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The team of the project "{{ project_name }}" removed you from the test campaign "{{ campaign_title }}". You no longer have access to its downloads.
+
+Your other campaigns are listed on your account page: {{ account_url }}{% endautoescape %}{% endblock content %}

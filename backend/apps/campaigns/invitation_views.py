@@ -12,6 +12,9 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.profiles.models import Profile
+from apps.profiles.serializers import PublicProfileSerializer
+
 from .invitations import (
     accept,
     decline,
@@ -43,8 +46,15 @@ class CampaignInvitationSerializer(serializers.Serializer):
 
 
 class ParticipantSerializer(serializers.Serializer):
+    """For the team only: username, joining date and what the person made public."""
+
     username = serializers.CharField(source="user.username")
     joined_at = serializers.DateTimeField(source="created_at")
+    profile = serializers.SerializerMethodField()
+
+    def get_profile(self, participation) -> dict:
+        profile, _ = Profile.objects.get_or_create(user=participation.user)
+        return PublicProfileSerializer(profile).data
 
 
 class CampaignInvitationsView(APIView):
@@ -69,7 +79,7 @@ class CampaignInvitationsView(APIView):
         campaign = _team_campaign(request, slug, campaign_slug)
         participants = (
             Participation.objects.filter(campaign=campaign, status=Participation.Status.ACTIVE)
-            .select_related("user")
+            .select_related("user__profile")
             .order_by("created_at")
         )
         return Response(

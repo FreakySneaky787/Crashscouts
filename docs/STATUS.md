@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.5) · **Current phase:** 3A – Campaigns
+**Last update:** 2026-11-13 (WP 3A.4a) · **Current phase:** 3A – Campaigns
 
 ## Work packages
 
@@ -548,21 +548,34 @@ downloads" works in the real UI already.
 - **Not covered by an automated test:** truly concurrent accepts (the row lock is in place; a
   threaded test against PostgreSQL can be added in WP 3A.4a together with direct joining).
 
+### WP 3A.4a – Joining, leaving, removal (2026-11-13) ✅
+
+- `apps/campaigns/participation.py`: `activate` (shared by direct joining and accepting
+  invitations; row lock, hard limit, removed people stay out), `join` (public campaigns with
+  direct participation, confirmed email, not for the team), `leave`, `remove` (team; revokes open
+  invitations; email after commit). Audit `campaign.participant_left/removed`.
+- API: `…/join/`, `…/leave/`, `…/participants/<username>/` (DELETE, team); campaign data has
+  `is_participant` (the viewer's own); the team's tester list includes each participant's public
+  profile details.
+- Frontend: "Take part" panel on the campaign page (join for public direct campaigns – usable
+  once public campaigns are unlocked; leave with confirmation), participants with profile details
+  and removal with confirmation on the testers page, account notice after leaving.
+- **Provisional rules (added to open question W):** joining directly needs a confirmed email;
+  team members do not join their own campaigns; removal is final for that campaign; the removal
+  email carries no reason text.
+- **Verification (run on 2026-11-13):** pytest **391 passed** (14 new, including a
+  **threaded concurrency test** against PostgreSQL: 5 simultaneous joins for 2 places end with
+  exactly 2 participants; with the row lock removed it failed 3 of 3 runs, with it it passed 5 of
+  5); 4 mutation checks caught; Vitest **80 passed**; Playwright **71 passed** (1 new: leave with
+  confirmation, access ends, re-invitation, removal, removed person cannot be invited, axe).
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A, WPs 3A.1, 3A.2, 3A.3 and 3A.5 done and pushed (CI green). Order
-agreed with the owner: next **3A.4a**, then **3A.4b**, then **3A.6**.
+**Where we are:** phase 3A, WPs 3A.1, 3A.2, 3A.3, 3A.5 and 3A.4a done and pushed (CI
+green). Next **3A.4b**, then **3A.6**.
 
-- **3A.4a – direct participation, leaving, removal:**
-  - Join directly (public campaigns with `participation=direct`), reusing the row-lock pattern of
-    `apps/campaigns/invitations.py::accept`.
-  - Leaving frees the place (`Participation.Status.LEFT`); removal by the team
-    (`REMOVED`, blocks re-joining and re-inviting).
-  - Team sees participants with the profile details they made visible (decision: everyone else
-    only the count).
-  - Emails (join/removal) and account notices; a concurrency test for the hard limit.
-  - Public campaigns stay locked: test with `PUBLIC_CAMPAIGNS_ENABLED=True` in pytest only.
-- **3A.4b – applications:** per-campaign question builder (short text, long text, single choice,
+- **3A.4b – applications:** joining after approval must go through `participation.activate`
+  when the team approves (same lock and limit); per-campaign question builder (short text, long text, single choice,
   yes/no; at most 10; required or optional; templates, default "short message, optional");
   apply, approve, reject (answers deleted on rejection; no re-application).
 - **3A.6 – wrap-up:** data export and deletion for participations, invitations and answers

@@ -45,7 +45,14 @@ phase 3A round):
    name, and pages show the times in that zone. The backend validates the zone against the IANA
    database of the `tzdata` package (2026.6, Apache-2.0, Python Software Foundation), a direct
    dependency so the list does not depend on the server's operating system.
-8. Creating needs a confirmed email address and is limited to 20 campaigns per day and person.
+8. **Taking part** (WPs 3A.4a and 3A.5): one `Participation` per person and campaign (`active`,
+   `left`, `removed`). Every way in (direct joining, accepting an invitation) runs through
+   `participation.activate`, which locks the campaign row (`SELECT … FOR UPDATE`) before counting,
+   so concurrent joins never exceed the limit (verified by a threaded test against PostgreSQL that
+   fails without the lock). Leaving frees the place; removal by the team is final for that
+   campaign (no rejoining, no new invitation, open invitations revoked). The team sees
+   participants with their public profile details only; everyone else sees only the number.
+9. Creating needs a confirmed email address and is limited to 20 campaigns per day and person.
    State changes are audited (`campaign.created/published/completed/cancelled/deleted`).
 
 ## Alternatives

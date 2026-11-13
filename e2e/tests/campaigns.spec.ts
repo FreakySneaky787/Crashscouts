@@ -263,3 +263,51 @@ test("invite to a private campaign, accept, then see the downloads", async ({ pa
   expect(results.violations.map((v) => v.id)).toEqual([]);
   await testerContext.close();
 });
+
+test("participants leave; the team removes and removed people stay out", async ({ page, request, browser }) => {
+  await createSignedInAccount(page, request);
+  const project = await createProject(page);
+  await createCampaign(page, project);
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/beta-1$`));
+
+  const testerContext = await browser.newContext();
+  const tester = await testerContext.newPage();
+  const account = await createSignedInAccount(tester, request);
+  const inviteAndAccept = async () => {
+    await page.goto(`/p/${project}/c/beta-1/testers`);
+    await page.getByLabel("Username").fill(account.username);
+    await page.getByRole("button", { name: "Invite" }).click();
+    await expect(page.getByText("The invitation was sent.")).toBeVisible();
+    await tester.goto("/account");
+    await tester.getByRole("button", { name: "Accept the invitation to Beta 1" }).click();
+    await expect(tester.getByText("You take part in the campaign now.")).toBeVisible();
+  };
+
+  await inviteAndAccept();
+  await tester.goto(`/p/${project}/c/beta-1`);
+  await tester.getByRole("button", { name: "Leave campaign" }).click();
+  await expect(tester.getByRole("alert")).toContainText("Tick the box to confirm that you want to leave.");
+  await tester.getByLabel(/I want to leave/).check();
+  await tester.getByRole("button", { name: "Leave campaign" }).click();
+  await expect(tester).toHaveURL(/\/account\?participation=left$/);
+  await expect(tester.getByText("You left the campaign.")).toBeVisible();
+  expect((await tester.goto(`/p/${project}/c/beta-1`))?.status()).toBe(404); // private: access ends
+
+  await inviteAndAccept(); // a new invitation brings them back
+  await page.goto(`/p/${project}/c/beta-1/testers`);
+  const participants = page.getByRole("list", { name: "Participants" });
+  await expect(participants.getByRole("link", { name: account.username })).toBeVisible();
+  const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+  await participants.getByLabel(new RegExp(`Remove ${account.username}`)).check();
+  await participants.getByRole("button", { name: "Remove" }).click();
+  await expect(page.getByText("The participant was removed.")).toBeVisible();
+  expect((await tester.goto(`/p/${project}/c/beta-1`))?.status()).toBe(404);
+
+  await page.getByLabel("Username").fill(account.username);
+  await page.getByRole("button", { name: "Invite" }).click();
+  await expect(page.getByRole("alert")).toContainText("This person was removed from the campaign and cannot be invited again.");
+  await testerContext.close();
+});

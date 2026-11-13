@@ -28,6 +28,8 @@ export type Campaign = {
   status: CampaignStatusCode;
   participant_count: number;
   can_edit: boolean;
+  /** The viewer's own participation (never who else takes part). */
+  is_participant: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -249,12 +251,30 @@ export const CAMPAIGN_PROBLEMS = [
   "below_participants",
   "email_unconfirmed",
   "too_many_links",
+  "not_direct",
+  "campaign_full",
+  "already_participant",
+  "removed",
+  "team_member",
+  "not_participant",
 ] as const;
-export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "generic";
+export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "generic";
 
 export function campaignProblem(status: number, body: unknown): CampaignProblem {
   if (status === 429) return "rateLimited";
   const code = body && typeof body === "object" ? (body as { code?: unknown }).code : undefined;
   if (typeof code === "string" && (CAMPAIGN_PROBLEMS as readonly string[]).includes(code)) return code as CampaignProblem;
   return status === 403 ? "forbidden" : "generic";
+}
+
+/** Whether the page offers "Join": public, direct, published, places free, not the team. */
+export function canJoinDirectly(campaign: Campaign): boolean {
+  return (
+    campaign.visibility === "public" &&
+    campaign.participation === "direct" &&
+    campaign.state === "published" &&
+    !campaign.can_edit &&
+    !campaign.is_participant &&
+    campaign.participant_count < campaign.target_testers
+  );
 }

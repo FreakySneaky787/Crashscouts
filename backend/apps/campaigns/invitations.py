@@ -14,13 +14,11 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
-from apps.audit.models import AuditEvent
-from apps.audit.services import record
 from apps.projects.models import Membership
 from apps.projects.team import TeamError, invitable_user
 
-from . import status
 from .models import Campaign, CampaignInvitation, Participation
+from .participation import activate
 from .services import CampaignError
 
 INVITATION_LIFETIME = timedelta(days=14)
@@ -114,32 +112,10 @@ def open_invitations_of(user):
 
 @transaction.atomic
 def accept(invitation: CampaignInvitation) -> Participation:
-    """Joins through the invitation. The campaign row is locked, so concurrent joins never
-    exceed the limit."""
-    campaign = Campaign.objects.select_for_update().get(pk=invitation.campaign_id)
-    active = Participation.objects.filter(campaign=campaign, status=Participation.Status.ACTIVE)
-    if not status.accepts_participants(
-        campaign.state, participants=active.count(), target=campaign.target_testers
-    ):
-        raise CampaignError(
-            "campaign_full" if campaign.state == Campaign.State.PUBLISHED else "campaign_closed"
-        )
-    participation, created = Participation.objects.get_or_create(
-        campaign=campaign, user=invitation.invitee
-    )
-    if not created:
-        if participation.status == Participation.Status.REMOVED:
-            raise CampaignError("removed")
-        participation.status = Participation.Status.ACTIVE
-        participation.save(update_fields=["status", "updated_at"])
+    """Joins through the invitation (shared rules and row lock in participation.activate)."""
+    participation = activate(invitation.campaign_id, invitation.invitee, via="invitation")
     invitation.status = CampaignInvitation.Status.ACCEPTED
     invitation.save(update_fields=["status", "updated_at"])
-    record(
-        AuditEvent.Kind.CAMPAIGN_PARTICIPANT_JOINED,
-        actor=invitation.invitee,
-        subject=invitation.invitee,
-        data={"campaign": str(campaign.pk), "via": "invitation"},
-    )
     return participation
 
 
