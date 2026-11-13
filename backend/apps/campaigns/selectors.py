@@ -1,7 +1,7 @@
 from apps.projects.models import Project
 from apps.projects.validators import SLUG_PATTERN
 
-from .models import Campaign, CampaignSlugHistory
+from .models import Campaign, CampaignSlugHistory, Participation
 from .policies import can_view
 
 
@@ -32,5 +32,6 @@ def campaigns_of(user, project: Project) -> list[Campaign]:
 
 
 def participant_count(campaign: Campaign) -> int:
-    """Active participants; participations arrive in WP 3A.4."""
-    return 0
+    return Participation.objects.filter(
+        campaign=campaign, status=Participation.Status.ACTIVE
+    ).count()

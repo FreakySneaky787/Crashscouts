@@ -24,13 +24,23 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects, invitations] = await Promise.all([
+  const [csrf, projects, invitations, campaignInvitations, participations] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
     backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
+    backendFetch<{ id: string; campaign_title: string; campaign_slug: string; project_name: string; project_slug: string; invited_by: string | null }[]>(
+      request,
+      "/api/v1/me/campaign-invitations/",
+    ),
+    backendFetch<{ campaign_title: string; campaign_slug: string; project_name: string; project_slug: string }[]>(request, "/api/v1/me/participations/"),
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
+  const campaignAnswer = params.get("campaign_invitation");
+  const campaignInvitationResult: "joined" | "declined" | "full" | "closed" | "gone" | null =
+    campaignAnswer === "joined" || campaignAnswer === "declined" || campaignAnswer === "full" || campaignAnswer === "closed" || campaignAnswer === "gone"
+      ? campaignAnswer
+      : null;
   // A GitHub verification that could not be tied to a project ends here (e.g. expired state).
   const outcome = verificationOutcome(params);
   const verificationError = outcome && !outcome.ok ? outcome.error : null;
@@ -46,6 +56,9 @@ export async function loader({ request }: Route.LoaderArgs) {
       deleted,
       invitationResult,
       verificationError,
+      campaignInvitations: campaignInvitations.data ?? [],
+      participations: participations.data ?? [],
+      campaignInvitationResult,
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -68,6 +81,52 @@ export default function Account({ loaderData }: Route.ComponentProps) {
       {loaderData.verificationError ? <Notice tone="danger" title={t(`verification.errors.${loaderData.verificationError}`)} /> : null}
       {loaderData.invitationResult ? (
         <Notice tone={loaderData.invitationResult === "gone" ? "danger" : "ok"} title={t(`invitations.${loaderData.invitationResult}`)} />
+      ) : null}
+      {loaderData.campaignInvitationResult ? (
+        <Notice
+          tone={["joined", "declined"].includes(loaderData.campaignInvitationResult) ? "ok" : "danger"}
+          title={t(`campaigns.invitations.result.${loaderData.campaignInvitationResult}`)}
+        />
+      ) : null}
+      {loaderData.campaignInvitations.length ? (
+        <Panel title={t("campaigns.invitations.title")}>
+          <ul className={styles.plainList} aria-label={t("campaigns.invitations.title")}>
+            {loaderData.campaignInvitations.map((invitation) => (
+              <li key={invitation.id} className={styles.listRow}>
+                <span>
+                  {t("campaigns.invitations.text", { inviter: invitation.invited_by ?? "?", project: invitation.project_name })}{" "}
+                  <Link to={`/p/${invitation.project_slug}/c/${invitation.campaign_slug}`}>{invitation.campaign_title}</Link>
+                </span>
+                <span className={styles.buttonRow}>
+                  <Form method="post" action={`/campaign-invitations/${invitation.id}/accept`}>
+                    <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+                    <Button type="submit" size="sm" variant="primary" aria-label={t("campaigns.invitations.acceptNamed", { title: invitation.campaign_title })}>
+                      {t("invitations.accept")}
+                    </Button>
+                  </Form>
+                  <Form method="post" action={`/campaign-invitations/${invitation.id}/decline`}>
+                    <input type="hidden" name="csrf_token" value={loaderData.csrfToken} />
+                    <Button type="submit" size="sm" variant="quiet" aria-label={t("campaigns.invitations.declineNamed", { title: invitation.campaign_title })}>
+                      {t("invitations.decline")}
+                    </Button>
+                  </Form>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
+      {loaderData.participations.length ? (
+        <Panel title={t("campaigns.invitations.mine")}>
+          <ul className={styles.plainList} aria-label={t("campaigns.invitations.mine")}>
+            {loaderData.participations.map((p) => (
+              <li key={`${p.project_slug}/${p.campaign_slug}`} className={styles.listRow}>
+                <Link to={`/p/${p.project_slug}/c/${p.campaign_slug}`}>{p.campaign_title}</Link>
+                <span className={styles.muted}>{p.project_name}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       ) : null}
       {loaderData.invitations.length ? (
         <Panel title={t("invitations.title")}>

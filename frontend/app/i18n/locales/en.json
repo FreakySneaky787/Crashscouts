@@ -608,6 +608,51 @@
       "noChecksum": "The team gave no checksum for this file.",
       "continue": "Continue to {{host}}",
       "back": "Back to the campaign"
+    },
+    "testers": {
+      "title": "Testers",
+      "intro": "Invite people by username to private campaigns. They take part once they accept, as long as places are free.",
+      "participants": "Participants",
+      "noParticipants": "Nobody takes part yet.",
+      "invitations": "Open invitations",
+      "noInvitations": "No open invitations.",
+      "username": "Username",
+      "usernameHint": "The person needs an account with a confirmed email address. Invitations expire after 14 days.",
+      "invite": "Invite",
+      "revoke": "Revoke",
+      "revokeNamed": "Revoke the invitation for {{username}}",
+      "publishFirst": "Publish the campaign to invite testers.",
+      "publicNoInvites": "Public campaigns take part directly or after approval; invitations are for private campaigns.",
+      "done": {
+        "invited": "The invitation was sent.",
+        "revoked": "The invitation was revoked."
+      },
+      "problem": {
+        "user_not_found": "There is no account with this username, or it cannot be invited yet.",
+        "already_team": "This person is part of the project team.",
+        "already_invited": "This person already has an open invitation.",
+        "already_participant": "This person already takes part.",
+        "removed": "This person was removed from the campaign and cannot be invited again.",
+        "too_many_invitations": "This campaign has 100 open invitations. Wait for answers or revoke some.",
+        "not_private": "Invitations are for private campaigns.",
+        "not_published": "Only published, running campaigns take invitations.",
+        "rateLimited": "You sent many invitations today. Try again tomorrow.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "invitations": {
+      "title": "Campaign invitations",
+      "mine": "Your campaigns",
+      "text": "{{inviter}} invited you to test for {{project}}:",
+      "acceptNamed": "Accept the invitation to {{title}}",
+      "declineNamed": "Decline the invitation to {{title}}",
+      "result": {
+        "joined": "You take part in the campaign now.",
+        "declined": "The invitation was declined.",
+        "full": "The campaign is full. Your invitation stays open in case a place becomes free.",
+        "closed": "The campaign has ended.",
+        "gone": "This invitation is no longer valid."
+      }
     }
   },
   "team": {

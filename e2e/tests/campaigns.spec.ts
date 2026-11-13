@@ -211,3 +211,55 @@ test("download links sit behind a warning page that only the team can open", asy
   await expect(page.getByText("The link was removed.")).toBeVisible();
   expect((await page.goto(warning))?.status()).toBe(404);
 });
+
+test("invite to a private campaign, accept, then see the downloads", async ({ page, request, browser }) => {
+  await createSignedInAccount(page, request);
+  const project = await createProject(page);
+  await createCampaign(page, project);
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  const links = page.getByRole("region", { name: "Downloads" });
+  await links.getByLabel("Label").fill("Linux AppImage");
+  await links.getByLabel("Link", { exact: true }).fill("https://downloads.example.org/tidewater-2.0.AppImage");
+  await links.getByRole("button", { name: "Add link" }).click();
+  await expect(page.getByText("The link was added.")).toBeVisible();
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/beta-1$`));
+
+  const testerContext = await browser.newContext();
+  const tester = await testerContext.newPage();
+  const testerAccount = await createSignedInAccount(tester, request);
+  expect((await tester.goto(`/p/${project}/c/beta-1`))?.status()).toBe(404); // not invited yet
+
+  await page.getByRole("link", { name: "Testers" }).click();
+  await page.getByLabel("Username").fill("no-such-user-here");
+  await page.getByRole("button", { name: "Invite" }).click();
+  await expect(page.getByRole("alert")).toContainText("There is no account with this username");
+  await page.getByLabel("Username").fill(testerAccount.username);
+  await page.getByRole("button", { name: "Invite" }).click();
+  await expect(page.getByText("The invitation was sent.")).toBeVisible();
+  await expect(page.getByRole("list", { name: "Open invitations" })).toContainText(testerAccount.username);
+
+  // Invited: the campaign is visible, the downloads are not.
+  await tester.goto(`/p/${project}/c/beta-1`);
+  await expect(tester.getByRole("heading", { level: 1, name: "Beta 1" })).toBeVisible();
+  await expect(tester.getByRole("region", { name: "Downloads" })).toHaveCount(0);
+
+  await tester.goto("/account");
+  await tester.getByRole("button", { name: "Accept the invitation to Beta 1" }).click();
+  await expect(tester.getByText("You take part in the campaign now.")).toBeVisible();
+  await expect(tester.getByRole("list", { name: "Your campaigns" }).getByRole("link", { name: "Beta 1" })).toBeVisible();
+
+  await tester.goto(`/p/${project}/c/beta-1`);
+  await expect(tester.getByText("1 of 5 taken")).toBeVisible();
+  await tester.getByRole("region", { name: "Downloads" }).getByRole("link", { name: "Linux AppImage" }).click();
+  await expect(tester.getByTestId("download-host")).toHaveText("downloads.example.org");
+  // Participants cannot manage the campaign.
+  expect((await tester.goto(`/p/${project}/c/beta-1/testers`))?.status()).toBe(404);
+  expect((await tester.goto(`/p/${project}/c/beta-1/edit`))?.status()).toBe(404);
+
+  await page.reload();
+  await expect(page.getByRole("list", { name: "Participants" })).toContainText(testerAccount.username);
+  const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+  await testerContext.close();
+});

@@ -7,6 +7,7 @@
 - The short name is unique per project and forms /p/<project>/c/<campaign>.
 """
 
+from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
 from django.db.models.functions import Lower
@@ -131,3 +132,62 @@ class CampaignLink(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.campaign}: {self.label}"
+
+
+class CampaignInvitation(BaseModel):
+    """Invitation to a private campaign, by username (owner's decision, 2026-11-13).
+    Accepting it makes the person a participant, as long as places are free."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ACCEPTED = "accepted", "Accepted"
+        DECLINED = "declined", "Declined"
+        REVOKED = "revoked", "Revoked"
+
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="invitations")
+    invitee = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="campaign_invitations"
+    )
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["campaign", "invitee"],
+                condition=Q(status="pending"),
+                name="campaigns_one_pending_invitation",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.invitee} to {self.campaign} ({self.status})"
+
+
+class Participation(BaseModel):
+    """Someone taking part in a campaign. Active participations count against the hard limit
+    (``target_testers``); leaving and removal follow in WP 3A.4a."""
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        LEFT = "left", "Left"
+        REMOVED = "removed", "Removed"
+
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="participations")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="participations"
+    )
+    status = models.CharField(max_length=8, choices=Status.choices, default=Status.ACTIVE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["campaign", "user"], name="campaigns_one_participation"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} in {self.campaign} ({self.status})"

@@ -302,6 +302,7 @@ REST_FRAMEWORK = {
         "project_invite": "30/day",
         "project_image": "30/hour",
         "campaign_create": "20/day",
+        "campaign_invite": "50/day",
     },
 }
 

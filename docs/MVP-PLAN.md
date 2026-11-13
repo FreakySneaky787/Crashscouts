@@ -109,8 +109,9 @@ Work packages (decisions 2026-11-13, see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md
 | 3A.1 | Campaigns backend: model, derived status, permissions, API, server-side lock for public campaigns ([ADR 0016](adr/0016-campaigns-and-status-model.md)) | ✅ done |
 | 3A.2 | Campaigns frontend: create, edit, campaign page `/p/<project>/c/<campaign>`, list on the project page; start/end with time zone | ✅ done |
 | 3A.3 | Download links (https only, optional SHA-256) with warning page, visible to team and participants only ([ADR 0017](adr/0017-download-links-and-warning-page.md)) | ✅ done |
-| 3A.4 | Participation: direct, application with per-campaign questions (templates, default "short message, optional"), approval, leaving, removal, hard limit, email and account page | planned |
-| 3A.5 | Private invitations by username | planned |
+| 3A.4a | Participation: join directly, leave, removal by the team, hard limit under concurrency, participant list for the team, email and account page | planned (next) |
+| 3A.4b | Applications with per-campaign questions (templates, default "short message, optional"), approval and rejection | planned |
+| 3A.5 | Private invitations by username; participation through acceptance (done before 3A.4 at the owner's request) | ✅ done |
 | 3A.6 | Data export and deletion, E2E for the lock, documentation; phase 3A complete | planned |
 
 ## Phase 3B – Security gate (mandatory before any public campaign)

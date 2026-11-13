@@ -1,0 +1,1 @@
+{% autoescape off %}{{ inviter }} invited you to test {{ campaign_title }}{% endautoescape %}

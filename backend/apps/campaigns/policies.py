@@ -1,11 +1,12 @@
 """The only place that decides who may see or change a campaign (docs/ARCHITECTURE.md)."""
 
 from django.conf import settings
+from django.utils import timezone
 
 from apps.projects import policies as project_policies
 from apps.projects.models import Project
 
-from .models import Campaign
+from .models import Campaign, CampaignInvitation, Participation
 
 
 def is_team(user, campaign: Campaign) -> bool:
@@ -18,8 +19,18 @@ def public_campaigns_enabled() -> bool:
 
 
 def has_private_access(user, campaign: Campaign) -> bool:
-    """Invited people and participants of a private campaign (WP 3A.4/3A.5); nobody yet."""
-    return False
+    """Participants and people with an open invitation see a published private campaign."""
+    if not getattr(user, "is_authenticated", False):
+        return False
+    return (
+        is_participant(user, campaign)
+        or CampaignInvitation.objects.filter(
+            campaign=campaign,
+            invitee=user,
+            status=CampaignInvitation.Status.PENDING,
+            expires_at__gt=timezone.now(),
+        ).exists()
+    )
 
 
 def can_view(user, campaign: Campaign) -> bool:
@@ -39,8 +50,11 @@ def can_edit(user, campaign: Campaign) -> bool:
 
 
 def is_participant(user, campaign: Campaign) -> bool:
-    """Active participant (WP 3A.4); nobody yet."""
-    return False
+    if not getattr(user, "is_authenticated", False):
+        return False
+    return Participation.objects.filter(
+        campaign=campaign, user=user, status=Participation.Status.ACTIVE
+    ).exists()
 
 
 def can_see_links(user, campaign: Campaign) -> bool:

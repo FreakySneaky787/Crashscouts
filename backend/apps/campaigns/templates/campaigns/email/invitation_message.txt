@@ -1,0 +1,6 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}{{ inviter }} invited you to take part in the private test campaign "{{ campaign_title }}" of the project "{{ project_name }}".
+
+Accept or decline the invitation on your account page: {{ account_url }}
+
+The invitation expires after 14 days. If you do not know this project, you can simply ignore this email.{% endautoescape %}{% endblock content %}

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.3) · **Current phase:** 3A – Campaigns
+**Last update:** 2026-11-13 (WP 3A.5) · **Current phase:** 3A – Campaigns
 
 ## Work packages
 
@@ -518,6 +518,67 @@ per-campaign application questions, email plus account notices ([`OPEN-QUESTIONS
 - **Findings during the work:** a header on the warning page (`Referrer-Policy: no-referrer`)
   was silently replaced by the site-wide `same-origin`; removed, since `same-origin` already sends
   no referrer to other sites and the link carries `noreferrer`.
+
+### WP 3A.5 – Invitations to private campaigns (2026-11-13) ✅
+
+Done before WP 3A.4 at the owner's request, so the path "invite privately → take part → see the
+downloads" works in the real UI already.
+
+- Models `CampaignInvitation` (pending/accepted/declined/revoked, expires) and `Participation`
+  (active/left/removed; one per person and campaign). Accepting locks the campaign row and checks
+  the hard limit (`status.accepts_participants`); a full campaign keeps the invitation open.
+- Invited people see the published private campaign (not its links); participants also see the
+  download links. Team-only list of open invitations and participants.
+- API: `…/campaigns/<c>/invitations/` (GET, POST), `…/invitations/<id>/` (DELETE),
+  `/me/campaign-invitations/` (+ `<id>/accept|decline/`), `/me/participations/`; email to the
+  invitee after commit; audit `campaign.participant_joined`; `projects.team.invitable_user` is now
+  public and shared.
+- Frontend: `/p/<project>/c/<campaign>/testers` (invite, revoke, participants), "Campaign
+  invitations" and "Your campaigns" on the account page, "Testers" button on the campaign page.
+- **Provisional rules (WP 3A.5, to confirm with the owner, open question W):** the whole team
+  invites; only published, running private campaigns; 14 days; at most 100 open invitations per
+  campaign; 50 invitations per day and person; removed participants cannot be invited again.
+- **Verification (run on 2026-11-13):** pytest **377 passed** (18 new: full flow incl.
+  email, decline/revoke, team-only lists, invitee-only answers, who cannot be invited, duplicates,
+  expiry, running private campaigns only, hard limit with the invitation kept open, closed
+  campaigns, caps, rate limit); 5 mutation checks caught; Vitest **78 passed**; Playwright
+  **70 passed** (1 new: invite, unknown user error, invited sees campaign but no downloads, accept
+  on the account page, participant opens the download warning page, participant gets 404 on
+  testers/edit, axe).
+- **Not covered by an automated test:** truly concurrent accepts (the row lock is in place; a
+  threaded test against PostgreSQL can be added in WP 3A.4a together with direct joining).
+
+## Handover – next session (written 2026-11-13)
+
+**Where we are:** phase 3A, WPs 3A.1, 3A.2, 3A.3 and 3A.5 done and pushed (CI green). Order
+agreed with the owner: next **3A.4a**, then **3A.4b**, then **3A.6**.
+
+- **3A.4a – direct participation, leaving, removal:**
+  - Join directly (public campaigns with `participation=direct`), reusing the row-lock pattern of
+    `apps/campaigns/invitations.py::accept`.
+  - Leaving frees the place (`Participation.Status.LEFT`); removal by the team
+    (`REMOVED`, blocks re-joining and re-inviting).
+  - Team sees participants with the profile details they made visible (decision: everyone else
+    only the count).
+  - Emails (join/removal) and account notices; a concurrency test for the hard limit.
+  - Public campaigns stay locked: test with `PUBLIC_CAMPAIGNS_ENABLED=True` in pytest only.
+- **3A.4b – applications:** per-campaign question builder (short text, long text, single choice,
+  yes/no; at most 10; required or optional; templates, default "short message, optional");
+  apply, approve, reject (answers deleted on rejection; no re-application).
+- **3A.6 – wrap-up:** data export and deletion for participations, invitations and answers
+  (`apps/accounts/lifecycle.py`), E2E for the public-campaign lock, docs; phase 3A complete.
+
+**Owner decisions of 2026-11-13** are in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (C, V, B,
+campaign rules) and ADRs 0015–0017. Open for the owner: W (provisional invitation rules), U
+(real GitHub test on the first test server, including the second callback URL
+`<frontend>/projects/github/verify/callback`).
+
+**Working in the cloud environment:** start Docker inline when `docker info` fails
+(`dockerd` in the background, then `docker compose up -d db mailpit`); backend commands need
+`UV_SYSTEM_CERTS=1` and `--env-file ../.env`; E2E with
+`PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm exec playwright test --trace off`.
+`pnpm audit` reports one moderate advisory in `minimatch` (via ESLint, development only); CI
+fails only on high/critical.
 
 ## Known limitations
 

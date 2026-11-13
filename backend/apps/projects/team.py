@@ -31,7 +31,7 @@ class TeamError(Exception):
         self.code = code
 
 
-def _invitable_user(username: str):
+def invitable_user(username: str):
     """Users that may be invited: active, confirmed email, not waiting for deletion. Anyone else
     is reported as "not found", like on public profiles."""
     user = (
@@ -54,7 +54,7 @@ def pending_invitations(project: Project):
 
 @transaction.atomic
 def invite(project: Project, by, username: str) -> Invitation:
-    invitee = _invitable_user(username)
+    invitee = invitable_user(username)
     if Membership.objects.filter(project=project, user=invitee).exists():
         raise TeamError("already_member")
     # An expired invitation no longer blocks a new one.

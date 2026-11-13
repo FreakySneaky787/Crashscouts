@@ -8,7 +8,7 @@ import { data, Link, redirect } from "react-router";
 import type { Route } from "./+types/campaign";
 import { ButtonLink } from "~/components/ui/Button";
 import { Chips, FactList, RowList } from "~/components/ui/Data";
-import { DownloadSimpleIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon } from "~/components/ui/icons";
+import { DownloadSimpleIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -88,9 +88,14 @@ export default function CampaignPage({ loaderData }: Route.ComponentProps) {
         }
         actions={
           campaign.can_edit ? (
-            <ButtonLink to={`/p/${project.slug}/c/${campaign.slug}/edit`} icon={PencilSimpleIcon}>
-              {t("campaigns.edit")}
-            </ButtonLink>
+            <>
+              <ButtonLink to={`/p/${project.slug}/c/${campaign.slug}/testers`} variant="quiet" icon={UsersIcon}>
+                {t("campaigns.testers.title")}
+              </ButtonLink>
+              <ButtonLink to={`/p/${project.slug}/c/${campaign.slug}/edit`} icon={PencilSimpleIcon}>
+                {t("campaigns.edit")}
+              </ButtonLink>
+            </>
           ) : null
         }
       />
