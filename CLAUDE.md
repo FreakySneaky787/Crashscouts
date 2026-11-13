@@ -94,7 +94,8 @@ Open items live in [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md).
 - Tool versions are pinned in `.devcontainer/post-create.sh` and `scripts/cloud-setup.sh`
   (uv 0.13.7, pnpm 10.34.9); keep both in sync.
 - E2E in the cloud environment: `PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm test` in
-  `e2e/`.
+  `e2e/`, then `pnpm test:gate` (security-gate abuse case with public campaigns on for that run
+  only; never in parallel with the main run).
 - Backend: see [`backend/README.md`](backend/README.md).
 - Frontend: see [`frontend/README.md`](frontend/README.md).
 - E2E: see [`e2e/README.md`](e2e/README.md).

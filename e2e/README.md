@@ -30,6 +30,19 @@ installs, point to it:
 PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm test
 ```
 
+### Security-gate run (flag on)
+
+The abuse case of the security gate (`gate/abuse-case.spec.ts`, WP 3B.6) needs public campaigns
+switched on. It runs separately, with `PUBLIC_CAMPAIGNS_ENABLED=true` for Django in this run only
+(`playwright.gate.config.ts`); the main run keeps checking that public campaigns are locked. Run it
+after the main run, never at the same time (same ports):
+
+```bash
+pnpm test:gate
+```
+
+The gate checklist for the project owner is [`docs/GATE-CHECKLIST.md`](../docs/GATE-CHECKLIST.md).
+
 ## Contents
 
 `tests/ssr-auth.spec.ts` covers the six acceptance criteria of the SSR auth spike (WP 0.4, see

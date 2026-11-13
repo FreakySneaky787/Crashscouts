@@ -15,56 +15,73 @@ export const MAILPIT_URL = "http://127.0.0.1:8025";
 // Optional: a preinstalled Chromium (e.g. cloud environment), otherwise the one Playwright installs.
 const executablePath = process.env.PW_CHROMIUM_EXECUTABLE || undefined;
 
-export default defineConfig({
-  testDir: "./tests",
-  globalSetup: "./global-setup.ts",
-  fullyParallel: false,
-  workers: 1,
-  forbidOnly: Boolean(process.env.CI),
-  retries: 0,
-  reporter: [["list"]],
-  use: {
-    baseURL: FRONTEND_URL,
-    trace: "off",
-  },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"], launchOptions: { executablePath } },
+/**
+ * Shared settings of both runs. `backendEnv` adds environment variables for Django only; the
+ * security-gate run (playwright.gate.config.ts) uses it to switch public campaigns on.
+ */
+export function e2eConfig(
+  testDir: string,
+  backendEnv: Record<string, string> = {},
+) {
+  return defineConfig({
+    testDir,
+    globalSetup: "./global-setup.ts",
+    fullyParallel: false,
+    workers: 1,
+    forbidOnly: Boolean(process.env.CI),
+    retries: 0,
+    reporter: [["list"]],
+    use: {
+      baseURL: FRONTEND_URL,
+      trace: "off",
     },
-  ],
-  webServer: [
-    {
-      command: "uv run --env-file ../.env python manage.py runserver 127.0.0.1:8000 --noreload",
-      cwd: "../backend",
-      url: `${BACKEND_URL}/api/v1/health/`,
-      env: {
-        ...process.env,
-        DJANGO_CSRF_TRUSTED_ORIGINS: FRONTEND_URL,
-        FRONTEND_URL,
-        DJANGO_SIGNUP_ENABLED: "true",
-        // Development settings only: the suite signs in more often per minute than allauth allows.
-        DJANGO_E2E_RELAXED_RATE_LIMITS: "true",
-        // Dummy GitHub app: tests stop at github.com and never call GitHub (secret generated per run).
-        DJANGO_GITHUB_CLIENT_ID: "e2e-dummy-client-id",
-        DJANGO_GITHUB_CLIENT_SECRET: randomBytes(20).toString("hex"),
-      } as Record<string, string>,
-      reuseExistingServer: false,
-      timeout: 120_000,
-    },
-    {
-      command: "pnpm build && pnpm start",
-      cwd: "../frontend",
-      url: FRONTEND_URL,
-      env: {
-        ...process.env,
-        HOST: "127.0.0.1",
-        PORT: "3000",
-        BACKEND_INTERNAL_URL: BACKEND_URL,
-        NODE_ENV: "production",
-      } as Record<string, string>,
-      reuseExistingServer: false,
-      timeout: 180_000,
-    },
-  ],
-});
+    projects: [
+      {
+        name: "chromium",
+        use: {
+          ...devices["Desktop Chrome"],
+          launchOptions: { executablePath },
+        },
+      },
+    ],
+    webServer: [
+      {
+        command:
+          "uv run --env-file ../.env python manage.py runserver 127.0.0.1:8000 --noreload",
+        cwd: "../backend",
+        url: `${BACKEND_URL}/api/v1/health/`,
+        env: {
+          ...process.env,
+          DJANGO_CSRF_TRUSTED_ORIGINS: FRONTEND_URL,
+          FRONTEND_URL,
+          DJANGO_SIGNUP_ENABLED: "true",
+          // Development settings only: the suite signs in more often per minute than allauth allows.
+          DJANGO_E2E_RELAXED_RATE_LIMITS: "true",
+          // Dummy GitHub app: tests stop at github.com and never call GitHub (secret generated per run).
+          DJANGO_GITHUB_CLIENT_ID: "e2e-dummy-client-id",
+          DJANGO_GITHUB_CLIENT_SECRET: randomBytes(20).toString("hex"),
+          ...backendEnv,
+        } as Record<string, string>,
+        reuseExistingServer: false,
+        timeout: 120_000,
+      },
+      {
+        command: "pnpm build && pnpm start",
+        cwd: "../frontend",
+        url: FRONTEND_URL,
+        env: {
+          ...process.env,
+          HOST: "127.0.0.1",
+          PORT: "3000",
+          BACKEND_INTERNAL_URL: BACKEND_URL,
+          NODE_ENV: "production",
+        } as Record<string, string>,
+        reuseExistingServer: false,
+        timeout: 180_000,
+      },
+    ],
+  });
+}
+
+// Main run: public campaigns stay locked, as in production until the owner opens the gate.
+export default e2eConfig("./tests");

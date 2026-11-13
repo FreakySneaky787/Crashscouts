@@ -5,7 +5,8 @@
   "license": "AGPL-3.0-only",
   "packageManager": "pnpm@10.34.9",
   "scripts": {
-    "test": "playwright test --trace off"
+    "test": "playwright test --trace off",
+    "test:gate": "playwright test --config playwright.gate.config.ts --trace off"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

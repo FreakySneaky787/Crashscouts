@@ -1,4 +1,5 @@
 /** Shared E2E helpers: unique test accounts, reading emails from Mailpit, signing in, TOTP. */
+import { execFileSync } from "node:child_process";
 import { createHmac, randomBytes } from "node:crypto";
 import { crc32, deflateSync } from "node:zlib";
 
@@ -161,4 +162,12 @@ export async function enableTotp(page: Page, password: string): Promise<string> 
   await page.getByRole("button", { name: "Turn on" }).click();
   await expect(page.getByRole("status").first()).toContainText("Two-factor authentication is on.");
   return secret;
+}
+
+/** Grants a platform role with the server command (the first admin is made the same way). */
+export function setRole(username: string, role: string) {
+  execFileSync("uv", ["run", "--env-file", "../.env", "python", "manage.py", "set_platform_role", username, role], {
+    cwd: "../backend",
+    stdio: "pipe",
+  });
 }

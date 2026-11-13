@@ -2,21 +2,13 @@
  * WP 3B.1 – Platform roles. The first admin comes from the server command; roles need 2FA;
  * every change needs the admin's password; everyone else gets 404.
  */
-import { execFileSync } from "node:child_process";
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-import { createSignedInAccount, enableTotp } from "./helpers";
+import { createSignedInAccount, enableTotp, setRole } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
-
-function setRole(username: string, role: string) {
-  execFileSync("uv", ["run", "--env-file", "../.env", "python", "manage.py", "set_platform_role", username, role], {
-    cwd: "../backend",
-    stdio: "pipe",
-  });
-}
 
 test("an admin grants the moderator role; everyone else gets 404", async ({ page, request, browser }) => {
   const admin = await createSignedInAccount(page, request);

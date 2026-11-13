@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.5) · **Current phase:** 3B – Security gate
+**Last update:** 2026-11-13 (WP 3B.6) · **Current phase:** 3B complete (flag off) – next: 4, Testing
 
 ## Work packages
 
@@ -623,7 +623,12 @@ downloads" works in the real UI already.
   caught (export of other people's applications, grace-period filter); Playwright **72 passed** (lock test extended);
   Vitest **82 passed**.
 
-## Phase 3B – Security gate (started 2026-11-13)
+## Phase 3B – Security gate (2026-11-13) ✅ implemented – flag still off
+
+All eight gate items are implemented and tested; the checklist for the owner is
+[`GATE-CHECKLIST.md`](GATE-CHECKLIST.md). `PUBLIC_CAMPAIGNS_ENABLED` stays `false`: the
+operations items of the checklist (part 2) need the production server, and only the owner
+switches the flag.
 
 ### WP 3B.1 – Platform roles (2026-11-13) ✅
 
@@ -734,22 +739,36 @@ downloads" works in the real UI already.
   Vitest **87 passed**; Playwright **76 passed**; Ruff, migrations check, OpenAPI validation and
   pip-audit clean.
 
+### WP 3B.6 – E2E abuse case and gate checklist (2026-11-13) ✅
+
+- Separate Playwright run with public campaigns on for that run only
+  (`e2e/playwright.gate.config.ts`, `pnpm test:gate`); the main run keeps testing the lock. Both
+  configurations share one definition (`e2eConfig` in `playwright.config.ts`). CI runs the gate
+  run after the main run on every push.
+- `e2e/gate/abuse-case.spec.ts`: a team with 2FA submits a public campaign with a link; a
+  moderator approves it in the review queue (axe with a non-empty queue); a tester joins, opens
+  the warning page and reports the link as malware; the moderator blocks the link. Afterwards the
+  warning page and the link API answer 404 to the participant and to the team, the team sees
+  "Blocked by moderators", the campaign stays available, the reporter sees "Resolved".
+- `setRole` moved to the shared E2E helpers.
+- [`GATE-CHECKLIST.md`](GATE-CHECKLIST.md): the eight gate items with their evidence, the
+  operations items before switching, known risks, and how to switch.
+- **Verification (run on 2026-11-13):** Playwright main run **76 passed**, gate run **1 passed**;
+  mutation check caught (a blocked link still served: the warning page answered 200 instead of
+  404). No application code changed in this WP.
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1–3B.5 done (roles, reporting,
-moderation and blocking, review of public campaigns, rate limits with the database cache). Next:
-**3B.6** (E2E abuse case with the flag on in a dedicated E2E run, and the gate checklist for the
-owner). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
-`PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
+**Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
+tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
+checklist's operations items need the production server, and only the owner switches the flag.
+Next: **phase 4 – testing** (test tasks, progress per participation, overview for maintainers);
+present its work packages and open questions before starting.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles
 are assigned on an admin page (first admin via a one-off server command; fresh reauthentication
 and 2FA for role changes; audited; the last admin cannot remove themselves).
-
-Work package to propose for 3B (present before starting, as usual):
-- 3B.6 E2E "abuse case" (submit, review, approve, report link, block; the link is no longer
-  reachable) and the gate checklist for the owner.
 
 **Decided for 3B on 2026-11-13 as well:** report reasons (malware, deception/phishing, someone
 else's software, spam, legal violation, other; free text optional; malware first), feedback to
@@ -764,7 +783,8 @@ server, including the second callback URL `<frontend>/projects/github/verify/cal
 **Working in the cloud environment:** start Docker inline when `docker info` fails
 (`dockerd` in the background, then `docker compose up -d db mailpit`); backend commands need
 `UV_SYSTEM_CERTS=1` and `--env-file ../.env`; E2E with
-`PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm exec playwright test --trace off`.
+`PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm exec playwright test --trace off`, then
+`pnpm test:gate` (security-gate run with public campaigns on).
 `pnpm audit` reports one moderate advisory in `minimatch` (via ESLint, development only); CI
 fails only on high/critical.
 

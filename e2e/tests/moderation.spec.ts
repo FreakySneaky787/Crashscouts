@@ -2,22 +2,14 @@
  * WP 3B.3 – Moderation: a report reaches the queue, a moderator blocks the project, visitors get
  * 404, the team sees the reason and appeals once, the moderator accepts the appeal.
  */
-import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-import { createProject, createSignedInAccount, enableTotp } from "./helpers";
+import { createProject, createSignedInAccount, enableTotp, setRole } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
-
-function setRole(username: string, role: string) {
-  execFileSync("uv", ["run", "--env-file", "../.env", "python", "manage.py", "set_platform_role", username, role], {
-    cwd: "../backend",
-    stdio: "pipe",
-  });
-}
 
 test("report, block, appeal and lift", async ({ page, request, browser }) => {
   // The team: a public project with a unique name (the E2E database keeps earlier runs).

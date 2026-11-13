@@ -159,3 +159,8 @@ jobs:
       - name: Run Playwright
         working-directory: e2e
         run: pnpm test
+      # Security gate (WP 3B.6): the abuse case with public campaigns switched on for this run
+      # only; the main run above checks that they stay locked by default.
+      - name: Run Playwright (security gate, flag on)
+        working-directory: e2e
+        run: pnpm test:gate
