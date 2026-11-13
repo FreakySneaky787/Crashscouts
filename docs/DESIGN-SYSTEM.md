@@ -85,6 +85,7 @@ module.
 
 | Component | Purpose | Notes |
 |---|---|---|
+| `ExternalButtonLink` | the one button that leaves the platform (download warning page) | fixed `rel="noopener noreferrer nofollow ugc"` and `referrerpolicy="no-referrer"`; not for other uses |
 | `Button`, `ButtonLink` | actions and link buttons | variants `primary` (one per area), `secondary`, `quiet`, `danger` (irreversible actions only); size `sm`; optional icon; `aria-pressed` for toggles |
 | `StatusPill` | status | tone + icon + text; status maps in `statuses.ts` (campaign, feedback, task, project) |
 | `Panel` | grouped content | title, optional aside, `flush` for lists |

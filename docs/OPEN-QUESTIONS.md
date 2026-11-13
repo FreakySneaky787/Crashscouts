@@ -29,6 +29,7 @@
 | – | Notifications in phase 3A | **Email plus a notice on the account page**; a notification centre comes later (2026-11-13). |
 | – | Ending a participation | Testers may **leave**; the team may **remove** participants (2026-11-13). |
 | – | Campaign start and end | **Date, time and time zone** chosen by the team (default Europe/Zurich); shown in that zone (2026-11-13). |
+| – | Checksums for download links | **Optional SHA-256** per link, shown on the warning page with instructions (2026-11-13). |
 | – | Campaign URL | **`/p/<project>/c/<campaign>`** with redirects after renaming (2026-11-13). |
 | V | Team rules | **Confirmed by the owner (2026-11-13):** only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day. |
 | – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |

@@ -58,6 +58,9 @@ class AuditEvent(models.Model):
         CAMPAIGN_COMPLETED = "campaign.completed", "Campaign completed"
         CAMPAIGN_CANCELLED = "campaign.cancelled", "Campaign cancelled"
         CAMPAIGN_DELETED = "campaign.deleted", "Campaign draft deleted"
+        CAMPAIGN_LINK_ADDED = "campaign.link_added", "Campaign download link added"
+        CAMPAIGN_LINK_CHANGED = "campaign.link_changed", "Campaign download link changed"
+        CAMPAIGN_LINK_REMOVED = "campaign.link_removed", "Campaign download link removed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

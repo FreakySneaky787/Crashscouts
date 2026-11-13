@@ -4,6 +4,8 @@ import {
   campaignPayload,
   campaignProblem,
   campaignStatusStyleKey,
+  groupedChecksum,
+  linkPayload,
   formatInZone,
   groupedTimeZones,
   timeZones,
@@ -112,5 +114,18 @@ describe("campaign helpers", () => {
     expect(campaignProblem(429, null)).toBe("rateLimited");
     expect(campaignProblem(403, { code: "<script>" })).toBe("forbidden");
     expect(campaignProblem(400, "nonsense")).toBe("generic");
+  });
+});
+
+describe("links", () => {
+  it("builds the payload and groups checksums", () => {
+    const form = new FormData();
+    form.set("label", "AppImage");
+    form.set("url", "  https://downloads.example.org/app  ");
+    form.set("platform", "");
+    form.set("sha256", " ABC ");
+    expect(linkPayload(form)).toEqual({ label: "AppImage", url: "https://downloads.example.org/app", platform: null, sha256: "ABC" });
+    expect(groupedChecksum("a".repeat(16) + "b".repeat(4))).toBe("aaaaaaaa aaaaaaaa bbbb");
+    expect(groupedChecksum("")).toBe("");
   });
 });

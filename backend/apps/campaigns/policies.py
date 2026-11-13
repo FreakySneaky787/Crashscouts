@@ -36,3 +36,13 @@ def can_view(user, campaign: Campaign) -> bool:
 
 def can_edit(user, campaign: Campaign) -> bool:
     return is_team(user, campaign)
+
+
+def is_participant(user, campaign: Campaign) -> bool:
+    """Active participant (WP 3A.4); nobody yet."""
+    return False
+
+
+def can_see_links(user, campaign: Campaign) -> bool:
+    """Download links: only the team and participants (owner's decision, 2026-11-13)."""
+    return is_team(user, campaign) or (can_view(user, campaign) and is_participant(user, campaign))

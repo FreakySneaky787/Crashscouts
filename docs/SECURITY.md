@@ -86,6 +86,11 @@ including the negative cases.
 
 - `https://` only.
 - Interstitial warning page before every external link; `rel="noopener noreferrer nofollow ugc"`.
+- ✅ Implemented in WP 3A.3 ([ADR 0017](adr/0017-download-links-and-warning-page.md)): no IP
+  addresses, local names, credentials or unusual ports; ASCII host names only (no look-alike
+  letters); never fetched by the server; visible only to the team and participants (404 for
+  everyone else); warning page with domain, full address, verified-repository hint and optional
+  SHA-256; no automatic forwarding; link changes audited.
 - **Public campaigns are technically locked** (`PUBLIC_CAMPAIGNS_ENABLED=false`) until the gate
   from [`MVP-PLAN.md`](MVP-PLAN.md), phase 3B, is met. ✅ Enforced since WP 3A.1: publishing a
   public campaign answers 403 `public_campaigns_locked`, and public campaigns are hidden from

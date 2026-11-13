@@ -48,3 +48,23 @@ export function ButtonLink({
     </Link>
   );
 }
+
+/**
+ * Link to another website styled as a button. Only for the download warning page: `rel` is fixed
+ * (no opener, no referrer, no endorsement) and cannot be overridden.
+ */
+export function ExternalButtonLink({
+  variant = "primary",
+  size = "md",
+  icon: Icon,
+  children,
+  className,
+  href,
+}: Common & { href: string; className?: string }) {
+  return (
+    <a className={classes(variant, size, className)} href={href} rel="noopener noreferrer nofollow ugc" referrerPolicy="no-referrer">
+      {Icon ? <Icon aria-hidden="true" className={styles.icon} /> : null}
+      {children}
+    </a>
+  );
+}

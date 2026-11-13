@@ -160,3 +160,54 @@ test("campaign pages have no WCAG A/AA violations in light and dark", async ({ p
     }
   }
 });
+
+test("download links sit behind a warning page that only the team can open", async ({ page, request, browser }) => {
+  await createSignedInAccount(page, request);
+  const project = await createProject(page);
+  await createCampaign(page, project);
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  const links = page.getByRole("region", { name: "Downloads" });
+
+  await links.getByLabel("Label").fill("Linux AppImage");
+  await links.getByLabel("Link", { exact: true }).fill("https://192.168.1.10/app.AppImage");
+  await links.getByRole("button", { name: "Add link" }).click();
+  await expect(links.getByText("Enter a public https:// link without user name")).toBeVisible();
+
+  const sha = "0123456789abcdef".repeat(4);
+  await links.getByLabel("Link", { exact: true }).fill("https://downloads.example.org/tidewater-2.0.AppImage");
+  await links.getByLabel("Operating system or device").selectOption("linux");
+  await links.getByLabel("SHA-256 checksum (optional)").fill(sha.toUpperCase());
+  await links.getByRole("button", { name: "Add link" }).click();
+  await expect(page.getByText("The link was added.")).toBeVisible();
+
+  await page.goto(`/p/${project}/c/beta-1`);
+  await page.getByRole("region", { name: "Downloads" }).getByRole("link", { name: "Linux AppImage" }).click();
+  await expect(page).toHaveURL(new RegExp(`/p/${project}/c/beta-1/download/[0-9a-f-]{36}$`));
+  const warning = page.url();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("This link leads to downloads.example.org");
+  await expect(page.getByTestId("download-url")).toHaveText("https://downloads.example.org/tidewater-2.0.AppImage");
+  await expect(page.getByTestId("download-sha256")).toHaveText("01234567 89abcdef 01234567 89abcdef 01234567 89abcdef 01234567 89abcdef");
+  await expect(page.getByText("Not in a verified repository")).toBeVisible();
+  const go = page.getByRole("link", { name: "Continue to downloads.example.org" });
+  await expect(go).toHaveAttribute("href", "https://downloads.example.org/tidewater-2.0.AppImage");
+  await expect(go).toHaveAttribute("rel", "noopener noreferrer nofollow ugc");
+  // No automatic forwarding: after a while the browser is still on the warning page.
+  await page.waitForTimeout(1500);
+  expect(page.url()).toBe(warning);
+  const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+
+  const strangerContext = await browser.newContext();
+  const stranger = await strangerContext.newPage();
+  await createSignedInAccount(stranger, request);
+  expect((await stranger.goto(warning))?.status()).toBe(404);
+  const visitorContext = await browser.newContext();
+  expect((await (await visitorContext.newPage()).goto(warning))?.status()).toBe(404);
+  await strangerContext.close();
+  await visitorContext.close();
+
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  await links.getByRole("button", { name: "Remove link “Linux AppImage”" }).click();
+  await expect(page.getByText("The link was removed.")).toBeVisible();
+  expect((await page.goto(warning))?.status()).toBe(404);
+});

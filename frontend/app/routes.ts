@@ -29,6 +29,7 @@ export default [
   route("p/:slug/c/new", "routes/campaign-new.tsx"),
   route("p/:slug/c/:campaign", "routes/campaign.tsx"),
   route("p/:slug/c/:campaign/edit", "routes/campaign-edit.tsx"),
+  route("p/:slug/c/:campaign/download/:id", "routes/campaign-download.tsx"),
   route("project-images/:key", "routes/project-image.tsx"),
   route("projects/github/verify/callback", "routes/verification-github-callback.tsx"),
   route("invitations/:id/:answer", "routes/invitation-answer.tsx"),

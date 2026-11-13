@@ -212,6 +212,32 @@ export function campaignFormValues(campaign: Campaign): CampaignFormValues {
   };
 }
 
+export type CampaignLink = {
+  id: string;
+  label: string;
+  url: string;
+  host: string;
+  platform: CatalogItem | null;
+  sha256: string;
+  in_repository: boolean;
+};
+
+/** The add-link form as API payload. */
+export function linkPayload(form: FormData) {
+  const platform = String(form.get("platform") ?? "");
+  return {
+    label: String(form.get("label") ?? ""),
+    url: String(form.get("url") ?? "").trim(),
+    platform: platform || null,
+    sha256: String(form.get("sha256") ?? "").trim(),
+  };
+}
+
+/** Groups a SHA-256 in blocks of eight so people can compare it piece by piece. */
+export function groupedChecksum(sha256: string): string {
+  return sha256.match(/.{1,8}/g)?.join(" ") ?? "";
+}
+
 /** Problems the API reports as {"code": "..."} for campaigns. */
 export const CAMPAIGN_PROBLEMS = [
   "public_campaigns_locked",
@@ -222,6 +248,7 @@ export const CAMPAIGN_PROBLEMS = [
   "not_a_draft",
   "below_participants",
   "email_unconfirmed",
+  "too_many_links",
 ] as const;
 export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "generic";
 

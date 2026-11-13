@@ -8,6 +8,7 @@ import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign-edit";
 import { CampaignForm } from "~/components/campaigns/CampaignForm";
+import { LinksPanel } from "~/components/campaigns/LinksPanel";
 import { Button } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { CheckCircleIcon, PaperPlaneTiltIcon, TrashIcon, XCircleIcon } from "~/components/ui/icons";
@@ -16,9 +17,17 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { backendFetch, getSessionUser } from "~/lib/backend.server";
-import { campaignFormEcho, campaignFormValues, campaignPayload, campaignProblem, type Campaign } from "~/lib/campaigns";
+import {
+  campaignFormEcho,
+  campaignFormValues,
+  campaignPayload,
+  campaignProblem,
+  linkPayload,
+  type Campaign,
+  type CampaignLink,
+} from "~/lib/campaigns";
 import { loadCampaignFormData } from "~/lib/campaigns.server";
-import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, projectErrorCodes, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -48,7 +57,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (project.data.slug !== params.slug || campaign.data.slug !== params.campaign) {
     throw redirect(`/p/${project.data.slug}/c/${campaign.data.slug}/edit`, { headers: privateNoStoreHeaders() });
   }
-  const { platforms, timeZones, csrf } = await loadCampaignFormData(request);
+  const [{ platforms, timeZones, csrf }, links] = await Promise.all([
+    loadCampaignFormData(request),
+    backendFetch<CampaignLink[]>(request, `${api}links/`),
+  ]);
   const done = new URL(request.url).searchParams.get("done");
   return data(
     {
@@ -58,6 +70,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       timeZones,
       csrfToken: csrf.token,
       saved: done === "saved",
+      links: links.data ?? [],
+      linkDone: done === "link-added" ? ("added" as const) : done === "link-removed" ? ("removed" as const) : null,
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -77,6 +91,22 @@ export async function action({ request, params }: Route.ActionArgs) {
     const result = await backendFetch<Campaign>(request, `${api}${ACTIONS[intent as keyof typeof ACTIONS]}/`, { method: "POST", csrfToken });
     if (result.status === 200 && result.data) throw redirect(`/p/${slug}/c/${result.data.slug}`, { headers });
     if (result.status === 404) throw data(null, { status: 404, headers });
+    return data({ values: null, errors: {}, problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+  if (intent === "link-add") {
+    const linkValues = linkPayload(form);
+    const result = await backendFetch(request, `${api}links/`, { method: "POST", csrfToken, json: linkValues });
+    if (result.status === 201) throw redirect(`/p/${slug}/c/${params.campaign}/edit?done=link-added`, { headers });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    const fieldErrors = result.status === 400 && result.data && !("code" in (result.data as object)) ? projectErrorCodes(result.data) : {};
+    const problem = Object.keys(fieldErrors).length ? null : campaignProblem(result.status, result.data);
+    return data({ values: null, errors: {}, problem, linkErrors: fieldErrors, linkValues }, { status: 400, headers });
+  }
+  if (intent === "link-remove") {
+    const id = String(form.get("link") ?? "");
+    if (!isUuid(id)) throw data(null, { status: 404, headers });
+    const result = await backendFetch(request, `${api}links/${id}/`, { method: "DELETE", csrfToken });
+    if (result.status === 204) throw redirect(`/p/${slug}/c/${params.campaign}/edit?done=link-removed`, { headers });
     return data({ values: null, errors: {}, problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
   }
   if (intent === "delete") {
@@ -168,6 +198,16 @@ export default function CampaignEdit({ loaderData, actionData }: Route.Component
           editableAccess={draft}
         />
       )}
+
+      <LinksPanel
+        links={loaderData.links}
+        platforms={loaderData.platforms}
+        csrfToken={csrfToken}
+        editable={!closed}
+        errors={actionData && "linkErrors" in actionData ? actionData.linkErrors : {}}
+        values={actionData && "linkValues" in actionData ? actionData.linkValues : null}
+        done={loaderData.linkDone}
+      />
 
       {draft ? (
         <Panel title={t("campaigns.deleteTitle")}>

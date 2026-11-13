@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.2) · **Current phase:** 3A – Campaigns
+**Last update:** 2026-11-13 (WP 3A.3) · **Current phase:** 3A – Campaigns
 
 ## Work packages
 
@@ -499,6 +499,25 @@ per-campaign application questions, email plus account notices ([`OPEN-QUESTIONS
   of the list; every zone Node offers is accepted by the backend (checked against all 418).
   A test race (next step started before the create POST finished) fixed by waiting for the
   resulting address.
+
+### WP 3A.3 – Download links and warning page (2026-11-13) ✅
+
+- `CampaignLink` (label, URL, optional platform, optional SHA-256; at most 10), strict URL rules,
+  team-only changes, visible to team and participants only (404 for everyone else), audit events,
+  "in the verified repository" hint ([ADR 0017](adr/0017-download-links-and-warning-page.md)).
+- Edit page: add and remove links; campaign page: "Downloads" panel; warning page
+  `/p/<project>/c/<campaign>/download/<id>` with domain, full address, source, checksum and
+  per-OS commands; no automatic forwarding. New component `ExternalButtonLink`.
+- **Owner's decision:** optional SHA-256 checksum per link.
+- **Verification (run on 2026-11-13):** pytest **359 passed** (35 new: visibility incl. a
+  simulated participant who may read but not change, 16 unsafe URLs incl. IP, credentials, local
+  names and a Cyrillic look-alike host, checksums, limit, closed campaigns, audit, repository
+  hint); 7 mutation checks caught (one only after adding the simulated participant test);
+  Vitest **78 passed**; Playwright **69 passed** (1 new: invalid link refused, warning page
+  content and `rel`, no forwarding, 404 for stranger and visitor, removal, axe).
+- **Findings during the work:** a header on the warning page (`Referrer-Policy: no-referrer`)
+  was silently replaced by the site-wide `same-origin`; removed, since `same-origin` already sends
+  no referrer to other sites and the link carries `noreferrer`.
 
 ## Known limitations
 

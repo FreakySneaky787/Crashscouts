@@ -538,7 +538,8 @@
       "forbidden": "You cannot change this campaign.",
       "confirmDelete": "Tick the box to confirm the deletion.",
       "confirmCancel": "Tick the box to confirm the cancellation.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "too_many_links": "A campaign can have at most 10 download links. Remove one first."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -562,6 +563,51 @@
         "platforms": "Choose from the list.",
         "slug": "Check the short name."
       }
+    },
+    "links": {
+      "title": "Downloads",
+      "intro": "Links to the official downloads of this version. Only your team and participants see them, always behind a warning page that shows where they lead. The platform never hosts or checks files.",
+      "none": "No download links yet.",
+      "add": "Add a download link",
+      "addButton": "Add link",
+      "label": "Label",
+      "labelHint": "For example “Linux AppImage (x86_64)”.",
+      "url": "Link",
+      "urlHint": "A public https:// address, ideally your repository's releases or your official website.",
+      "platform": "Operating system or device",
+      "anyPlatform": "Any",
+      "sha256": "SHA-256 checksum (optional)",
+      "sha256Hint": "64 hexadecimal characters. Testers can compare it with the downloaded file.",
+      "hasChecksum": "with checksum",
+      "inRepository": "In the verified repository",
+      "remove": "Remove",
+      "removeNamed": "Remove link “{{label}}”",
+      "done": {
+        "added": "The link was added.",
+        "removed": "The link was removed."
+      },
+      "errors": {
+        "label": "Enter a label (at most 80 characters).",
+        "url": "Enter a public https:// link without user name, password, IP address or local name.",
+        "platform": "Choose from the list.",
+        "sha256": "Enter the checksum as 64 hexadecimal characters."
+      }
+    },
+    "download": {
+      "crumb": "Download link",
+      "title": "This link leads to {{host}}",
+      "subtitle": "You are about to leave {{brand}}.",
+      "notice": "{{brand}} does not host or check this file.",
+      "noticeText": "The project team added this link. Check the domain and address below and only run software you trust. If something looks wrong, do not continue.",
+      "domain": "Domain",
+      "address": "Full address",
+      "source": "Source",
+      "notInRepository": "Not in a verified repository",
+      "checksumTitle": "Check the file",
+      "checksumText": "After downloading, compute the file's SHA-256 checksum and compare it with this one. If they differ, do not open the file.",
+      "noChecksum": "The team gave no checksum for this file.",
+      "continue": "Continue to {{host}}",
+      "back": "Back to the campaign"
     }
   },
   "team": {

@@ -16,7 +16,7 @@ from apps.core.models import BaseModel
 from apps.projects.models import Project
 
 from . import status
-from .validators import validate_campaign_slug, validate_timezone
+from .validators import validate_campaign_slug, validate_download_url, validate_timezone
 
 MARKDOWN_MAX_LENGTH = 10_000
 SHORT_MARKDOWN_MAX_LENGTH = 4_000
@@ -108,3 +108,26 @@ class CampaignSlugHistory(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.slug} -> {self.campaign.slug}"
+
+
+class CampaignLink(BaseModel):
+    """A download link of a campaign (WP 3A.3). Never fetched by the server; shown only to the
+    team and participants, always behind a warning page."""
+
+    MAX_PER_CAMPAIGN = 10
+
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="links")
+    label = models.CharField(max_length=80)
+    url = models.CharField(max_length=500, validators=[validate_download_url])
+    platform = models.ForeignKey(
+        Platform, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    # Optional SHA-256 of the file, lowercase hex, so testers can check the download.
+    sha256 = models.CharField(max_length=64, blank=True)
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.campaign}: {self.label}"

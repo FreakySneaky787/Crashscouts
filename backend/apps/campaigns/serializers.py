@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -8,7 +9,12 @@ from . import status
 from .models import MAX_TARGET_TESTERS, Campaign, CampaignSlugHistory
 from .policies import is_team
 from .selectors import participant_count
-from .validators import validate_campaign_slug, validate_timezone
+from .validators import (
+    normalize_sha256,
+    validate_campaign_slug,
+    validate_download_url,
+    validate_timezone,
+)
 
 
 class CampaignSerializer(serializers.ModelSerializer):
@@ -147,3 +153,46 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             )
         attrs["participation"] = participation
         return attrs
+
+
+class CampaignLinkSerializer(serializers.Serializer):
+    """Read view of a download link; ``host`` and ``in_repository`` help testers judge it."""
+
+    id = serializers.UUIDField()
+    label = serializers.CharField()
+    url = serializers.CharField()
+    host = serializers.SerializerMethodField()
+    platform = CatalogItemSerializer(allow_null=True)
+    sha256 = serializers.CharField()
+    in_repository = serializers.SerializerMethodField()
+
+    def get_host(self, link) -> str:
+        from .links import host_of
+
+        return host_of(link.url)
+
+    def get_in_repository(self, link) -> bool:
+        from .links import in_verified_repository
+
+        return in_verified_repository(link)
+
+
+class CampaignLinkWriteSerializer(serializers.Serializer):
+    label = serializers.CharField(max_length=80)
+    url = serializers.CharField(max_length=500, validators=[validate_download_url])
+    platform = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Platform.objects.all(), allow_null=True, required=False
+    )
+    sha256 = serializers.CharField(max_length=100, allow_blank=True, required=False)
+
+    def validate_label(self, value: str) -> str:
+        return value.strip()
+
+    def validate_url(self, value: str) -> str:
+        return value.strip()
+
+    def validate_sha256(self, value: str) -> str:
+        try:
+            return normalize_sha256(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages[0], code="invalid_sha256") from None

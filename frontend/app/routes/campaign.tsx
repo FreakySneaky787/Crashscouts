@@ -3,12 +3,12 @@
  * exist only for those allowed to see them (404 for everyone else). Former short names redirect.
  */
 import { useTranslation } from "react-i18next";
-import { data, redirect } from "react-router";
+import { data, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign";
 import { ButtonLink } from "~/components/ui/Button";
-import { Chips, FactList } from "~/components/ui/Data";
-import { LockSimpleIcon, PencilSimpleIcon } from "~/components/ui/icons";
+import { Chips, FactList, RowList } from "~/components/ui/Data";
+import { DownloadSimpleIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -17,7 +17,7 @@ import { StatusPill } from "~/components/ui/StatusPill";
 import { CAMPAIGN_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch } from "~/lib/backend.server";
-import { campaignStatusStyleKey, formatInZone, type Campaign } from "~/lib/campaigns";
+import { campaignStatusStyleKey, formatInZone, type Campaign, type CampaignLink } from "~/lib/campaigns";
 import { cacheHeadersFor, privateNoStoreHeaders } from "~/lib/http";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
 
@@ -38,9 +38,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const slug = params.slug?.toLowerCase();
   const campaignSlug = params.campaign?.toLowerCase();
   if (!isValidProjectSlug(slug) || !isValidProjectSlug(campaignSlug)) throw data(null, { status: 404 });
-  const [project, result] = await Promise.all([
+  const [project, result, links] = await Promise.all([
     backendFetch<Project>(request, `/api/v1/projects/${slug}/`),
     backendFetch<Campaign>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/`),
+    // Only the team and participants get the links; everyone else gets 404 and sees none.
+    backendFetch<CampaignLink[]>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/links/`),
   ]);
   if (project.status !== 200 || !project.data || result.status !== 200 || !result.data) {
     throw data(null, { status: 404, headers: privateNoStoreHeaders() });
@@ -50,9 +52,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (project.data.slug !== params.slug || campaign.slug !== params.campaign) {
     throw redirect(`/p/${project.data.slug}/c/${campaign.slug}`, { status: 301 });
   }
-  const isPublic = campaign.visibility === "public" && project.data.visibility === "public" && !campaign.can_edit;
+  const downloadLinks = links.status === 200 ? (links.data ?? []) : null;
+  const isPublic = campaign.visibility === "public" && project.data.visibility === "public" && !campaign.can_edit && downloadLinks === null;
   const headers = isPublic ? cacheHeadersFor(request) : privateNoStoreHeaders();
-  return data({ campaign, project: { slug: project.data.slug, name: project.data.name } }, { headers });
+  return data({ campaign, project: { slug: project.data.slug, name: project.data.name }, links: downloadLinks }, { headers });
 }
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
@@ -61,7 +64,7 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
 
 export default function CampaignPage({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { campaign, project } = loaderData;
+  const { campaign, project, links } = loaderData;
   const style = CAMPAIGN_STATUS[campaignStatusStyleKey(campaign.status)];
   const zone = campaign.timezone;
   const sections = [
@@ -124,6 +127,33 @@ export default function CampaignPage({ loaderData }: Route.ComponentProps) {
           </div>
         </Panel>
       </div>
+      {links !== null ? (
+        <Panel title={t("campaigns.links.title")} flush={links.length > 0}>
+          {links.length ? (
+            <RowList
+              label={t("campaigns.links.title")}
+              rows={links.map((link) => ({
+                key: link.id,
+                icon: DownloadSimpleIcon,
+                primary: (
+                  <Link to={`/p/${project.slug}/c/${campaign.slug}/download/${link.id}`} className={styles.textLink}>
+                    {link.label}
+                  </Link>
+                ),
+                secondary: (
+                  <>
+                    <code>{link.host}</code>
+                    {link.platform ? ` · ${link.platform.name}` : ""}
+                  </>
+                ),
+                trailing: link.in_repository ? <StatusPill tone="ok" icon={ShieldCheckIcon} label={t("campaigns.links.inRepository")} /> : null,
+              }))}
+            />
+          ) : (
+            <p className={styles.muted}>{t("campaigns.links.none")}</p>
+          )}
+        </Panel>
+      ) : null}
       {sections.map((section) => (
         <Panel key={section.key} title={section.title}>
           <Markdown>{section.body}</Markdown>
