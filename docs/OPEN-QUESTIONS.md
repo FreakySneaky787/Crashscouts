@@ -9,7 +9,6 @@
 | # | Question | Due | Proposal |
 |---|---|---|---|
 | A | Waiting period for new accounts before they may submit public campaigns | phase 3B | 7 days plus verified email plus 2FA, or manual approval by an admin |
-| C | Is `target_testers` a hard limit (automatically "Full")? When does the status switch to "In Progress"? | phase 3A | hard limit for direct participation; "In Progress" from `starts_at` |
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | H | Who moderates initially? | phase 3B | the project owner only |
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
@@ -22,6 +21,14 @@
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
 | B | Repository verification | **Two ways:** a file with a check code in the repository, on **GitHub, GitLab.com and Codeberg** (2026-11-13), or, for GitHub projects, a **one-time GitHub authorization** whose token is revoked at once and never stored. Public repositories only ([ADR 0015](adr/0015-repository-verification.md)). |
+| C | Campaign status | **Hard limit** for the desired number of testers (automatically "Full"); **"In Progress" automatically from the start date**; **"Completed" only by hand** (2026-11-13). Stored are only the team's decisions; the visible status is derived ([ADR 0016](adr/0016-campaigns-and-status-model.md)). |
+| – | Private campaign invitations | **By username only**, accepted by the invited person (like project teams); no shareable links, no invitations to email addresses (2026-11-13). |
+| – | Download links | **Any `https` link**, behind a warning page that shows the target and whether it lies in the verified repository; visible **only to the team and participants** (2026-11-13). |
+| – | What participants see | **The team sees participants** (username and the profile details they made visible); everyone else sees only the number (2026-11-13; completes D). |
+| – | Applications | **Per-campaign questions** set by the team, with templates; default "short message, optional" (2026-11-13). |
+| – | Notifications in phase 3A | **Email plus a notice on the account page**; a notification centre comes later (2026-11-13). |
+| – | Ending a participation | Testers may **leave**; the team may **remove** participants (2026-11-13). |
+| – | Campaign URL | **`/p/<project>/c/<campaign>`** with redirects after renaming (2026-11-13). |
 | V | Team rules | **Confirmed by the owner (2026-11-13):** only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day. |
 | – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |
 | – | Who may create projects | **Every account with a confirmed email address**, with a daily limit; abuse is handled by reporting and blocking (phase 3B). |

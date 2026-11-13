@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/v1/", include("apps.profiles.urls")),
     path("api/v1/", include("apps.accounts.urls")),
     path("api/v1/", include("apps.projects.urls")),
+    path("api/v1/", include("apps.campaigns.urls")),
     # django-allauth headless: /_allauth/browser/v1/...
     path("_allauth/", include("allauth.headless.urls")),
     # Provider callbacks only (headless mode): /accounts/github/login/callback/

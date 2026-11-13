@@ -87,7 +87,9 @@ including the negative cases.
 - `https://` only.
 - Interstitial warning page before every external link; `rel="noopener noreferrer nofollow ugc"`.
 - **Public campaigns are technically locked** (`PUBLIC_CAMPAIGNS_ENABLED=false`) until the gate
-  from [`MVP-PLAN.md`](MVP-PLAN.md), phase 3B, is met.
+  from [`MVP-PLAN.md`](MVP-PLAN.md), phase 3B, is met. ✅ Enforced since WP 3A.1: publishing a
+  public campaign answers 403 `public_campaigns_locked`, and public campaigns are hidden from
+  everyone outside the team whenever the flag is off ([ADR 0016](adr/0016-campaigns-and-status-model.md)).
 - Review queue for every new public campaign; ⚑ a link change triggers a new review.
 - Waiting period or manual approval for new accounts (open question A).
 - "Repository verified" badge after proof of ownership.

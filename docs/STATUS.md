@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 2.5, phase 2 complete) · **Current phase:** 2 – Projects (complete; phase 3A next)
+**Last update:** 2026-11-13 (WP 3A.1) · **Current phase:** 3A – Campaigns
 
 ## Work packages
 
@@ -457,6 +457,27 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
 - **Finding during the work:** the callback first was a POST; in production the browser arrives
   from github.com, so Django's CSRF origin check would have refused it. It is now a GET like every
   OAuth callback, protected by the signed single-use `state`.
+
+## Phase 3A – Campaigns (started 2026-11-13)
+
+Decisions: hard tester limit, "In Progress" from the start date, completion by hand, private
+invitations by username, download links for team and participants only behind a warning page,
+per-campaign application questions, email plus account notices ([`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
+
+### WP 3A.1 – Campaigns backend (2026-11-13) ✅
+
+- New app `apps/campaigns`: model `Campaign` (fields from the master prompt, Markdown texts,
+  platforms from the catalog, database constraints for dates, tester range and
+  participation/visibility), short-name history, derived status (`status.py`), policies, services,
+  API under `/api/v1/projects/<slug>/campaigns/` with publish/complete/cancel
+  ([ADR 0016](adr/0016-campaigns-and-status-model.md)).
+- **Public-campaign lock enforced server-side** (`PUBLIC_CAMPAIGNS_ENABLED`, default off, only
+  from the environment, documented in `.env.example`).
+- **Verification (run on 2026-11-13):** pytest **323 passed** (61 new: permission matrix incl.
+  flag and project visibility, transitions, lock, derived status, validation codes, short names,
+  daily limit); 7 mutation checks caught. One of them (policy ignoring the project's visibility)
+  first slipped through because the API already hides private projects – added a direct policy
+  test so the policy holds on its own. Ruff, migrations and OpenAPI clean.
 
 ## Known limitations
 

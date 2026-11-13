@@ -21,6 +21,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0013](0013-account-deletion-and-data-export.md) | Account deletion and personal data export | Accepted |
 | [0014](0014-spdx-licence-catalog.md) | Licence catalog from the SPDX License List | Accepted |
 | [0015](0015-repository-verification.md) | Repository verification (check file, one-time GitHub authorization) | Accepted |
+| [0016](0016-campaigns-and-status-model.md) | Campaigns and status model | Accepted |
 
 ## Template
 

@@ -51,7 +51,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `profiles` | Profile, interests, operating systems, skills, privacy, avatar | implemented (WP 1.2) |
 | `catalog` | Taxonomies: categories, platforms, languages, software type, SPDX licenses | categories, platforms, skills (WP 1.2); the rest in phase 2 |
 | `projects` | Project, membership (owner/maintainer), short names with history, verification, screenshots, status | complete for phase 2: projects, team, images, repository verification (WP 2.2–2.5) |
-| `campaigns` | Campaigns, links, invitations, participations, status machine | planned |
+| `campaigns` | Campaigns, links, invitations, participations, status machine | model, derived status, policies, API, public-campaign lock (WP 3A.1) |
 | `testing` | Test tasks, progress | planned |
 | `feedback` | Feedback, attachments, status, publishing | planned |
 | `moderation` | Reports, review queue, actions, blocks | planned |

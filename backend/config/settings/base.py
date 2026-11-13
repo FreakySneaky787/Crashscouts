@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.catalog",
     "apps.profiles",
     "apps.projects",
+    "apps.campaigns",
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,10 @@ ACCOUNT_ADAPTER = "apps.accounts.adapter.AccountAdapter"
 ACCOUNT_SIGNUP_FORM_CLASS = "apps.accounts.forms.SignupForm"
 # Signup can be closed (e.g. closed beta); off unless explicitly enabled.
 SIGNUP_ENABLED = env_bool("DJANGO_SIGNUP_ENABLED", False)
+
+# Security gate (docs/MVP-PLAN.md, phase 3B): public campaigns stay drafts while this is off.
+# Only the project owner switches it, through the environment; enforced in the campaigns app.
+PUBLIC_CAMPAIGNS_ENABLED = env_bool("PUBLIC_CAMPAIGNS_ENABLED", False)
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*"]
 ACCOUNT_UNIQUE_EMAIL = True
@@ -296,6 +301,7 @@ REST_FRAMEWORK = {
         "project_create": "10/day",
         "project_invite": "30/day",
         "project_image": "30/hour",
+        "campaign_create": "20/day",
     },
 }
 

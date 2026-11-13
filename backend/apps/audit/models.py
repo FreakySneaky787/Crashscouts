@@ -53,6 +53,11 @@ class AuditEvent(models.Model):
             "project.verification_failed",
             "Project repository verification failed",
         )
+        CAMPAIGN_CREATED = "campaign.created", "Campaign created"
+        CAMPAIGN_PUBLISHED = "campaign.published", "Campaign published"
+        CAMPAIGN_COMPLETED = "campaign.completed", "Campaign completed"
+        CAMPAIGN_CANCELLED = "campaign.cancelled", "Campaign cancelled"
+        CAMPAIGN_DELETED = "campaign.deleted", "Campaign draft deleted"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)
