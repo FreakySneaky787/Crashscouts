@@ -30,6 +30,10 @@ export type Campaign = {
   can_edit: boolean;
   /** The viewer's own participation (never who else takes part). */
   is_participant: boolean;
+  /** Open applications – a number for the team, null for everyone else. */
+  open_applications: number | null;
+  /** Status of the viewer's own application, if any. */
+  my_application: "pending" | "approved" | "rejected" | "withdrawn" | null;
   created_at: string;
   updated_at: string;
 };
@@ -261,8 +265,13 @@ export const CAMPAIGN_PROBLEMS = [
   "too_many_questions",
   "unknown_template",
   "no_applications",
+  "answer_required",
+  "invalid_answers",
+  "already_applied",
+  "rejected",
+  "no_open_application",
 ] as const;
-export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "generic";
+export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "confirmReject" | "generic";
 
 export function campaignProblem(status: number, body: unknown): CampaignProblem {
   if (status === 429) return "rateLimited";
@@ -300,4 +309,27 @@ export function questionPayload(form: FormData) {
           .filter(Boolean)
       : [];
   return { prompt: String(form.get("prompt") ?? "").trim(), kind, options, required: form.get("required") === "on" };
+}
+
+/** Whether the page offers the application form. */
+export function canApply(campaign: Campaign): boolean {
+  return (
+    campaign.visibility === "public" &&
+    campaign.participation === "approval" &&
+    campaign.state === "published" &&
+    !campaign.can_edit &&
+    !campaign.is_participant &&
+    campaign.my_application !== "pending" &&
+    campaign.my_application !== "rejected" &&
+    campaign.participant_count < campaign.target_testers
+  );
+}
+
+/** Answers from the application form: fields named "answer:<question id>". */
+export function answersPayload(form: FormData): Record<string, string> {
+  const answers: Record<string, string> = {};
+  for (const [name, value] of form.entries()) {
+    if (name.startsWith("answer:") && typeof value === "string") answers[name.slice("answer:".length)] = value.trim();
+  }
+  return answers;
 }

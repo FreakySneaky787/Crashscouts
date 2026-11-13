@@ -1,5 +1,12 @@
 from django.urls import path
 
+from .application_views import (
+    ApplicationDecisionView,
+    ApplicationsView,
+    ApplyView,
+    MyApplicationsView,
+    WithdrawView,
+)
 from .invitation_views import (
     CampaignInvitationRevokeView,
     CampaignInvitationsView,
@@ -54,6 +61,27 @@ urlpatterns = [
         QuestionView.as_view(),
         name="campaign-question",
     ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/apply/",
+        ApplyView.as_view(),
+        name="campaign-apply",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/withdraw/",
+        WithdrawView.as_view(),
+        name="campaign-withdraw",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/applications/",
+        ApplicationsView.as_view(),
+        name="campaign-applications",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/applications/<uuid:application_id>/<str:decision>/",
+        ApplicationDecisionView.as_view(),
+        name="campaign-application-decision",
+    ),
+    path("me/applications/", MyApplicationsView.as_view(), name="my-applications"),
     path(
         "projects/<str:slug>/campaigns/<str:campaign_slug>/join/",
         JoinView.as_view(),

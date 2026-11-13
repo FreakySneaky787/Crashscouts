@@ -4,6 +4,8 @@ import {
   campaignPayload,
   campaignProblem,
   campaignStatusStyleKey,
+  answersPayload,
+  canApply,
   canJoinDirectly,
   questionPayload,
   groupedChecksum,
@@ -169,5 +171,36 @@ describe("questionPayload", () => {
     });
     expect(questionPayload(form({ prompt: "Notes", kind: "long_text", options: "stray" })).options).toEqual([]);
     expect(questionPayload(form({ prompt: "x", kind: "essay" })).kind).toBe("short_text");
+  });
+});
+
+describe("applications", () => {
+  const base = {
+    visibility: "public",
+    participation: "approval",
+    state: "published",
+    can_edit: false,
+    is_participant: false,
+    my_application: null,
+    participant_count: 0,
+    target_testers: 2,
+  } as unknown as Parameters<typeof canApply>[0];
+
+  it("offers the form only when applying is possible", () => {
+    expect(canApply(base)).toBe(true);
+    expect(canApply({ ...base, my_application: "withdrawn" })).toBe(true);
+    expect(canApply({ ...base, my_application: "pending" })).toBe(false);
+    expect(canApply({ ...base, my_application: "rejected" })).toBe(false);
+    expect(canApply({ ...base, participant_count: 2 })).toBe(false);
+    expect(canApply({ ...base, participation: "direct" })).toBe(false);
+    expect(canApply({ ...base, can_edit: true })).toBe(false);
+  });
+
+  it("collects answers from the form", () => {
+    const form = new FormData();
+    form.set("csrf_token", "x");
+    form.set("answer:q1", "  Laptop  ");
+    form.set("answer:q2", "yes");
+    expect(answersPayload(form)).toEqual({ q1: "Laptop", q2: "yes" });
   });
 });

@@ -52,7 +52,14 @@ phase 3A round):
    fails without the lock). Leaving frees the place; removal by the team is final for that
    campaign (no rejoining, no new invitation, open invitations revoked). The team sees
    participants with their public profile details only; everyone else sees only the number.
-9. Creating needs a confirmed email address and is limited to 20 campaigns per day and person.
+9. **Applications** (WP 3A.4b): campaigns with approval have up to 10 questions (short text,
+   long text, single choice, yes/no; templates, "short message" by default), frozen once
+   published. Approval runs through `participation.activate` (same lock and limit; a threaded
+   test proves it). Answers are visible to the team only and deleted on rejection, withdrawal,
+   leaving or removal, otherwise 30 days after the campaign ends (`purge_application_answers`,
+   daily). Rejected applicants cannot apply again; full campaigns keep open applications but take
+   no new ones. The team is not emailed per application; it sees the count on its pages.
+10. Creating needs a confirmed email address and is limited to 20 campaigns per day and person.
    State changes are audited (`campaign.created/published/completed/cancelled/deleted`).
 
 ## Alternatives

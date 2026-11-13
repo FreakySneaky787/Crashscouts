@@ -30,7 +30,15 @@ type Testers = {
   }[];
 };
 
-const RESULTS = ["invited", "revoked", "removed"] as const;
+type PendingApplication = {
+  id: string;
+  username: string;
+  created_at: string;
+  answers: { prompt: string; value: string }[];
+  profile: { platforms?: { slug: string; name: string }[]; skills?: { slug: string; name: string }[] };
+};
+
+const RESULTS = ["invited", "revoked", "removed", "approved", "rejected"] as const;
 const PROBLEMS = [
   "user_not_found",
   "already_team",
@@ -42,6 +50,9 @@ const PROBLEMS = [
   "not_published",
   "not_participant",
   "confirmRemove",
+  "confirmReject",
+  "campaign_full",
+  "no_open_application",
   "rateLimited",
   "generic",
 ] as const;
@@ -63,9 +74,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (!(await getSessionUser(request))) {
     throw redirect(`/login?next=${encodeURIComponent(`/p/${slug}/c/${campaignSlug}/testers`)}`, { headers: privateNoStoreHeaders() });
   }
-  const [campaign, testers, csrf] = await Promise.all([
+  const [campaign, testers, applications, csrf] = await Promise.all([
     backendFetch<Campaign>(request, api),
     backendFetch<Testers>(request, `${api}invitations/`),
+    backendFetch<PendingApplication[]>(request, `${api}applications/`),
     ensureCsrfToken(request),
   ]);
   if (campaign.status !== 200 || !campaign.data || testers.status !== 200 || !testers.data) {
@@ -79,6 +91,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     {
       campaign: campaign.data,
       testers: testers.data,
+      applications: applications.status === 200 ? (applications.data ?? []) : [],
       csrfToken: csrf.token,
       done: (RESULTS as readonly string[]).includes(done ?? "") ? (done as (typeof RESULTS)[number]) : null,
     },
@@ -104,6 +117,12 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (!isUuid(id)) throw data(null, { status: 404 });
     result = await backendFetch(request, `${api}invitations/${id}/`, { method: "DELETE", csrfToken });
     success = "revoked";
+  } else if (intent === "approve" || intent === "reject") {
+    const id = String(form.get("id") ?? "");
+    if (!isUuid(id)) throw data(null, { status: 404 });
+    if (intent === "reject" && form.get("confirm") !== "on") return data({ problem: "confirmReject" as Problem }, { status: 400, headers });
+    result = await backendFetch(request, `${api}applications/${id}/${intent}/`, { method: "POST", csrfToken });
+    success = intent === "approve" ? "approved" : "rejected";
   } else if (intent === "remove") {
     const username = String(form.get("username") ?? "").trim().toLowerCase();
     if (!isValidUsername(username)) throw data(null, { status: 404 });
@@ -126,7 +145,7 @@ export function headers({ actionHeaders, loaderHeaders }: Route.HeadersArgs) {
 
 export default function CampaignTesters({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { campaign, testers, csrfToken, done } = loaderData;
+  const { campaign, testers, applications, csrfToken, done } = loaderData;
   const canInvite = campaign.visibility === "private" && campaign.state === "published";
   const back = `/p/${campaign.project}/c/${campaign.slug}`;
   return (
@@ -167,6 +186,51 @@ export default function CampaignTesters({ loaderData, actionData }: Route.Compon
           <p className={styles.muted}>{t("campaigns.testers.noParticipants")}</p>
         )}
       </Panel>
+
+      {campaign.participation === "approval" ? (
+        <Panel title={t("campaigns.testers.applications")} aside={String(applications.length)}>
+          {applications.length ? (
+            <ul className={styles.plainList} aria-label={t("campaigns.testers.applications")}>
+              {applications.map((a) => (
+                <li key={a.id} className={styles.stackTight}>
+                  <Link to={`/u/${a.username}`}>{a.username}</Link>
+                  {a.answers.length ? (
+                    <dl className={styles.stackTight}>
+                      {a.answers.map((answer) => (
+                        <div key={answer.prompt}>
+                          <dt className={styles.muted}>{answer.prompt}</dt>
+                          <dd>{answer.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                  <div className={styles.buttonRow}>
+                    <Form method="post">
+                      <input type="hidden" name="csrf_token" value={csrfToken} />
+                      <input type="hidden" name="intent" value="approve" />
+                      <input type="hidden" name="id" value={a.id} />
+                      <Button type="submit" size="sm" variant="primary" aria-label={t("campaigns.testers.approveNamed", { username: a.username })}>
+                        {t("campaigns.testers.approve")}
+                      </Button>
+                    </Form>
+                    <Form method="post" className={styles.buttonRow}>
+                      <input type="hidden" name="csrf_token" value={csrfToken} />
+                      <input type="hidden" name="intent" value="reject" />
+                      <input type="hidden" name="id" value={a.id} />
+                      <CheckboxField id={`confirm-reject-${a.id}`} name="confirm" label={t("campaigns.testers.rejectConfirm", { username: a.username })} />
+                      <Button type="submit" size="sm" variant="danger">
+                        {t("campaigns.testers.reject")}
+                      </Button>
+                    </Form>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.muted}>{t("campaigns.testers.noApplications")}</p>
+          )}
+        </Panel>
+      ) : null}
 
       <Panel title={t("campaigns.testers.invitations")}>
         <div className={styles.stack}>

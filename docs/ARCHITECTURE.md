@@ -194,7 +194,9 @@ React Router's data requests.
   directly ([ADR 0012](adr/0012-github-login.md)).
 - The reverse proxy limits request bodies (a few MB) in front of the SSR server and Django
   ([ADR 0010](adr/0010-image-upload-pipeline.md)); `/media` is never routed.
-- A daily job runs `manage.py purge_deleted_accounts` (final account deletion, ADR 0013).
+- A daily job runs `manage.py purge_deleted_accounts` (final account deletion, ADR 0013) and
+  `manage.py purge_application_answers` (application answers 30 days after a campaign ended,
+  ADR 0016).
 - Outgoing HTTPS from Django to `api.github.com`, `github.com`, `gitlab.com` and `codeberg.org`
   (repository verification, [ADR 0015](adr/0015-repository-verification.md)); nothing else is
   needed. The SSR server routes `/projects/github/verify/callback`, the second callback URL of the

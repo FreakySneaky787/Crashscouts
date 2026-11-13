@@ -550,7 +550,13 @@
       "questions_locked": "Questions cannot change after publishing: applicants answer what was published.",
       "too_many_questions": "A campaign can have at most 10 questions.",
       "unknown_template": "This template does not exist.",
-      "no_applications": "Only campaigns that take applications have questions."
+      "no_applications": "Only campaigns that take applications have questions.",
+      "answer_required": "Answer all required questions.",
+      "invalid_answers": "Check your answers: choose from the lists and keep texts short.",
+      "already_applied": "You already applied.",
+      "rejected": "The team did not accept your application for this campaign.",
+      "no_open_application": "There is no open application.",
+      "confirmReject": "Tick the box to confirm the rejection."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -637,7 +643,9 @@
       "done": {
         "invited": "The invitation was sent.",
         "revoked": "The invitation was revoked.",
-        "removed": "The participant was removed."
+        "removed": "The participant was removed.",
+        "approved": "The application was approved.",
+        "rejected": "The application was rejected and its answers were deleted."
       },
       "problem": {
         "user_not_found": "There is no account with this username, or it cannot be invited yet.",
@@ -651,11 +659,20 @@
         "rateLimited": "You sent many invitations today. Try again tomorrow.",
         "generic": "Something went wrong. Please try again.",
         "not_participant": "This person no longer takes part.",
-        "confirmRemove": "Tick the box to confirm the removal."
+        "confirmRemove": "Tick the box to confirm the removal.",
+        "confirmReject": "Tick the box to confirm the rejection.",
+        "campaign_full": "The campaign is full. Approve once a place is free.",
+        "no_open_application": "This application is no longer open."
       },
       "noDetails": "No public profile details.",
       "remove": "Remove",
-      "removeConfirm": "Remove {{username}}; they cannot come back"
+      "removeConfirm": "Remove {{username}}; they cannot come back",
+      "applications": "Open applications",
+      "noApplications": "No open applications.",
+      "approve": "Approve",
+      "approveNamed": "Approve {{username}}",
+      "reject": "Reject",
+      "rejectConfirm": "Reject {{username}}; their answers are deleted"
     },
     "invitations": {
       "title": "Campaign invitations",
@@ -715,6 +732,33 @@
         "prompt": "Enter a question (at most 200 characters).",
         "options": "Give 2 to 10 different choices of at most 100 characters.",
         "kind": "Choose an answer type."
+      }
+    },
+    "apply": {
+      "title": "Apply",
+      "intro": "The team chooses its testers. Answer the questions below; you take part once the team approves your application.",
+      "optional": "{{prompt}} (optional)",
+      "choose": "Choose …",
+      "yes": "Yes",
+      "no": "No",
+      "privacy": "Only the project team sees your answers. They are deleted when your application is rejected or withdrawn, when you leave, and 30 days after the campaign ends.",
+      "send": "Send application",
+      "pending": "Your application is waiting for the team's decision.",
+      "withdraw": "Withdraw application",
+      "rejected": "The team did not accept your application for this campaign.",
+      "done": {
+        "sent": "Your application was sent.",
+        "withdrawn": "Your application was withdrawn."
+      },
+      "openForTeam_one": "{{count}} open application",
+      "openForTeam_other": "{{count}} open applications",
+      "openShort_one": "{{count}} open application",
+      "openShort_other": "{{count}} open applications",
+      "review": "Review applications",
+      "mine": "Your applications",
+      "statuses": {
+        "pending": "Waiting for the team",
+        "rejected": "Not accepted"
       }
     }
   },

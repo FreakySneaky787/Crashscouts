@@ -121,7 +121,9 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
                       {c.title}
                     </Link>
                   ),
-                  secondary: `${c.summary} · ${formatInZone(c.starts_at, c.timezone)}`,
+                  secondary: [c.summary, formatInZone(c.starts_at, c.timezone), c.open_applications ? t("campaigns.apply.openShort", { count: c.open_applications }) : null]
+                    .filter(Boolean)
+                    .join(" · "),
                   trailing: <StatusPill tone={style.tone} icon={style.icon} label={t(`campaigns.statuses.${c.status}`)} />,
                 };
               })}

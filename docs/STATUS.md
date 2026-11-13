@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.4a) · **Current phase:** 3A – Campaigns
+**Last update:** 2026-11-13 (WP 3A.4b) · **Current phase:** 3A – Campaigns
 
 ## Work packages
 
@@ -583,46 +583,50 @@ downloads" works in the real UI already.
 - **Verification (run on 2026-11-13):** pytest **407 passed** (16 new); 2 mutation checks
   caught (questions not frozen, anyone edits); Vitest **80 passed**; Playwright **72 passed**
   (1 new: default template, template, own choice question, validation, removal, axe).
-- Part 2 (applications) follows.
+### WP 3A.4b, part 2 – Applications (2026-11-13) ✅
+
+- `Application` (pending/approved/rejected/withdrawn) and `ApplicationAnswer` (question text
+  kept with the value); `apps/campaigns/applications.py`: apply (public campaigns with approval,
+  published, not full, confirmed email, not the team, not removed or rejected people; answers
+  validated against the questions), withdraw (answers deleted, re-applying allowed), approve
+  (through `participation.activate`), reject (answers deleted at once, no re-application),
+  `purge_answers` with the daily command `purge_application_answers`; leaving and removal delete
+  the answers. Audit `campaign.application_approved/rejected`; emails to applicants only.
+- API: `…/apply/`, `…/withdraw/`, `…/applications/` (team), `…/applications/<id>/approve|reject/`
+  (team), `/me/applications/`; campaign data has `open_applications` (team only) and
+  `my_application`.
+- Frontend: application form and status on the campaign page, "Open applications" with answers,
+  approve and reject (with confirmation) on the testers page, the count on the project and
+  campaign pages for the team, "Your applications" on the account page. Applying is usable once
+  public campaigns are unlocked (phase 3B); covered by pytest with the flag on.
+- **Verification (run on 2026-11-13):** pytest **423 passed** (16 new, including a threaded test:
+  4 simultaneous approvals for 1 place end with exactly 1 participant); 5 mutation checks caught
+  (answers visible to all, rejection keeps answers, approval bypasses the limit, purge ignores
+  the retention period, rejected may re-apply); Vitest **82 passed**; Playwright **72 passed**;
+  Ruff, migrations, OpenAPI and pip-audit clean.
 
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A, WPs 3A.1, 3A.2, 3A.3, 3A.5 and 3A.4a done and pushed (CI
-green). Next **3A.4b** (the owner continues tonight, 2026-11-13), then **3A.6**.
+**Where we are:** phase 3A, WPs 3A.1–3A.5 done and pushed (CI green). Next and last of the
+phase: **3A.6**.
 
-**Decided for 3A.4b on 2026-11-13** (see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)): answers
-deleted on rejection, leaving or removal and 30 days after the campaign ends (daily command like
-`purge_deleted_accounts`); applications stay open when the campaign is full, approval only with a
-free place, no new applications while full, withdrawal at any time. **Also in 3A.4b:** the data
-foundation for the growth metrics ([`METRICS.md`](METRICS.md)) – `Campaign.published_at`,
-`completed_at`, `cancelled_at`, `published_by` (`SET_NULL`), set in `services.change_state`, a
-data migration filling them from the audit events.
+- **3A.6 – wrap-up of phase 3A:**
+  - Data export (`apps/accounts/lifecycle.py::export_data`): the person's participations,
+    campaign invitations and applications with their own answers.
+  - Account deletion: participations, invitations and applications go with the account
+    (`CASCADE`); check that `published_by` and `decided_by` become NULL and that campaigns of
+    handed-over projects survive; tests.
+  - E2E for the public-campaign lock end to end (already covered in parts; one consolidated
+    test that a public campaign can neither be published nor seen).
+  - Docs: STATUS, MVP-PLAN (phase 3A complete), ARCHITECTURE data model update.
+- Then **phase 3B – security gate** (reporting, blocking, review queue, rate limits, waiting
+  period A): needs the owner's answers to open questions A and H first.
 
-Plan for 3A.4b (approved in outline):
-- `ApplicationQuestion` (text, type `short_text`/`long_text`/`single_choice`/`yes_no`, options,
-  required, position; at most 10; editable only while the campaign is a draft; templates "Short
-  message" (default, optional), "Device and operating system", "Testing experience",
-  "Availability during the test period").
-- `Application` (pending/approved/rejected/withdrawn) with `ApplicationAnswer`; apply only to
-  published public campaigns with `participation=approval`, not full, confirmed email, not the
-  team, not removed people; approval through `participation.activate`; rejection deletes the
-  answers and blocks re-applying; answers team-only; emails on approval and rejection; "Your
-  applications" on the account page.
-- Tests: permissions, limit on approval, deletion on rejection and after the retention period,
-  mutation checks; E2E for the question builder on drafts (applying needs a public campaign, so
-  pytest with the flag on).
-
-- **3A.4b – applications:** joining after approval must go through `participation.activate`
-  when the team approves (same lock and limit); per-campaign question builder (short text, long text, single choice,
-  yes/no; at most 10; required or optional; templates, default "short message, optional");
-  apply, approve, reject (answers deleted on rejection; no re-application).
-- **3A.6 – wrap-up:** data export and deletion for participations, invitations and answers
-  (`apps/accounts/lifecycle.py`), E2E for the public-campaign lock, docs; phase 3A complete.
-
-**Owner decisions of 2026-11-13** are in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (C, V, B,
-campaign rules) and ADRs 0015–0017. Open for the owner: W (provisional invitation rules), U
-(real GitHub test on the first test server, including the second callback URL
-`<frontend>/projects/github/verify/callback`).
+**Owner decisions of 2026-11-13** are in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (C, B, V, W,
+campaign rules, metrics, applications) and ADRs 0015–0017. Still open for the owner: U (real
+GitHub test on the first test server, including the second callback URL
+`<frontend>/projects/github/verify/callback`). Metrics: [`METRICS.md`](METRICS.md); the statistics
+page is WP M.1 after phase 5.
 
 **Working in the cloud environment:** start Docker inline when `docker info` fails
 (`dockerd` in the background, then `docker compose up -d db mailpit`); backend commands need

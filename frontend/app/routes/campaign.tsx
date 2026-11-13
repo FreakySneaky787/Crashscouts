@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign";
+import { ApplicationPanel } from "~/components/campaigns/ApplicationPanel";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { Chips, FactList, RowList } from "~/components/ui/Data";
@@ -18,7 +19,16 @@ import { StatusPill } from "~/components/ui/StatusPill";
 import { CAMPAIGN_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
-import { campaignProblem, campaignStatusStyleKey, canJoinDirectly, formatInZone, type Campaign, type CampaignLink } from "~/lib/campaigns";
+import {
+  answersPayload,
+  campaignProblem,
+  campaignStatusStyleKey,
+  canJoinDirectly,
+  formatInZone,
+  type ApplicationQuestion,
+  type Campaign,
+  type CampaignLink,
+} from "~/lib/campaigns";
 import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
 
@@ -59,9 +69,21 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const signedIn = Boolean(await getSessionUser(request));
   const csrf = signedIn ? await ensureCsrfToken(request) : null;
   const headers = csrf ? setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) : isPublic ? cacheHeadersFor(request) : privateNoStoreHeaders();
-  const joined = new URL(request.url).searchParams.get("joined") === "1";
+  const search = new URL(request.url).searchParams;
+  const joined = search.get("joined") === "1";
+  const applied = search.get("applied");
+  const questions =
+    campaign.participation === "approval"
+      ? ((await backendFetch<{ questions: ApplicationQuestion[] }>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/questions/`)).data?.questions ?? [])
+      : [];
   return data(
-    { campaign, project: { slug: project.data.slug, name: project.data.name }, links: downloadLinks, signedIn, csrfToken: csrf?.token ?? null, joined },
+    { campaign, project: { slug: project.data.slug, name: project.data.name }, links: downloadLinks,
+      signedIn,
+      csrfToken: csrf?.token ?? null,
+      joined,
+      questions,
+      applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
+    },
     { headers },
   );
 }
@@ -79,6 +101,18 @@ export async function action({ request, params }: Route.ActionArgs) {
     const result = await backendFetch(request, `${api}join/`, { method: "POST", csrfToken });
     if (result.status === 200) throw redirect(`/p/${slug}/c/${campaignSlug}?joined=1`, { headers });
     if (result.status === 404) throw data(null, { status: 404, headers });
+    return data({ problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+  if (intent === "apply") {
+    const answers = answersPayload(form);
+    const result = await backendFetch(request, `${api}apply/`, { method: "POST", csrfToken, json: { answers } });
+    if (result.status === 201) throw redirect(`/p/${slug}/c/${campaignSlug}?applied=sent`, { headers });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    return data({ problem: campaignProblem(result.status, result.data), answers }, { status: 400, headers });
+  }
+  if (intent === "withdraw") {
+    const result = await backendFetch(request, `${api}withdraw/`, { method: "POST", csrfToken });
+    if (result.status === 204) throw redirect(`/p/${slug}/c/${campaignSlug}?applied=withdrawn`, { headers });
     return data({ problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
   }
   if (intent === "leave") {
@@ -134,6 +168,14 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
         }
       />
       {loaderData.joined ? <Notice tone="ok" title={t("campaigns.join.joined")} /> : null}
+      {loaderData.applied ? <Notice tone="ok" title={t(`campaigns.apply.done.${loaderData.applied}`)} /> : null}
+      {campaign.open_applications ? (
+        <Notice tone="info" title={t("campaigns.apply.openForTeam", { count: campaign.open_applications })}>
+          <Link to={`/p/${project.slug}/c/${campaign.slug}/testers`} className={styles.textLink}>
+            {t("campaigns.apply.review")}
+          </Link>
+        </Notice>
+      ) : null}
       {problem ? <Notice tone="danger" title={t(`campaigns.problem.${problem}`)} /> : null}
       {campaign.is_participant ? (
         <Panel title={t("campaigns.join.participatingTitle")}>
@@ -149,6 +191,15 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
             </div>
           </Form>
         </Panel>
+      ) : campaign.participation === "approval" ? (
+        <ApplicationPanel
+          campaign={campaign}
+          questions={loaderData.questions}
+          signedIn={signedIn}
+          csrfToken={csrfToken}
+          loginTo={`/login?next=${encodeURIComponent(`/p/${project.slug}/c/${campaign.slug}`)}`}
+          values={actionData && "answers" in actionData ? (actionData.answers as Record<string, string>) : null}
+        />
       ) : canJoinDirectly(campaign) ? (
         <Panel title={t("campaigns.join.title")}>
           <div className={styles.stack}>

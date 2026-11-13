@@ -230,3 +230,56 @@ class ApplicationQuestion(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.campaign}: {self.prompt}"
+
+
+class Application(BaseModel):
+    """An application to a campaign with approval (WP 3A.4b). The answers are visible to the team
+    only and deleted on rejection, withdrawal, leaving, removal and 30 days after the campaign
+    ends (owner's decision, 2026-11-13)."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+        WITHDRAWN = "withdrawn", "Withdrawn"
+
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="applications")
+    applicant = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="campaign_applications"
+    )
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    decided_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["campaign", "applicant"], name="campaigns_one_application"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.applicant} to {self.campaign} ({self.status})"
+
+
+class ApplicationAnswer(BaseModel):
+    """One answer; the question text is kept with it so it stays readable on its own."""
+
+    MAX_LENGTH = 2000
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="answers")
+    question = models.ForeignKey(
+        ApplicationQuestion, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    prompt = models.CharField(max_length=200)
+    value = models.TextField(max_length=MAX_LENGTH)
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position"]
+
+    def __str__(self) -> str:
+        return f"{self.application}: {self.prompt}"

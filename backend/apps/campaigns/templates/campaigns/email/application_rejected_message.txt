@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The team of the project "{{ project_name }}" did not accept your application for the test campaign "{{ campaign_title }}" this time. Your answers have been deleted.
+
+Other campaigns are waiting for testers: {{ account_url }}{% endautoescape %}{% endblock content %}

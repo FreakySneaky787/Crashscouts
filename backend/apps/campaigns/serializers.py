@@ -6,7 +6,13 @@ from apps.catalog.models import Platform
 from apps.catalog.serializers import CatalogItemSerializer
 
 from . import status
-from .models import MAX_TARGET_TESTERS, ApplicationQuestion, Campaign, CampaignSlugHistory
+from .models import (
+    MAX_TARGET_TESTERS,
+    Application,
+    ApplicationQuestion,
+    Campaign,
+    CampaignSlugHistory,
+)
 from .policies import is_participant, is_team
 from .selectors import participant_count
 from .validators import (
@@ -26,6 +32,8 @@ class CampaignSerializer(serializers.ModelSerializer):
     participant_count = serializers.SerializerMethodField()
     can_edit = serializers.SerializerMethodField()
     is_participant = serializers.SerializerMethodField()
+    open_applications = serializers.SerializerMethodField()
+    my_application = serializers.SerializerMethodField()
 
     class Meta:
         model = Campaign
@@ -52,6 +60,8 @@ class CampaignSerializer(serializers.ModelSerializer):
             "participant_count",
             "can_edit",
             "is_participant",
+            "open_applications",
+            "my_application",
             "created_at",
             "updated_at",
         )
@@ -70,6 +80,22 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     def get_can_edit(self, campaign) -> bool:
         return is_team(self.context["request"].user, campaign)
+
+    def get_open_applications(self, campaign) -> int | None:
+        """Number of open applications, for the team only (owner's decision: shown, not emailed)."""
+        if not is_team(self.context["request"].user, campaign):
+            return None
+        return Application.objects.filter(
+            campaign=campaign, status=Application.Status.PENDING
+        ).count()
+
+    def get_my_application(self, campaign) -> str | None:
+        """Status of the viewer's own application, if any."""
+        user = self.context["request"].user
+        if not getattr(user, "is_authenticated", False):
+            return None
+        mine = Application.objects.filter(campaign=campaign, applicant=user).first()
+        return mine.status if mine else None
 
     def get_is_participant(self, campaign) -> bool:
         """The viewer's own participation only; never who else takes part."""

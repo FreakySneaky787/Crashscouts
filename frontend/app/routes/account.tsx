@@ -24,7 +24,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects, invitations, campaignInvitations, participations] = await Promise.all([
+  const [csrf, projects, invitations, campaignInvitations, participations, applications] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
     backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
@@ -33,6 +33,10 @@ export async function loader({ request }: Route.LoaderArgs) {
       "/api/v1/me/campaign-invitations/",
     ),
     backendFetch<{ campaign_title: string; campaign_slug: string; project_name: string; project_slug: string }[]>(request, "/api/v1/me/participations/"),
+    backendFetch<{ campaign_title: string; campaign_slug: string; project_name: string; project_slug: string; status: "pending" | "rejected" }[]>(
+      request,
+      "/api/v1/me/applications/",
+    ),
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
@@ -59,6 +63,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       verificationError,
       campaignInvitations: campaignInvitations.data ?? [],
       participations: participations.data ?? [],
+      applications: applications.data ?? [],
       campaignInvitationResult,
       participationLeft,
     },
@@ -126,6 +131,18 @@ export default function Account({ loaderData }: Route.ComponentProps) {
               <li key={`${p.project_slug}/${p.campaign_slug}`} className={styles.listRow}>
                 <Link to={`/p/${p.project_slug}/c/${p.campaign_slug}`}>{p.campaign_title}</Link>
                 <span className={styles.muted}>{p.project_name}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
+      {loaderData.applications.length ? (
+        <Panel title={t("campaigns.apply.mine")}>
+          <ul className={styles.plainList} aria-label={t("campaigns.apply.mine")}>
+            {loaderData.applications.map((a) => (
+              <li key={`${a.project_slug}/${a.campaign_slug}`} className={styles.listRow}>
+                <Link to={`/p/${a.project_slug}/c/${a.campaign_slug}`}>{a.campaign_title}</Link>
+                <span className={styles.muted}>{t(`campaigns.apply.statuses.${a.status}`)}</span>
               </li>
             ))}
           </ul>

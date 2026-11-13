@@ -67,6 +67,14 @@ class AuditEvent(models.Model):
             "campaign.participant_removed",
             "Campaign participant removed",
         )
+        CAMPAIGN_APPLICATION_APPROVED = (
+            "campaign.application_approved",
+            "Campaign application approved",
+        )
+        CAMPAIGN_APPLICATION_REJECTED = (
+            "campaign.application_rejected",
+            "Campaign application rejected",
+        )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

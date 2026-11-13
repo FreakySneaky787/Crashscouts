@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The team of the project "{{ project_name }}" approved your application for the test campaign "{{ campaign_title }}". You take part now and can see its downloads:
+
+{{ campaign_url }}{% endautoescape %}{% endblock content %}

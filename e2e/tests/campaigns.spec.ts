@@ -353,4 +353,10 @@ test("the team builds application questions for a campaign with approval", async
   await expect(list.getByRole("listitem")).toHaveCount(2);
   const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(results.violations.map((v) => v.id)).toEqual([]);
+
+  // The team's testers page lists applications (none yet; applying needs an unlocked public campaign).
+  await page.goto(`/p/${project}/c/open-beta/testers`);
+  await expect(page.getByRole("region", { name: "Open applications" })).toContainText("No open applications.");
+  const testers = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(testers.violations.map((v) => v.id)).toEqual([]);
 });

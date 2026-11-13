@@ -16,7 +16,7 @@ from apps.projects.models import Membership
 from apps.projects.services import has_confirmed_email
 
 from . import status
-from .models import Campaign, CampaignInvitation, Participation
+from .models import ApplicationAnswer, Campaign, CampaignInvitation, Participation
 from .services import CampaignError
 
 
@@ -51,6 +51,13 @@ def activate(campaign_id, user, *, via: str) -> Participation:
     return participation
 
 
+def _delete_answers(campaign: Campaign, user) -> None:
+    """Application answers are not kept once someone no longer takes part (owner's decision)."""
+    ApplicationAnswer.objects.filter(
+        application__campaign=campaign, application__applicant=user
+    ).delete()
+
+
 @transaction.atomic
 def join(campaign: Campaign, user) -> Participation:
     """Join directly (public campaigns with direct participation)."""
@@ -77,6 +84,7 @@ def leave(campaign: Campaign, user) -> None:
         raise CampaignError("not_participant")
     participation.status = Participation.Status.LEFT
     participation.save(update_fields=["status", "updated_at"])
+    _delete_answers(campaign, user)
     record(
         AuditEvent.Kind.CAMPAIGN_PARTICIPANT_LEFT,
         actor=user,
@@ -102,6 +110,7 @@ def remove(campaign: Campaign, by, username: str) -> None:
         raise CampaignError("not_participant")
     participation.status = Participation.Status.REMOVED
     participation.save(update_fields=["status", "updated_at"])
+    _delete_answers(campaign, participation.user)
     CampaignInvitation.objects.filter(
         campaign=campaign, invitee=participation.user, status=CampaignInvitation.Status.PENDING
     ).update(status=CampaignInvitation.Status.REVOKED)
