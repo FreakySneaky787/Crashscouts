@@ -99,6 +99,11 @@ including the negative cases.
 - Waiting period or manual approval for new accounts (open question A).
 - "Repository verified" badge after proof of ownership.
 - Reporting and immediate blocking by admins; blocked links are served to no one.
+  ✅ Reporting implemented in WP 3B.2 ([ADR 0019](adr/0019-reporting-and-link-suspension.md)):
+  confirmed email, only visible content (404 otherwise), one open report per content, 20 per day,
+  no free text in the audit log; a download link reported as malware by 3 different accounts is
+  suspended automatically and served to no one until moderators decide. Blocking by moderators
+  follows in WP 3B.3.
 
 ## 5. Uploads
 

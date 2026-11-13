@@ -8,7 +8,7 @@ import { Form } from "react-router";
 import { Button } from "~/components/ui/Button";
 import { RowList } from "~/components/ui/Data";
 import { SelectField, TextField } from "~/components/ui/Form";
-import { DownloadSimpleIcon, PlusIcon, ShieldCheckIcon, XIcon } from "~/components/ui/icons";
+import { DownloadSimpleIcon, PlusIcon, ShieldCheckIcon, WarningIcon, XIcon } from "~/components/ui/icons";
 import { Notice } from "~/components/ui/Notice";
 import { Panel } from "~/components/ui/Panel";
 import { StatusPill } from "~/components/ui/StatusPill";
@@ -62,8 +62,9 @@ export function LinksPanel({
               ),
               trailing: (
                 <span className={styles.trail}>
+                  {link.suspended ? <StatusPill tone="danger" icon={WarningIcon} label={t("campaigns.links.suspended")} /> : null}
                   {link.in_repository ? <StatusPill tone="ok" icon={ShieldCheckIcon} label={t("campaigns.links.inRepository")} /> : null}
-                  {editable ? (
+                  {editable && !link.suspended ? (
                     <Form method="post">
                       <input type="hidden" name="csrf_token" value={csrfToken} />
                       <input type="hidden" name="intent" value="link-remove" />

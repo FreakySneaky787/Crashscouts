@@ -138,6 +138,10 @@ class CampaignLink(BaseModel):
     # Optional SHA-256 of the file, lowercase hex, so testers can check the download.
     sha256 = models.CharField(max_length=64, blank=True)
     position = models.PositiveSmallIntegerField(default=0)
+    # Suspended links are served to no one (WP 3B.2: automatic suspension after malware reports;
+    # moderators lift or confirm it in WP 3B.3).
+    suspended_at = models.DateTimeField(null=True, blank=True, editable=False)
+    suspended_reason = models.CharField(max_length=40, blank=True, editable=False)
 
     class Meta:
         ordering = ["position", "created_at"]

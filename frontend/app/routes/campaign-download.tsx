@@ -9,7 +9,7 @@ import { data, redirect } from "react-router";
 import type { Route } from "./+types/campaign-download";
 import { ButtonLink, ExternalButtonLink } from "~/components/ui/Button";
 import { FactList } from "~/components/ui/Data";
-import { ArrowLeftIcon, ArrowSquareOutIcon, ShieldCheckIcon, WarningIcon } from "~/components/ui/icons";
+import { ArrowLeftIcon, ArrowSquareOutIcon, FlagIcon, ShieldCheckIcon, WarningIcon } from "~/components/ui/icons";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
@@ -18,6 +18,7 @@ import { brand } from "~/config/brand";
 import { backendFetch } from "~/lib/backend.server";
 import { groupedChecksum, type Campaign, type CampaignLink } from "~/lib/campaigns";
 import { isUuid, privateNoStoreHeaders } from "~/lib/http";
+import { reportHref } from "~/lib/reports";
 import { isValidProjectSlug } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -112,6 +113,11 @@ export default function CampaignDownload({ loaderData }: Route.ComponentProps) {
               <ButtonLink to={back} variant="quiet" icon={ArrowLeftIcon}>
                 {t("campaigns.download.back")}
               </ButtonLink>
+              {!campaign.can_edit ? (
+                <ButtonLink to={reportHref({ type: "link", project: campaign.project, campaign: campaign.slug, link: link.id })} variant="quiet" icon={FlagIcon}>
+                  {t("reports.actionLink")}
+                </ButtonLink>
+              ) : null}
             </div>
           </div>
         </Panel>

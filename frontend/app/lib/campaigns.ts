@@ -226,6 +226,8 @@ export type CampaignLink = {
   platform: CatalogItem | null;
   sha256: string;
   in_repository: boolean;
+  /** Suspended after malware reports; served to no one until moderators decide. */
+  suspended: boolean;
 };
 
 /** The add-link form as API payload. */

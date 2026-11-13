@@ -24,6 +24,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0016](0016-campaigns-and-status-model.md) | Campaigns and status model | Accepted |
 | [0017](0017-download-links-and-warning-page.md) | Download links and warning page | Accepted |
 | [0018](0018-platform-roles.md) | Platform roles (admin, moderator) | Accepted |
+| [0019](0019-reporting-and-link-suspension.md) | Reporting and automatic link suspension | Accepted |
 
 ## Template
 

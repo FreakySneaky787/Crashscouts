@@ -27,13 +27,15 @@ def _links_campaign(request: Request, slug: str, campaign_slug: str):
     return campaign
 
 
-def _link(campaign, link_id) -> CampaignLink:
+def _link(campaign, link_id, *, served: bool = True) -> CampaignLink:
+    """``served``: the link is about to be shown to someone (warning page); suspended links are
+    served to no one, not even the team."""
     link = (
         CampaignLink.objects.select_related("platform", "campaign__project")
         .filter(campaign=campaign, pk=link_id)
         .first()
     )
-    if link is None:
+    if link is None or (served and link.suspended_at is not None):
         raise Http404
     return link
 
@@ -47,6 +49,8 @@ class CampaignLinksView(APIView):
         links = CampaignLink.objects.select_related("platform", "campaign__project").filter(
             campaign=campaign
         )
+        if not can_edit(request.user, campaign):
+            links = links.filter(suspended_at__isnull=True)  # suspended: served to no one
         return Response(CampaignLinkSerializer(links, many=True).data)
 
     @extend_schema(
@@ -85,7 +89,7 @@ class CampaignLinkView(APIView):
         campaign = _links_campaign(request, slug, campaign_slug)
         if not can_edit(request.user, campaign):
             raise PermissionDenied
-        link = _link(campaign, link_id)
+        link = _link(campaign, link_id, served=False)
         serializer = CampaignLinkWriteSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return error_codes(serializer)
@@ -101,7 +105,7 @@ class CampaignLinkView(APIView):
         if not can_edit(request.user, campaign):
             raise PermissionDenied
         try:
-            remove_link(request.user, _link(campaign, link_id))
+            remove_link(request.user, _link(campaign, link_id, served=False))
         except CampaignError as exc:
             return _error(exc)
         return Response(status=status.HTTP_204_NO_CONTENT)

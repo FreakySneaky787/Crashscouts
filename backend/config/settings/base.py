@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "apps.profiles",
     "apps.projects",
     "apps.campaigns",
+    "apps.moderation",
 ]
 
 MIDDLEWARE = [
@@ -303,6 +304,7 @@ REST_FRAMEWORK = {
         "project_image": "30/hour",
         "campaign_create": "20/day",
         "campaign_invite": "50/day",
+        "report": "20/day",
     },
 }
 

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.1) · **Current phase:** 3B – Security gate
+**Last update:** 2026-11-13 (WP 3B.2) · **Current phase:** 3B – Security gate
 
 ## Work packages
 
@@ -642,10 +642,28 @@ downloads" works in the real UI already.
   moved to `e2e/tests/helpers.ts`).
 - Note: the E2E database keeps admins of earlier runs, so "last admin" is tested in pytest only.
 
+### WP 3B.2 – Reporting (2026-11-13) ✅
+
+- New app `apps/moderation`: `Report` (target copy, reason, free text, status), reporting service
+  that resolves the target through the page selectors (404 for invisible content), confirmed
+  email, one open report per content, 20 per day, audit without free text; automatic suspension
+  of a download link after 3 different accounts reported malware (served to no one, team
+  emailed, team cannot change it); `/api/v1/reports/`, `/api/v1/me/reports/`; reports in the data
+  export ([ADR 0019](adr/0019-reporting-and-link-suspension.md)).
+- Frontend: "Report" on project and campaign pages (not for the team) and "Report this link" on
+  the warning page; `/report` page (reason, details, privacy note); thanks notice; "Your reports"
+  on the account page; suspended links marked for the team.
+- **Verification (run on 2026-11-13):** pytest **447 passed** (8 new); mutation checks: 3 of
+  4 caught (visibility check removed, suspended links served, participant list unfiltered); the
+  4th (counting reports instead of distinct reporters) changes nothing because a database
+  constraint already allows one open report per account and content – an equivalent mutant,
+  noted in ADR 0019; Vitest **85 passed**; Playwright **75 passed** (2 new).
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A complete; phase 3B started – WP 3B.1 (platform roles) done. Next:
-**3B.2 reporting**. Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
+**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1 (platform roles) and 3B.2 (reporting) done. Next:
+**3B.3 moderation queue and blocking** (lift or confirm suspended links, close reports with an
+email to the reporter, hide/block projects, campaigns and links for everyone, warn; audit). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
 `PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
@@ -654,8 +672,6 @@ are assigned on an admin page (first admin via a one-off server command; fresh r
 and 2FA for role changes; audited; the last admin cannot remove themselves).
 
 Work packages to propose for 3B (present before starting, as usual):
-- 3B.2 Reporting of projects, campaigns and download links (reasons, free text, rate limit,
-  confirmed email; invitees of private campaigns can report).
 - 3B.3 Moderation queue (open, in review, resolved, dismissed; hide, block, warn; feedback to
   the reporter; audit) and blocking (blocked campaigns, projects and links are served to no one,
   reversible, with reason).

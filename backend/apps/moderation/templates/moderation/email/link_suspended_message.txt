@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}Several testers reported the download link "{{ link_label }}" of the campaign "{{ campaign_title }}" as malware or a dangerous download. Until a moderator has reviewed the reports, the link is not shown to anyone.
+
+If the file is safe, nothing else is needed from you: a moderator will review the case. If something is wrong with the file, replace the download at its source. Campaign: {{ edit_url }}{% endautoescape %}{% endblock content %}

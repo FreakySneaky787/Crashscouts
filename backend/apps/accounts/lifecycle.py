@@ -19,6 +19,7 @@ from django.utils import timezone
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
 from apps.campaigns.models import Application, Campaign, CampaignInvitation, Participation
+from apps.moderation.models import Report
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
 from apps.projects.models import Invitation, Membership
@@ -183,6 +184,16 @@ def export_data(user) -> dict:
             for a in Application.objects.filter(applicant=user)
             .select_related("campaign")
             .prefetch_related("answers")
+        ],
+        "reports": [
+            {
+                "target": r.target_label,
+                "reason": r.reason,
+                "text": r.text,
+                "status": r.status,
+                "created_at": _iso(r.created_at),
+            }
+            for r in Report.objects.filter(reporter=user)
         ],
         "campaigns_published": [
             {

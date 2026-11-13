@@ -24,7 +24,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects, invitations, campaignInvitations, participations, applications, role] = await Promise.all([
+  const [csrf, projects, invitations, campaignInvitations, participations, applications, role, reports] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
     backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
@@ -38,6 +38,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       "/api/v1/me/applications/",
     ),
     backendFetch<{ platform_role: string }>(request, "/api/v1/me/platform-role/"),
+    backendFetch<{ target_label: string; reason: string; status: string; created_at: string }[]>(request, "/api/v1/me/reports/"),
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
@@ -66,6 +67,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       participations: participations.data ?? [],
       applications: applications.data ?? [],
       isAdmin: role.data?.platform_role === "admin",
+      reports: reports.data ?? [],
       campaignInvitationResult,
       participationLeft,
     },
@@ -213,6 +215,20 @@ export default function Account({ loaderData }: Route.ComponentProps) {
               </ButtonLink>
             </div>
           </div>
+        </Panel>
+      ) : null}
+      {loaderData.reports.length ? (
+        <Panel title={t("reports.mine")}>
+          <ul className={styles.plainList} aria-label={t("reports.mine")}>
+            {loaderData.reports.map((r) => (
+              <li key={`${r.created_at}-${r.target_label}`} className={styles.listRow}>
+                <span>
+                  {r.target_label} · {t(`reports.reasons.${r.reason as "spam"}`)}
+                </span>
+                <span className={styles.muted}>{t(`reports.statuses.${r.status as "open"}`)}</span>
+              </li>
+            ))}
+          </ul>
         </Panel>
       ) : null}
       <Panel title={t("account.profile")}>

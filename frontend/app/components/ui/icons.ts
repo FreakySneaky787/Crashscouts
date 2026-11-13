@@ -26,6 +26,7 @@ export {
   EnvelopeSimpleIcon,
   EyeIcon,
   FingerprintIcon,
+  FlagIcon,
   FlaskIcon,
   GithubLogoIcon,
   GlobeIcon,

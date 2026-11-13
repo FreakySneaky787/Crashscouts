@@ -197,6 +197,10 @@ class CampaignLinkSerializer(serializers.Serializer):
     platform = CatalogItemSerializer(allow_null=True)
     sha256 = serializers.CharField()
     in_repository = serializers.SerializerMethodField()
+    suspended = serializers.SerializerMethodField()
+
+    def get_suspended(self, link) -> bool:
+        return link.suspended_at is not None
 
     def get_host(self, link) -> str:
         from .links import host_of

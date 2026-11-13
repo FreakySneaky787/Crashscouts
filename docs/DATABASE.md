@@ -47,11 +47,12 @@ erDiagram
 | projects | `RepositoryVerification` | proof of repository ownership (ADR 0015) | `verified_by`: SET_NULL |
 | campaigns | `Campaign` | test campaign; stored state plus `published_at`, `completed_at`, `cancelled_at` | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
 | campaigns | `CampaignSlugHistory` | former short names | – |
-| campaigns | `CampaignLink` | download links (ADR 0017) | – |
+| campaigns | `CampaignLink` | download links (ADR 0017); `suspended_at`/`suspended_reason` after malware reports (ADR 0019) | – |
 | campaigns | `CampaignInvitation` | invitations to private campaigns | invitee: CASCADE; `invited_by`: SET_NULL |
 | campaigns | `Participation` | taking part (`active`/`left`/`removed`; one per person and campaign) | CASCADE with the account (frees the place) |
 | campaigns | `ApplicationQuestion` | per-campaign questions | – |
 | campaigns | `Application` | application (`pending`/`approved`/`rejected`/`withdrawn`) | applicant: CASCADE; `decided_by`: SET_NULL |
+| moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
 | campaigns | `ApplicationAnswer` | answers (question text kept) | deleted on rejection, withdrawal, leaving, removal, 30 days after the campaign ends, and with the account |
 
 ## Retention jobs (daily)
@@ -70,4 +71,4 @@ participations keep their places until the final deletion (owner's decision, 202
 `/api/v1/me/export/` (`apps/accounts/lifecycle.py::export_data`) contains everything above that
 belongs to the person: account, profile, projects and team invitations, connected accounts, 2FA
 method types, security log, campaign participations, campaign invitations, applications with
-their own answers, and the campaigns they published.
+their own answers, the campaigns they published, and their reports (with their own text).

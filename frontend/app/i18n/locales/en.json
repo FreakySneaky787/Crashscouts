@@ -556,7 +556,8 @@
       "already_applied": "You already applied.",
       "rejected": "The team did not accept your application for this campaign.",
       "no_open_application": "There is no open application.",
-      "confirmReject": "Tick the box to confirm the rejection."
+      "confirmReject": "Tick the box to confirm the rejection.",
+      "link_suspended": "This link is suspended while moderators review reports about it."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -608,7 +609,8 @@
         "url": "Enter a public https:// link without user name, password, IP address or local name.",
         "platform": "Choose from the list.",
         "sha256": "Enter the checksum as 64 hexadecimal characters."
-      }
+      },
+      "suspended": "Suspended – under review"
     },
     "download": {
       "crumb": "Download link",
@@ -842,6 +844,46 @@
         "rateLimited": "Too many attempts. Try again later.",
         "generic": "Something went wrong. Please try again."
       }
+    }
+  },
+  "reports": {
+    "action": "Report",
+    "actionLink": "Report this link",
+    "title": "Report",
+    "subtitle": {
+      "project": "Project: {{label}}",
+      "campaign": "Campaign: {{label}}",
+      "link": "Download link: {{label}}"
+    },
+    "panel": "What is wrong?",
+    "reason": "Reason",
+    "reasonHint": "Malware reports are reviewed first.",
+    "reasons": {
+      "malware": "Malware or dangerous download",
+      "deception": "Deception or phishing",
+      "not_own_software": "Someone else's software passed off as own",
+      "spam": "Spam",
+      "legal": "Legal violation (copyright, illegal content)",
+      "other": "Other"
+    },
+    "text": "Details (optional)",
+    "textHint": "What did you notice? At most 1,000 characters.",
+    "privacy": "Only moderators see your report and your name. The project team does not learn who reported. You can follow the status on your account page.",
+    "send": "Send report",
+    "back": "Back",
+    "thanks": "Thank you. Moderators will review your report.",
+    "mine": "Your reports",
+    "statuses": {
+      "open": "Open",
+      "in_review": "In review",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "problem": {
+      "already_reported": "You already reported this, and your report is still open.",
+      "email_unconfirmed": "Confirm your email address before reporting.",
+      "rateLimited": "You sent many reports today. Try again tomorrow.",
+      "generic": "Something went wrong. Please try again."
     }
   }
 }

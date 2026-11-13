@@ -4,7 +4,7 @@ import { data, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/project";
 import { Chips, FactList, ProjectIcon, RowList } from "~/components/ui/Data";
-import { ArrowSquareOutIcon, CalendarIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
+import { ArrowSquareOutIcon, CalendarIcon, FlagIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
 import { ButtonLink } from "~/components/ui/Button";
 import { Markdown } from "~/components/ui/Markdown";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -16,6 +16,7 @@ import { CAMPAIGN_STATUS, PROJECT_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch } from "~/lib/backend.server";
 import { campaignStatusStyleKey, formatInZone, type Campaign } from "~/lib/campaigns";
+import { reportHref } from "~/lib/reports";
 import { cacheHeadersFor, privateNoStoreHeaders } from "~/lib/http";
 import { isValidProjectSlug, projectImageSrc, statusLabel, type Project } from "~/lib/projects";
 
@@ -55,8 +56,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (project.slug !== params.slug) throw redirect(`/p/${project.slug}`, { status: 301 });
   const url = new URL(`/p/${project.slug}`, request.url).toString();
   const headers = project.visibility === "public" && !project.role ? cacheHeadersFor(request) : privateNoStoreHeaders();
-  const campaignDeleted = new URL(request.url).searchParams.get("campaign") === "deleted";
-  return data({ project, url, campaigns: campaigns.status === 200 ? (campaigns.data ?? []) : [], campaignDeleted }, { headers });
+  const search = new URL(request.url).searchParams;
+  const campaignDeleted = search.get("campaign") === "deleted";
+  const reported = search.get("reported") === "1";
+  return data({ project, url, campaigns: campaigns.status === 200 ? (campaigns.data ?? []) : [], campaignDeleted, reported }, { headers });
 }
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
@@ -92,9 +95,14 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
                 {t("projects.edit")}
               </ButtonLink>
             </>
-          ) : null
+          ) : (
+            <ButtonLink to={reportHref({ type: "project", project: project.slug })} variant="quiet" icon={FlagIcon}>
+              {t("reports.action")}
+            </ButtonLink>
+          )
         }
       />
+      {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
       {loaderData.campaignDeleted ? <Notice tone="ok" title={t("campaigns.deleted")} /> : null}
       {campaigns.length || project.role ? (
         <Panel

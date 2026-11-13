@@ -10,7 +10,7 @@ import { ApplicationPanel } from "~/components/campaigns/ApplicationPanel";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { Chips, FactList, RowList } from "~/components/ui/Data";
-import { DownloadSimpleIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, SignInIcon, SignOutIcon, UserPlusIcon, UsersIcon } from "~/components/ui/icons";
+import { DownloadSimpleIcon, FlagIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, SignInIcon, SignOutIcon, UserPlusIcon, UsersIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -29,6 +29,7 @@ import {
   type Campaign,
   type CampaignLink,
 } from "~/lib/campaigns";
+import { reportHref } from "~/lib/reports";
 import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
 
@@ -71,6 +72,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const headers = csrf ? setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) : isPublic ? cacheHeadersFor(request) : privateNoStoreHeaders();
   const search = new URL(request.url).searchParams;
   const joined = search.get("joined") === "1";
+  const reported = search.get("reported") === "1";
   const applied = search.get("applied");
   const questions =
     campaign.participation === "approval"
@@ -81,6 +83,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       signedIn,
       csrfToken: csrf?.token ?? null,
       joined,
+      reported,
       questions,
       applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
     },
@@ -164,10 +167,15 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
                 {t("campaigns.edit")}
               </ButtonLink>
             </>
-          ) : null
+          ) : (
+            <ButtonLink to={reportHref({ type: "campaign", project: project.slug, campaign: campaign.slug })} variant="quiet" icon={FlagIcon}>
+              {t("reports.action")}
+            </ButtonLink>
+          )
         }
       />
       {loaderData.joined ? <Notice tone="ok" title={t("campaigns.join.joined")} /> : null}
+      {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
       {loaderData.applied ? <Notice tone="ok" title={t(`campaigns.apply.done.${loaderData.applied}`)} /> : null}
       {campaign.open_applications ? (
         <Notice tone="info" title={t("campaigns.apply.openForTeam", { count: campaign.open_applications })}>

@@ -64,9 +64,15 @@ def add_link(user, campaign: Campaign, **fields) -> CampaignLink:
     return link
 
 
+def _ensure_not_suspended(link: CampaignLink) -> None:
+    if link.suspended_at is not None:
+        raise CampaignError("link_suspended")  # decided by moderators (WP 3B.3)
+
+
 @transaction.atomic
 def change_link(user, link: CampaignLink, **fields) -> CampaignLink:
     _ensure_open(link.campaign)
+    _ensure_not_suspended(link)
     for key, value in fields.items():
         setattr(link, key, value)
     link.save()
@@ -78,5 +84,6 @@ def change_link(user, link: CampaignLink, **fields) -> CampaignLink:
 @transaction.atomic
 def remove_link(user, link: CampaignLink) -> None:
     _ensure_open(link.campaign)
+    _ensure_not_suspended(link)
     _audit(AuditEvent.Kind.CAMPAIGN_LINK_REMOVED, user, link)
     link.delete()
