@@ -25,6 +25,8 @@ export type Project = {
   role: "owner" | "maintainer" | null;
   logo_key: string | null;
   screenshots: { key: string; alt_text: string; width: number; height: number }[];
+  /** How the repository link was verified (WP 2.5); null while it is not verified. */
+  verification_method: "file" | "github" | null;
   created_at: string;
   updated_at: string;
 };

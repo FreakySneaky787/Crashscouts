@@ -7,6 +7,7 @@ from apps.catalog.serializers import CatalogItemSerializer
 from .models import Membership, Project, SlugHistory
 from .policies import role_of
 from .validators import validate_project_slug
+from .verification import verified_method
 
 
 class LicenseSummarySerializer(serializers.Serializer):
@@ -39,6 +40,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
     logo_key = serializers.UUIDField(allow_null=True)
     screenshots = ScreenshotSerializer(many=True)
+    verification_method = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
@@ -59,6 +61,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "role",
             "logo_key",
             "screenshots",
+            "verification_method",
             "created_at",
             "updated_at",
         )
@@ -73,6 +76,10 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_role(self, project) -> str | None:
         return role_of(self.context["request"].user, project)
+
+    def get_verification_method(self, project) -> str | None:
+        """Method "file" or "github" (WP 2.5) while the repository link is verified; else null."""
+        return verified_method(project)
 
 
 class ProjectWriteSerializer(serializers.ModelSerializer):

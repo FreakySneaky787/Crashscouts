@@ -50,7 +50,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `ssr_probe` | **Test only**: probe objects for the SSR spike; never installed in production | implemented |
 | `profiles` | Profile, interests, operating systems, skills, privacy, avatar | implemented (WP 1.2) |
 | `catalog` | Taxonomies: categories, platforms, languages, software type, SPDX licenses | categories, platforms, skills (WP 1.2); the rest in phase 2 |
-| `projects` | Project, membership (owner/maintainer), short names with history, verification, screenshots, status | model, policies, API (WP 2.2a) |
+| `projects` | Project, membership (owner/maintainer), short names with history, verification, screenshots, status | complete for phase 2: projects, team, images, repository verification (WP 2.2–2.5) |
 | `campaigns` | Campaigns, links, invitations, participations, status machine | planned |
 | `testing` | Test tasks, progress | planned |
 | `feedback` | Feedback, attachments, status, publishing | planned |
@@ -195,5 +195,9 @@ React Router's data requests.
 - The reverse proxy limits request bodies (a few MB) in front of the SSR server and Django
   ([ADR 0010](adr/0010-image-upload-pipeline.md)); `/media` is never routed.
 - A daily job runs `manage.py purge_deleted_accounts` (final account deletion, ADR 0013).
+- Outgoing HTTPS from Django to `api.github.com`, `github.com`, `gitlab.com` and `codeberg.org`
+  (repository verification, [ADR 0015](adr/0015-repository-verification.md)); nothing else is
+  needed. The SSR server routes `/projects/github/verify/callback`, the second callback URL of the
+  GitHub OAuth app.
 - Transactional email via Scaleway (open question F), configured through `DJANGO_EMAIL_*`.
 - The hosting provider is still open.

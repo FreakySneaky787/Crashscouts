@@ -4,6 +4,7 @@ import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/project-edit";
 import { ProjectForm } from "~/components/projects/ProjectForm";
+import { VerificationPanel } from "~/components/projects/VerificationPanel";
 import { Button } from "~/components/ui/Button";
 import { CheckboxField, TextField } from "~/components/ui/Form";
 import { ProjectIcon } from "~/components/ui/Data";
@@ -16,6 +17,8 @@ import { backendFetch, getSessionUser } from "~/lib/backend.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, projectErrorCodes, projectImageSrc, projectPayload, type Project } from "~/lib/projects";
 import { loadFormData } from "~/lib/projects.server";
+import { isGitHubAuthorizeUrl } from "~/lib/github";
+import { verificationErrorKey, verificationOutcome, type VerificationStatus } from "~/lib/verification";
 
 import styles from "./forms.module.css";
 
@@ -35,11 +38,24 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const project = await backendFetch<Project>(request, `/api/v1/projects/${slug}/`);
   if (project.status !== 200 || !project.data?.role) throw data(null, { status: 404, headers: privateNoStoreHeaders() });
   if (project.data.slug !== params.slug) throw redirect(`/p/${project.data.slug}/edit`, { headers: privateNoStoreHeaders() });
-  const { catalog, licenses, csrf } = await loadFormData(request);
-  const mediaParam = new URL(request.url).searchParams.get("media");
+  const [{ catalog, licenses, csrf }, verification] = await Promise.all([
+    loadFormData(request),
+    backendFetch<VerificationStatus>(request, `/api/v1/projects/${slug}/verification/`),
+  ]);
+  if (verification.status !== 200 || !verification.data) throw data(null, { status: 404, headers: privateNoStoreHeaders() });
+  const search = new URL(request.url).searchParams;
+  const mediaParam = search.get("media");
   const media: "saved" | "removed" | null = mediaParam === "saved" || mediaParam === "removed" ? mediaParam : null;
   return data(
-    { project: project.data, catalog, licenses, csrfToken: csrf.token, media },
+    {
+      project: project.data,
+      catalog,
+      licenses,
+      csrfToken: csrf.token,
+      media,
+      verification: verification.data,
+      verificationOutcome: verificationOutcome(search),
+    },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
@@ -81,6 +97,24 @@ export async function action({ request, params }: Route.ActionArgs) {
     const result = await backendFetch(request, path, { method: "DELETE", csrfToken });
     if (result.status === 204) throw redirect(`/p/${slug}/edit?media=removed`, { headers });
     return data({ values: null, errors: {}, problem: "generic" }, { status: 400, headers });
+  }
+
+  if (intent === "verify-file" || intent === "verify-github") {
+    const result = await backendFetch<{ code?: string; authorize_url?: string }>(
+      request,
+      `${base}/verification/${intent === "verify-file" ? "file" : "github"}/`,
+      { method: "POST", csrfToken },
+    );
+    // The GitHub way stores a one-time value in the session: pass the refreshed cookie on.
+    const verifyHeaders = setCookieHeaders(result.setCookies, privateNoStoreHeaders());
+    const authorizeUrl = result.data?.authorize_url;
+    if (intent === "verify-github" && result.status === 200 && isGitHubAuthorizeUrl(authorizeUrl)) {
+      throw redirect(authorizeUrl, { headers: verifyHeaders });
+    }
+    if (intent === "verify-file" && result.status === 200) throw redirect(`/p/${slug}/edit?verification=verified`, { headers: verifyHeaders });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    const error = verificationErrorKey(result.data?.code);
+    throw redirect(`/p/${slug}/edit?verification_error=${error}`, { headers: verifyHeaders });
   }
 
   if (intent === "delete") {
@@ -135,6 +169,7 @@ export default function ProjectEdit({ loaderData, actionData }: Route.ComponentP
         submitLabel={t("projects.save")}
         intent="save"
       />
+      <VerificationPanel status={loaderData.verification} csrfToken={loaderData.csrfToken} outcome={loaderData.verificationOutcome} />
       <Panel title={t("projects.media")}>
         <div className={styles.stack}>
           {loaderData.media ? <Notice tone="ok" title={t(`projects.mediaDone.${loaderData.media}`)} /> : null}

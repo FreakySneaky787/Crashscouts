@@ -17,6 +17,7 @@ from .policies import can_delete, can_edit
 from .selectors import project_for, projects_of
 from .serializers import ProjectSerializer, ProjectWriteSerializer
 from .services import create_project, has_confirmed_email, rename
+from .verification import forget as forget_verification
 
 
 class ProjectCreateView(APIView):
@@ -67,6 +68,7 @@ class ProjectDetailView(APIView):
         data = dict(serializer.validated_data)
         new_slug = data.pop("slug", project.slug)
         old_visibility = project.visibility
+        old_repository_url = project.repository_url
         with transaction.atomic():
             for key in ("categories", "platforms", "languages"):
                 if key in data:
@@ -75,6 +77,8 @@ class ProjectDetailView(APIView):
                 setattr(project, key, value)
             project.save()
             rename(project, new_slug)
+            if project.repository_url != old_repository_url:
+                forget_verification(project)  # a proof never carries over to another link
             if project.visibility != old_visibility:
                 record(
                     AuditEvent.Kind.PROJECT_VISIBILITY_CHANGED,

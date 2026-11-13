@@ -48,6 +48,11 @@ class AuditEvent(models.Model):
         PROJECT_VISIBILITY_CHANGED = "project.visibility_changed", "Project visibility changed"
         PROJECT_MEMBER_ADDED = "project.member_added", "Project maintainer added"
         PROJECT_MEMBER_REMOVED = "project.member_removed", "Project maintainer removed"
+        PROJECT_VERIFIED = "project.verified", "Project repository verified"
+        PROJECT_VERIFICATION_FAILED = (
+            "project.verification_failed",
+            "Project repository verification failed",
+        )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

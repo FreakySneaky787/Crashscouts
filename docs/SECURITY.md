@@ -70,6 +70,18 @@ including the negative cases.
   third-party requests), links only http(s)/mailto with `nofollow ugc`; `dangerouslySetInnerHTML`
   stays banned. Tested with script, image, event-handler and `javascript:` inputs.
 
+### Outgoing requests (WP 2.5, [ADR 0015](adr/0015-repository-verification.md))
+
+- The server contacts third-party servers only for the repository verification, and only the
+  official APIs of `api.github.com`, `github.com` (token exchange), `gitlab.com` and
+  `codeberg.org`. Addresses are built by the server from validated path segments; user input is
+  never used as a URL (no SSRF).
+- No redirects followed, 5 s timeout, response bodies capped (4 KB check file, 256 KB JSON).
+- The one-time GitHub token (no scopes) is revoked immediately after the check, also on failure,
+  and never stored, logged or returned. The OAuth `state` is signed, bound to user, session,
+  project and repository link, valid for 10 minutes and usable once.
+- Checks are team-only (404 for everyone else) and limited to 10 per hour per project.
+
 ## 4. Download links and the security gate
 
 - `https://` only.

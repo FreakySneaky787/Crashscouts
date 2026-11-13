@@ -148,3 +148,31 @@ class SlugHistory(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.slug} -> {self.project.slug}"
+
+
+class RepositoryVerification(BaseModel):
+    """Proof that a project belongs to its repository (WP 2.5, ADR 0015).
+
+    One row per project. The check code belongs to exactly one repository URL, and the proof counts
+    only while the project still links to that URL: changing the link removes the row.
+    """
+
+    class Method(models.TextChoices):
+        FILE = "file", "Check file"
+        GITHUB = "github", "GitHub authorization"
+
+    project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name="verification")
+    repository_url = models.CharField(max_length=300)
+    code = models.CharField(max_length=64)
+    method = models.CharField(max_length=8, choices=Method.choices, blank=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    verified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+
+    def __str__(self) -> str:
+        state = f"verified ({self.method})" if self.verified_at else "not verified"
+        return f"{self.project}: {state}"
+
+    def is_valid_for(self, project: Project) -> bool:
+        return self.verified_at is not None and self.repository_url == project.repository_url

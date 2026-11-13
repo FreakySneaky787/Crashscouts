@@ -15,6 +15,12 @@ from .team_views import (
     TeamView,
     TransferView,
 )
+from .verification_views import (
+    FileCheckView,
+    GitHubCallbackView,
+    GitHubStartView,
+    VerificationView,
+)
 from .views import MyProjectsView, ProjectCreateView, ProjectDetailView
 
 urlpatterns = [
@@ -43,6 +49,22 @@ urlpatterns = [
         name="screenshot-delete",
     ),
     path("project-images/<uuid:key>/", project_image, name="project-image"),
+    path("projects/<str:slug>/verification/", VerificationView.as_view(), name="verification"),
+    path(
+        "projects/<str:slug>/verification/file/",
+        FileCheckView.as_view(),
+        name="verification-file",
+    ),
+    path(
+        "projects/<str:slug>/verification/github/",
+        GitHubStartView.as_view(),
+        name="verification-github",
+    ),
+    path(
+        "repository-verification/github/callback/",
+        GitHubCallbackView.as_view(),
+        name="verification-github-callback",
+    ),
     path(
         "me/invitations/<uuid:invitation_id>/<str:answer>/",
         InvitationAnswerView.as_view(),

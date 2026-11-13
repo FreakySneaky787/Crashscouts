@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-12 (WP 2.4) · **Current phase:** 2 – Projects
+**Last update:** 2026-11-13 (WP 2.5, phase 2 complete) · **Current phase:** 2 – Projects (complete; phase 3A next)
 
 ## Work packages
 
@@ -337,7 +337,7 @@ account deletion) and [ADR 0009](adr/0009-account-rules-and-password-policy.md).
 **Phase 1 (accounts) is complete.** Still open: trying the real GitHub login on the first test
 server (open question U).
 
-## Phase 2 – Projects (started 2026-11-12)
+## Phase 2 – Projects (2026-11-12 – 2026-11-13) ✅
 
 Decisions: public or private projects, every confirmed account may create projects, maintainers by
 accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
@@ -427,6 +427,37 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
   (project and screenshot) – renamed to "Screenshot description"; another test race with a stale
   success notice, fixed by waiting for the new image itself.
 
+### WP 2.5 – Repository verification (2026-11-13) ✅
+
+- Owner's decisions: check file on GitHub, GitLab.com and Codeberg; for GitHub also a one-time
+  authorization whose token is revoked at once ([ADR 0015](adr/0015-repository-verification.md)).
+- Backend: `repositories.py` (host allowlist, strict path segments, fixed official API addresses),
+  `verification.py` (no redirects, 5 s timeout, size caps, public repositories only, constant-time
+  code comparison, OAuth `state` signed and bound to user, session, project and link, single use;
+  `maintain` or `admin` required; token revoked also on failure), model `RepositoryVerification`
+  (proof bound to the link; a new link deletes it), team-only API with 10 checks per hour per
+  project, audit events `project.verified` / `project.verification_failed`, `verification_method`
+  in the project data.
+- Frontend: "Repository verification" panel on the edit page (plain forms, works without
+  JavaScript), SSR callback `/projects/github/verify/callback`, badge "Repository verified" on the
+  project page.
+- **Fact checks before coding:** API formats from the official sources (GitHub OpenAPI and
+  `github/docs`, GitLab docs, Gitea specification). Found on the way: OAuth apps on github.com
+  accept up to 10 callback URLs (so a second callback is possible), and the token revocation uses
+  basic authentication with client ID and secret.
+- **Not yet verifiable here** (open question U, first test server): the `permissions` field for a
+  token without scopes, and Codeberg's API (codeberg.org is not reachable from this environment).
+- **Verification (run on 2026-11-13):** pytest **262 passed** (58 new, against simulated code
+  hosts; 10 mutation checks all caught: host allowlist removed, redirects followed, `push` accepted
+  as maintainer, no token revocation, no session nonce, no visibility check, no size cap, no team
+  check, proof not bound to the link, no rate limit); Ruff, migrations and OpenAPI clean; Vitest
+  **68 passed**; Playwright **62 passed** (4 new: instructions and unsupported links, GitHub start
+  without scopes and without JavaScript, forged state rejected, badge appears and disappears with
+  the link; axe without findings).
+- **Finding during the work:** the callback first was a POST; in production the browser arrives
+  from github.com, so Django's CSRF origin check would have refused it. It is now a GET like every
+  OAuth callback, protected by the signed single-use `state`.
+
 ## Known limitations
 
 - GitHub Free for private repositories: no push protection and no branch protection (see
@@ -435,4 +466,6 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
   scale, to be revisited when sessions grow (ADR 0013).
 - allauth rate limits use the per-process memory cache; a shared cache is required before the beta
   (open question O).
+- Unauthenticated GitHub API requests share a per-IP rate limit; many file checks for GitHub
+  repositories in a short time may answer "code host not reachable" until it resets (ADR 0015).
 - The design system covers the pages that exist so far; product pages (projects, campaigns, feedback) adopt it as they are built.

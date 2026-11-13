@@ -80,7 +80,8 @@ regression tests.
 - Public SSR project page with meta and Open Graph tags.
 
 Work packages (decisions 2026-11-12: public or private projects, every confirmed account may
-create projects, maintainers by accepted invitation, repository verification by file or GitHub):
+create projects, maintainers by accepted invitation, repository verification by file or GitHub).
+**Phase 2 is complete** (2026-11-13):
 
 | WP | Content | State |
 |---|---|---|
@@ -89,7 +90,7 @@ create projects, maintainers by accepted invitation, repository verification by 
 | 2.2b | Projects frontend: create/edit pages, public SSR page with Open Graph and Markdown (allowlist), my projects | ✅ done |
 | 2.3 | Maintainer invitations (invite by username, accept/decline, leave, remove), ownership handover | ✅ done |
 | 2.4 | Logo and screenshots via the image upload pipeline (ADR 0010) | ✅ done |
-| 2.5 | Repository verification: check file in the repository or connected GitHub account | planned |
+| 2.5 | Repository verification: check file (GitHub, GitLab.com, Codeberg) or one-time GitHub authorization ([ADR 0015](adr/0015-repository-verification.md)) | ✅ done (real GitHub check on the test server still to be tried) |
 
 ## Phase 3A – Campaigns (public visibility locked)
 

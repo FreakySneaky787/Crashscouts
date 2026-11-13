@@ -11,6 +11,7 @@ import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+import { verificationOutcome } from "~/lib/verification";
 
 import styles from "./forms.module.css";
 
@@ -30,6 +31,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
+  // A GitHub verification that could not be tied to a project ends here (e.g. expired state).
+  const outcome = verificationOutcome(params);
+  const verificationError = outcome && !outcome.ok ? outcome.error : null;
   const answered = params.get("invitation");
   const invitationResult: "accepted" | "declined" | "gone" | null =
     answered === "accepted" || answered === "declined" || answered === "gone" ? answered : null;
@@ -41,6 +45,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       invitations: invitations.data ?? [],
       deleted,
       invitationResult,
+      verificationError,
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -60,6 +65,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         subtitle={<span data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</span>}
       />
       {loaderData.deleted ? <Notice tone="ok" title={t("projects.deleted")} /> : null}
+      {loaderData.verificationError ? <Notice tone="danger" title={t(`verification.errors.${loaderData.verificationError}`)} /> : null}
       {loaderData.invitationResult ? (
         <Notice tone={loaderData.invitationResult === "gone" ? "danger" : "ok"} title={t(`invitations.${loaderData.invitationResult}`)} />
       ) : null}

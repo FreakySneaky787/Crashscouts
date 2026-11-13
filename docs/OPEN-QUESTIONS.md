@@ -1,6 +1,6 @@
 # Open Questions
 
-> As of: 2026-11-12. Every question is clarified **before** the phase that needs it. Until then,
+> As of: 2026-11-13. Every question is clarified **before** the phase that needs it. Until then,
 > nothing that depends on it is implemented.
 > The "Proposal" column is a recommendation, **not** a decision.
 
@@ -15,14 +15,14 @@
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
-| V | Team rules set provisionally in WP 2.3 (conservative): only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day | confirm with the owner | keep as is; loosen later if maintainers should also invite |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
 ### Resolved
 
 | # | Question | Decision (2026-11-12) |
 |---|---|---|
-| B | Repository verification | **Two ways:** a file with a check code in the repository (works with every code host) or, for GitHub projects, a check via the connected GitHub account. |
+| B | Repository verification | **Two ways:** a file with a check code in the repository, on **GitHub, GitLab.com and Codeberg** (2026-11-13), or, for GitHub projects, a **one-time GitHub authorization** whose token is revoked at once and never stored. Public repositories only ([ADR 0015](adr/0015-repository-verification.md)). |
+| V | Team rules | **Confirmed by the owner (2026-11-13):** only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day. |
 | – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |
 | – | Who may create projects | **Every account with a confirmed email address**, with a daily limit; abuse is handled by reporting and blocking (phase 3B). |
 | – | Adding maintainers | **Invitation that the person must accept**; nobody is added to a project without consent. |
@@ -61,7 +61,7 @@ Sources: [FADP (Fedlex)](https://www.fedlex.admin.ch/eli/cc/2022/491/de) ·
 |---|---|---|
 | O | Shared Django cache for allauth rate limits (the default per-process memory cache is insufficient with several processes), e.g. the database cache | before phase 3B / beta |
 | P | Behind the TLS proxy, the SSR server must see the public origin (host and `https`), because React Router rejects actions whose `Origin` does not match the request URL. Configure via a custom server with trusted proxy headers or `allowedActionOrigins`, and cover it with an E2E test against the production-like setup | WP 0.5 / phase 8 |
-| U | Try the real GitHub login with the owner's OAuth app (callback already set to `http://localhost:3000/accounts/github/login/callback/`) | first test server with a real domain | owner's decision (2026-11-12): test on the first test server; then add that server's callback URL to the same OAuth app. Nothing to do until then. |
+| U | Try the real GitHub login with the owner's OAuth app (callback already set to `http://localhost:3000/accounts/github/login/callback/`) | first test server with a real domain | owner's decision (2026-11-12): test on the first test server; then add that server's callback URLs to the same OAuth app: the login callback and, since WP 2.5, `<frontend>/projects/github/verify/callback` for the repository verification (ADR 0015). On that occasion also confirm that GitHub returns `permissions` for a token without scopes and that Codeberg answers the Gitea API v1 endpoints. Nothing to do until then. |
 | R | Confirm the dev container in a real GitHub Codespace: features (Node 24, GitHub CLI, Claude Code), full `post-create.sh` including Playwright's Chromium, private port forwarding, `pnpm e2e` | before phase 1 (needs one Codespace start by the project owner) |
 | S | Evaluate pnpm 12 (major upgrade from 10.x) | when convenient |
 | Q | Remove `apps.ssr_probe` and the probe routes once the regression tests have moved to the real models | phase 2/3 |

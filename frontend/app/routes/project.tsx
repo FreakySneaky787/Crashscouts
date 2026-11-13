@@ -4,7 +4,7 @@ import { data, redirect } from "react-router";
 
 import type { Route } from "./+types/project";
 import { Chips, FactList, ProjectIcon } from "~/components/ui/Data";
-import { ArrowSquareOutIcon, LockSimpleIcon, PencilSimpleIcon, UsersIcon } from "~/components/ui/icons";
+import { ArrowSquareOutIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
 import { ButtonLink } from "~/components/ui/Button";
 import { Markdown } from "~/components/ui/Markdown";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -72,6 +72,7 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
             <StatusPill tone={PROJECT_STATUS[status].tone} label={t(`projects.statuses.${project.status}`)} />
             <StatusPill tone={project.open_source ? "ok" : "neutral"} label={project.open_source ? t("projects.openSource") : t("projects.notOpenSource")} />
             {project.visibility === "private" ? <StatusPill tone="neutral" icon={LockSimpleIcon} label={t("projects.visibilities.private")} /> : null}
+            {project.verification_method ? <StatusPill tone="ok" icon={ShieldCheckIcon} label={t("verification.badge")} /> : null}
           </>
         }
         actions={
@@ -118,6 +119,10 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
                             <ArrowSquareOutIcon aria-hidden="true" className={styles.inlineIcon} />
                           </a>
                         ),
+                      },
+                      {
+                        label: t("verification.factLabel"),
+                        value: project.verification_method ? t("verification.badgeExplained") : t("verification.badgeMissing"),
                       },
                     ]
                   : []),
