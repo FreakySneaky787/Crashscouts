@@ -648,8 +648,10 @@ Work packages to propose for 3B (present before starting, as usual):
 - 3B.6 E2E "abuse case" (submit, review, approve, report link, block; the link is no longer
   reachable) and the gate checklist for the owner.
 
-**Questions for the owner before 3B starts:** the list of report reasons; whether reporters get
-feedback on the outcome; open question O (shared cache).
+**Decided for 3B on 2026-11-13 as well:** report reasons (malware, deception/phishing, someone
+else's software, spam, legal violation, other; free text optional; malware first), feedback to
+reporters on the account page plus a short email when closed, shared cache = Django's database
+cache (open question O).
 
 **Owner decisions of 2026-11-13** are in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) and ADRs
 0015–0017; data model in [`DATABASE.md`](DATABASE.md); metrics in [`METRICS.md`](METRICS.md)
