@@ -85,7 +85,7 @@ Authorization is checked by a central, server-side policy layer.
   CSS custom properties and CSS Modules, no component library; self-hosted fonts and icons; theme
   preference in a cookie, rendered on the server.
 
-## 5. Data model (draft)
+## 5. Data model (target; implemented part in [`DATABASE.md`](DATABASE.md))
 
 ```mermaid
 erDiagram
@@ -119,7 +119,8 @@ erDiagram
   nor creation time. There are no sequential IDs.
 - All models have `created_at` and `updated_at`.
 - Soft delete only where needed (moderation, anonymization).
-- The final schema will be documented in `DATABASE.md` once the models exist.
+- The implemented schema (phases 1–3A) with deletion rules and personal data is in
+  [`DATABASE.md`](DATABASE.md); the diagram above remains the target picture for later phases.
 
 ## 6. API concept
 

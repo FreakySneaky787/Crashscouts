@@ -80,7 +80,11 @@ class ApplicationsView(APIView):
         if not is_team(request.user, campaign):
             raise Http404
         applications = (
-            Application.objects.filter(campaign=campaign, status=Application.Status.PENDING)
+            Application.objects.filter(
+                campaign=campaign,
+                status=Application.Status.PENDING,
+                applicant__deletion_scheduled_for__isnull=True,
+            )
             .select_related("applicant__profile")
             .prefetch_related("answers")
         )

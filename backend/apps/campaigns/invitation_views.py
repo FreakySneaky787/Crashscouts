@@ -78,7 +78,13 @@ class CampaignInvitationsView(APIView):
     def get(self, request: Request, slug: str, campaign_slug: str) -> Response:
         campaign = _team_campaign(request, slug, campaign_slug)
         participants = (
-            Participation.objects.filter(campaign=campaign, status=Participation.Status.ACTIVE)
+            # Accounts in their deletion grace period keep their place but are not listed
+            # (invisible like everywhere else, WP 3A.6).
+            Participation.objects.filter(
+                campaign=campaign,
+                status=Participation.Status.ACTIVE,
+                user__deletion_scheduled_for__isnull=True,
+            )
             .select_related("user__profile")
             .order_by("created_at")
         )

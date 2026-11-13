@@ -92,7 +92,7 @@ create projects, maintainers by accepted invitation, repository verification by 
 | 2.4 | Logo and screenshots via the image upload pipeline (ADR 0010) | ✅ done |
 | 2.5 | Repository verification: check file (GitHub, GitLab.com, Codeberg) or one-time GitHub authorization ([ADR 0015](adr/0015-repository-verification.md)) | ✅ done (real GitHub check on the test server still to be tried) |
 
-## Phase 3A – Campaigns (public visibility locked)
+## Phase 3A – Campaigns (public visibility locked) ✅ complete (2026-11-13)
 
 - Private campaigns complete; public campaigns as drafts only.
 - Status machine (C).
@@ -112,7 +112,7 @@ Work packages (decisions 2026-11-13, see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md
 | 3A.4a | Participation: join directly, leave, removal by the team, hard limit under concurrency, participant list for the team, email and account page | ✅ done |
 | 3A.4b | Applications with per-campaign questions (templates, default "short message, optional"), approval and rejection; answers deleted on rejection, leaving, removal and 30 days after the campaign ends; **data foundation for the metrics** (`published_at`, `completed_at`, `cancelled_at`, `published_by`) | ✅ done |
 | 3A.5 | Private invitations by username; participation through acceptance (done before 3A.4 at the owner's request) | ✅ done |
-| 3A.6 | Data export and deletion, E2E for the lock, documentation; phase 3A complete | planned (next) |
+| 3A.6 | Data export and deletion, E2E for the lock, documentation (`DATABASE.md`); phase 3A complete | ✅ done |
 
 ## Phase 3B – Security gate (mandatory before any public campaign)
 

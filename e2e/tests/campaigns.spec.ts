@@ -69,7 +69,7 @@ test("the team creates, publishes and completes a private campaign", async ({ pa
   await expect(page.getByRole("button", { name: "Save changes" })).toHaveCount(0);
 });
 
-test("public campaigns stay drafts while the gate is closed", async ({ page, request }) => {
+test("public campaigns stay drafts while the gate is closed", async ({ page, request, browser }) => {
   await createSignedInAccount(page, request);
   const project = await createProject(page);
   await createCampaign(page, project, { visibility: "public" });
@@ -79,6 +79,18 @@ test("public campaigns stay drafts while the gate is closed", async ({ page, req
   await expect(page.getByRole("alert")).toContainText("Public campaigns cannot be published yet. Make the campaign private");
   await page.goto(`/p/${project}/c/beta-1`);
   await expect(page.getByText("Draft", { exact: true })).toBeVisible();
+
+  // Nobody outside the team sees the public draft: not visitors, not signed-in strangers.
+  const visitorContext = await browser.newContext();
+  expect((await (await visitorContext.newPage()).goto(`/p/${project}/c/beta-1`))?.status()).toBe(404);
+  const strangerContext = await browser.newContext();
+  const stranger = await strangerContext.newPage();
+  await createSignedInAccount(stranger, request);
+  expect((await stranger.goto(`/p/${project}/c/beta-1`))?.status()).toBe(404);
+  await stranger.goto(`/p/${project}`);
+  await expect(stranger.getByRole("list", { name: "Campaigns" })).toHaveCount(0);
+  await visitorContext.close();
+  await strangerContext.close();
 });
 
 test("strangers and visitors get 404 for drafts and private campaigns", async ({ page, request, browser }) => {

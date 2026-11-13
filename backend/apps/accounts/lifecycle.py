@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
+from apps.campaigns.models import Application, Campaign, CampaignInvitation, Participation
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
 from apps.projects.models import Invitation, Membership
@@ -155,5 +156,41 @@ def export_data(user) -> dict:
         "security_log": [
             {"event": e.kind, "at": _iso(e.created_at)}
             for e in AuditEvent.objects.filter(subject=user).order_by("created_at")
+        ],
+        # Campaigns (WP 3A.6): only the person's own participations, invitations, applications
+        # and answers; never other people's data.
+        "campaign_participations": [
+            {
+                "project": p.campaign.project.slug,
+                "campaign": p.campaign.slug,
+                "title": p.campaign.title,
+                "status": p.status,
+                "joined_at": _iso(p.created_at),
+            }
+            for p in Participation.objects.filter(user=user).select_related("campaign__project")
+        ],
+        "campaign_invitations": [
+            {"campaign": i.campaign.title, "status": i.status, "created_at": _iso(i.created_at)}
+            for i in CampaignInvitation.objects.filter(invitee=user).select_related("campaign")
+        ],
+        "campaign_applications": [
+            {
+                "campaign": a.campaign.title,
+                "status": a.status,
+                "created_at": _iso(a.created_at),
+                "answers": [{"question": x.prompt, "answer": x.value} for x in a.answers.all()],
+            }
+            for a in Application.objects.filter(applicant=user)
+            .select_related("campaign")
+            .prefetch_related("answers")
+        ],
+        "campaigns_published": [
+            {
+                "project": c.project.slug,
+                "campaign": c.slug,
+                "title": c.title,
+                "published_at": _iso(c.published_at),
+            }
+            for c in Campaign.objects.filter(published_by=user).select_related("project")
         ],
     }

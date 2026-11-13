@@ -119,6 +119,11 @@ including the negative cases.
 
 ## 6. Privacy and authorization
 
+- **Campaign data in export and deletion (WP 3A.6):** the data export contains the person's
+  participations, campaign invitations, applications with their own answers and the campaigns
+  they published – never other people's data. Final account deletion removes participations,
+  invitations, applications and answers; references in campaigns (`published_by`,
+  `decided_by`, `invited_by`) become NULL ([`DATABASE.md`](DATABASE.md)).
 - **No tracking:** no analytics scripts, no tracking cookies, no third-party analytics. Growth
   metrics are computed from the platform's own data, as aggregates only, and shown internally
   ([`METRICS.md`](METRICS.md), owner's decision 2026-11-13).

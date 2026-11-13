@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.4b) · **Current phase:** 3A – Campaigns
+**Last update:** 2026-11-13 (WP 3A.6, phase 3A complete) · **Current phase:** 3B – Security gate (next)
 
 ## Work packages
 
@@ -458,7 +458,7 @@ accepted invitation, repository verification by file or GitHub ([`OPEN-QUESTIONS
   from github.com, so Django's CSRF origin check would have refused it. It is now a GET like every
   OAuth callback, protected by the signed single-use `state`.
 
-## Phase 3A – Campaigns (started 2026-11-13)
+## Phase 3A – Campaigns (2026-11-13) ✅
 
 Decisions: hard tester limit, "In Progress" from the start date, completion by hand, private
 invitations by username, download links for team and participants only behind a warning page,
@@ -605,28 +605,56 @@ downloads" works in the real UI already.
   the retention period, rejected may re-apply); Vitest **82 passed**; Playwright **72 passed**;
   Ruff, migrations, OpenAPI and pip-audit clean.
 
+### WP 3A.6 – Wrap-up of phase 3A (2026-11-13) ✅
+
+- Data export with campaign participations, campaign invitations, applications with the
+  person's own answers, and campaigns they published.
+- Deletion grace period (owner's decision): participations keep their places, the person is
+  hidden from participant and application lists; final deletion removes all campaign data of the
+  person and frees the place; `published_by`/`decided_by` become NULL; campaigns follow their
+  project when it is handed over.
+- E2E: a public draft is 404 for visitors and signed-in strangers and missing from the project
+  page; publishing it is refused (lock).
+- New [`DATABASE.md`](DATABASE.md): implemented data model, deletion rules, personal data,
+  retention jobs, export.
+- Owner decisions recorded: A (email + 2FA, no waiting period), H (owner moderates), admin roles
+  on an admin page, grace-period handling.
+- **Verification (run on 2026-11-13):** pytest **428 passed** (5 new); 2 mutation checks
+  caught (export of other people's applications, grace-period filter); Playwright **72 passed** (lock test extended);
+  Vitest **82 passed**.
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A, WPs 3A.1–3A.5 done and pushed (CI green). Next and last of the
-phase: **3A.6**.
+**Where we are:** phase 3A is complete (WPs 3A.1–3A.6, CI green). Next: **phase 3B – security
+gate**, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
+`PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
 
-- **3A.6 – wrap-up of phase 3A:**
-  - Data export (`apps/accounts/lifecycle.py::export_data`): the person's participations,
-    campaign invitations and applications with their own answers.
-  - Account deletion: participations, invitations and applications go with the account
-    (`CASCADE`); check that `published_by` and `decided_by` become NULL and that campaigns of
-    handed-over projects survive; tests.
-  - E2E for the public-campaign lock end to end (already covered in parts; one consolidated
-    test that a public campaign can neither be published nor seen).
-  - Docs: STATUS, MVP-PLAN (phase 3A complete), ARCHITECTURE data model update.
-- Then **phase 3B – security gate** (reporting, blocking, review queue, rate limits, waiting
-  period A): needs the owner's answers to open questions A and H first.
+Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
+every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles
+are assigned on an admin page (first admin via a one-off server command; fresh reauthentication
+and 2FA for role changes; audited; the last admin cannot remove themselves).
 
-**Owner decisions of 2026-11-13** are in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (C, B, V, W,
-campaign rules, metrics, applications) and ADRs 0015–0017. Still open for the owner: U (real
-GitHub test on the first test server, including the second callback URL
-`<frontend>/projects/github/verify/callback`). Metrics: [`METRICS.md`](METRICS.md); the statistics
-page is WP M.1 after phase 5.
+Work packages to propose for 3B (present before starting, as usual):
+- 3B.1 Roles and admin page (bootstrap command, role changes, audit).
+- 3B.2 Reporting of projects, campaigns and download links (reasons, free text, rate limit,
+  confirmed email; invitees of private campaigns can report).
+- 3B.3 Moderation queue (open, in review, resolved, dismissed; hide, block, warn; feedback to
+  the reporter; audit) and blocking (blocked campaigns, projects and links are served to no one,
+  reversible, with reason).
+- 3B.4 Review queue for public campaigns; a link change of an approved campaign triggers a new
+  review; rule A enforced on publishing.
+- 3B.5 Rate limits per user and IP with a shared cache (open question O must be decided:
+  Valkey or the database cache) and tests.
+- 3B.6 E2E "abuse case" (submit, review, approve, report link, block; the link is no longer
+  reachable) and the gate checklist for the owner.
+
+**Questions for the owner before 3B starts:** the list of report reasons; whether reporters get
+feedback on the outcome; open question O (shared cache).
+
+**Owner decisions of 2026-11-13** are in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) and ADRs
+0015–0017; data model in [`DATABASE.md`](DATABASE.md); metrics in [`METRICS.md`](METRICS.md)
+(statistics page = WP M.1 after phase 5). Still open: U (real GitHub test on the first test
+server, including the second callback URL `<frontend>/projects/github/verify/callback`).
 
 **Working in the cloud environment:** start Docker inline when `docker info` fails
 (`dockerd` in the background, then `docker compose up -d db mailpit`); backend commands need
