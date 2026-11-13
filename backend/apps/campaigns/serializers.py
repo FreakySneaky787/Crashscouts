@@ -8,7 +8,7 @@ from . import status
 from .models import MAX_TARGET_TESTERS, Campaign, CampaignSlugHistory
 from .policies import is_team
 from .selectors import participant_count
-from .validators import validate_campaign_slug
+from .validators import validate_campaign_slug, validate_timezone
 
 
 class CampaignSerializer(serializers.ModelSerializer):
@@ -35,6 +35,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             "methodology",
             "starts_at",
             "ends_at",
+            "timezone",
             "target_testers",
             "platforms",
             "visibility",
@@ -66,6 +67,7 @@ class CampaignSerializer(serializers.ModelSerializer):
 class CampaignWriteSerializer(serializers.ModelSerializer):
     slug = serializers.CharField(max_length=40, validators=[validate_campaign_slug])
     target_testers = serializers.IntegerField(min_value=1, max_value=MAX_TARGET_TESTERS)
+    timezone = serializers.CharField(max_length=64, required=False, validators=[validate_timezone])
     participation = serializers.ChoiceField(choices=Campaign.Participation.choices, required=False)
     platforms = serializers.SlugRelatedField(
         slug_field="slug", queryset=Platform.objects.all(), many=True, required=False
@@ -85,6 +87,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             "methodology",
             "starts_at",
             "ends_at",
+            "timezone",
             "target_testers",
             "platforms",
             "visibility",

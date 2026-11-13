@@ -1,18 +1,21 @@
 /** Project page /p/:slug – server-rendered with link previews; private projects only for the team. */
 import { useTranslation } from "react-i18next";
-import { data, redirect } from "react-router";
+import { data, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/project";
-import { Chips, FactList, ProjectIcon } from "~/components/ui/Data";
-import { ArrowSquareOutIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
+import { Chips, FactList, ProjectIcon, RowList } from "~/components/ui/Data";
+import { ArrowSquareOutIcon, CalendarIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, UsersIcon } from "~/components/ui/icons";
 import { ButtonLink } from "~/components/ui/Button";
 import { Markdown } from "~/components/ui/Markdown";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
+import { Notice } from "~/components/ui/Notice";
 import { StatusPill } from "~/components/ui/StatusPill";
-import { PROJECT_STATUS } from "~/components/ui/statuses";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { CAMPAIGN_STATUS, PROJECT_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch } from "~/lib/backend.server";
+import { campaignStatusStyleKey, formatInZone, type Campaign } from "~/lib/campaigns";
 import { cacheHeadersFor, privateNoStoreHeaders } from "~/lib/http";
 import { isValidProjectSlug, projectImageSrc, statusLabel, type Project } from "~/lib/projects";
 
@@ -42,14 +45,18 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export async function loader({ request, params }: Route.LoaderArgs) {
   const slug = params.slug?.toLowerCase();
   if (!isValidProjectSlug(slug)) throw data(null, { status: 404 });
-  const result = await backendFetch<Project>(request, `/api/v1/projects/${slug}/`);
+  const [result, campaigns] = await Promise.all([
+    backendFetch<Project>(request, `/api/v1/projects/${slug}/`),
+    backendFetch<Campaign[]>(request, `/api/v1/projects/${slug}/campaigns/`),
+  ]);
   if (result.status !== 200 || !result.data) throw data(null, { status: 404, headers: privateNoStoreHeaders() });
   const project = result.data;
   // Former short names (and wrong letter case) redirect permanently to the current one.
   if (project.slug !== params.slug) throw redirect(`/p/${project.slug}`, { status: 301 });
   const url = new URL(`/p/${project.slug}`, request.url).toString();
   const headers = project.visibility === "public" && !project.role ? cacheHeadersFor(request) : privateNoStoreHeaders();
-  return data({ project, url }, { headers });
+  const campaignDeleted = new URL(request.url).searchParams.get("campaign") === "deleted";
+  return data({ project, url, campaigns: campaigns.status === 200 ? (campaigns.data ?? []) : [], campaignDeleted }, { headers });
 }
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
@@ -58,7 +65,7 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
 
 export default function ProjectPage({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { project } = loaderData;
+  const { project, campaigns } = loaderData;
   const status = statusLabel(project.status);
   const owner = project.team.find((m) => m.role === "owner");
   return (
@@ -88,6 +95,42 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
           ) : null
         }
       />
+      {loaderData.campaignDeleted ? <Notice tone="ok" title={t("campaigns.deleted")} /> : null}
+      {campaigns.length || project.role ? (
+        <Panel
+          title={t("campaigns.title")}
+          aside={
+            project.role ? (
+              <ButtonLink to={`/p/${project.slug}/c/new`} variant="quiet" size="sm" icon={PlusIcon}>
+                {t("campaigns.new")}
+              </ButtonLink>
+            ) : null
+          }
+          flush={campaigns.length > 0}
+        >
+          {campaigns.length ? (
+            <RowList
+              label={t("campaigns.title")}
+              rows={campaigns.map((c) => {
+                const style = CAMPAIGN_STATUS[campaignStatusStyleKey(c.status)];
+                return {
+                  key: c.slug,
+                  icon: CalendarIcon,
+                  primary: (
+                    <Link to={`/p/${project.slug}/c/${c.slug}`} className={styles.textLink}>
+                      {c.title}
+                    </Link>
+                  ),
+                  secondary: `${c.summary} · ${formatInZone(c.starts_at, c.timezone)}`,
+                  trailing: <StatusPill tone={style.tone} icon={style.icon} label={t(`campaigns.statuses.${c.status}`)} />,
+                };
+              })}
+            />
+          ) : (
+            <EmptyState kind="empty" title={t("campaigns.none")} />
+          )}
+        </Panel>
+      ) : null}
       {project.screenshots.length ? (
         <Panel title={t("projects.screenshots")}>
           <ul className={styles.gallery} aria-label={t("projects.screenshots")}>

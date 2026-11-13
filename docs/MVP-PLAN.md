@@ -107,7 +107,7 @@ Work packages (decisions 2026-11-13, see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md
 | WP | Content | State |
 |---|---|---|
 | 3A.1 | Campaigns backend: model, derived status, permissions, API, server-side lock for public campaigns ([ADR 0016](adr/0016-campaigns-and-status-model.md)) | ✅ done |
-| 3A.2 | Campaigns frontend: create, edit, campaign page `/p/<project>/c/<campaign>`, list on the project page | planned |
+| 3A.2 | Campaigns frontend: create, edit, campaign page `/p/<project>/c/<campaign>`, list on the project page; start/end with time zone | ✅ done |
 | 3A.3 | Download links (https only) with interstitial warning page, visible to team and participants only | planned |
 | 3A.4 | Participation: direct, application with per-campaign questions (templates, default "short message, optional"), approval, leaving, removal, hard limit, email and account page | planned |
 | 3A.5 | Private invitations by username | planned |

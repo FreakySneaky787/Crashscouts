@@ -16,7 +16,7 @@ from apps.core.models import BaseModel
 from apps.projects.models import Project
 
 from . import status
-from .validators import validate_campaign_slug
+from .validators import validate_campaign_slug, validate_timezone
 
 MARKDOWN_MAX_LENGTH = 10_000
 SHORT_MARKDOWN_MAX_LENGTH = 4_000
@@ -51,6 +51,10 @@ class Campaign(BaseModel):
     methodology = models.TextField(max_length=SHORT_MARKDOWN_MAX_LENGTH, blank=True)
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
+    # The team's time zone (IANA name): start and end are shown and edited in it.
+    timezone = models.CharField(
+        max_length=64, default="Europe/Zurich", validators=[validate_timezone]
+    )
     target_testers = models.PositiveIntegerField()
     platforms = models.ManyToManyField(Platform, blank=True, related_name="+")
     visibility = models.CharField(

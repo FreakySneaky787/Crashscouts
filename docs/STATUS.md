@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.1) · **Current phase:** 3A – Campaigns
+**Last update:** 2026-11-13 (WP 3A.2) · **Current phase:** 3A – Campaigns
 
 ## Work packages
 
@@ -478,6 +478,27 @@ per-campaign application questions, email plus account notices ([`OPEN-QUESTIONS
   daily limit); 7 mutation checks caught. One of them (policy ignoring the project's visibility)
   first slipped through because the API already hides private projects – added a direct policy
   test so the policy holds on its own. Ruff, migrations and OpenAPI clean.
+
+### WP 3A.2 – Campaigns frontend (2026-11-13) ✅
+
+- Pages `/p/<project>/c/new`, `/p/<project>/c/<campaign>` (status pill with icon, version, times
+  in the campaign's time zone, places "x of y", Markdown sections; former names redirect) and
+  `…/edit` (save, publish, complete, cancel with confirmation, delete drafts with confirmation;
+  visibility and participation only while a draft). Campaign list on the project page.
+- **Owner's decision:** start and end with date, time and time zone (default Europe/Zurich).
+  The SSR server converts with `Intl`; the backend stores the zone and validates it against
+  `tzdata` 2026.6 (new direct dependency, Apache-2.0).
+- The lock for public campaigns is explained on the page and the server's refusal is shown.
+- **Verification (run on 2026-11-13):** pytest **324 passed** (1 new: time zone stored and validated); Vitest **77 passed** (9 new:
+  time-zone conversion incl. daylight saving time and +05:45, round trip, payload, problems);
+  Playwright **68 passed** (6 new: create/publish/complete, public lock, 404 for strangers and
+  visitors, validation and confirmations, without JavaScript, axe light/dark; run twice in a row
+  without flakes); Ruff, migrations, OpenAPI, pip-audit clean.
+- **Findings during the work:** Node lists some zones only under older names (e.g.
+  `Asia/Katmandu`, `Europe/Kiev`), so the frontend validates zones through `Intl` itself instead
+  of the list; every zone Node offers is accepted by the backend (checked against all 418).
+  A test race (next step started before the create POST finished) fixed by waiting for the
+  resulting address.
 
 ## Known limitations
 

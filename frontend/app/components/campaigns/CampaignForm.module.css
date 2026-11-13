@@ -1,0 +1,54 @@
+.form {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 48rem;
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.radios {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.radio {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.radio input {
+  margin-top: 0.3rem;
+  accent-color: var(--color-accent);
+}
+
+.radio > span {
+  display: grid;
+  gap: 2px;
+}
+
+.radioLabel {
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.radioHint {
+  font-size: var(--text-sec);
+  color: var(--color-fg-secondary);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.row > * {
+  min-width: 0;
+}

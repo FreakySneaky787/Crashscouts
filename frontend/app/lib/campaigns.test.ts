@@ -1,0 +1,116 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  campaignPayload,
+  campaignProblem,
+  campaignStatusStyleKey,
+  formatInZone,
+  groupedTimeZones,
+  timeZones,
+  utcToZonedInput,
+  zonedToUtc,
+} from "./campaigns";
+
+describe("zonedToUtc", () => {
+  it("converts local times in a zone to UTC, including daylight saving time", () => {
+    expect(zonedToUtc("2026-11-20T09:00", "Europe/Zurich")).toBe("2026-11-20T08:00:00.000Z"); // CET
+    expect(zonedToUtc("2026-07-01T09:00", "Europe/Zurich")).toBe("2026-07-01T07:00:00.000Z"); // CEST
+    expect(zonedToUtc("2026-11-20T09:00", "America/New_York")).toBe("2026-11-20T14:00:00.000Z");
+    expect(zonedToUtc("2026-11-20T09:00", "UTC")).toBe("2026-11-20T09:00:00.000Z");
+    expect(zonedToUtc("2026-11-20T09:00", "Asia/Kathmandu")).toBe("2026-11-20T03:15:00.000Z"); // +05:45
+  });
+
+  it("rejects malformed input and unknown zones", () => {
+    for (const [local, zone] of [
+      ["", "Europe/Zurich"],
+      ["2026-11-20", "Europe/Zurich"],
+      ["2026-13-01T09:00", "Europe/Zurich"],
+      ["2026-11-20T25:00", "Europe/Zurich"],
+      ["2026-11-20T09:00", "Mars/Olympus"],
+      ["2026-11-20T09:00", ""],
+    ] as [string, string][]) {
+      expect(zonedToUtc(local, zone)).toBeNull();
+    }
+  });
+
+  it("round-trips with utcToZonedInput", () => {
+    for (const zone of ["Europe/Zurich", "America/Los_Angeles", "Australia/Sydney", "UTC"]) {
+      const iso = zonedToUtc("2026-03-29T12:30", zone)!;
+      expect(utcToZonedInput(iso, zone)).toBe("2026-03-29T12:30");
+    }
+    expect(utcToZonedInput("not a date", "UTC")).toBe("");
+  });
+});
+
+describe("time zones", () => {
+  it("lists IANA zones plus UTC, grouped by region", () => {
+    const zones = timeZones();
+    expect(zones).toContain("Europe/Zurich");
+    expect(zones).toContain("UTC");
+    const groups = groupedTimeZones(["Europe/Zurich", "Europe/Berlin", "UTC", "America/New_York"]);
+    expect(groups).toEqual([
+      { label: "Europe", options: ["Europe/Zurich", "Europe/Berlin"] },
+      { label: "Other", options: ["UTC"] },
+      { label: "America", options: ["America/New_York"] },
+    ]);
+  });
+
+  it("formats in the campaign's zone", () => {
+    expect(formatInZone("2026-11-20T08:00:00Z", "Europe/Zurich")).toBe("20 Nov 2026, 09:00");
+  });
+});
+
+describe("campaignPayload", () => {
+  const form = (entries: [string, string][]) => {
+    const data = new FormData();
+    for (const [k, v] of entries) data.append(k, v);
+    return data;
+  };
+  const base: [string, string][] = [
+    ["slug", " Beta-1 "],
+    ["title", "Beta 1"],
+    ["starts_at", "2026-11-20T09:00"],
+    ["ends_at", "2026-12-04T18:00"],
+    ["timezone", "Europe/Zurich"],
+    ["target_testers", "20"],
+    ["platforms", "linux"],
+    ["platforms", "windows"],
+  ];
+
+  it("converts times and keeps participation only for public campaigns", () => {
+    const privateForm = campaignPayload(form([...base, ["visibility", "private"], ["participation", "approval"]]));
+    expect(privateForm.errors).toEqual({});
+    expect(privateForm.values).toMatchObject({
+      slug: "beta-1",
+      starts_at: "2026-11-20T08:00:00.000Z",
+      ends_at: "2026-12-04T17:00:00.000Z",
+      target_testers: 20,
+      platforms: ["linux", "windows"],
+      visibility: "private",
+    });
+    expect(privateForm.values).not.toHaveProperty("participation");
+    const publicForm = campaignPayload(form([...base, ["visibility", "public"], ["participation", "approval"]]));
+    expect(publicForm.values).toMatchObject({ visibility: "public", participation: "approval" });
+  });
+
+  it("leaves out visibility when the form does not offer it (after publishing)", () => {
+    const { values } = campaignPayload(form(base));
+    expect(values).not.toHaveProperty("visibility");
+    expect(values).not.toHaveProperty("participation");
+  });
+
+  it("reports unreadable dates as field errors", () => {
+    const { errors } = campaignPayload(form([["starts_at", "soon"], ["timezone", "Europe/Zurich"]]));
+    expect(errors).toEqual({ starts_at: "invalid", ends_at: "invalid" });
+  });
+});
+
+describe("campaign helpers", () => {
+  it("maps statuses to the design system and problems to known codes", () => {
+    expect(campaignStatusStyleKey("in_progress")).toBe("In Progress");
+    expect(campaignProblem(403, { code: "public_campaigns_locked" })).toBe("public_campaigns_locked");
+    expect(campaignProblem(429, null)).toBe("rateLimited");
+    expect(campaignProblem(403, { code: "<script>" })).toBe("forbidden");
+    expect(campaignProblem(400, "nonsense")).toBe("generic");
+  });
+});

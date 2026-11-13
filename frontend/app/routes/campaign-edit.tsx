@@ -1,0 +1,189 @@
+/**
+ * Edit a campaign (WP 3A.2): details, publish, complete, cancel, delete drafts. Team only; 404
+ * for everyone else. Publishing a public campaign is refused by the server while the security
+ * gate (phase 3B) is closed; the page says so.
+ */
+import { useTranslation } from "react-i18next";
+import { data, Form, redirect } from "react-router";
+
+import type { Route } from "./+types/campaign-edit";
+import { CampaignForm } from "~/components/campaigns/CampaignForm";
+import { Button } from "~/components/ui/Button";
+import { CheckboxField } from "~/components/ui/Form";
+import { CheckCircleIcon, PaperPlaneTiltIcon, TrashIcon, XCircleIcon } from "~/components/ui/icons";
+import { Notice } from "~/components/ui/Notice";
+import { PageHeader } from "~/components/ui/PageHeader";
+import { Panel } from "~/components/ui/Panel";
+import { brand } from "~/config/brand";
+import { backendFetch, getSessionUser } from "~/lib/backend.server";
+import { campaignFormEcho, campaignFormValues, campaignPayload, campaignProblem, type Campaign } from "~/lib/campaigns";
+import { loadCampaignFormData } from "~/lib/campaigns.server";
+import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+import { isValidProjectSlug, projectErrorCodes, type Project } from "~/lib/projects";
+
+import styles from "./forms.module.css";
+
+const ACTIONS = { publish: "publish", complete: "complete", cancel: "cancel" } as const;
+
+export function meta(_: Route.MetaArgs) {
+  return [{ title: `Edit campaign · ${brand.name}` }, { name: "robots", content: "noindex" }];
+}
+
+function slugs(params: { slug?: string; campaign?: string }) {
+  const slug = params.slug?.toLowerCase();
+  const campaign = params.campaign?.toLowerCase();
+  if (!isValidProjectSlug(slug) || !isValidProjectSlug(campaign)) throw data(null, { status: 404 });
+  return { slug, campaign, api: `/api/v1/projects/${slug}/campaigns/${campaign}/` };
+}
+
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const { slug, campaign: campaignSlug, api } = slugs(params);
+  if (!(await getSessionUser(request))) {
+    throw redirect(`/login?next=${encodeURIComponent(`/p/${slug}/c/${campaignSlug}/edit`)}`, { headers: privateNoStoreHeaders() });
+  }
+  const [project, campaign] = await Promise.all([backendFetch<Project>(request, `/api/v1/projects/${slug}/`), backendFetch<Campaign>(request, api)]);
+  if (project.status !== 200 || !project.data || campaign.status !== 200 || !campaign.data?.can_edit) {
+    throw data(null, { status: 404, headers: privateNoStoreHeaders() });
+  }
+  if (project.data.slug !== params.slug || campaign.data.slug !== params.campaign) {
+    throw redirect(`/p/${project.data.slug}/c/${campaign.data.slug}/edit`, { headers: privateNoStoreHeaders() });
+  }
+  const { platforms, timeZones, csrf } = await loadCampaignFormData(request);
+  const done = new URL(request.url).searchParams.get("done");
+  return data(
+    {
+      project: { slug: project.data.slug, name: project.data.name },
+      campaign: campaign.data,
+      platforms,
+      timeZones,
+      csrfToken: csrf.token,
+      saved: done === "saved",
+    },
+    { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
+  );
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+  const { slug, api } = slugs(params);
+  const headers = privateNoStoreHeaders();
+  const form = await request.formData();
+  const csrfToken = String(form.get("csrf_token") ?? "");
+  const intent = String(form.get("intent") ?? "");
+
+  if (intent === "cancel" && form.get("confirm") !== "on") {
+    return data({ values: null, errors: {}, problem: "confirmCancel" as const }, { status: 400, headers });
+  }
+  if (intent in ACTIONS) {
+    const result = await backendFetch<Campaign>(request, `${api}${ACTIONS[intent as keyof typeof ACTIONS]}/`, { method: "POST", csrfToken });
+    if (result.status === 200 && result.data) throw redirect(`/p/${slug}/c/${result.data.slug}`, { headers });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    return data({ values: null, errors: {}, problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+  if (intent === "delete") {
+    if (form.get("confirm") !== "on") return data({ values: null, errors: {}, problem: "confirmDelete" as const }, { status: 400, headers });
+    const result = await backendFetch(request, api, { method: "DELETE", csrfToken });
+    if (result.status === 204) throw redirect(`/p/${slug}?campaign=deleted`, { headers });
+    return data({ values: null, errors: {}, problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+  }
+
+  const echo = campaignFormEcho(form);
+  const { values, errors } = campaignPayload(form);
+  if (Object.keys(errors).length) return data({ values: echo, errors, problem: null }, { status: 400, headers });
+  const result = await backendFetch<Campaign>(request, api, { method: "PATCH", csrfToken, json: values });
+  if (result.status === 200 && result.data) throw redirect(`/p/${slug}/c/${result.data.slug}/edit?done=saved`, { headers });
+  if (result.status === 404) throw data(null, { status: 404, headers });
+  if (result.status === 400 && result.data && !("code" in (result.data as object))) {
+    return data({ values: echo, errors: projectErrorCodes(result.data), problem: null }, { status: 400, headers });
+  }
+  return data({ values: echo, errors: {}, problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
+}
+
+export function headers({ actionHeaders, loaderHeaders }: Route.HeadersArgs) {
+  return [...actionHeaders].length > 0 ? actionHeaders : loaderHeaders;
+}
+
+export default function CampaignEdit({ loaderData, actionData }: Route.ComponentProps) {
+  const { t } = useTranslation();
+  const { project, campaign, csrfToken } = loaderData;
+  const draft = campaign.state === "draft";
+  const closed = campaign.state === "completed" || campaign.state === "cancelled";
+  const problem = actionData?.problem ?? null;
+  const stateButton = (intent: "publish" | "complete", label: string, icon: typeof CheckCircleIcon, variant: "primary" | "secondary") => (
+    <Form method="post">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <input type="hidden" name="intent" value={intent} />
+      <Button type="submit" variant={variant} icon={icon}>
+        {label}
+      </Button>
+    </Form>
+  );
+  return (
+    <div className={styles.stack}>
+      <PageHeader
+        breadcrumbs={[
+          { label: project.name, to: `/p/${project.slug}` },
+          { label: campaign.title, to: `/p/${project.slug}/c/${campaign.slug}` },
+          { label: t("campaigns.edit") },
+        ]}
+        title={t("campaigns.editTitle", { title: campaign.title })}
+      />
+      {loaderData.saved ? <Notice tone="ok" title={t("campaigns.saved")} /> : null}
+      {problem ? <Notice tone="danger" title={t(`campaigns.problem.${problem}`)} /> : null}
+
+      <Panel title={t("campaigns.stateTitle")}>
+        <div className={styles.stack}>
+          <p>{t(`campaigns.stateText.${campaign.state}`)}</p>
+          {draft && campaign.visibility === "public" ? <Notice tone="info" title={t("campaigns.publicLockedNotice")} /> : null}
+          {!closed ? (
+            <div className={styles.buttonRow}>
+              {draft ? stateButton("publish", t("campaigns.publish"), PaperPlaneTiltIcon, "primary") : null}
+              {campaign.state === "published" ? stateButton("complete", t("campaigns.complete"), CheckCircleIcon, "secondary") : null}
+            </div>
+          ) : null}
+          {!closed ? (
+            <Form method="post" className={styles.form}>
+              <input type="hidden" name="csrf_token" value={csrfToken} />
+              <input type="hidden" name="intent" value="cancel" />
+              <CheckboxField id="confirm-cancel" name="confirm" label={t("campaigns.cancelConfirm", { title: campaign.title })} />
+              <div>
+                <Button type="submit" variant="danger" icon={XCircleIcon}>
+                  {t("campaigns.cancel")}
+                </Button>
+              </div>
+            </Form>
+          ) : null}
+        </div>
+      </Panel>
+
+      {closed ? (
+        <Notice tone="info" title={t("campaigns.closedNotice")} />
+      ) : (
+        <CampaignForm
+          csrfToken={csrfToken}
+          platforms={loaderData.platforms}
+          timeZones={loaderData.timeZones}
+          values={actionData?.values ?? campaignFormValues(campaign)}
+          errors={actionData?.errors ?? {}}
+          submitLabel={t("campaigns.save")}
+          editableAccess={draft}
+        />
+      )}
+
+      {draft ? (
+        <Panel title={t("campaigns.deleteTitle")}>
+          <Form method="post" className={styles.form}>
+            <p>{t("campaigns.deleteText")}</p>
+            <input type="hidden" name="csrf_token" value={csrfToken} />
+            <input type="hidden" name="intent" value="delete" />
+            <CheckboxField id="confirm-delete" name="confirm" label={t("campaigns.deleteConfirm", { title: campaign.title })} />
+            <div>
+              <Button type="submit" variant="danger" icon={TrashIcon}>
+                {t("campaigns.delete")}
+              </Button>
+            </div>
+          </Form>
+        </Panel>
+      ) : null}
+    </div>
+  );
+}

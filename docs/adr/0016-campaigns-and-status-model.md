@@ -39,7 +39,13 @@ phase 3A round):
    else is a plain 404, also through former short names.
 6. **Short names** are unique per project (case-insensitive) with history, so old addresses keep
    redirecting.
-7. Creating needs a confirmed email address and is limited to 20 campaigns per day and person.
+7. **Times with a time zone** (owner's decision, WP 3A.2): the team enters start and end as
+   local date and time plus an IANA time zone (default `Europe/Zurich`). The SSR server converts
+   them to UTC with the platform's `Intl` data; the campaign stores the instants and the zone
+   name, and pages show the times in that zone. The backend validates the zone against the IANA
+   database of the `tzdata` package (2026.6, Apache-2.0, Python Software Foundation), a direct
+   dependency so the list does not depend on the server's operating system.
+8. Creating needs a confirmed email address and is limited to 20 campaigns per day and person.
    State changes are audited (`campaign.created/published/completed/cancelled/deleted`).
 
 ## Alternatives
@@ -59,5 +65,8 @@ phase 3A round):
 ## Sources
 
 - Master prompt, sections 2.2 and 3.5 (`docs/MASTER-PROMPT.md`).
+- Python `zoneinfo` and the `tzdata` package: https://docs.python.org/3/library/zoneinfo.html,
+  https://pypi.org/project/tzdata/2026.6/ (version, licence and author checked in the installed
+  package metadata).
 - Django constraints (`CheckConstraint(condition=…)`, expressions in `UniqueConstraint`):
   https://docs.djangoproject.com/en/6.1/ref/models/constraints/

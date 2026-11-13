@@ -1,3 +1,6 @@
+from functools import cache
+from zoneinfo import available_timezones
+
 from django.core.exceptions import ValidationError
 
 from apps.projects.validators import SLUG_PATTERN
@@ -14,3 +17,14 @@ def validate_campaign_slug(value: str) -> None:
         )
     if value in RESERVED_SLUGS:
         raise ValidationError("This name is reserved.", code="reserved_slug")
+
+
+@cache
+def _timezones() -> frozenset[str]:
+    # From the tzdata package (a direct dependency), so the list does not depend on the OS.
+    return frozenset(available_timezones())
+
+
+def validate_timezone(value: str) -> None:
+    if value not in _timezones():
+        raise ValidationError("Choose a time zone from the list.", code="invalid_timezone")

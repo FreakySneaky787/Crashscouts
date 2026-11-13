@@ -386,3 +386,14 @@ def test_policy_alone_hides_public_campaigns_of_private_projects(people, setting
     campaign.refresh_from_db()
     assert can_view(people["stranger"], campaign) is False
     assert can_view(people["owner"], campaign) is True
+
+
+def test_time_zone_is_stored_and_validated(people, project):
+    body = create(people["owner"]).json()
+    assert body["timezone"] == "Europe/Zurich"  # default
+    body = create(people["owner"], slug="beta-ny", timezone="America/New_York").json()
+    assert body["timezone"] == "America/New_York"
+    for bad in ("Mars/Olympus", "../../etc/passwd", ""):
+        response = create(people["owner"], slug="beta-bad", timezone=bad)
+        assert response.status_code == 400
+        assert response.json()["timezone"][0] in {"invalid_timezone", "blank"}
