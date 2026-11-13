@@ -35,6 +35,7 @@ class CampaignSerializer(serializers.ModelSerializer):
     open_applications = serializers.SerializerMethodField()
     my_application = serializers.SerializerMethodField()
     moderation = serializers.SerializerMethodField()
+    review_note = serializers.SerializerMethodField()
 
     class Meta:
         model = Campaign
@@ -64,6 +65,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             "open_applications",
             "my_application",
             "moderation",
+            "review_note",
             "created_at",
             "updated_at",
         )
@@ -82,6 +84,12 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     def get_can_edit(self, campaign) -> bool:
         return is_team(self.context["request"].user, campaign)
+
+    def get_review_note(self, campaign) -> str | None:
+        """The moderators' reason for sending it back; for the team only."""
+        if not is_team(self.context["request"].user, campaign):
+            return None
+        return campaign.review_note
 
     def get_moderation(self, campaign) -> dict | None:
         """Block with reason and appeal state, for the team only (ADR 0020)."""
@@ -209,6 +217,8 @@ class CampaignLinkSerializer(serializers.Serializer):
     in_repository = serializers.SerializerMethodField()
     suspended = serializers.SerializerMethodField()
     blocked = serializers.SerializerMethodField()
+    review_status = serializers.CharField()
+    review_note = serializers.CharField()
 
     def get_suspended(self, link) -> bool:
         return link.suspended_at is not None

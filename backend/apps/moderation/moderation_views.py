@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.roles import is_moderator
+from apps.campaigns.models import Campaign, CampaignLink
 from apps.projects.policies import can_edit
 
 from .actions import (
@@ -28,6 +29,14 @@ from .actions import (
     warn,
 )
 from .models import OPEN_STATES, Block, ModerationNote, Report
+from .reviews import (
+    approve_campaign,
+    approve_link,
+    pending_campaigns,
+    pending_links,
+    reject_campaign,
+    reject_link,
+)
 
 CODE = inline_serializer("ModerationError", {"code": serializers.CharField()})
 
@@ -263,6 +272,79 @@ class AppealCreateView(APIView):
             return Response({"code": "too_long"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             appeal(found, request.user, text)
+        except ModerationError as exc:
+            return _error(exc)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReviewsView(ModeratorView):
+    """Public campaigns waiting for review, and waiting links of published campaigns."""
+
+    @extend_schema(
+        operation_id="moderation_reviews_list",
+        responses=inline_serializer("Reviews", {"x": serializers.CharField()}),
+    )
+    def get(self, request: Request) -> Response:
+        def link_data(link):
+            return {
+                "id": str(link.pk),
+                "label": link.label,
+                "url": link.url,
+                "sha256": link.sha256,
+                "review_status": link.review_status,
+            }
+
+        return Response(
+            {
+                "campaigns": [
+                    {
+                        "id": str(c.pk),
+                        "title": c.title,
+                        "summary": c.summary,
+                        "description": c.description,
+                        "project": c.project.slug,
+                        "project_name": c.project.name,
+                        "campaign": c.slug,
+                        "links": [link_data(link) for link in c.links.all()],
+                    }
+                    for c in pending_campaigns()
+                ],
+                "links": [
+                    {
+                        **link_data(link),
+                        "campaign_title": link.campaign.title,
+                        "project": link.campaign.project.slug,
+                        "project_name": link.campaign.project.name,
+                        "campaign": link.campaign.slug,
+                    }
+                    for link in pending_links()
+                ],
+            }
+        )
+
+
+class ReviewDecisionView(ModeratorView):
+    @extend_schema(
+        operation_id="moderation_review_decide",
+        request=ActionSerializer,
+        responses={204: None, 400: CODE},
+    )
+    def post(self, request: Request, kind: str, target_id, decision: str) -> Response:
+        model = {"campaign": Campaign, "link": CampaignLink}.get(kind)
+        target = model.objects.filter(pk=target_id).first() if model else None
+        if target is None or decision not in {"approve", "reject"}:
+            raise Http404
+        message = str(request.data.get("message", ""))
+        try:
+            if kind == "campaign":
+                if decision == "approve":
+                    approve_campaign(target, request.user)
+                else:
+                    reject_campaign(target, request.user, message)
+            elif decision == "approve":
+                approve_link(target, request.user)
+            else:
+                reject_link(target, request.user, message)
         except ModerationError as exc:
             return _error(exc)
         return Response(status=status.HTTP_204_NO_CONTENT)

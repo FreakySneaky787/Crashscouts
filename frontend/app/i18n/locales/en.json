@@ -499,7 +499,8 @@
       "full": "Full",
       "in_progress": "In progress",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "in_review": "In review"
     },
     "about": "About this campaign",
     "noDescription": "No description yet.",
@@ -514,7 +515,8 @@
       "draft": "Draft: only your team can see it. Publishing makes it available to the people allowed to take part; who can take part cannot be changed afterwards.",
       "published": "Published. It shows as in progress from the start. Complete it when testing is over.",
       "completed": "Completed. The campaign can no longer be changed.",
-      "cancelled": "Cancelled. The campaign can no longer be changed."
+      "cancelled": "Cancelled. The campaign can no longer be changed.",
+      "in_review": "Waiting for the moderators' review. Nobody outside your team can see it yet; you can still edit texts and links."
     },
     "publish": "Publish",
     "complete": "Complete campaign",
@@ -559,7 +561,8 @@
       "no_open_application": "There is no open application.",
       "confirmReject": "Tick the box to confirm the rejection.",
       "link_suspended": "This link is suspended while moderators review reports about it.",
-      "blocked": "Moderators blocked this content; it cannot be changed. You can appeal on its page."
+      "blocked": "Moderators blocked this content; it cannot be changed. You can appeal on its page.",
+      "needs_2fa": "Turn on two-factor authentication before submitting a public campaign."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -613,7 +616,9 @@
         "sha256": "Enter the checksum as 64 hexadecimal characters."
       },
       "suspended": "Suspended – under review",
-      "blocked": "Blocked by moderators"
+      "blocked": "Blocked by moderators",
+      "pending": "Waiting for review",
+      "rejected": "Rejected: {{reason}}"
     },
     "download": {
       "crumb": "Download link",
@@ -765,7 +770,10 @@
         "pending": "Waiting for the team",
         "rejected": "Not accepted"
       }
-    }
+    },
+    "submitReview": "Submit for review",
+    "reviewRejected": "The moderators sent this campaign back:",
+    "publicReviewNotice": "Public campaigns are reviewed by moderators before they go live. Submitting needs two-factor authentication. While the platform is not open for public campaigns yet, they stay drafts."
   },
   "team": {
     "title": "Team",
@@ -938,7 +946,9 @@
       "not_suspended": "This link is not suspended.",
       "no_open_appeal": "There is no open appeal.",
       "confirm": "Tick the box to confirm.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "not_in_review": "This is no longer waiting for review.",
+      "too_long": "At most 1,000 characters."
     },
     "team": {
       "title": "Blocked by the moderators",
@@ -954,6 +964,15 @@
         "upheld": "The moderators reviewed your appeal and kept the block.",
         "lifted": "The block was lifted."
       }
-    }
+    },
+    "reviews": "Reviews",
+    "noReviews": "Nothing to review.",
+    "reviewCampaign": "Campaign",
+    "reviewLink": "Changed or new link",
+    "approve": "Approve",
+    "reject": "Send back",
+    "rejectMessage": "Reason for the team",
+    "rejectConfirm": "Send it back with this reason.",
+    "links": "Download links"
   }
 }

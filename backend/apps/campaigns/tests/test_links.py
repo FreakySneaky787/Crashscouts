@@ -35,9 +35,13 @@ URL = "/api/v1/projects/linked-app/campaigns/beta/links/"
 
 
 def add(user, **overrides):
+    """Adds a link and, as moderators would (WP 3B.4), approves it for this public campaign."""
     data = {"label": "Linux AppImage", "url": "https://downloads.example.org/app-2.0.AppImage"}
     data.update(overrides)
-    return client_for(user).post(URL, data, format="json")
+    response = client_for(user).post(URL, data, format="json")
+    if response.status_code == 201:
+        CampaignLink.objects.filter(pk=response.json()["id"]).update(review_status="approved")
+    return response
 
 
 def test_the_team_adds_links_and_sees_them(team):

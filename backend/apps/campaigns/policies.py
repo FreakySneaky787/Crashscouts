@@ -36,7 +36,7 @@ def has_private_access(user, campaign: Campaign) -> bool:
 def can_view(user, campaign: Campaign) -> bool:
     if is_team(user, campaign):
         return True
-    if campaign.state == Campaign.State.DRAFT:
+    if campaign.state in (Campaign.State.DRAFT, Campaign.State.IN_REVIEW):
         return False
     if campaign.blocked_at is not None or campaign.project.blocked_at is not None:
         return False  # blocked by moderators: gone for invitees and participants too

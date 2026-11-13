@@ -6,6 +6,7 @@ import {
   CheckCircleIcon,
   CircleHalfIcon,
   CircleIcon,
+  HourglassMediumIcon,
   ProhibitIcon,
   UsersIcon,
   XCircleIcon,
@@ -17,6 +18,7 @@ export type StatusStyle = { tone: Tone; icon?: IconComponent };
 
 export const CAMPAIGN_STATUS = {
   Draft: { tone: "neutral", icon: CircleIcon },
+  "In Review": { tone: "warn", icon: HourglassMediumIcon },
   Open: { tone: "ok", icon: CircleIcon },
   Full: { tone: "warn", icon: UsersIcon },
   "In Progress": { tone: "info", icon: CircleHalfIcon },

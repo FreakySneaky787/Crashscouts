@@ -23,7 +23,8 @@ describe("identity", () => {
 
 describe("status maps cover every value from the PRD", () => {
   it("campaigns", () => {
-    expect(Object.keys(CAMPAIGN_STATUS)).toEqual(["Draft", "Open", "Full", "In Progress", "Completed", "Cancelled"]);
+    // The six statuses of the PRD plus "In Review" (team only), added by the security gate (ADR 0021).
+    expect(Object.keys(CAMPAIGN_STATUS)).toEqual(["Draft", "In Review", "Open", "Full", "In Progress", "Completed", "Cancelled"]);
   });
   it("feedback", () => {
     expect(Object.keys(FEEDBACK_STATUS)).toEqual([

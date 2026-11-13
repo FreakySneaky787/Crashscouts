@@ -54,6 +54,7 @@ class AuditEvent(models.Model):
             "Project repository verification failed",
         )
         CAMPAIGN_CREATED = "campaign.created", "Campaign created"
+        CAMPAIGN_SUBMITTED = "campaign.submitted", "Campaign submitted for review"
         CAMPAIGN_PUBLISHED = "campaign.published", "Campaign published"
         CAMPAIGN_COMPLETED = "campaign.completed", "Campaign completed"
         CAMPAIGN_CANCELLED = "campaign.cancelled", "Campaign cancelled"
@@ -85,6 +86,10 @@ class AuditEvent(models.Model):
         REPORTS_DISMISSED = "moderation.reports_dismissed", "Reports dismissed"
         APPEALED = "moderation.appealed", "Block appealed"
         APPEAL_DECIDED = "moderation.appeal_decided", "Appeal decided"
+        CAMPAIGN_APPROVED = "moderation.campaign_approved", "Public campaign approved"
+        CAMPAIGN_REJECTED = "moderation.campaign_rejected", "Public campaign sent back"
+        LINK_APPROVED = "moderation.link_approved", "Download link approved"
+        LINK_REJECTED = "moderation.link_rejected", "Download link rejected"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

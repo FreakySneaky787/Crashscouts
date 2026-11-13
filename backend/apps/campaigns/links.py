@@ -60,7 +60,14 @@ def add_link(user, campaign: Campaign, **fields) -> CampaignLink:
     count = CampaignLink.objects.filter(campaign=campaign).count()
     if count >= CampaignLink.MAX_PER_CAMPAIGN:
         raise CampaignError("too_many_links")
-    link = CampaignLink.objects.create(campaign=campaign, position=count, **fields)
+    review = (
+        CampaignLink.Review.PENDING
+        if campaign.visibility == Campaign.Visibility.PUBLIC
+        else CampaignLink.Review.APPROVED
+    )
+    link = CampaignLink.objects.create(
+        campaign=campaign, position=count, review_status=review, **fields
+    )
     _audit(AuditEvent.Kind.CAMPAIGN_LINK_ADDED, user, link)
     return link
 
@@ -76,8 +83,14 @@ def _ensure_not_suspended(link: CampaignLink) -> None:
 def change_link(user, link: CampaignLink, **fields) -> CampaignLink:
     _ensure_open(link.campaign)
     _ensure_not_suspended(link)
+    target_changed = any(
+        key in fields and fields[key] != getattr(link, key) for key in ("url", "sha256")
+    )
     for key, value in fields.items():
         setattr(link, key, value)
+    if target_changed and link.campaign.visibility == Campaign.Visibility.PUBLIC:
+        # Only where the link leads matters (owner's decision): back to review.
+        link.review_status, link.review_note = CampaignLink.Review.PENDING, ""
     link.save()
     # Phase 3B: a changed link of an approved public campaign goes back to review.
     _audit(AuditEvent.Kind.CAMPAIGN_LINK_CHANGED, user, link)

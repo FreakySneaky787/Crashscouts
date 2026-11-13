@@ -3,8 +3,8 @@ import type { CampaignStatus } from "~/components/ui/statuses";
 
 import type { CatalogItem } from "./profile";
 
-export type CampaignState = "draft" | "published" | "completed" | "cancelled";
-export type CampaignStatusCode = "draft" | "open" | "full" | "in_progress" | "completed" | "cancelled";
+export type CampaignState = "draft" | "in_review" | "published" | "completed" | "cancelled";
+export type CampaignStatusCode = "draft" | "in_review" | "open" | "full" | "in_progress" | "completed" | "cancelled";
 
 export type Campaign = {
   project: string;
@@ -36,12 +36,15 @@ export type Campaign = {
   my_application: "pending" | "approved" | "rejected" | "withdrawn" | null;
   /** Block by moderators with reason and appeal state; for the team only (WP 3B.3). */
   moderation: import("./moderation").ModerationInfo | null;
+  /** Moderators' reason for sending a public campaign back to draft; team only. */
+  review_note: string | null;
   created_at: string;
   updated_at: string;
 };
 
 const STATUS_LABELS: Record<CampaignStatusCode, CampaignStatus> = {
   draft: "Draft",
+  in_review: "In Review",
   open: "Open",
   full: "Full",
   in_progress: "In Progress",
@@ -232,6 +235,9 @@ export type CampaignLink = {
   suspended: boolean;
   /** Blocked by moderators; served to no one. */
   blocked: boolean;
+  /** Links of public campaigns are reviewed before anyone gets them (WP 3B.4). */
+  review_status: "approved" | "pending" | "rejected";
+  review_note: string;
 };
 
 /** The add-link form as API payload. */
@@ -273,6 +279,7 @@ export const CAMPAIGN_PROBLEMS = [
   "no_applications",
   "blocked",
   "link_suspended",
+  "needs_2fa",
   "answer_required",
   "invalid_answers",
   "already_applied",

@@ -75,7 +75,8 @@ test("public campaigns stay drafts while the gate is closed", async ({ page, req
   await createCampaign(page, project, { visibility: "public" });
   await expect(page.getByText(/Public campaigns cannot be published yet/)).toBeVisible();
   await page.goto(`/p/${project}/c/beta-1/edit`);
-  await page.getByRole("button", { name: "Publish" }).click();
+  // Public campaigns are submitted for review (WP 3B.4); the lock refuses that as well.
+  await page.getByRole("button", { name: "Submit for review" }).click();
   await expect(page.getByRole("alert")).toContainText("Public campaigns cannot be published yet. Make the campaign private");
   await page.goto(`/p/${project}/c/beta-1`);
   await expect(page.getByText("Draft", { exact: true })).toBeVisible();

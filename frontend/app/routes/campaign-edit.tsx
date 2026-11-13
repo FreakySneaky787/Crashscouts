@@ -187,10 +187,15 @@ export default function CampaignEdit({ loaderData, actionData }: Route.Component
       <Panel title={t("campaigns.stateTitle")}>
         <div className={styles.stack}>
           <p>{t(`campaigns.stateText.${campaign.state}`)}</p>
-          {draft && campaign.visibility === "public" ? <Notice tone="info" title={t("campaigns.publicLockedNotice")} /> : null}
+          {draft && campaign.review_note ? (
+            <Notice tone="danger" title={t("campaigns.reviewRejected")}>
+              {campaign.review_note}
+            </Notice>
+          ) : null}
+          {draft && campaign.visibility === "public" ? <Notice tone="info" title={t("campaigns.publicReviewNotice")} /> : null}
           {!closed ? (
             <div className={styles.buttonRow}>
-              {draft ? stateButton("publish", t("campaigns.publish"), PaperPlaneTiltIcon, "primary") : null}
+              {draft ? stateButton("publish", campaign.visibility === "public" ? t("campaigns.submitReview") : t("campaigns.publish"), PaperPlaneTiltIcon, "primary") : null}
               {campaign.state === "published" ? stateButton("complete", t("campaigns.complete"), CheckCircleIcon, "secondary") : null}
             </div>
           ) : null}

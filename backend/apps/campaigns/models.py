@@ -36,6 +36,7 @@ class Campaign(BaseModel):
 
     class State(models.TextChoices):
         DRAFT = status.DRAFT, "Draft"
+        IN_REVIEW = status.IN_REVIEW, "In review"
         PUBLISHED = status.PUBLISHED, "Published"
         COMPLETED = status.COMPLETED, "Completed"
         CANCELLED = status.CANCELLED, "Cancelled"
@@ -67,6 +68,8 @@ class Campaign(BaseModel):
     state = models.CharField(max_length=12, choices=State.choices, default=State.DRAFT)
     # Blocked by moderators (WP 3B.3, ADR 0020): invisible to everyone but the team.
     blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
+    # Moderators' reason when they sent a public campaign back to draft (WP 3B.4, ADR 0021).
+    review_note = models.TextField(max_length=1000, blank=True, editable=False)
     # When the team changed the state, and who published (metrics, docs/METRICS.md).
     published_at = models.DateTimeField(null=True, blank=True, editable=False)
     completed_at = models.DateTimeField(null=True, blank=True, editable=False)
@@ -146,11 +149,23 @@ class CampaignLink(BaseModel):
     suspended_reason = models.CharField(max_length=40, blank=True, editable=False)
     blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
 
+    class Review(models.TextChoices):
+        APPROVED = "approved", "Approved"
+        PENDING = "pending", "Waiting for review"
+        REJECTED = "rejected", "Rejected"
+
+    # Links of public campaigns are reviewed before anyone gets them (WP 3B.4, ADR 0021).
+    review_status = models.CharField(
+        max_length=10, choices=Review.choices, default=Review.APPROVED, editable=False
+    )
+    review_note = models.TextField(max_length=1000, blank=True, editable=False)
+
     def is_served(self) -> bool:
         """Whether this link may be shown to anyone at all (ADR 0019, ADR 0020)."""
         campaign = self.campaign
         return (
-            self.suspended_at is None
+            self.review_status == self.Review.APPROVED
+            and self.suspended_at is None
             and self.blocked_at is None
             and campaign.blocked_at is None
             and campaign.project.blocked_at is None

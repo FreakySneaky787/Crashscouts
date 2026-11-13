@@ -64,6 +64,8 @@ export function LinksPanel({
                 <span className={styles.trail}>
                   {link.suspended ? <StatusPill tone="danger" icon={WarningIcon} label={t("campaigns.links.suspended")} /> : null}
                   {link.blocked ? <StatusPill tone="danger" icon={WarningIcon} label={t("campaigns.links.blocked")} /> : null}
+                  {link.review_status === "pending" ? <StatusPill tone="warn" label={t("campaigns.links.pending")} /> : null}
+                  {link.review_status === "rejected" ? <StatusPill tone="danger" icon={WarningIcon} label={t("campaigns.links.rejected", { reason: link.review_note })} /> : null}
                   {link.in_repository ? <StatusPill tone="ok" icon={ShieldCheckIcon} label={t("campaigns.links.inRepository")} /> : null}
                   {editable && !link.suspended && !link.blocked ? (
                     <Form method="post">

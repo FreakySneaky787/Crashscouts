@@ -96,6 +96,10 @@ including the negative cases.
   public campaign answers 403 `public_campaigns_locked`, and public campaigns are hidden from
   everyone outside the team whenever the flag is off ([ADR 0016](adr/0016-campaigns-and-status-model.md)).
 - Review queue for every new public campaign; ⚑ a link change triggers a new review.
+  ✅ Implemented in WP 3B.4 ([ADR 0021](adr/0021-review-of-public-campaigns.md)): public campaigns
+  are submitted for review (confirmed email and 2FA required, rule A) and published only by
+  moderators; new or changed links of public campaigns wait for review and are served to no one
+  until approved.
 - Waiting period or manual approval for new accounts (open question A).
 - "Repository verified" badge after proof of ownership.
 - Reporting and immediate blocking by admins; blocked links are served to no one.

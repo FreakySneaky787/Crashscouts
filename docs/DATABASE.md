@@ -45,9 +45,9 @@ erDiagram
 | projects | `Invitation` | team invitations | invitee: CASCADE; `invited_by`: SET_NULL |
 | projects | `Screenshot`, `SlugHistory` | images, former short names | – |
 | projects | `RepositoryVerification` | proof of repository ownership (ADR 0015) | `verified_by`: SET_NULL |
-| campaigns | `Campaign` | test campaign; stored state plus `published_at`, `completed_at`, `cancelled_at` | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
+| campaigns | `Campaign` | test campaign; stored state (draft, in review, published, completed, cancelled) plus `published_at`, `completed_at`, `cancelled_at`, `blocked_at`, `review_note` | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
 | campaigns | `CampaignSlugHistory` | former short names | – |
-| campaigns | `CampaignLink` | download links (ADR 0017); `suspended_at`/`suspended_reason` after malware reports (ADR 0019) | – |
+| campaigns | `CampaignLink` | download links (ADR 0017); suspension (ADR 0019), `blocked_at` (ADR 0020), `review_status`/`review_note` (ADR 0021) | – |
 | campaigns | `CampaignInvitation` | invitations to private campaigns | invitee: CASCADE; `invited_by`: SET_NULL |
 | campaigns | `Participation` | taking part (`active`/`left`/`removed`; one per person and campaign) | CASCADE with the account (frees the place) |
 | campaigns | `ApplicationQuestion` | per-campaign questions | – |

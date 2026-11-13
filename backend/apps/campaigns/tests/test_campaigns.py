@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 import pytest
+from allauth.mfa.models import Authenticator
 from django.utils import timezone
 
 from apps.audit.models import AuditEvent
@@ -314,7 +315,12 @@ def test_public_campaigns_need_a_public_project_once_unlocked(people, settings):
     assert act(people["owner"], campaign, "publish").json() == {"code": "project_not_public"}
     public_project = new_project(people["owner"], "open-app", "public")
     campaign = make_campaign(public_project, status.DRAFT, "public")
-    assert act(people["owner"], campaign, "publish").json()["state"] == "published"
+    # Rule A: submitting needs 2FA; then the campaign waits for review (WP 3B.4).
+    assert act(people["owner"], campaign, "publish").json() == {"code": "needs_2fa"}
+    Authenticator.objects.create(
+        user=people["owner"], type=Authenticator.Type.TOTP, data={"secret": "x"}
+    )
+    assert act(people["owner"], campaign, "publish").json()["state"] == "in_review"
 
 
 def test_the_lock_is_off_by_default():

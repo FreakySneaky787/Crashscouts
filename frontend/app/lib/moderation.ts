@@ -52,3 +52,10 @@ export function isCaseType(value: string | undefined): value is ModerationCase["
 
 export const CASE_ACTIONS = ["take", "block", "warn", "dismiss", "lift-suspension"] as const;
 export type CaseAction = (typeof CASE_ACTIONS)[number];
+
+type ReviewLink = { id: string; label: string; url: string; sha256: string; review_status: string };
+
+export type Reviews = {
+  campaigns: { id: string; title: string; summary: string; description: string; project: string; project_name: string; campaign: string; links: ReviewLink[] }[];
+  links: (ReviewLink & { campaign_title: string; project: string; project_name: string; campaign: string })[];
+};

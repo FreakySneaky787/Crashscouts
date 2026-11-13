@@ -114,6 +114,7 @@ describe("campaignPayload", () => {
 describe("campaign helpers", () => {
   it("maps statuses to the design system and problems to known codes", () => {
     expect(campaignStatusStyleKey("in_progress")).toBe("In Progress");
+    expect(campaignStatusStyleKey("in_review")).toBe("In Review");
     expect(campaignProblem(403, { code: "public_campaigns_locked" })).toBe("public_campaigns_locked");
     expect(campaignProblem(429, null)).toBe("rateLimited");
     expect(campaignProblem(403, { code: "<script>" })).toBe("forbidden");

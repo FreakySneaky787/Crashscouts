@@ -47,6 +47,9 @@ test("report, block, appeal and lift", async ({ page, request, browser }) => {
   await enableTotp(mod, moderator.password);
   setRole(moderator.username, "moderator");
   await mod.goto("/moderation");
+  await expect(mod.getByRole("region", { name: "Reviews" })).toBeVisible();
+  const queue = await new AxeBuilder({ page: mod }).withTags(WCAG).analyze();
+  expect(queue.violations.map((v) => v.id)).toEqual([]);
   await mod.getByRole("list", { name: "Open cases" }).getByRole("link", { name }).click();
   await expect(mod.getByText("Only advertising, no software.")).toBeVisible();
   const results = await new AxeBuilder({ page: mod }).withTags(WCAG).analyze();

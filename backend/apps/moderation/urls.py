@@ -8,6 +8,8 @@ from .moderation_views import (
     CaseActionView,
     CasesView,
     CaseView,
+    ReviewDecisionView,
+    ReviewsView,
 )
 from .views import MyReportsView, ReportCreateView
 
@@ -33,4 +35,10 @@ urlpatterns = [
         name="moderation-appeal-decide",
     ),
     path("blocks/<uuid:block_id>/appeal/", AppealCreateView.as_view(), name="block-appeal"),
+    path("moderation/reviews/", ReviewsView.as_view(), name="moderation-reviews"),
+    path(
+        "moderation/reviews/<str:kind>/<uuid:target_id>/<str:decision>/",
+        ReviewDecisionView.as_view(),
+        name="moderation-review-decide",
+    ),
 ]

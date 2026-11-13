@@ -1,0 +1,9 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}{% if approved %}The moderators approved {{ what }}. It is published now.{% else %}The moderators did not approve {{ what }}.
+
+Their reason:
+{{ message }}
+
+You can change it and submit it again.{% endif %}
+
+{{ project_url }}{% endautoescape %}{% endblock content %}

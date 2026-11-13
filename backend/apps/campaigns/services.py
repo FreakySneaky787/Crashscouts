@@ -1,11 +1,13 @@
 """Writes for campaigns. Views stay thin; permissions are checked by the caller (policies)."""
 
+from allauth.mfa.utils import is_mfa_enabled
 from django.db import transaction
 from django.utils import timezone
 
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
 from apps.projects.models import Project
+from apps.projects.services import has_confirmed_email
 
 from . import status
 from .models import Campaign, CampaignSlugHistory
@@ -54,7 +56,7 @@ def update_campaign(user, campaign: Campaign, **fields) -> Campaign:
     ensure_unblocked(campaign)
     if campaign.state in (Campaign.State.COMPLETED, Campaign.State.CANCELLED):
         raise CampaignError("campaign_closed")
-    if campaign.state == Campaign.State.PUBLISHED and any(
+    if campaign.state in (Campaign.State.PUBLISHED, Campaign.State.IN_REVIEW) and any(
         key in fields and fields[key] != getattr(campaign, key) for key in LOCKED_AFTER_PUBLISH
     ):
         raise CampaignError("locked_after_publish")
@@ -87,6 +89,7 @@ def _rename(campaign: Campaign, new_slug: str) -> None:
 
 
 AUDIT_KINDS = {
+    status.IN_REVIEW: AuditEvent.Kind.CAMPAIGN_SUBMITTED,
     status.PUBLISHED: AuditEvent.Kind.CAMPAIGN_PUBLISHED,
     status.COMPLETED: AuditEvent.Kind.CAMPAIGN_COMPLETED,
     status.CANCELLED: AuditEvent.Kind.CAMPAIGN_CANCELLED,
@@ -105,10 +108,18 @@ def change_state(user, campaign: Campaign, new_state: str) -> Campaign:
             raise CampaignError("public_campaigns_locked")
         if campaign.project.visibility != Project.Visibility.PUBLIC:
             raise CampaignError("project_not_public")
+        # Rule A (open question A): confirmed email and two-factor authentication to submit.
+        if not has_confirmed_email(user) or not is_mfa_enabled(user):
+            raise CampaignError("needs_2fa")
+        # Every public campaign goes through the moderators' review first (ADR 0021).
+        new_state = status.IN_REVIEW
     campaign.state = new_state
     now = timezone.now()
     fields = ["state", "updated_at"]
-    if new_state == status.PUBLISHED:
+    if new_state == status.IN_REVIEW:
+        campaign.published_by, campaign.review_note = user, ""
+        fields += ["published_by", "review_note"]
+    elif new_state == status.PUBLISHED:
         campaign.published_at, campaign.published_by = now, user
         fields += ["published_at", "published_by"]
     elif new_state == status.COMPLETED:

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.3) · **Current phase:** 3B – Security gate
+**Last update:** 2026-11-13 (WP 3B.4) · **Current phase:** 3B – Security gate
 
 ## Work packages
 
@@ -689,12 +689,31 @@ downloads" works in the real UI already.
   with confirmation, 404 for visitors and the reporter, reporter sees "Resolved", team notice and
   appeal, appeal accepted, project back, axe on the case page; moderation pages 404 for others).
 
+### WP 3B.4 – Review of public campaigns (2026-11-13) ✅
+
+- Stored state `in_review`: a team's "publish" of a public campaign submits it for review (rule A:
+  confirmed email and 2FA); moderators approve (published, `published_at` set then) or send it back
+  with a reason; only the team sees it in review. Link review: new or changed (URL, checksum) links
+  of public campaigns wait and are served to no one until approved; the campaign and its reviewed
+  links stay available ([ADR 0021](adr/0021-review-of-public-campaigns.md)).
+- Moderation page: "Reviews" with campaigns (all links visible) and single links (URL, checksum),
+  approve or send back with reason and confirmation. Edit page: "Submit for review", reason notice,
+  link pills "Waiting for review"/"Rejected". New status "In Review" (team only), an addition to the
+  six statuses of the master prompt.
+- Older tests adapted to the new flow (publishing public campaigns now needs 2FA and review; link
+  tests of a public campaign approve their links as moderators would).
+- **Verification (run on 2026-11-13):** pytest **467 passed** (8 new); 4 mutation checks caught
+  (review ignored when serving, rule A removed, URL change keeps approval, submit publishes
+  directly); Vitest **85 passed**; Playwright **76 passed** (axe on the moderation queue with the
+  reviews section; the lock test now uses "Submit for review"). The review flow itself is covered
+  by pytest only, because public campaigns are locked in E2E.
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1 (roles), 3B.2 (reporting) and 3B.3 (moderation and
-blocking) done. Next: **3B.4 review queue for public campaigns** (every new public campaign is
-reviewed before it is published; a link change of an approved campaign triggers a new review;
-rule A – confirmed email and 2FA – enforced when submitting). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
+**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1–3B.4 done (roles, reporting, moderation and blocking,
+review of public campaigns). Next: **3B.5 rate limits with Django's database cache** (owner's
+decision O), then **3B.6** (E2E abuse case with the flag on in a dedicated E2E run, and the gate
+checklist for the owner). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
 `PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
@@ -703,8 +722,6 @@ are assigned on an admin page (first admin via a one-off server command; fresh r
 and 2FA for role changes; audited; the last admin cannot remove themselves).
 
 Work packages to propose for 3B (present before starting, as usual):
-- 3B.4 Review queue for public campaigns; a link change of an approved campaign triggers a new
-  review; rule A enforced on publishing.
 - 3B.5 Rate limits per user and IP with a shared cache (open question O must be decided:
   Valkey or the database cache) and tests.
 - 3B.6 E2E "abuse case" (submit, review, approve, report link, block; the link is no longer

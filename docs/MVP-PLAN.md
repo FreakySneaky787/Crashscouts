@@ -142,8 +142,8 @@ roles on an admin page, standard report reasons, feedback to reporters, database
 | 3B.1 | Platform roles (admin, moderator) with 2FA requirement and admin page ([ADR 0018](adr/0018-platform-roles.md)) | ✅ done |
 | 3B.2 | Reporting of projects, campaigns and download links; automatic suspension of links after 3 malware reports ([ADR 0019](adr/0019-reporting-and-link-suspension.md)) | ✅ done |
 | 3B.3 | Moderation queue, blocking (blocked content and links served to no one), warnings, appeals, feedback to reporters ([ADR 0020](adr/0020-moderation-and-blocking.md)) | ✅ done |
-| 3B.4 | Review queue for public campaigns; link changes trigger a new review; rule A on submission | planned (next) |
-| 3B.5 | Database cache and rate limits per user and IP | planned |
+| 3B.4 | Review queue for public campaigns; link changes trigger a new review; rule A on submission ([ADR 0021](adr/0021-review-of-public-campaigns.md)) | ✅ done |
+| 3B.5 | Database cache and rate limits per user and IP | planned (next) |
 | 3B.6 | E2E abuse case and gate checklist for the owner | planned |
 
 ## Phase 4 – Testing

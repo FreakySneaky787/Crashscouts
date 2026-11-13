@@ -11,6 +11,7 @@ reached; a hard limit) > open.
 from datetime import datetime
 
 DRAFT = "draft"
+IN_REVIEW = "in_review"  # public campaigns wait for moderators (WP 3B.4, ADR 0021)
 PUBLISHED = "published"
 COMPLETED = "completed"
 CANCELLED = "cancelled"
@@ -20,8 +21,11 @@ FULL = "full"
 IN_PROGRESS = "in_progress"
 
 # Allowed changes of the stored state, all by the team.
+# Approval (in review -> published) and rejection (in review -> draft) are moderators' actions,
+# not team transitions; a team's "publish" of a public campaign becomes "submit for review".
 TRANSITIONS = {
     DRAFT: {PUBLISHED, CANCELLED},
+    IN_REVIEW: {CANCELLED},
     PUBLISHED: {COMPLETED, CANCELLED},
     COMPLETED: set(),
     CANCELLED: set(),
@@ -31,7 +35,7 @@ TRANSITIONS = {
 def effective_status(
     state: str, *, starts_at: datetime, now: datetime, participants: int, target: int
 ) -> str:
-    if state in (DRAFT, COMPLETED, CANCELLED):
+    if state in (DRAFT, IN_REVIEW, COMPLETED, CANCELLED):
         return state
     if now >= starts_at:
         return IN_PROGRESS

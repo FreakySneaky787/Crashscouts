@@ -24,6 +24,11 @@ def team(db, settings):
     return {"owner": owner, "maintainer": maintainer, "project": project}
 
 
+def publish_approved(campaign: Campaign) -> None:
+    """Public campaigns are published by moderators after review (WP 3B.4)."""
+    Campaign.objects.filter(pk=campaign.pk).update(state="published")
+
+
 def approval_draft(team, slug: str = "apply-beta") -> Campaign:
     response = client_for(team["owner"]).post(
         BASE,
@@ -175,7 +180,7 @@ def test_questions_are_frozen_once_published(team):
     campaign = approval_draft(team)
     question = ApplicationQuestion.objects.get(campaign=campaign)
     owner = client_for(team["owner"])
-    owner.post(f"{BASE}apply-beta/publish/")
+    publish_approved(campaign)
     url = f"{BASE}apply-beta/questions/"
     assert owner.post(url, {"prompt": "Late", "kind": "yes_no"}, format="json").json() == {
         "code": "questions_locked"
@@ -191,7 +196,7 @@ def test_questions_are_frozen_once_published(team):
 def test_only_the_team_changes_questions(team):
     approval_draft(team)
     owner = client_for(team["owner"])
-    owner.post(f"{BASE}apply-beta/publish/")
+    publish_approved(Campaign.objects.get(slug="apply-beta"))
     stranger = client_for(make_user("quiz-stranger"))
     url = f"{BASE}apply-beta/questions/"
     assert stranger.post(url, {"prompt": "x", "kind": "yes_no"}, format="json").status_code == 403
