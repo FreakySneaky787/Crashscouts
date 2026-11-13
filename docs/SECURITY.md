@@ -147,6 +147,11 @@ including the negative cases.
   official docs during implementation.
 - Few `is_staff` accounts; every admin login is written to the audit log.
 - A CI test ensures that the proxy does not forward `/admin/`.
+- ✅ **Platform roles** (WP 3B.1, [ADR 0018](adr/0018-platform-roles.md)), separate from
+  `is_staff`: admin and moderator count only with 2FA and while the account is active; granted on
+  `/platform/roles` by an admin with password confirmation, rate-limited and audited; targets need
+  a confirmed email and 2FA; the last admin cannot be removed; the first admin comes from
+  `manage.py set_platform_role`.
 
 ## 8. SSR, sessions and caching (✅ validated in WP 0.4)
 

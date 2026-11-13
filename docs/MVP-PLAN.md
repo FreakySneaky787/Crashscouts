@@ -134,6 +134,18 @@ and only by the project owner.
 8. E2E test "abuse case": submit, review, approve, report link, block; afterwards the link is no
    longer reachable.
 
+Work packages (decisions 2026-11-13: A email + 2FA without waiting period, H owner moderates,
+roles on an admin page, standard report reasons, feedback to reporters, database cache):
+
+| WP | Content | State |
+|---|---|---|
+| 3B.1 | Platform roles (admin, moderator) with 2FA requirement and admin page ([ADR 0018](adr/0018-platform-roles.md)) | ✅ done |
+| 3B.2 | Reporting of projects, campaigns and download links | planned (next) |
+| 3B.3 | Moderation queue, blocking (blocked content and links served to no one), feedback to reporters | planned |
+| 3B.4 | Review queue for public campaigns; link changes trigger a new review; rule A on submission | planned |
+| 3B.5 | Database cache and rate limits per user and IP | planned |
+| 3B.6 | E2E abuse case and gate checklist for the owner | planned |
+
 ## Phase 4 – Testing
 
 - Test tasks for the free, structured and combined methods.

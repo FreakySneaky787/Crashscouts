@@ -24,7 +24,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects, invitations, campaignInvitations, participations, applications] = await Promise.all([
+  const [csrf, projects, invitations, campaignInvitations, participations, applications, role] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
     backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
@@ -37,6 +37,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       request,
       "/api/v1/me/applications/",
     ),
+    backendFetch<{ platform_role: string }>(request, "/api/v1/me/platform-role/"),
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
@@ -64,6 +65,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       campaignInvitations: campaignInvitations.data ?? [],
       participations: participations.data ?? [],
       applications: applications.data ?? [],
+      isAdmin: role.data?.platform_role === "admin",
       campaignInvitationResult,
       participationLeft,
     },
@@ -201,6 +203,18 @@ export default function Account({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
       </Panel>
+      {loaderData.isAdmin ? (
+        <Panel title={t("platform.title")}>
+          <div className={styles.stack}>
+            <p>{t("platform.text")}</p>
+            <div>
+              <ButtonLink to="/platform/roles" icon={ShieldCheckIcon}>
+                {t("platform.roles.title")}
+              </ButtonLink>
+            </div>
+          </div>
+        </Panel>
+      ) : null}
       <Panel title={t("account.profile")}>
         <div className={styles.stack}>
           <p>{t("account.profileText")}</p>

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3A.6, phase 3A complete) · **Current phase:** 3B – Security gate (next)
+**Last update:** 2026-11-13 (WP 3B.1) · **Current phase:** 3B – Security gate
 
 ## Work packages
 
@@ -623,10 +623,29 @@ downloads" works in the real UI already.
   caught (export of other people's applications, grace-period filter); Playwright **72 passed** (lock test extended);
   Vitest **82 passed**.
 
+## Phase 3B – Security gate (started 2026-11-13)
+
+### WP 3B.1 – Platform roles (2026-11-13) ✅
+
+- `User.platform_role` (none, moderator, admin); `apps/accounts/roles.py` (roles count only with
+  2FA, active and not deleting); `set_platform_role` command for the first admin; API
+  `/api/v1/platform/roles/` (admins only, 404 otherwise; password confirmation; targets need a
+  confirmed email and 2FA; last admin protected with a row lock; rate limit; audit) and
+  `/api/v1/me/platform-role/`; page `/platform/roles` and a link on the account page for admins
+  ([ADR 0018](adr/0018-platform-roles.md)).
+- Deviation from the plan: the role comes from a new endpoint `/api/v1/me/platform-role/`
+  (there was no `/api/v1/me/` endpoint to extend).
+- **Verification (run on 2026-11-13):** pytest **439 passed** (11 new); 4 mutation checks
+  caught (no 2FA check, no last-admin guard, no password check, target without 2FA); Vitest
+  **82 passed**; Playwright **73 passed** (1 new: first admin via command, 404 for others, 2FA
+  required for the candidate, wrong password, granting the moderator role, axe; the TOTP helper
+  moved to `e2e/tests/helpers.ts`).
+- Note: the E2E database keeps admins of earlier runs, so "last admin" is tested in pytest only.
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A is complete (WPs 3A.1–3A.6, CI green). Next: **phase 3B – security
-gate**, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
+**Where we are:** phase 3A complete; phase 3B started – WP 3B.1 (platform roles) done. Next:
+**3B.2 reporting**. Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
 `PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
@@ -635,7 +654,6 @@ are assigned on an admin page (first admin via a one-off server command; fresh r
 and 2FA for role changes; audited; the last admin cannot remove themselves).
 
 Work packages to propose for 3B (present before starting, as usual):
-- 3B.1 Roles and admin page (bootstrap command, role changes, audit).
 - 3B.2 Reporting of projects, campaigns and download links (reasons, free text, rate limit,
   confirmed email; invitees of private campaigns can report).
 - 3B.3 Moderation queue (open, in review, resolved, dismissed; hide, block, warn; feedback to

@@ -34,6 +34,14 @@ class User(AbstractUser):
     )
     # Account deletion with a grace period (owner's decision): hidden at once, deleted for good
     # after this point in time by `manage.py purge_deleted_accounts`, cancelled by signing in.
+    # Platform role (WP 3B.1, ADR 0018). Separate from Django's is_staff (Django admin, SSH only).
+    # Effective only with active two-factor authentication (apps/accounts/roles.py).
+    platform_role = models.CharField(
+        max_length=10,
+        choices=[("", "None"), ("moderator", "Moderator"), ("admin", "Admin")],
+        default="",
+        blank=True,
+    )
     deletion_scheduled_for = models.DateTimeField(
         "deletion scheduled for", null=True, blank=True, db_index=True
     )

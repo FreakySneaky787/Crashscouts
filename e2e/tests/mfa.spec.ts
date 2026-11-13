@@ -2,56 +2,14 @@
  * WP 1.3a – two-factor authentication: authenticator app (TOTP), recovery codes, the second login
  * step and the password confirmation before security changes.
  */
-import { createHmac } from "node:crypto";
-
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { FRONTEND_URL } from "../playwright.config";
 
-import { createSignedInAccount, logIn } from "./helpers";
+import { createSignedInAccount, enableTotp, logIn, readSecret, totp } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
-
-/** RFC 6238 TOTP (SHA-1, 6 digits, 30-second steps), independent of the application. */
-function totp(secret: string, at = Date.now()): string {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  const bits = secret
-    .replace(/[\s=]/g, "")
-    .toUpperCase()
-    .split("")
-    .map((c) => alphabet.indexOf(c).toString(2).padStart(5, "0"))
-    .join("");
-  const key = Buffer.from(bits.match(/.{8}/g)!.map((byte) => parseInt(byte, 2)));
-  const counter = Buffer.alloc(8);
-  counter.writeBigUInt64BE(BigInt(Math.floor(at / 1000 / 30)));
-  const digest = createHmac("sha1", key).update(counter).digest();
-  const offset = digest[digest.length - 1] & 0x0f;
-  return String((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).padStart(6, "0");
-}
-
-async function readSecret(page: Page): Promise<string> {
-  return (await page.getByTestId("totp-secret").innerText()).replace(/\s+/g, "");
-}
-
-/** Turns on TOTP from the security page, including the password confirmation. */
-async function enableTotp(page: Page, password: string): Promise<string> {
-  await page.goto("/settings/security");
-  await page.getByLabel("Code", { exact: true }).fill(totp(await readSecret(page)));
-  await page.getByRole("button", { name: "Turn on" }).click();
-
-  // Security changes require a fresh password confirmation.
-  await expect(page).toHaveURL(/\/reauthenticate\?next=/);
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Confirm" }).click();
-  await expect(page).toHaveURL(/\/settings\/security$/);
-
-  const secret = await readSecret(page);
-  await page.getByLabel("Code", { exact: true }).fill(totp(secret));
-  await page.getByRole("button", { name: "Turn on" }).click();
-  await expect(page.getByRole("status").first()).toContainText("Two-factor authentication is on.");
-  return secret;
-}
 
 async function logOut(page: Page) {
   await page.goto("/account");

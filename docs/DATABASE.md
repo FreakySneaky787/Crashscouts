@@ -36,7 +36,7 @@ erDiagram
 
 | App | Model | Purpose | Personal data and deletion |
 |---|---|---|---|
-| accounts | `User` | account (email login, username, age confirmation, deletion schedule) | deleted after the 14-day grace period (ADR 0013) |
+| accounts | `User` | account (email login, username, age confirmation, deletion schedule, `platform_role` – ADR 0018) | deleted after the 14-day grace period (ADR 0013) |
 | profiles | `Profile` | bio, link, interests, platforms, skills, avatar; `show_*` visibility per field | deleted with the account (CASCADE) |
 | audit | `AuditEvent` | append-only security log | `actor`/`subject` set to NULL when an account is deleted; no IPs, no tokens |
 | catalog | `Category`, `Platform`, `Skill`, `ProgrammingLanguage`, `License` | fixed lists (SPDX licences) | none |

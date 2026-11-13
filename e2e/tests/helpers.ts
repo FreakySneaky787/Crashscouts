@@ -1,5 +1,5 @@
-/** Shared E2E helpers: unique test accounts, reading emails from Mailpit, signing in. */
-import { randomBytes } from "node:crypto";
+/** Shared E2E helpers: unique test accounts, reading emails from Mailpit, signing in, TOTP. */
+import { createHmac, randomBytes } from "node:crypto";
 import { crc32, deflateSync } from "node:zlib";
 
 import { expect, type APIRequestContext, type Page } from "@playwright/test";
@@ -121,4 +121,44 @@ export function png(width: number, height: number): Buffer {
     chunk("IDAT", pixels),
     chunk("IEND", Buffer.alloc(0)),
   ]);
+}
+
+/** RFC 6238 TOTP (SHA-1, 6 digits, 30-second steps), independent of the application. */
+export function totp(secret: string, at = Date.now()): string {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  const bits = secret
+    .replace(/[\s=]/g, "")
+    .toUpperCase()
+    .split("")
+    .map((c) => alphabet.indexOf(c).toString(2).padStart(5, "0"))
+    .join("");
+  const key = Buffer.from(bits.match(/.{8}/g)!.map((byte) => parseInt(byte, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(at / 1000 / 30)));
+  const digest = createHmac("sha1", key).update(counter).digest();
+  const offset = digest[digest.length - 1] & 0x0f;
+  return String((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).padStart(6, "0");
+}
+
+export async function readSecret(page: Page): Promise<string> {
+  return (await page.getByTestId("totp-secret").innerText()).replace(/\s+/g, "");
+}
+
+/** Turns on TOTP from the security page, including the password confirmation. */
+export async function enableTotp(page: Page, password: string): Promise<string> {
+  await page.goto("/settings/security");
+  await page.getByLabel("Code", { exact: true }).fill(totp(await readSecret(page)));
+  await page.getByRole("button", { name: "Turn on" }).click();
+
+  // Security changes require a fresh password confirmation.
+  await expect(page).toHaveURL(/\/reauthenticate\?next=/);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Confirm" }).click();
+  await expect(page).toHaveURL(/\/settings\/security$/);
+
+  const secret = await readSecret(page);
+  await page.getByLabel("Code", { exact: true }).fill(totp(secret));
+  await page.getByRole("button", { name: "Turn on" }).click();
+  await expect(page.getByRole("status").first()).toContainText("Two-factor authentication is on.");
+  return secret;
 }

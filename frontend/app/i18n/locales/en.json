@@ -810,5 +810,38 @@
     "accepted": "You joined the project.",
     "declined": "Invitation declined.",
     "gone": "This invitation is no longer valid."
+  },
+  "platform": {
+    "title": "Platform administration",
+    "text": "Manage who moderates and administers the platform.",
+    "roles": {
+      "title": "Platform roles",
+      "intro": "Admins manage roles and moderate; moderators handle reports and reviews. A role only counts while the account has two-factor authentication turned on.",
+      "current": "Current roles",
+      "names": {
+        "admin": "Admin",
+        "moderator": "Moderator",
+        "none": "No role"
+      },
+      "active": "Active (2FA on)",
+      "inactive": "Inactive (2FA off)",
+      "change": "Grant or change a role",
+      "username": "Username",
+      "usernameHint": "The account needs a confirmed email address and two-factor authentication.",
+      "role": "Role",
+      "password": "Your password",
+      "passwordHint": "Confirm the change with your own password.",
+      "save": "Save role",
+      "done": "The role was changed.",
+      "problem": {
+        "wrong_password": "The password is not correct.",
+        "user_not_found": "There is no active account with this username and a confirmed email address.",
+        "target_needs_2fa": "This account has to turn on two-factor authentication first.",
+        "last_admin": "The platform needs at least one admin. Make someone else admin first.",
+        "invalid": "Check the entries.",
+        "rateLimited": "Too many attempts. Try again later.",
+        "generic": "Something went wrong. Please try again."
+      }
+    }
   }
 }
