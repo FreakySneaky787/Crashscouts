@@ -27,6 +27,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0019](0019-reporting-and-link-suspension.md) | Reporting and automatic link suspension | Accepted |
 | [0020](0020-moderation-and-blocking.md) | Moderation and blocking | Accepted |
 | [0021](0021-review-of-public-campaigns.md) | Review of public campaigns | Accepted |
+| [0022](0022-rate-limits-and-shared-cache.md) | Rate limits and the shared cache | Accepted |
 
 ## Template
 

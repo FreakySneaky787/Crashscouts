@@ -12,8 +12,9 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
+
+from apps.core.throttling import USER_AND_IP
 
 from .images import (
     LOGO_MAX_BYTES,
@@ -50,7 +51,7 @@ def _too_large(request: Request, max_bytes: int) -> bool:
 class ProjectLogoView(APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser,)
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = USER_AND_IP
     throttle_scope = "project_image"
 
     @extend_schema(
@@ -85,7 +86,7 @@ class ProjectLogoView(APIView):
 class ScreenshotCreateView(APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser,)
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = USER_AND_IP
     throttle_scope = "project_image"
 
     @extend_schema(

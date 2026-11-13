@@ -20,8 +20,12 @@ including the negative cases.
 ## 2. Accounts
 
 - ✅ Passwords hashed with Argon2id.
-- allauth rate limits for login, signup and reset. They rely on Django's cache; a shared cache is
-  required in production (open question O).
+- ✅ Rate limits per IP address for login, signup and reset (allauth) and per account **and** per
+  IP address for reports, campaign creation, project creation, invitations and uploads, in a shared
+  database cache that holds across processes ([ADR 0022](adr/0022-rate-limits-and-shared-cache.md)).
+  IP addresses are stored only as HMAC hashes in the cache keys and deleted at most one day after
+  the last request (hourly `purge_rate_limit_cache`). `X-Forwarded-For` counts only behind the
+  configured number of trusted proxies (`DJANGO_TRUSTED_PROXY_COUNT`), so it cannot be forged.
 - ✅ Login by email only; email and username unique case-insensitively (database constraints).
 - ✅ Password policy: at least 12 characters, no composition rules, blocklist and similarity check
   ([ADR 0009](adr/0009-account-rules-and-password-policy.md); deliberately below NIST's 15).
@@ -180,6 +184,9 @@ including the negative cases.
 - ✅ The SSR server forwards the public host (`X-Forwarded-Host`); Django trusts it
   (`USE_X_FORWARDED_HOST`). Requirement for production: Django is reachable only through the
   reverse proxy, which overwrites `X-Forwarded-Host` and `X-Forwarded-Proto`.
+- ✅ The SSR server passes the reverse proxy's `X-Forwarded-For` on unchanged (rate limits per IP,
+  ADR 0022). Requirement for production: the reverse proxy **overwrites** `X-Forwarded-For` with
+  the client address (never appends a client-supplied value), and `DJANGO_TRUSTED_PROXY_COUNT=1`.
 - CSP `form-action 'self' https://github.com` (GitHub login redirect after a form POST).
 
 ## 9. Audit log
@@ -224,5 +231,7 @@ admin logins, deletions and exports.
 ## 12. Operations (before the beta)
 
 - TLS via the reverse proxy; the database has no public port.
+- `DJANGO_TRUSTED_PROXY_COUNT=1` (production refuses to start without it); the cache table comes
+  with the migrations; `manage.py purge_rate_limit_cache` runs hourly (ADR 0022).
 - Automatic, encrypted, off-site PostgreSQL backups with a **tested** restore.
 - Security review against OWASP ASVS level 1 before the closed beta.

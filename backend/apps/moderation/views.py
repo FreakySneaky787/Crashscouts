@@ -6,10 +6,10 @@ from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.core.api import error_codes
+from apps.core.throttling import USER_AND_IP
 
 from .models import TEXT_MAX_LENGTH, Report
 from .services import NotVisible, ReportError, report, reports_of, resolve_target
@@ -34,7 +34,7 @@ class MyReportSerializer(serializers.Serializer):
 
 class ReportCreateView(APIView):
     permission_classes = (IsAuthenticated,)
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = USER_AND_IP
     throttle_scope = "report"
 
     @extend_schema(

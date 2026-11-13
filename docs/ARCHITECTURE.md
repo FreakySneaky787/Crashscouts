@@ -22,6 +22,8 @@ Task worker (django-tasks-db, same code as Django) ──► PostgreSQL
 - **Django is the single source of data and authorization.** The SSR server contains no business
   logic and no secrets except its internal API URL.
 - **No Redis and no Celery in the MVP** ([ADR 0003](adr/0003-background-jobs-without-redis.md)).
+  The shared cache for rate limits is Django's database cache in PostgreSQL, with hashed keys
+  ([ADR 0022](adr/0022-rate-limits-and-shared-cache.md)).
 - **Files:** a local volume in development; S3-compatible storage with a Swiss or EU provider in
   production (decided before the beta). Attachments are never directly reachable.
 
@@ -195,6 +197,10 @@ React Router's data requests.
   directly ([ADR 0012](adr/0012-github-login.md)).
 - The reverse proxy limits request bodies (a few MB) in front of the SSR server and Django
   ([ADR 0010](adr/0010-image-upload-pipeline.md)); `/media` is never routed.
+- An hourly job runs `manage.py purge_rate_limit_cache` (expired rate-limit entries with hashed IP
+  addresses, ADR 0022).
+- The reverse proxy overwrites `X-Forwarded-For` with the client address;
+  `DJANGO_TRUSTED_PROXY_COUNT=1`.
 - A daily job runs `manage.py purge_deleted_accounts` (final account deletion, ADR 0013) and
   `manage.py purge_application_answers` (application answers 30 days after a campaign ended,
   ADR 0016).

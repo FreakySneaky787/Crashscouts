@@ -9,9 +9,9 @@ from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.core.throttling import USER_AND_IP
 from apps.profiles.models import Profile
 from apps.profiles.serializers import PublicProfileSerializer
 
@@ -64,7 +64,7 @@ class CampaignInvitationsView(APIView):
     throttle_scope = "campaign_invite"
 
     def get_throttles(self):
-        return [ScopedRateThrottle()] if self.request.method == "POST" else []
+        return [cls() for cls in USER_AND_IP] if self.request.method == "POST" else []
 
     @extend_schema(
         responses=inline_serializer(

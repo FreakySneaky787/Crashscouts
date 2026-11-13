@@ -8,6 +8,7 @@
  * - Write requests carry the browser's CSRF token as a header plus its `Origin`/`Referer`;
  *   Django checks both. The SSR server never bypasses these checks.
  * - Every call is bound to exactly one browser request; there is no shared state.
+ * - `X-Forwarded-For` from the reverse proxy is passed on unchanged (rate limits per IP, ADR 0022).
  */
 import { CSRF_COOKIE, readCookie, readSetCookie } from "./http";
 
@@ -51,6 +52,11 @@ export async function backendFetch<T = unknown>(
   // Public host, so URLs Django builds (e.g. the GitHub callback) point to the frontend, not to
   // the internal backend address (USE_X_FORWARDED_HOST in the Django settings).
   headers.set("X-Forwarded-Host", publicUrl.host);
+  // Client address for Django's rate limits per IP (ADR 0022). Passed on unchanged: the reverse
+  // proxy overwrites it with the client's address, and Django trusts exactly that one proxy
+  // (DJANGO_TRUSTED_PROXY_COUNT). Without a proxy (development) Django ignores the header.
+  const forwardedFor = request.headers.get("X-Forwarded-For");
+  if (forwardedFor) headers.set("X-Forwarded-For", forwardedFor);
 
   if (method !== "GET") {
     for (const name of ["Origin", "Referer"] as const) {

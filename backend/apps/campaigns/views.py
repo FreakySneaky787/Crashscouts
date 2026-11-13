@@ -7,10 +7,10 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.core.api import error_codes
+from apps.core.throttling import USER_AND_IP
 from apps.projects.policies import can_edit as can_edit_project
 from apps.projects.selectors import project_for
 from apps.projects.services import has_confirmed_email
@@ -53,7 +53,7 @@ class CampaignListView(APIView):
     throttle_scope = "campaign_create"
 
     def get_throttles(self):
-        return [ScopedRateThrottle()] if self.request.method == "POST" else []
+        return [cls() for cls in USER_AND_IP] if self.request.method == "POST" else []
 
     @extend_schema(responses=CampaignSerializer(many=True))
     def get(self, request: Request, slug: str) -> Response:

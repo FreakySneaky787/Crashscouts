@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.4) · **Current phase:** 3B – Security gate
+**Last update:** 2026-11-13 (WP 3B.5) · **Current phase:** 3B – Security gate
 
 ## Work packages
 
@@ -708,12 +708,38 @@ downloads" works in the real UI already.
   reviews section; the lock test now uses "Submit for review"). The review flow itself is covered
   by pytest only, because public campaigns are locked in E2E.
 
+### WP 3B.5 – Rate limits per account and IP, shared database cache (2026-11-13) ✅
+
+- Django's database cache (`rate_limit_cache`, created by migration) replaces the per-process
+  cache, so limits hold across workers. Every cache key is an HMAC-SHA256 hash: no IP address or
+  email address is stored in plain text (owner's decision: only as a hash, at most one day).
+  `manage.py purge_rate_limit_cache` deletes expired entries and runs **hourly** – Django removes
+  them on its own only when the table outgrows `MAX_ENTRIES`
+  ([ADR 0022](adr/0022-rate-limits-and-shared-cache.md)).
+- Client address: `DJANGO_TRUSTED_PROXY_COUNT` sets allauth's and DRF's trusted proxy count
+  together; 0 in development (`X-Forwarded-For` ignored, cannot be forged), required and at least
+  1 in production. The SSR server now passes the reverse proxy's `X-Forwarded-For` on; before,
+  all SSR visitors shared the SSR server's address.
+- Per-IP limits in addition to the per-account limits for reports, campaign creation, project
+  creation, project and campaign invitations, avatar, logo and screenshot uploads (values in
+  ADR 0022, provisional). Login, signup and reset keep allauth's defaults, now tested.
+- `DJANGO_E2E_RELAXED_RATE_LIMITS` (development settings only) also relaxes the per-IP API limits,
+  because the counters now outlive an E2E run.
+- **Verification (run on 2026-11-13):** pytest **490 passed** (23 new: limits per account and per
+  IP, another address unaffected, forged `X-Forwarded-For` ignored, one trusted proxy counted,
+  failed logins per IP and per account, signup and reset per IP, no plain IP or key in the cache
+  table, every gate view carries both limits, purge of expired entries, production refuses a
+  missing or invalid proxy count); 5 mutation checks caught (per-IP limit removed, key hashing
+  removed, `NUM_PROXIES` unset, purge deletes nothing, SSR stops forwarding the header);
+  Vitest **87 passed**; Playwright **76 passed**; Ruff, migrations check, OpenAPI validation and
+  pip-audit clean.
+
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1–3B.4 done (roles, reporting, moderation and blocking,
-review of public campaigns). Next: **3B.5 rate limits with Django's database cache** (owner's
-decision O), then **3B.6** (E2E abuse case with the flag on in a dedicated E2E run, and the gate
-checklist for the owner). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
+**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1–3B.5 done (roles, reporting,
+moderation and blocking, review of public campaigns, rate limits with the database cache). Next:
+**3B.6** (E2E abuse case with the flag on in a dedicated E2E run, and the gate checklist for the
+owner). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
 `PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
@@ -721,9 +747,7 @@ every public campaign; H – the owner moderates alone, built role-based; admin 
 are assigned on an admin page (first admin via a one-off server command; fresh reauthentication
 and 2FA for role changes; audited; the last admin cannot remove themselves).
 
-Work packages to propose for 3B (present before starting, as usual):
-- 3B.5 Rate limits per user and IP with a shared cache (open question O must be decided:
-  Valkey or the database cache) and tests.
+Work package to propose for 3B (present before starting, as usual):
 - 3B.6 E2E "abuse case" (submit, review, approve, report link, block; the link is no longer
   reachable) and the gate checklist for the owner.
 
@@ -750,8 +774,8 @@ fails only on high/critical.
   [`SECURITY.md`](SECURITY.md), section 10).
 - Signing out everywhere scans all sessions (no index from users to sessions); fine at the current
   scale, to be revisited when sessions grow (ADR 0013).
-- allauth rate limits use the per-process memory cache; a shared cache is required before the beta
-  (open question O).
+- The per-IP limit values are provisional (ADR 0022); every limited request writes to PostgreSQL,
+  to be measured before the beta.
 - Unauthenticated GitHub API requests share a per-IP rate limit; many file checks for GitHub
   repositories in a short time may answer "code host not reachable" until it resets (ADR 0015).
 - The design system covers the pages that exist so far; product pages (projects, campaigns, feedback) adopt it as they are built.

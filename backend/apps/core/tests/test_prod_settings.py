@@ -31,6 +31,11 @@ print(json.dumps({
     "SIGNUP_ENABLED": settings.SIGNUP_ENABLED,
     "EMAIL_USE_TLS": settings.MAILERS["default"]["OPTIONS"]["use_tls"],
     "CONFIRM_URL": settings.HEADLESS_FRONTEND_URLS["account_confirm_email"],
+    "PROXIES": [
+        settings.TRUSTED_PROXY_COUNT,
+        settings.ALLAUTH_TRUSTED_PROXY_COUNT,
+        settings.REST_FRAMEWORK["NUM_PROXIES"],
+    ],
 }))
 """
 
@@ -61,6 +66,7 @@ def _prod_env(**overrides: str) -> dict[str, str]:
         "DJANGO_EMAIL_HOST": "smtp.example.invalid",
         "DJANGO_DEFAULT_FROM_EMAIL": "no-reply@example.invalid",
         "DJANGO_MEDIA_ROOT": "/srv/example-media",
+        "DJANGO_TRUSTED_PROXY_COUNT": "1",
         **overrides,
     }
 
@@ -83,6 +89,7 @@ def test_prod_settings_are_secure():
         "SIGNUP_ENABLED": False,
         "EMAIL_USE_TLS": True,
         "CONFIRM_URL": "https://example.invalid/verify-email/{key}",
+        "PROXIES": [1, 1, 1],
     }
 
 
@@ -124,6 +131,21 @@ def test_prod_refuses_to_start_without_mail_configuration(missing):
 
     assert result.returncode != 0
     assert missing in result.stderr
+
+
+def test_prod_refuses_to_start_without_trusted_proxy_count():
+    result = _run(PROBE, _prod_env(), drop=("DJANGO_TRUSTED_PROXY_COUNT",))
+
+    assert result.returncode != 0
+    assert "DJANGO_TRUSTED_PROXY_COUNT" in result.stderr
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "one"])
+def test_prod_refuses_invalid_trusted_proxy_count(value):
+    result = _run(PROBE, _prod_env(DJANGO_TRUSTED_PROXY_COUNT=value))
+
+    assert result.returncode != 0
+    assert "DJANGO_TRUSTED_PROXY_COUNT" in result.stderr
 
 
 def test_prod_refuses_plain_http_frontend_url():

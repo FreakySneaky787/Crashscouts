@@ -9,8 +9,9 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
+
+from apps.core.throttling import USER_AND_IP
 
 from .avatars import MAX_BYTES, avatar_path, delete_avatar, process_avatar, store_avatar
 from .selectors import profile_for, visible_profiles
@@ -54,7 +55,7 @@ class OwnProfileView(APIView):
 class OwnAvatarView(APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (MultiPartParser,)
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = USER_AND_IP
     throttle_scope = "avatar_upload"
 
     @extend_schema(

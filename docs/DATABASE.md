@@ -1,6 +1,6 @@
 # Data model
 
-> State after phase 3A (2026-11-13). Generated from the models in `backend/apps/*/models.py`;
+> State after WP 3B.5 (2026-11-13). Generated from the models in `backend/apps/*/models.py`;
 > update this file in the same commit as any model change.
 
 All own tables use a random UUIDv4 primary key and `created_at`/`updated_at`
@@ -55,9 +55,16 @@ erDiagram
 | moderation | `Block` | moderators' block with message, lifting and one appeal (ADR 0020) | `created_by`/`lifted_by`/`appealed_by`: SET_NULL; target: CASCADE |
 | moderation | `ModerationNote` | warning to a project's team, moderators only | `created_by`: SET_NULL |
 | moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
+| core | `rate_limit_cache` | Django's database cache for rate limits (not a model; created by migration `core/0001`, ADR 0022) | keys are HMAC hashes (no plain IP address); expired entries deleted hourly, at most one day after the last request |
 | campaigns | `ApplicationAnswer` | answers (question text kept) | deleted on rejection, withdrawal, leaving, removal, 30 days after the campaign ends, and with the account |
 
-## Retention jobs (daily)
+## Retention jobs
+
+Hourly:
+
+- `manage.py purge_rate_limit_cache` – expired rate-limit entries (hashed IP addresses, ADR 0022).
+
+Daily:
 
 - `manage.py purge_deleted_accounts` – final account deletion after 14 days.
 - `manage.py purge_application_answers` – application answers 30 days after a campaign ended.

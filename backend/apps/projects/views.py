@@ -6,12 +6,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
 from apps.core.api import error_codes
+from apps.core.throttling import USER_AND_IP
 
 from .policies import can_delete, can_edit
 from .selectors import project_for, projects_of
@@ -22,7 +22,7 @@ from .verification import forget as forget_verification
 
 class ProjectCreateView(APIView):
     permission_classes = (IsAuthenticated,)
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = USER_AND_IP
     throttle_scope = "project_create"
 
     @extend_schema(request=ProjectWriteSerializer, responses={201: ProjectSerializer})

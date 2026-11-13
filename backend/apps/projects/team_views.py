@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.core.throttling import USER_AND_IP
+
 from .models import Invitation, Membership
 from .policies import can_delete, can_edit
 from .selectors import project_for
@@ -78,7 +80,7 @@ class TeamView(APIView):
 
 class InvitationCreateView(APIView):
     permission_classes = (IsAuthenticated,)
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = USER_AND_IP
     throttle_scope = "project_invite"
 
     @extend_schema(

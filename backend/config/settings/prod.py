@@ -29,6 +29,18 @@ SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+# Client IP for rate limits (ADR 0022). Required: with 0, every visitor of the SSR pages would
+# share the SSR server's address and its limits. The reverse proxy must overwrite
+# X-Forwarded-For with the client address (docs/SECURITY.md, section 8).
+try:
+    TRUSTED_PROXY_COUNT = int(env_str("DJANGO_TRUSTED_PROXY_COUNT"))
+except ValueError as exc:
+    raise ImproperlyConfigured("DJANGO_TRUSTED_PROXY_COUNT must be an integer.") from exc
+if TRUSTED_PROXY_COUNT < 1:
+    raise ImproperlyConfigured("DJANGO_TRUSTED_PROXY_COUNT must be at least 1 in production.")
+ALLAUTH_TRUSTED_PROXY_COUNT = TRUSTED_PROXY_COUNT
+REST_FRAMEWORK = {**REST_FRAMEWORK, "NUM_PROXIES": TRUSTED_PROXY_COUNT}  # noqa: F405
+
 # HSTS: 1 year. includeSubDomains and preload are commitments for the (not yet chosen) domain
 # and stay off until the domain is decided (project owner's decision).
 SECURE_HSTS_SECONDS = env_int("DJANGO_SECURE_HSTS_SECONDS", 31_536_000)

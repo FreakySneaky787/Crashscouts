@@ -279,8 +279,28 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 
+# --- Shared cache (WP 3B.5, open question O: Django's database cache, ADR 0022) ---
+# One cache for all processes, so rate limits hold across workers. Keys are HMAC-hashed
+# (config/cache.py): no IP address or other key is stored in plain text.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "rate_limit_cache",
+        "KEY_FUNCTION": "config.cache.hashed_key",
+        "TIMEOUT": 300,
+        "OPTIONS": {"MAX_ENTRIES": 100_000},
+    }
+}
+
+# Client IP behind proxies (WP 3B.5): how many trusted proxies append to X-Forwarded-For.
+# 0 (development): X-Forwarded-For is ignored, so it cannot be forged. Production: 1; the reverse
+# proxy must overwrite X-Forwarded-For with the client address (docs/SECURITY.md, section 8).
+TRUSTED_PROXY_COUNT = env_int("DJANGO_TRUSTED_PROXY_COUNT", 0)
+ALLAUTH_TRUSTED_PROXY_COUNT = TRUSTED_PROXY_COUNT
+
 # --- API ---
 REST_FRAMEWORK = {
+    "NUM_PROXIES": TRUSTED_PROXY_COUNT,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
@@ -305,6 +325,15 @@ REST_FRAMEWORK = {
         "campaign_create": "20/day",
         "campaign_invite": "50/day",
         "report": "20/day",
+        # Per IP address in addition to per account (gate item 3); higher because several
+        # people can share one address. Keys are hashed (ADR 0022).
+        "report_ip": "60/day",
+        "campaign_create_ip": "40/day",
+        "project_create_ip": "30/day",
+        "project_invite_ip": "60/day",
+        "campaign_invite_ip": "100/day",
+        "avatar_upload_ip": "30/hour",
+        "project_image_ip": "60/hour",
     },
 }
 
