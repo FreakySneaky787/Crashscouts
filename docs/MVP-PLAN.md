@@ -110,7 +110,7 @@ Work packages (decisions 2026-11-13, see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md
 | 3A.2 | Campaigns frontend: create, edit, campaign page `/p/<project>/c/<campaign>`, list on the project page; start/end with time zone | ✅ done |
 | 3A.3 | Download links (https only, optional SHA-256) with warning page, visible to team and participants only ([ADR 0017](adr/0017-download-links-and-warning-page.md)) | ✅ done |
 | 3A.4a | Participation: join directly, leave, removal by the team, hard limit under concurrency, participant list for the team, email and account page | ✅ done |
-| 3A.4b | Applications with per-campaign questions (templates, default "short message, optional"), approval and rejection | planned (next) |
+| 3A.4b | Applications with per-campaign questions (templates, default "short message, optional"), approval and rejection; answers deleted on rejection, leaving, removal and 30 days after the campaign ends; **data foundation for the metrics** (`published_at`, `completed_at`, `cancelled_at`, `published_by`) | planned (next) |
 | 3A.5 | Private invitations by username; participation through acceptance (done before 3A.4 at the owner's request) | ✅ done |
 | 3A.6 | Data export and deletion, E2E for the lock, documentation; phase 3A complete | planned |
 
@@ -151,6 +151,16 @@ and only by the project owner.
 > Phase 5 requirement from WP 1.5: `purge_deleted_accounts` must anonymise feedback of deleted
 > accounts instead of deleting it, and the data export must include the user's own feedback
 > ([ADR 0013](adr/0013-account-deletion-and-data-export.md)).
+
+## Metrics (after phase 5)
+
+Growth metrics decided by the owner on 2026-11-13 ([`METRICS.md`](METRICS.md)): Time to First
+Tester, Campaign Completion Rate, Useful Feedback Rate, Returning Testers, Returning Developers.
+Own data only, aggregates only, internal.
+
+| WP | Content | State |
+|---|---|---|
+| M.1 | Internal statistics page for platform admins with the five metrics per month (aggregate queries, tests with fixed example data) | planned |
 
 ## Phase 6 – Discover
 

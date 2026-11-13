@@ -572,7 +572,29 @@ downloads" works in the real UI already.
 ## Handover – next session (written 2026-11-13)
 
 **Where we are:** phase 3A, WPs 3A.1, 3A.2, 3A.3, 3A.5 and 3A.4a done and pushed (CI
-green). Next **3A.4b**, then **3A.6**.
+green). Next **3A.4b** (the owner continues tonight, 2026-11-13), then **3A.6**.
+
+**Decided for 3A.4b on 2026-11-13** (see [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)): answers
+deleted on rejection, leaving or removal and 30 days after the campaign ends (daily command like
+`purge_deleted_accounts`); applications stay open when the campaign is full, approval only with a
+free place, no new applications while full, withdrawal at any time. **Also in 3A.4b:** the data
+foundation for the growth metrics ([`METRICS.md`](METRICS.md)) – `Campaign.published_at`,
+`completed_at`, `cancelled_at`, `published_by` (`SET_NULL`), set in `services.change_state`, a
+data migration filling them from the audit events.
+
+Plan for 3A.4b (approved in outline):
+- `ApplicationQuestion` (text, type `short_text`/`long_text`/`single_choice`/`yes_no`, options,
+  required, position; at most 10; editable only while the campaign is a draft; templates "Short
+  message" (default, optional), "Device and operating system", "Testing experience",
+  "Availability during the test period").
+- `Application` (pending/approved/rejected/withdrawn) with `ApplicationAnswer`; apply only to
+  published public campaigns with `participation=approval`, not full, confirmed email, not the
+  team, not removed people; approval through `participation.activate`; rejection deletes the
+  answers and blocks re-applying; answers team-only; emails on approval and rejection; "Your
+  applications" on the account page.
+- Tests: permissions, limit on approval, deletion on rejection and after the retention period,
+  mutation checks; E2E for the question builder on drafts (applying needs a public campaign, so
+  pytest with the flag on).
 
 - **3A.4b – applications:** joining after approval must go through `participation.activate`
   when the team approves (same lock and limit); per-campaign question builder (short text, long text, single choice,

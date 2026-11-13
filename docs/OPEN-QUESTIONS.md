@@ -32,6 +32,9 @@
 | – | Campaign start and end | **Date, time and time zone** chosen by the team (default Europe/Zurich); shown in that zone (2026-11-13). |
 | – | Checksums for download links | **Optional SHA-256** per link, shown on the warning page with instructions (2026-11-13). |
 | – | Campaign URL | **`/p/<project>/c/<campaign>`** with redirects after renaming (2026-11-13). |
+| – | Growth metrics | **Five metrics** (Time to First Tester, Campaign Completion Rate, Useful Feedback Rate, Returning Testers, Returning Developers), defined in [`METRICS.md`](METRICS.md). **Own data only** (no tracking cookies, no third-party analytics), **internal** for platform admins, aggregates only. First tester = first participation of any kind; useful feedback = every feedback not marked Duplicate, Cannot Reproduce or Rejected. Data foundation now (WP 3A.4b), statistics page after phase 5 (2026-11-13). |
+| – | Application answers | Visible to the team only; deleted at once on rejection, leaving or removal, otherwise **30 days after the campaign is completed or cancelled** (2026-11-13). |
+| – | Applications when a campaign is full | **Stay open**; the team approves only when a place is free; no new applications while full; applicants may withdraw at any time (2026-11-13). |
 | V | Team rules | **Confirmed by the owner (2026-11-13):** only the owner invites, removes and hands over; maintainers may leave; invitations expire after 14 days; at most 20 pending per project; 30 invitations per day. |
 | – | Project visibility | **Public or private**, chosen per project; private projects are visible only to owner, maintainers and (later) invited testers, 404 for everyone else. |
 | – | Who may create projects | **Every account with a confirmed email address**, with a daily limit; abuse is handled by reporting and blocking (phase 3B). |

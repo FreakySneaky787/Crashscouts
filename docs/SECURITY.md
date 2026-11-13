@@ -119,6 +119,10 @@ including the negative cases.
 
 ## 6. Privacy and authorization
 
+- **No tracking:** no analytics scripts, no tracking cookies, no third-party analytics. Growth
+  metrics are computed from the platform's own data, as aggregates only, and shown internally
+  ([`METRICS.md`](METRICS.md), owner's decision 2026-11-13).
+
 - One central, server-side policy layer. ✅ Private resources return 404 (verified for the probe
   objects via SSR and API).
 - Parametrized tests of the permission matrix, including "a stranger sees nothing".
