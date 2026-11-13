@@ -29,8 +29,8 @@ def ensure_unblocked(campaign: Campaign) -> None:
         raise CampaignError("blocked")
 
 
-# Fields that shape who can take part; frozen once the campaign is published.
-LOCKED_AFTER_PUBLISH = ("visibility", "participation")
+# Fields that shape who can take part and how; frozen once the campaign is published.
+LOCKED_AFTER_PUBLISH = ("visibility", "participation", "method")
 
 
 @transaction.atomic
@@ -62,6 +62,10 @@ def update_campaign(user, campaign: Campaign, **fields) -> Campaign:
         raise CampaignError("locked_after_publish")
     if "target_testers" in fields and fields["target_testers"] < participant_count(campaign):
         raise CampaignError("below_participants")
+    if "method" in fields and fields["method"] != campaign.method:
+        from .tasks import ensure_method_change_allowed  # avoid an import cycle
+
+        ensure_method_change_allowed(campaign, fields["method"])
     new_slug = fields.pop("slug", campaign.slug)
     platforms = fields.pop("platforms", None)
     for key, value in fields.items():
@@ -102,6 +106,10 @@ def change_state(user, campaign: Campaign, new_state: str) -> Campaign:
     ensure_unblocked(campaign)
     if not status.can_transition(campaign.state, new_state):
         raise CampaignError("invalid_transition")
+    if new_state == status.PUBLISHED:
+        from .tasks import ensure_tasks_for_method  # avoid an import cycle
+
+        ensure_tasks_for_method(campaign)  # structured and combined need a task (ADR 0023)
     if new_state == status.PUBLISHED and campaign.visibility == Campaign.Visibility.PUBLIC:
         # Server-side security gate: public campaigns stay drafts until phase 3B is met.
         if not public_campaigns_enabled():

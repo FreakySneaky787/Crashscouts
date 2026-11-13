@@ -18,7 +18,13 @@ from django.utils import timezone
 
 from apps.audit.models import AuditEvent
 from apps.audit.services import record
-from apps.campaigns.models import Application, Campaign, CampaignInvitation, Participation
+from apps.campaigns.models import (
+    Application,
+    Campaign,
+    CampaignInvitation,
+    Participation,
+    TaskProgress,
+)
 from apps.moderation.models import Report
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
@@ -169,6 +175,19 @@ def export_data(user) -> dict:
                 "joined_at": _iso(p.created_at),
             }
             for p in Participation.objects.filter(user=user).select_related("campaign__project")
+        ],
+        # Own task progress with notes (WP 4.1, ADR 0023).
+        "campaign_task_progress": [
+            {
+                "campaign": t.participation.campaign.title,
+                "task": t.task.title,
+                "status": t.status,
+                "note": t.note,
+                "updated_at": _iso(t.updated_at),
+            }
+            for t in TaskProgress.objects.filter(participation__user=user).select_related(
+                "participation__campaign", "task"
+            )
         ],
         "campaign_invitations": [
             {"campaign": i.campaign.title, "status": i.status, "created_at": _iso(i.created_at)}

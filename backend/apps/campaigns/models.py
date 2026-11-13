@@ -34,6 +34,13 @@ class Campaign(BaseModel):
         APPROVAL = "approval", "After approval"
         INVITATION = "invitation", "By invitation"
 
+    class Method(models.TextChoices):
+        """Testing method (master prompt 2.3; owner's decision 2026-11-13, ADR 0023)."""
+
+        FREE = "free", "Free testing"
+        STRUCTURED = "structured", "Structured testing"
+        COMBINED = "combined", "Combined testing"
+
     class State(models.TextChoices):
         DRAFT = status.DRAFT, "Draft"
         IN_REVIEW = status.IN_REVIEW, "In review"
@@ -51,6 +58,7 @@ class Campaign(BaseModel):
     hardware_requirements = models.TextField(max_length=SHORT_MARKDOWN_MAX_LENGTH, blank=True)
     prerequisites = models.TextField(max_length=SHORT_MARKDOWN_MAX_LENGTH, blank=True)
     methodology = models.TextField(max_length=SHORT_MARKDOWN_MAX_LENGTH, blank=True)
+    method = models.CharField(max_length=12, choices=Method.choices, default=Method.FREE)
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
     # The team's time zone (IANA name): start and end are shown and edited in it.
@@ -315,3 +323,56 @@ class ApplicationAnswer(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.application}: {self.prompt}"
+
+
+class TestTask(BaseModel):
+    """A task of a structured or combined campaign (WP 4.1, ADR 0023). Visible to everyone who
+    sees the campaign. A task with reported progress is hidden instead of deleted, so the team
+    keeps what testers reported."""
+
+    MAX_PER_CAMPAIGN = 30
+    __test__ = False  # not a pytest test class despite the name
+
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="tasks")
+    title = models.CharField(max_length=120)
+    instructions = models.TextField(max_length=SHORT_MARKDOWN_MAX_LENGTH, blank=True)
+    expected_result = models.TextField(max_length=1000, blank=True)
+    position = models.PositiveSmallIntegerField(default=0)
+    hidden_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    class Meta:
+        ordering = ["position", "created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.campaign}: {self.title}"
+
+
+class TaskProgress(BaseModel):
+    """One participant's status of one task; no row means "not started". Belongs to the
+    participation, so it stays when someone leaves or is removed and continues when they come
+    back; it is deleted with the account (owner's decision 2026-11-13)."""
+
+    NOTE_MAX_LENGTH = 1000
+
+    class Status(models.TextChoices):
+        NOT_STARTED = "not_started", "Not started"
+        IN_PROGRESS = "in_progress", "In progress"
+        COMPLETED = "completed", "Completed"
+        BLOCKED = "blocked", "Blocked"
+
+    participation = models.ForeignKey(
+        Participation, on_delete=models.CASCADE, related_name="task_progress"
+    )
+    task = models.ForeignKey(TestTask, on_delete=models.CASCADE, related_name="progress")
+    status = models.CharField(max_length=12, choices=Status.choices)
+    note = models.TextField(max_length=NOTE_MAX_LENGTH, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["participation", "task"], name="campaigns_one_progress_per_task"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.participation}: {self.task.title} ({self.status})"

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.6) · **Current phase:** 3B complete (flag off) – next: 4, Testing
+**Last update:** 2026-11-13 (WP 3B.6; WP 4.1 in progress) · **Current phase:** 3B complete (flag off) – next: 4, Testing
 
 ## Work packages
 
@@ -758,6 +758,20 @@ switches the flag.
   404). No application code changed in this WP.
 
 ## Handover – next session (written 2026-11-13)
+
+**In progress – phase 4, WP 4.1 (backend), saved mid-work on 2026-11-13:** the plan for phase 4
+(WPs 4.1–4.4) is approved; `docs/OPEN-QUESTIONS.md` is still to be updated. Owner decisions
+of 2026-11-13: testing method as a fixed choice (free / structured / combined; structured
+and combined need a task before publishing), tasks editable after publishing (a task with progress
+is hidden, not deleted), optional short note per status (team and the tester only), progress kept
+when someone leaves or is removed (deleted with the account). Done so far (not yet covered by new
+tests): `Campaign.method`, `TestTask`, `TaskProgress` (migration 0012), `apps/campaigns/tasks.py`,
+`task_views.py` (tasks, move, own progress, team overview `…/progress/` = 404 for non-team), rules
+in `services.py` (`tasks_required`, `tasks_exist`, `method` locked after publishing), tasks in the
+review queue, own progress in the data export, throttle `task_progress` 300/hour. **Next:** pytest
+for WP 4.1 (permissions incl. negatives, rules, hide vs delete, closed campaign read-only, leaving
+and rejoining, export) and mutation checks; ADR 0023; DATABASE, OPEN-QUESTIONS, MVP-PLAN; then
+WPs 4.2–4.4.
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the

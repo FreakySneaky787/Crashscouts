@@ -305,7 +305,18 @@ class ReviewsView(ModeratorView):
                         "project": c.project.slug,
                         "project_name": c.project.name,
                         "campaign": c.slug,
+                        "method": c.method,
                         "links": [link_data(link) for link in c.links.all()],
+                        # Tasks are text that testers follow; moderators see them in the review
+                        # so nothing can hide there (ADR 0023).
+                        "tasks": [
+                            {
+                                "title": t.title,
+                                "instructions": t.instructions,
+                                "expected_result": t.expected_result,
+                            }
+                            for t in c.tasks.filter(hidden_at__isnull=True)
+                        ],
                     }
                     for c in pending_campaigns()
                 ],

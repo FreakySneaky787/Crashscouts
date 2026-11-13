@@ -325,6 +325,7 @@ REST_FRAMEWORK = {
         "campaign_create": "20/day",
         "campaign_invite": "50/day",
         "report": "20/day",
+        "task_progress": "300/hour",
         # Per IP address in addition to per account (gate item 3); higher because several
         # people can share one address. Keys are hashed (ADR 0022).
         "report_ip": "60/day",
@@ -339,7 +340,13 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     # One name for the report reasons, used by reports and moderation blocks.
-    "ENUM_NAME_OVERRIDES": {"ReportReasonEnum": "apps.moderation.models.Report.Reason"},
+    "ENUM_NAME_OVERRIDES": {
+        "ReportReasonEnum": "apps.moderation.models.Report.Reason",
+        "TaskProgressStatusEnum": "apps.campaigns.models.TaskProgress.Status",
+        "ParticipationStatusEnum": "apps.campaigns.models.Participation.Status",
+        "CampaignParticipationEnum": "apps.campaigns.models.Campaign.Participation",
+        "ProjectStatusEnum": "apps.projects.models.Project.Status",
+    },
     "TITLE": f"{PLATFORM_NAME} API",
     "VERSION": "0.0.0",
     "SERVE_INCLUDE_SCHEMA": False,

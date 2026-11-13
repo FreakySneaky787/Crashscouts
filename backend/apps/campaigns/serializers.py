@@ -8,10 +8,12 @@ from apps.catalog.serializers import CatalogItemSerializer
 from . import status
 from .models import (
     MAX_TARGET_TESTERS,
+    SHORT_MARKDOWN_MAX_LENGTH,
     Application,
     ApplicationQuestion,
     Campaign,
     CampaignSlugHistory,
+    TaskProgress,
 )
 from .policies import is_participant, is_team
 from .selectors import participant_count
@@ -50,6 +52,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             "hardware_requirements",
             "prerequisites",
             "methodology",
+            "method",
             "starts_at",
             "ends_at",
             "timezone",
@@ -125,6 +128,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
     target_testers = serializers.IntegerField(min_value=1, max_value=MAX_TARGET_TESTERS)
     timezone = serializers.CharField(max_length=64, required=False, validators=[validate_timezone])
     participation = serializers.ChoiceField(choices=Campaign.Participation.choices, required=False)
+    method = serializers.ChoiceField(choices=Campaign.Method.choices, required=False)
     platforms = serializers.SlugRelatedField(
         slug_field="slug", queryset=Platform.objects.all(), many=True, required=False
     )
@@ -141,6 +145,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             "hardware_requirements",
             "prerequisites",
             "methodology",
+            "method",
             "starts_at",
             "ends_at",
             "timezone",
@@ -289,3 +294,39 @@ class ApplicationQuestionSerializer(serializers.Serializer):
         else:
             attrs["options"] = []  # only choice questions have options
         return attrs
+
+
+class TestTaskSerializer(serializers.Serializer):
+    """A task as everyone who sees the campaign reads it; ``my_status``/``my_note`` are the
+    viewer's own progress only (never anyone else's)."""
+
+    __test__ = False  # not a pytest test class despite the name
+
+    id = serializers.UUIDField(read_only=True)
+    title = serializers.CharField(max_length=120)
+    instructions = serializers.CharField(
+        max_length=SHORT_MARKDOWN_MAX_LENGTH, required=False, allow_blank=True
+    )
+    expected_result = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+
+    def validate_title(self, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Enter a title.", code="blank")
+        return value
+
+    def validate_instructions(self, value: str) -> str:
+        return value.strip()
+
+    def validate_expected_result(self, value: str) -> str:
+        return value.strip()
+
+
+class TaskProgressWriteSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=TaskProgress.Status.choices)
+    note = serializers.CharField(
+        max_length=TaskProgress.NOTE_MAX_LENGTH, required=False, allow_blank=True, default=""
+    )
+
+    def validate_note(self, value: str) -> str:
+        return value.strip()

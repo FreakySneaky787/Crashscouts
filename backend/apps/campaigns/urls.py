@@ -17,6 +17,13 @@ from .invitation_views import (
 from .link_views import CampaignLinksView, CampaignLinkView
 from .participation_views import JoinView, LeaveView, ParticipantRemoveView
 from .question_views import QuestionsView, QuestionTemplateView, QuestionView
+from .task_views import (
+    ProgressOverviewView,
+    TaskMoveView,
+    TaskProgressView,
+    TasksView,
+    TaskView,
+)
 from .views import CampaignDetailView, CampaignListView, CampaignStateView
 
 urlpatterns = [
@@ -108,6 +115,32 @@ urlpatterns = [
         name="my-campaign-invitation-answer",
     ),
     path("me/participations/", MyParticipationsView.as_view(), name="my-participations"),
+    # Test tasks and progress (WP 4.1); before the catch-all state route below.
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/tasks/",
+        TasksView.as_view(),
+        name="campaign-tasks",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/tasks/<uuid:task_id>/",
+        TaskView.as_view(),
+        name="campaign-task",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/tasks/<uuid:task_id>/move/",
+        TaskMoveView.as_view(),
+        name="campaign-task-move",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/tasks/<uuid:task_id>/progress/",
+        TaskProgressView.as_view(),
+        name="campaign-task-progress",
+    ),
+    path(
+        "projects/<str:slug>/campaigns/<str:campaign_slug>/progress/",
+        ProgressOverviewView.as_view(),
+        name="campaign-progress",
+    ),
     path(
         "projects/<str:slug>/campaigns/<str:campaign_slug>/<str:action>/",
         CampaignStateView.as_view(),
