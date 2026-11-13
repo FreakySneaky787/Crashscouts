@@ -34,6 +34,8 @@ export type Campaign = {
   open_applications: number | null;
   /** Status of the viewer's own application, if any. */
   my_application: "pending" | "approved" | "rejected" | "withdrawn" | null;
+  /** Block by moderators with reason and appeal state; for the team only (WP 3B.3). */
+  moderation: import("./moderation").ModerationInfo | null;
   created_at: string;
   updated_at: string;
 };
@@ -228,6 +230,8 @@ export type CampaignLink = {
   in_repository: boolean;
   /** Suspended after malware reports; served to no one until moderators decide. */
   suspended: boolean;
+  /** Blocked by moderators; served to no one. */
+  blocked: boolean;
 };
 
 /** The add-link form as API payload. */
@@ -267,6 +271,8 @@ export const CAMPAIGN_PROBLEMS = [
   "too_many_questions",
   "unknown_template",
   "no_applications",
+  "blocked",
+  "link_suspended",
   "answer_required",
   "invalid_answers",
   "already_applied",

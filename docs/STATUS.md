@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.2) · **Current phase:** 3B – Security gate
+**Last update:** 2026-11-13 (WP 3B.3) · **Current phase:** 3B – Security gate
 
 ## Work packages
 
@@ -676,13 +676,25 @@ downloads" works in the real UI already.
 - **Verification (run on 2026-11-13):** pytest **459 passed** (12 new); 5 mutation checks caught –
   one (link served despite a blocked campaign) only after adding a test for the team's own view;
   Playwright **75 passed**; OpenAPI clean after fixing two schema warnings.
-- Part 2 (moderation pages, team notices, appeal form) follows.
+
+### WP 3B.3, part 2 – Moderation pages (2026-11-13) ✅
+
+- `/moderation` (open cases with malware and suspended markers, appeals) and
+  `/moderation/<type>/<id>` (reports with reporter names, earlier warnings and blocks, actions
+  take, block with confirmation, warn, dismiss with confirmation, lift suspension, lift block,
+  decide appeal); team notice with reason and the single appeal form on project and campaign
+  pages (`/blocks/<id>/appeal`); blocked links marked in the team's link list; "Moderation" link
+  on the account page for moderators ([ADR 0020](adr/0020-moderation-and-blocking.md)).
+- **Verification (run on 2026-11-13):** Playwright **76 passed** (1 new: report, queue, block
+  with confirmation, 404 for visitors and the reporter, reporter sees "Resolved", team notice and
+  appeal, appeal accepted, project back, axe on the case page; moderation pages 404 for others).
 
 ## Handover – next session (written 2026-11-13)
 
-**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1 (platform roles) and 3B.2 (reporting) done. Next:
-**3B.3 moderation queue and blocking** (lift or confirm suspended links, close reports with an
-email to the reporter, hide/block projects, campaigns and links for everyone, warn; audit). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
+**Where we are:** phase 3A complete; phase 3B started – WPs 3B.1 (roles), 3B.2 (reporting) and 3B.3 (moderation and
+blocking) done. Next: **3B.4 review queue for public campaigns** (every new public campaign is
+reviewed before it is published; a link change of an approved campaign triggers a new review;
+rule A – confirmed email and 2FA – enforced when submitting). Phase 3B is the security gate, mandatory before any public campaign (docs/MVP-PLAN.md). Only the owner switches
 `PUBLIC_CAMPAIGNS_ENABLED`, and only after every gate item is met.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
@@ -691,9 +703,6 @@ are assigned on an admin page (first admin via a one-off server command; fresh r
 and 2FA for role changes; audited; the last admin cannot remove themselves).
 
 Work packages to propose for 3B (present before starting, as usual):
-- 3B.3 Moderation queue (open, in review, resolved, dismissed; hide, block, warn; feedback to
-  the reporter; audit) and blocking (blocked campaigns, projects and links are served to no one,
-  reversible, with reason).
 - 3B.4 Review queue for public campaigns; a link change of an approved campaign triggers a new
   review; rule A enforced on publishing.
 - 3B.5 Rate limits per user and IP with a shared cache (open question O must be decided:

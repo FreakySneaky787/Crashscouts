@@ -27,6 +27,8 @@ export type Project = {
   screenshots: { key: string; alt_text: string; width: number; height: number }[];
   /** How the repository link was verified (WP 2.5); null while it is not verified. */
   verification_method: "file" | "github" | null;
+  /** Block by moderators with reason and appeal state; for the team only (WP 3B.3). */
+  moderation: import("./moderation").ModerationInfo | null;
   created_at: string;
   updated_at: string;
 };

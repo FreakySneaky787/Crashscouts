@@ -7,6 +7,7 @@ import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign";
 import { ApplicationPanel } from "~/components/campaigns/ApplicationPanel";
+import { BlockNotice } from "~/components/moderation/BlockNotice";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { Chips, FactList, RowList } from "~/components/ui/Data";
@@ -73,6 +74,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const search = new URL(request.url).searchParams;
   const joined = search.get("joined") === "1";
   const reported = search.get("reported") === "1";
+  const appeal = search.get("appeal");
   const applied = search.get("applied");
   const questions =
     campaign.participation === "approval"
@@ -84,6 +86,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       csrfToken: csrf?.token ?? null,
       joined,
       reported,
+      appeal,
       questions,
       applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
     },
@@ -176,6 +179,10 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
       />
       {loaderData.joined ? <Notice tone="ok" title={t("campaigns.join.joined")} /> : null}
       {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
+      {loaderData.appeal ? (
+        <Notice tone={loaderData.appeal === "sent" ? "ok" : "danger"} title={t(loaderData.appeal === "sent" ? "moderation.team.sent" : "moderation.team.failed")} />
+      ) : null}
+      {campaign.moderation ? <BlockNotice info={campaign.moderation} csrfToken={csrfToken} back={`/p/${project.slug}/c/${campaign.slug}`} /> : null}
       {loaderData.applied ? <Notice tone="ok" title={t(`campaigns.apply.done.${loaderData.applied}`)} /> : null}
       {campaign.open_applications ? (
         <Notice tone="info" title={t("campaigns.apply.openForTeam", { count: campaign.open_applications })}>

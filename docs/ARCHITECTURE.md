@@ -54,7 +54,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `campaigns` | Campaigns, links, invitations, participations, status machine | model, derived status, policies, API, public-campaign lock, time zones, download links, invitations and participations (WP 3A.1–3A.3, 3A.5) |
 | `testing` | Test tasks, progress | planned |
 | `feedback` | Feedback, attachments, status, publishing | planned |
-| `moderation` | Reports, review queue, actions, blocks | reports and automatic link suspension (WP 3B.2) |
+| `moderation` | Reports, review queue, actions, blocks | reports, link suspension, blocks, warnings, appeals, moderation pages (WP 3B.2–3B.3) |
 | `notifications` | In-app and email notifications (via tasks) | planned |
 | `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
 | `discover` | Search and filters (PostgreSQL full text) | planned |

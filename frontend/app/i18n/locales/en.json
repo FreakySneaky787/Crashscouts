@@ -372,7 +372,8 @@
       "forbidden": "You cannot change this project.",
       "confirmDelete": "Tick the box to confirm the deletion.",
       "ownerOnly": "Only the owner can delete the project.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "blocked": "Moderators blocked this project; it cannot be changed. You can appeal on the project page."
     },
     "screenshots": "Screenshots",
     "media": "Logo and screenshots",
@@ -557,7 +558,8 @@
       "rejected": "The team did not accept your application for this campaign.",
       "no_open_application": "There is no open application.",
       "confirmReject": "Tick the box to confirm the rejection.",
-      "link_suspended": "This link is suspended while moderators review reports about it."
+      "link_suspended": "This link is suspended while moderators review reports about it.",
+      "blocked": "Moderators blocked this content; it cannot be changed. You can appeal on its page."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -610,7 +612,8 @@
         "platform": "Choose from the list.",
         "sha256": "Enter the checksum as 64 hexadecimal characters."
       },
-      "suspended": "Suspended – under review"
+      "suspended": "Suspended – under review",
+      "blocked": "Blocked by moderators"
     },
     "download": {
       "crumb": "Download link",
@@ -815,7 +818,7 @@
   },
   "platform": {
     "title": "Platform administration",
-    "text": "Manage who moderates and administers the platform.",
+    "text": "Moderation and platform administration.",
     "roles": {
       "title": "Platform roles",
       "intro": "Admins manage roles and moderate; moderators handle reports and reviews. A role only counts while the account has two-factor authentication turned on.",
@@ -884,6 +887,73 @@
       "email_unconfirmed": "Confirm your email address before reporting.",
       "rateLimited": "You sent many reports today. Try again tomorrow.",
       "generic": "Something went wrong. Please try again."
+    }
+  },
+  "moderation": {
+    "title": "Moderation",
+    "intro": "Reports, blocks and appeals. Malware reports and suspended links come first.",
+    "cases": "Open cases",
+    "noCases": "No open reports.",
+    "appeals": "Appeals",
+    "noAppeals": "No open appeals.",
+    "types": {
+      "project": "Project",
+      "campaign": "Campaign",
+      "link": "Download link"
+    },
+    "reportCount_one": "{{count}} report",
+    "reportCount_other": "{{count}} reports",
+    "blocked": "Blocked",
+    "target": "Reported content",
+    "backToQueue": "Back to the queue",
+    "reports": "Reports",
+    "deletedAccount": "Deleted account",
+    "history": "Earlier warnings and blocks",
+    "warning": "Warning",
+    "block": "Block",
+    "lifted": "lifted",
+    "appeal": "Appeal by the team",
+    "appealLift": "Accept appeal and lift the block",
+    "appealUphold": "Keep the block",
+    "actions": "Actions",
+    "take": "Take the case (mark as in review)",
+    "liftSuspension": "Lift the suspension (the link is fine)",
+    "liftBlock": "Lift the block",
+    "blockTitle": "Block",
+    "category": "Reason",
+    "message": "Message to the team",
+    "messageHint": "The team sees this message. Reporters only learn that their report was reviewed.",
+    "blockConfirm": "Block this content for everyone outside the team; its links are served to no one.",
+    "blockButton": "Block",
+    "warnTitle": "Warn the team",
+    "warnMessage": "Warning to the team",
+    "warnButton": "Send warning",
+    "dismissConfirm": "Close all open reports without action.",
+    "dismiss": "Dismiss reports",
+    "done": "Done.",
+    "problem": {
+      "message_required": "Write a message to the team.",
+      "already_blocked": "This content is already blocked.",
+      "nothing_open": "There are no open reports.",
+      "not_suspended": "This link is not suspended.",
+      "no_open_appeal": "There is no open appeal.",
+      "confirm": "Tick the box to confirm.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "team": {
+      "title": "Blocked by the moderators",
+      "blocked": "Blocked: {{reason}}",
+      "effect": "Nobody outside your team can see this, its download links are not served, and it cannot be changed.",
+      "appeal": "Appeal",
+      "appealHint": "Explain why the block is a mistake. You can appeal once; at most 1,000 characters.",
+      "send": "Send appeal",
+      "sent": "Your appeal was sent. The moderators will decide.",
+      "failed": "The appeal could not be sent.",
+      "appealState": {
+        "pending": "Your appeal is waiting for the moderators' decision.",
+        "upheld": "The moderators reviewed your appeal and kept the block.",
+        "lifted": "The block was lifted."
+      }
     }
   }
 }

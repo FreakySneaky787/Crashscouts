@@ -102,8 +102,11 @@ including the negative cases.
   ✅ Reporting implemented in WP 3B.2 ([ADR 0019](adr/0019-reporting-and-link-suspension.md)):
   confirmed email, only visible content (404 otherwise), one open report per content, 20 per day,
   no free text in the audit log; a download link reported as malware by 3 different accounts is
-  suspended automatically and served to no one until moderators decide. Blocking by moderators
-  follows in WP 3B.3.
+  suspended automatically and served to no one until moderators decide. ✅ Blocking and the
+  moderation workflow implemented in WP 3B.3 ([ADR 0020](adr/0020-moderation-and-blocking.md)):
+  blocked projects and campaigns are visible only to their team, links of blocked or suspended
+  content are served to no one, teams cannot change blocked content; queue, warnings, one appeal
+  per block, emails to teams and reporters, audit.
 
 ## 5. Uploads
 

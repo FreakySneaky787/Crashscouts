@@ -67,6 +67,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       participations: participations.data ?? [],
       applications: applications.data ?? [],
       isAdmin: role.data?.platform_role === "admin",
+      isModerator: role.data?.platform_role === "admin" || role.data?.platform_role === "moderator",
       reports: reports.data ?? [],
       campaignInvitationResult,
       participationLeft,
@@ -205,14 +206,19 @@ export default function Account({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
       </Panel>
-      {loaderData.isAdmin ? (
+      {loaderData.isModerator ? (
         <Panel title={t("platform.title")}>
           <div className={styles.stack}>
             <p>{t("platform.text")}</p>
-            <div>
-              <ButtonLink to="/platform/roles" icon={ShieldCheckIcon}>
-                {t("platform.roles.title")}
+            <div className={styles.buttonRow}>
+              <ButtonLink to="/moderation" icon={ShieldCheckIcon}>
+                {t("moderation.title")}
               </ButtonLink>
+              {loaderData.isAdmin ? (
+                <ButtonLink to="/platform/roles" variant="secondary" icon={ShieldCheckIcon}>
+                  {t("platform.roles.title")}
+                </ButtonLink>
+              ) : null}
             </div>
           </div>
         </Panel>

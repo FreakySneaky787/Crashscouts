@@ -127,6 +127,9 @@ export async function action({ request, params }: Route.ActionArgs) {
   const values = projectPayload(form);
   const result = await backendFetch<Project>(request, `/api/v1/projects/${slug}/`, { method: "PATCH", csrfToken, json: values });
   if (result.status === 200 && result.data) throw redirect(`/p/${result.data.slug}`, { headers });
+  if (result.status === 400 && (result.data as { code?: string } | null)?.code === "blocked") {
+    return data({ values, errors: {}, problem: "blocked" }, { status: 400, headers });
+  }
   if (result.status === 400) return data({ values, errors: projectErrorCodes(result.data), problem: null }, { status: 400, headers });
   return data({ values, errors: {}, problem: result.status === 403 ? "forbidden" : "generic" }, { status: 400, headers });
 }

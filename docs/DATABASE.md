@@ -40,7 +40,7 @@ erDiagram
 | profiles | `Profile` | bio, link, interests, platforms, skills, avatar; `show_*` visibility per field | deleted with the account (CASCADE) |
 | audit | `AuditEvent` | append-only security log | `actor`/`subject` set to NULL when an account is deleted; no IPs, no tokens |
 | catalog | `Category`, `Platform`, `Skill`, `ProgrammingLanguage`, `License` | fixed lists (SPDX licences) | none |
-| projects | `Project` | project with short name, visibility, licence, repository link, logo | – |
+| projects | `Project` | project with short name, visibility, licence, repository link, logo, `blocked_at` (ADR 0020) | – |
 | projects | `Membership` | owner/maintainer | deleted with the account; projects are handed over first |
 | projects | `Invitation` | team invitations | invitee: CASCADE; `invited_by`: SET_NULL |
 | projects | `Screenshot`, `SlugHistory` | images, former short names | – |
@@ -52,6 +52,8 @@ erDiagram
 | campaigns | `Participation` | taking part (`active`/`left`/`removed`; one per person and campaign) | CASCADE with the account (frees the place) |
 | campaigns | `ApplicationQuestion` | per-campaign questions | – |
 | campaigns | `Application` | application (`pending`/`approved`/`rejected`/`withdrawn`) | applicant: CASCADE; `decided_by`: SET_NULL |
+| moderation | `Block` | moderators' block with message, lifting and one appeal (ADR 0020) | `created_by`/`lifted_by`/`appealed_by`: SET_NULL; target: CASCADE |
+| moderation | `ModerationNote` | warning to a project's team, moderators only | `created_by`: SET_NULL |
 | moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
 | campaigns | `ApplicationAnswer` | answers (question text kept) | deleted on rejection, withdrawal, leaving, removal, 30 days after the campaign ends, and with the account |
 

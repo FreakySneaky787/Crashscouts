@@ -14,10 +14,11 @@ import { StatusPill } from "~/components/ui/StatusPill";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { CAMPAIGN_STATUS, PROJECT_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
-import { backendFetch } from "~/lib/backend.server";
+import { BlockNotice } from "~/components/moderation/BlockNotice";
+import { backendFetch, ensureCsrfToken } from "~/lib/backend.server";
 import { campaignStatusStyleKey, formatInZone, type Campaign } from "~/lib/campaigns";
 import { reportHref } from "~/lib/reports";
-import { cacheHeadersFor, privateNoStoreHeaders } from "~/lib/http";
+import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, projectImageSrc, statusLabel, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -55,11 +56,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   // Former short names (and wrong letter case) redirect permanently to the current one.
   if (project.slug !== params.slug) throw redirect(`/p/${project.slug}`, { status: 301 });
   const url = new URL(`/p/${project.slug}`, request.url).toString();
-  const headers = project.visibility === "public" && !project.role ? cacheHeadersFor(request) : privateNoStoreHeaders();
   const search = new URL(request.url).searchParams;
+  // The team of blocked content gets a CSRF token for the appeal form.
+  const csrf = project.moderation ? await ensureCsrfToken(request) : null;
+  const headers = csrf
+    ? setCookieHeaders(csrf.setCookies, privateNoStoreHeaders())
+    : project.visibility === "public" && !project.role
+      ? cacheHeadersFor(request)
+      : privateNoStoreHeaders();
+  const appeal = search.get("appeal");
   const campaignDeleted = search.get("campaign") === "deleted";
   const reported = search.get("reported") === "1";
-  return data({ project, url, campaigns: campaigns.status === 200 ? (campaigns.data ?? []) : [], campaignDeleted, reported }, { headers });
+  return data({ project, url, campaigns: campaigns.status === 200 ? (campaigns.data ?? []) : [], campaignDeleted, reported, csrfToken: csrf?.token ?? null, appeal }, { headers });
 }
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
@@ -103,6 +111,10 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
         }
       />
       {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
+      {loaderData.appeal ? (
+        <Notice tone={loaderData.appeal === "sent" ? "ok" : "danger"} title={t(loaderData.appeal === "sent" ? "moderation.team.sent" : "moderation.team.failed")} />
+      ) : null}
+      {project.moderation ? <BlockNotice info={project.moderation} csrfToken={loaderData.csrfToken} back={`/p/${project.slug}`} /> : null}
       {loaderData.campaignDeleted ? <Notice tone="ok" title={t("campaigns.deleted")} /> : null}
       {campaigns.length || project.role ? (
         <Panel
