@@ -38,6 +38,8 @@ def can_view(user, campaign: Campaign) -> bool:
         return True
     if campaign.state == Campaign.State.DRAFT:
         return False
+    if campaign.blocked_at is not None or campaign.project.blocked_at is not None:
+        return False  # blocked by moderators: gone for invitees and participants too
     if campaign.visibility == Campaign.Visibility.PUBLIC:
         return (
             public_campaigns_enabled() and campaign.project.visibility == Project.Visibility.PUBLIC

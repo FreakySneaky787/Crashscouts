@@ -19,7 +19,7 @@ from apps.projects.team import TeamError, invitable_user
 
 from .models import Campaign, CampaignInvitation, Participation
 from .participation import activate
-from .services import CampaignError
+from .services import CampaignError, ensure_unblocked
 
 INVITATION_LIFETIME = timedelta(days=14)
 MAX_PENDING_INVITATIONS = 100
@@ -42,6 +42,7 @@ def _invitee(username: str):
 
 @transaction.atomic
 def invite(campaign: Campaign, by, username: str) -> CampaignInvitation:
+    ensure_unblocked(campaign)
     if campaign.visibility != Campaign.Visibility.PRIVATE:
         raise CampaignError("not_private")
     if campaign.state != Campaign.State.PUBLISHED:
@@ -104,6 +105,8 @@ def open_invitations_of(user):
             status=CampaignInvitation.Status.PENDING,
             expires_at__gt=timezone.now(),
             campaign__state=Campaign.State.PUBLISHED,
+            campaign__blocked_at__isnull=True,
+            campaign__project__blocked_at__isnull=True,
         )
         .select_related("campaign__project", "invited_by")
         .order_by("-created_at")
@@ -131,7 +134,12 @@ def revoke(invitation: CampaignInvitation) -> None:
 
 def participations_of(user):
     return (
-        Participation.objects.filter(user=user, status=Participation.Status.ACTIVE)
+        Participation.objects.filter(
+            user=user,
+            status=Participation.Status.ACTIVE,
+            campaign__blocked_at__isnull=True,
+            campaign__project__blocked_at__isnull=True,
+        )
         .select_related("campaign__project")
         .order_by("-created_at")
     )

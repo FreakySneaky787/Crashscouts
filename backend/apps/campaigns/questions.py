@@ -3,7 +3,7 @@
 from django.db import transaction
 
 from .models import ApplicationQuestion, Campaign
-from .services import CampaignError
+from .services import CampaignError, ensure_unblocked
 
 # Templates offered in the builder (owner's decision: templates, default "short message").
 TEMPLATES = {
@@ -36,6 +36,7 @@ DEFAULT_TEMPLATE = "short_message"
 
 
 def _ensure_editable(campaign: Campaign) -> None:
+    ensure_unblocked(campaign)
     if campaign.state != Campaign.State.DRAFT:
         raise CampaignError("questions_locked")  # applicants must answer what was published
     if campaign.participation != Campaign.Participation.APPROVAL:

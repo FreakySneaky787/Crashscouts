@@ -41,6 +41,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     logo_key = serializers.UUIDField(allow_null=True)
     screenshots = ScreenshotSerializer(many=True)
     verification_method = serializers.SerializerMethodField()
+    moderation = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
@@ -62,6 +63,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "logo_key",
             "screenshots",
             "verification_method",
+            "moderation",
             "created_at",
             "updated_at",
         )
@@ -76,6 +78,14 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_role(self, project) -> str | None:
         return role_of(self.context["request"].user, project)
+
+    def get_moderation(self, project) -> dict | None:
+        """Block with reason and appeal state, for the team only (ADR 0020)."""
+        if project.blocked_at is None or role_of(self.context["request"].user, project) is None:
+            return None
+        from apps.moderation.actions import team_block_info
+
+        return team_block_info(project)
 
     def get_verification_method(self, project) -> str | None:
         """Method "file" or "github" (WP 2.5) while the repository link is verified; else null."""

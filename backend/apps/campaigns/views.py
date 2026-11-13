@@ -72,7 +72,10 @@ class CampaignListView(APIView):
         serializer = CampaignWriteSerializer(data=request.data, context={"project": project})
         if not serializer.is_valid():
             return error_codes(serializer)
-        campaign = create_campaign(request.user, project, **serializer.validated_data)
+        try:
+            campaign = create_campaign(request.user, project, **serializer.validated_data)
+        except CampaignError as exc:
+            return _error(exc)
         return Response(
             CampaignSerializer(campaign, context={"request": request}).data,
             status=status.HTTP_201_CREATED,

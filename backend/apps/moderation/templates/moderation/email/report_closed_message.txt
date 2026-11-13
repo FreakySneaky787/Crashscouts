@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}Thank you for your report about "{{ target_label }}". The moderators reviewed it{% if outcome == "resolved" %} and took action{% else %} and found no reason to act{% endif %}.
+
+Your reports and their status: {{ account_url }}{% endautoescape %}{% endblock content %}

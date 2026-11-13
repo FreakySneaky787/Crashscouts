@@ -78,6 +78,13 @@ class AuditEvent(models.Model):
         PLATFORM_ROLE_CHANGED = "platform.role_changed", "Platform role changed"
         REPORTED = "moderation.reported", "Content reported"
         LINK_SUSPENDED = "moderation.link_suspended", "Download link suspended automatically"
+        SUSPENSION_LIFTED = "moderation.suspension_lifted", "Link suspension lifted"
+        BLOCKED = "moderation.blocked", "Content blocked by moderators"
+        UNBLOCKED = "moderation.unblocked", "Block lifted"
+        WARNED = "moderation.warned", "Project team warned"
+        REPORTS_DISMISSED = "moderation.reports_dismissed", "Reports dismissed"
+        APPEALED = "moderation.appealed", "Block appealed"
+        APPEAL_DECIDED = "moderation.appeal_decided", "Appeal decided"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

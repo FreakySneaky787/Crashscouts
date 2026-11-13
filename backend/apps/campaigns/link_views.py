@@ -35,7 +35,7 @@ def _link(campaign, link_id, *, served: bool = True) -> CampaignLink:
         .filter(campaign=campaign, pk=link_id)
         .first()
     )
-    if link is None or (served and link.suspended_at is not None):
+    if link is None or (served and not link.is_served()):
         raise Http404
     return link
 
@@ -50,7 +50,7 @@ class CampaignLinksView(APIView):
             campaign=campaign
         )
         if not can_edit(request.user, campaign):
-            links = links.filter(suspended_at__isnull=True)  # suspended: served to no one
+            links = [link for link in links if link.is_served()]  # served to no one otherwise
         return Response(CampaignLinkSerializer(links, many=True).data)
 
     @extend_schema(

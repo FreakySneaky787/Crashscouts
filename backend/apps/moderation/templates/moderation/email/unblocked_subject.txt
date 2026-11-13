@@ -1,0 +1,1 @@
+{% autoescape off %}A block on {{ project_name }} was lifted{% endautoescape %}

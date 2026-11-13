@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The moderators lifted the block on {{ what }}. It is visible again as before.
+
+{{ project_url }}{% endautoescape %}{% endblock content %}

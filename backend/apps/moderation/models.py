@@ -77,3 +77,85 @@ class Report(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.get_reason_display()}: {self.target_label} ({self.status})"
+
+
+class Block(BaseModel):
+    """A moderators' block (WP 3B.3, ADR 0020): the content is invisible to everyone but its
+    team, links are served to no one; reversible; one appeal per block."""
+
+    MESSAGE_MAX_LENGTH = 1000
+
+    class Decision(models.TextChoices):
+        UPHELD = "upheld", "Upheld"
+        LIFTED = "lifted", "Lifted"
+
+    target_type = models.CharField(max_length=10, choices=Report.TargetType.choices)
+    project = models.ForeignKey(
+        Project, null=True, blank=True, on_delete=models.CASCADE, related_name="+"
+    )
+    campaign = models.ForeignKey(
+        Campaign, null=True, blank=True, on_delete=models.CASCADE, related_name="+"
+    )
+    link = models.ForeignKey(
+        CampaignLink, null=True, blank=True, on_delete=models.CASCADE, related_name="+"
+    )
+    category = models.CharField(max_length=20, choices=Report.Reason.choices)
+    message = models.TextField(max_length=MESSAGE_MAX_LENGTH)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    lifted_at = models.DateTimeField(null=True, blank=True)
+    lifted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    appeal_text = models.TextField(max_length=MESSAGE_MAX_LENGTH, blank=True)
+    appealed_at = models.DateTimeField(null=True, blank=True)
+    appealed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    appeal_decision = models.CharField(max_length=8, choices=Decision.choices, blank=True)
+    appeal_decided_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            *(
+                models.UniqueConstraint(
+                    fields=[field],
+                    condition=Q(target_type=field, lifted_at__isnull=True),
+                    name=f"moderation_one_active_block_per_{field}",
+                )
+                for field in ("project", "campaign", "link")
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"Block of {self.target_type} ({'lifted' if self.lifted_at else 'active'})"
+
+    @property
+    def target(self):
+        return getattr(self, self.target_type)
+
+    @property
+    def owning_project(self) -> Project:
+        if self.target_type == Report.TargetType.PROJECT:
+            return self.project
+        if self.target_type == Report.TargetType.CAMPAIGN:
+            return self.campaign.project
+        return self.link.campaign.project
+
+
+class ModerationNote(BaseModel):
+    """A warning to a project's team, kept for moderators only (owner's decision 2026-11-13)."""
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="+")
+    text = models.TextField(max_length=Block.MESSAGE_MAX_LENGTH)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Warning for {self.project}"

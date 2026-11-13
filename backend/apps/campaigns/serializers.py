@@ -34,6 +34,7 @@ class CampaignSerializer(serializers.ModelSerializer):
     is_participant = serializers.SerializerMethodField()
     open_applications = serializers.SerializerMethodField()
     my_application = serializers.SerializerMethodField()
+    moderation = serializers.SerializerMethodField()
 
     class Meta:
         model = Campaign
@@ -62,6 +63,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             "is_participant",
             "open_applications",
             "my_application",
+            "moderation",
             "created_at",
             "updated_at",
         )
@@ -80,6 +82,14 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     def get_can_edit(self, campaign) -> bool:
         return is_team(self.context["request"].user, campaign)
+
+    def get_moderation(self, campaign) -> dict | None:
+        """Block with reason and appeal state, for the team only (ADR 0020)."""
+        if campaign.blocked_at is None or not is_team(self.context["request"].user, campaign):
+            return None
+        from apps.moderation.actions import team_block_info
+
+        return team_block_info(campaign)
 
     def get_open_applications(self, campaign) -> int | None:
         """Number of open applications, for the team only (owner's decision: shown, not emailed)."""
@@ -198,9 +208,13 @@ class CampaignLinkSerializer(serializers.Serializer):
     sha256 = serializers.CharField()
     in_repository = serializers.SerializerMethodField()
     suspended = serializers.SerializerMethodField()
+    blocked = serializers.SerializerMethodField()
 
     def get_suspended(self, link) -> bool:
         return link.suspended_at is not None
+
+    def get_blocked(self, link) -> bool:
+        return link.blocked_at is not None
 
     def get_host(self, link) -> str:
         from .links import host_of

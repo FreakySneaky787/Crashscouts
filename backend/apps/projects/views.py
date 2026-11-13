@@ -62,6 +62,8 @@ class ProjectDetailView(APIView):
         project = self.get_object(request, slug)
         if not can_edit(request.user, project):
             raise PermissionDenied  # visible (public) but not part of the team
+        if project.blocked_at is not None:
+            return Response({"code": "blocked"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = ProjectWriteSerializer(project, data=request.data, partial=True)
         if not serializer.is_valid():
             return error_codes(serializer)

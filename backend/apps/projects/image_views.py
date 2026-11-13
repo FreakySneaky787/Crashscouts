@@ -7,6 +7,7 @@ from django.http import FileResponse, Http404, HttpRequest
 from django.views.decorators.http import require_safe
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -34,6 +35,8 @@ def _team_project(request: Request, slug: str) -> Project:
     project = project_for(request.user, slug)
     if project is None or not can_edit(request.user, project):
         raise Http404
+    if project.blocked_at is not None:
+        raise PermissionDenied("blocked")  # blocked by moderators (ADR 0020)
     return project
 
 

@@ -1,0 +1,6 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The moderators reviewed reports about {{ what }} and send you this warning:
+
+{{ message }}
+
+Nothing was blocked. Please check your project: {{ project_url }}{% endautoescape %}{% endblock content %}

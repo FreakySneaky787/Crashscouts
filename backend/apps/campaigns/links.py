@@ -10,7 +10,7 @@ from apps.projects.repositories import parse_repository_url
 from apps.projects.verification import verified_method
 
 from .models import Campaign, CampaignLink
-from .services import CampaignError
+from .services import CampaignError, ensure_unblocked
 
 
 def host_of(url: str) -> str:
@@ -48,6 +48,7 @@ def _audit(kind, user, link: CampaignLink) -> None:
 
 
 def _ensure_open(campaign: Campaign) -> None:
+    ensure_unblocked(campaign)
     if campaign.state in (Campaign.State.COMPLETED, Campaign.State.CANCELLED):
         raise CampaignError("campaign_closed")
 
@@ -65,6 +66,8 @@ def add_link(user, campaign: Campaign, **fields) -> CampaignLink:
 
 
 def _ensure_not_suspended(link: CampaignLink) -> None:
+    if link.blocked_at is not None:
+        raise CampaignError("blocked")
     if link.suspended_at is not None:
         raise CampaignError("link_suspended")  # decided by moderators (WP 3B.3)
 

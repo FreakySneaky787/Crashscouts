@@ -1,0 +1,7 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The moderators blocked {{ what }}. It is no longer visible to anyone outside your team, and its download links are not served.
+
+Reason given by the moderators:
+{{ message }}
+
+If you think this is a mistake, you can appeal once on the project page: {{ project_url }}{% endautoescape %}{% endblock content %}

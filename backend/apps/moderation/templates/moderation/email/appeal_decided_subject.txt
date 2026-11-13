@@ -1,0 +1,1 @@
+{% autoescape off %}Your appeal for {{ project_name }} was decided{% endautoescape %}

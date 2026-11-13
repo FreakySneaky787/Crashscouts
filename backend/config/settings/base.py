@@ -309,6 +309,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
+    # One name for the report reasons, used by reports and moderation blocks.
+    "ENUM_NAME_OVERRIDES": {"ReportReasonEnum": "apps.moderation.models.Report.Reason"},
     "TITLE": f"{PLATFORM_NAME} API",
     "VERSION": "0.0.0",
     "SERVE_INCLUDE_SCHEMA": False,

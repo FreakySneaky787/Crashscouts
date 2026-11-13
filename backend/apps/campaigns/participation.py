@@ -17,13 +17,14 @@ from apps.projects.services import has_confirmed_email
 
 from . import status
 from .models import ApplicationAnswer, Campaign, CampaignInvitation, Participation
-from .services import CampaignError
+from .services import CampaignError, ensure_unblocked
 
 
 def activate(campaign_id, user, *, via: str) -> Participation:
     """Makes ``user`` an active participant. Must run inside a transaction: the campaign row is
     locked first, so concurrent joins can never exceed the limit."""
-    campaign = Campaign.objects.select_for_update().get(pk=campaign_id)
+    campaign = Campaign.objects.select_for_update().select_related("project").get(pk=campaign_id)
+    ensure_unblocked(campaign)  # e.g. accepting an invitation to a blocked campaign
     existing = Participation.objects.filter(campaign=campaign, user=user).first()
     if existing is not None and existing.status == Participation.Status.REMOVED:
         raise CampaignError("removed")

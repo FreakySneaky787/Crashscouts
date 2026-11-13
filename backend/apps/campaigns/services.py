@@ -21,12 +21,20 @@ class CampaignError(Exception):
         self.code = code
 
 
+def ensure_unblocked(campaign: Campaign) -> None:
+    """Blocked content cannot be changed by its team (ADR 0020)."""
+    if campaign.blocked_at is not None or campaign.project.blocked_at is not None:
+        raise CampaignError("blocked")
+
+
 # Fields that shape who can take part; frozen once the campaign is published.
 LOCKED_AFTER_PUBLISH = ("visibility", "participation")
 
 
 @transaction.atomic
 def create_campaign(user, project: Project, **fields) -> Campaign:
+    if project.blocked_at is not None:
+        raise CampaignError("blocked")
     platforms = fields.pop("platforms", [])
     campaign = Campaign.objects.create(project=project, **fields)
     campaign.platforms.set(platforms)
@@ -43,6 +51,7 @@ def create_campaign(user, project: Project, **fields) -> Campaign:
 
 @transaction.atomic
 def update_campaign(user, campaign: Campaign, **fields) -> Campaign:
+    ensure_unblocked(campaign)
     if campaign.state in (Campaign.State.COMPLETED, Campaign.State.CANCELLED):
         raise CampaignError("campaign_closed")
     if campaign.state == Campaign.State.PUBLISHED and any(
@@ -87,6 +96,7 @@ AUDIT_KINDS = {
 @transaction.atomic
 def change_state(user, campaign: Campaign, new_state: str) -> Campaign:
     campaign = Campaign.objects.select_for_update().select_related("project").get(pk=campaign.pk)
+    ensure_unblocked(campaign)
     if not status.can_transition(campaign.state, new_state):
         raise CampaignError("invalid_transition")
     if new_state == status.PUBLISHED and campaign.visibility == Campaign.Visibility.PUBLIC:
@@ -118,6 +128,7 @@ def change_state(user, campaign: Campaign, new_state: str) -> Campaign:
 
 @transaction.atomic
 def delete_draft(user, campaign: Campaign) -> None:
+    ensure_unblocked(campaign)
     if campaign.state != Campaign.State.DRAFT:
         raise CampaignError("not_a_draft")  # published campaigns are completed or cancelled
     record(

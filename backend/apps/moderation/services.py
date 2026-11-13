@@ -49,10 +49,12 @@ def resolve_target(user, target_type: str, project: str, campaign: str = "", lin
         return found_campaign
     if target_type != Report.TargetType.LINK or not can_see_links(user, found_campaign):
         raise NotVisible
-    found_link = CampaignLink.objects.filter(
-        campaign=found_campaign, pk=link, suspended_at__isnull=True
-    ).first()
-    if found_link is None:
+    found_link = (
+        CampaignLink.objects.select_related("campaign__project")
+        .filter(campaign=found_campaign, pk=link)
+        .first()
+    )
+    if found_link is None or not found_link.is_served():
         raise NotVisible
     return found_link
 

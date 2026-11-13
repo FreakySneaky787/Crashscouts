@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}{% if lifted %}The moderators accepted your appeal: the block on {{ what }} was lifted, and it is visible again.{% else %}The moderators reviewed your appeal and kept the block on {{ what }}. This decision is final.{% endif %}
+
+{{ project_url }}{% endautoescape %}{% endblock content %}

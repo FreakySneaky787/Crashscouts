@@ -659,6 +659,25 @@ downloads" works in the real UI already.
   constraint already allows one open report per account and content – an equivalent mutant,
   noted in ADR 0019; Vitest **85 passed**; Playwright **75 passed** (2 new).
 
+### WP 3B.3, part 1 – Blocking and moderation backend (2026-11-13) ✅
+
+- `blocked_at` on projects, campaigns and links, enforced centrally: project and campaign
+  policies (only the team sees blocked content), `CampaignLink.is_served()` (suspended or blocked
+  link, blocked campaign or project: served to no one, the team included), team changes refused
+  with `blocked` (project, images, campaigns, state changes, links, questions, invitations),
+  joining through an invitation refused, blocked content removed from participations and open
+  invitations.
+- `Block` (category, message, lift, one appeal with decision) and `ModerationNote` (warnings,
+  moderators only); actions take, block, lift, warn, dismiss, lift suspension, appeal, decide
+  appeal; emails to teams and reporters (no details); audit without reporters' free text.
+- API: `/api/v1/moderation/cases/` (malware and suspended links first), case detail, actions,
+  block lift, appeals and decisions (moderators only, 404 otherwise); `/api/v1/blocks/<id>/appeal/`
+  (team only); `moderation` info in project and campaign data for the team; `blocked` on links.
+- **Verification (run on 2026-11-13):** pytest **459 passed** (12 new); 5 mutation checks caught –
+  one (link served despite a blocked campaign) only after adding a test for the team's own view;
+  Playwright **75 passed**; OpenAPI clean after fixing two schema warnings.
+- Part 2 (moderation pages, team notices, appeal form) follows.
+
 ## Handover – next session (written 2026-11-13)
 
 **Where we are:** phase 3A complete; phase 3B started – WPs 3B.1 (platform roles) and 3B.2 (reporting) done. Next:

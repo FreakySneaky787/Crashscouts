@@ -1,0 +1,1 @@
+{% autoescape off %}Moderators blocked content of {{ project_name }}{% endautoescape %}

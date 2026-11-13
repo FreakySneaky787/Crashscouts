@@ -1,0 +1,1 @@
+{% autoescape off %}A warning from the moderators about {{ project_name }}{% endautoescape %}

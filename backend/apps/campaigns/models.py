@@ -65,6 +65,8 @@ class Campaign(BaseModel):
         max_length=12, choices=Participation.choices, default=Participation.INVITATION
     )
     state = models.CharField(max_length=12, choices=State.choices, default=State.DRAFT)
+    # Blocked by moderators (WP 3B.3, ADR 0020): invisible to everyone but the team.
+    blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
     # When the team changed the state, and who published (metrics, docs/METRICS.md).
     published_at = models.DateTimeField(null=True, blank=True, editable=False)
     completed_at = models.DateTimeField(null=True, blank=True, editable=False)
@@ -142,6 +144,17 @@ class CampaignLink(BaseModel):
     # moderators lift or confirm it in WP 3B.3).
     suspended_at = models.DateTimeField(null=True, blank=True, editable=False)
     suspended_reason = models.CharField(max_length=40, blank=True, editable=False)
+    blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    def is_served(self) -> bool:
+        """Whether this link may be shown to anyone at all (ADR 0019, ADR 0020)."""
+        campaign = self.campaign
+        return (
+            self.suspended_at is None
+            and self.blocked_at is None
+            and campaign.blocked_at is None
+            and campaign.project.blocked_at is None
+        )
 
     class Meta:
         ordering = ["position", "created_at"]

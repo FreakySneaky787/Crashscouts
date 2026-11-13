@@ -11,7 +11,10 @@ def role_of(user, project: Project) -> str | None:
 
 
 def can_view(user, project: Project) -> bool:
-    return project.visibility == Project.Visibility.PUBLIC or role_of(user, project) is not None
+    """Team always; everyone else only public, not blocked projects (ADR 0020)."""
+    if role_of(user, project) is not None:
+        return True
+    return project.visibility == Project.Visibility.PUBLIC and project.blocked_at is None
 
 
 def can_edit(user, project: Project) -> bool:

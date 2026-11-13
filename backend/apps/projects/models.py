@@ -50,6 +50,8 @@ class Project(BaseModel):
     languages = models.ManyToManyField(ProgrammingLanguage, blank=True, related_name="+")
     # Random name of the stored logo (projects/logos/<key>.webp); a new upload gets a new key.
     logo_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
+    # Blocked by moderators (WP 3B.3, ADR 0020): invisible to everyone but the team.
+    blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     class Meta:
         constraints = [
