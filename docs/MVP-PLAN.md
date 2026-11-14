@@ -206,7 +206,7 @@ Decisions of 2026-11-14 in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
 |---|---|---|
 | 6.1 | Software type: catalog list and project field | ✅ done |
 | 6.2 | Discover API: full-text search, filters, sort, open-source default, paging ([ADR 0025](adr/0025-discover.md)) | ✅ done |
-| 6.3 | Discover page with tabs, filters and paging | planned (next) |
+| 6.3 | Discover page with tabs, filters and paging | ✅ done |
 
 ## Phase 7 – Extend moderation and security review
 

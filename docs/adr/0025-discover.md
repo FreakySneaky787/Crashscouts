@@ -58,3 +58,6 @@ never by popularity; the filter "open source only" is preselected.
 - Closed-source projects are found only after unticking "open source only".
 - The campaigns tab stays empty until the owner opens the security gate.
 - Search cost grows with the number of public projects; to be measured before the beta.
+- The page is cached publicly for 60 seconds for visitors without a session (like other public
+  pages), so a newly approved campaign or a changed project can take up to a minute to show for
+  them.

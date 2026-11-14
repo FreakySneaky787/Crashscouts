@@ -33,7 +33,8 @@ PW_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium pnpm test
 ### Security-gate run (flag on)
 
 The abuse case of the security gate (`gate/abuse-case.spec.ts`, WP 3B.6) and published feedback
-(`gate/published-feedback.spec.ts`, WP 5.5) need public campaigns switched on. It runs separately, with `PUBLIC_CAMPAIGNS_ENABLED=true` for Django in this run only
+(`gate/published-feedback.spec.ts`, WP 5.5) and Discover's campaign tab
+(`gate/discover-campaigns.spec.ts`, WP 6.3) need public campaigns switched on. It runs separately, with `PUBLIC_CAMPAIGNS_ENABLED=true` for Django in this run only
 (`playwright.gate.config.ts`); the main run keeps checking that public campaigns are locked. Run it
 after the main run, never at the same time (same ports):
 

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 6.2) · **Current phase:** 6 – Discover (flag still off)
+**Last update:** 2026-11-14 (WP 6.3) · **Current phase:** 6 complete – next: 7, moderation and security review (flag still off)
 
 ## Work packages
 
@@ -927,7 +927,7 @@ switches the flag.
   text, sees "A tester", no files section and gets 404 for the file, axe on the public feedback
   page, made private again → 404); no application code changed in this WP.
 
-## Phase 6 – Discover (started 2026-11-14)
+## Phase 6 – Discover (2026-11-14) ✅
 
 Owner's decisions of 2026-11-14 (in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)): two tabs
 (projects and campaigns), software type as a new project field, default sort "recently active"
@@ -964,6 +964,25 @@ with "new" selectable (never by popularity), the filter "open source only" prese
   state); Ruff, migrations check, OpenAPI, pip-audit clean; Playwright main run **81 passed**, gate
   run **2 passed** (no frontend change yet).
 
+### WP 6.3 – Discover page (2026-11-14) ✅
+
+- `/discover` (navigation entry "Discover"; the home page links it): tabs "Projects" and "Test
+  campaigns" as links, search, filters as a GET form (licence with "Open source only"
+  preselected, sort "Recently active"/"Newest", operating system, software type, category,
+  language; projects: development status, "only with an open test campaign"; campaigns: testing
+  method, "only with free places"), "Reset all", result cards with "Open source"/"Not open
+  source", status and lists, paging. Works without JavaScript; shareable addresses; plain lists
+  indexable, searches and filters `noindex`; cached publicly for 60 s without a session
+  (ADR 0025).
+- **Verification (run on 2026-11-14):** Vitest **103 passed** (4 new); Playwright main run **83
+  passed** (2 new: search finds the open-source project only, "All licences" adds the
+  closed-source one labelled, the private project never appears, combined filters and shareable
+  address, empty state, reset, empty campaigns tab while the gate is closed, axe in light, dark
+  and at 390 px without horizontal scrolling; without JavaScript, filtered pages `noindex`), gate
+  run **3 passed** (new: a campaign in review is not found, after approval it is, with method and
+  places, the method filter applies, the project tab counts the open campaign); ESLint,
+  typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -972,8 +991,12 @@ checklist's operations items need the production server, and only the owner swit
 Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) with the
 owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
 attachments, status workflow with the author's verification, publishing with consent, the
-team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is under way with the approved plan: WP 6.1
-(software type) and WP 6.2 (Discover API) are done; next is WP 6.3 (Discover page). Also open: WP M.1 (statistics page; the data for all
+team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
+full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Next:
+**phase 7 – extend moderation and security review** (reporting of users and published feedback,
+account suspensions with deadlines and appeals, several moderators with purpose-bound logged
+access, statistics, OWASP ASVS level 1 review), or WP M.1 (statistics page) first. Present the
+work packages and open questions before starting. Also open: WP M.1 (statistics page; the data for all
 five metrics now exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

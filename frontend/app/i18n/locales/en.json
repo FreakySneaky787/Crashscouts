@@ -4,8 +4,8 @@
     "intro": "Early development build. Product features arrive phase by phase.",
     "activity": "Activity",
     "emptyTitle": "Nothing to show yet",
-    "emptyText": "Projects, campaigns and feedback will appear here once they exist. Meanwhile you can look at the building blocks of the interface.",
-    "emptyAction": "Open the design system"
+    "emptyText": "Projects, campaigns and feedback will appear here once there is a feed. Meanwhile you can browse public projects and test campaigns.",
+    "emptyAction": "Discover projects and campaigns"
   },
   "nav": {
     "home": "Home",
@@ -14,7 +14,8 @@
     "logout": "Log out",
     "designSystem": "Design system",
     "signup": "Sign up",
-    "profile": "Profile"
+    "profile": "Profile",
+    "discover": "Discover"
   },
   "login": {
     "title": "Log in",
@@ -1248,5 +1249,47 @@
       "published": "The feedback is public now.",
       "private": "The feedback is private again."
     }
+  },
+  "discover": {
+    "title": "Discover",
+    "intro": "Find open-source projects and public test campaigns. Sorted by recent activity, never by popularity, so small projects are found too.",
+    "tabs": "Discover sections",
+    "projects": "Projects",
+    "campaigns": "Test campaigns",
+    "search": "Search",
+    "searchHint": "Every word must match; the beginning of a word is enough.",
+    "filters": "Filters",
+    "apply": "Apply",
+    "reset": "Reset all",
+    "any": "Any",
+    "platform": "Operating system or device",
+    "category": "Category",
+    "language": "Programming language",
+    "softwareType": "Software type",
+    "status": "Development status",
+    "method": "Testing method",
+    "licence": "Licence",
+    "openSourceOnly": "Open source only",
+    "allLicences": "All licences",
+    "hasCampaign": "Only projects with an open test campaign",
+    "freePlaces": "Only campaigns with free places",
+    "sort": "Sort by",
+    "sortActive": "Recently active",
+    "sortNew": "Newest",
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results",
+    "page": "Page {{page}} of {{pages}}",
+    "previous": "Previous page",
+    "next": "Next page",
+    "pagination": "Pages",
+    "openSource": "Open source",
+    "notOpenSource": "Not open source",
+    "activeCampaigns_one": "{{count}} open test campaign",
+    "activeCampaigns_other": "{{count}} open test campaigns",
+    "places": "{{count}} of {{total}} places taken",
+    "noProjects": "No projects match.",
+    "noCampaigns": "No test campaigns match.",
+    "noProjectsText": "Try fewer filters or other words. Projects that are not open source appear when you choose “All licences”.",
+    "campaignsLocked": "Public test campaigns are not open yet. They appear here once the platform opens them."
   }
 }

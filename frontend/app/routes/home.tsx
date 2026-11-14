@@ -29,7 +29,7 @@ export default function Home() {
     <>
       <PageHeader title={t("home.title")} subtitle={t("home.intro")} />
       <Panel title={t("home.activity")}>
-        <EmptyState kind="first-use" title={t("home.emptyTitle")} action={<Link to="/design-system">{t("home.emptyAction")}</Link>}>
+        <EmptyState kind="first-use" title={t("home.emptyTitle")} action={<Link to="/discover">{t("home.emptyAction")}</Link>}>
           {t("home.emptyText")}
         </EmptyState>
       </Panel>
