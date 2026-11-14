@@ -5,6 +5,7 @@
   overview of everyone's progress is a plain 404 for everyone else.
 """
 
+from django.db.models import Count
 from django.http import Http404
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
@@ -210,6 +211,7 @@ class ProgressOverviewView(APIView):
                         "completed": serializers.IntegerField(),
                         "blocked": serializers.IntegerField(),
                         "in_progress": serializers.IntegerField(),
+                        "feedback": serializers.IntegerField(),
                     },
                     many=True,
                 ),
@@ -260,6 +262,15 @@ class ProgressOverviewView(APIView):
                     "updated_at": row.updated_at,
                 }
 
+        from apps.feedback.models import Feedback  # the feedback app builds on campaigns
+
+        feedback_counts = dict(
+            Feedback.objects.filter(campaign=campaign, task__isnull=False)
+            .values_list("task")
+            .annotate(n=Count("pk"))
+            .values_list("task", "n")
+        )
+
         def count(task_id, value) -> int:
             return sum(
                 1
@@ -277,6 +288,8 @@ class ProgressOverviewView(APIView):
                         "completed": count(t.pk, TaskProgress.Status.COMPLETED),
                         "blocked": count(t.pk, TaskProgress.Status.BLOCKED),
                         "in_progress": count(t.pk, TaskProgress.Status.IN_PROGRESS),
+                        # How much feedback names this task (WP 5.4, ADR 0024).
+                        "feedback": feedback_counts.get(t.pk, 0),
                     }
                     for t in tasks
                 ],

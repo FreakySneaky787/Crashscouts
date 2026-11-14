@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 5.3) · **Current phase:** 5 – Feedback (flag still off)
+**Last update:** 2026-11-14 (WP 5.4) · **Current phase:** 5 – Feedback (flag still off)
 
 ## Work packages
 
@@ -897,6 +897,22 @@ switches the flag.
   confirmation; the team and strangers get 404 for the form; axe on the type choice, the form and
   the detail page), gate run **1 passed**; ESLint, typecheck, build clean.
 
+### WP 5.4 – The team's feedback inbox (2026-11-14) ✅
+
+- `/p/<p>/c/<c>/feedback`: the team's inbox (404 for everyone else) with filters for kind, status
+  and task (plain GET form); entries show kind, author, task, number of files and date.
+- "x new feedback" notice with a link on the campaign page and the testers page; the campaign's
+  feedback panel links the inbox for the team.
+- Feedback page for the team: set the status (Duplicate with the original chosen from the
+  campaign's other feedback; the author is emailed), propose publishing or withdraw the proposal.
+- The progress overview counts feedback per task (API `feedback` per task, shown per task).
+- **Verification (run on 2026-11-14):** pytest **575 passed** (1 new); Vitest **99 passed**;
+  Playwright main run **81 passed** (new: inbox with counter, author visible to the team, filter
+  and reset, Confirmed and Fixed with the email to the author, the author verifies, duplicate of
+  another feedback, publishing proposed and shown to the author, 404 for the inbox for a tester and
+  a stranger; axe on the inbox and the team's view of a feedback), gate run **1 passed**; Ruff,
+  migrations check, ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -904,8 +920,8 @@ tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` st
 checklist's operations items need the production server, and only the owner switches the flag.
 Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) is under way with the
 approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WPs 5.1 (backend), 5.2
-(secure attachments) and 5.3 (testers' pages) are done; next are WP 5.4 (the team's inbox) and
-5.5 (published feedback, wrap-up).
+(secure attachments), 5.3 (testers' pages) and 5.4 (the team's inbox) are done; next is WP 5.5
+(published feedback, wrap-up).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

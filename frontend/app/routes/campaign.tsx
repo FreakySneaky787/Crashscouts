@@ -216,6 +216,13 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
       ) : null}
       {campaign.moderation ? <BlockNotice info={campaign.moderation} csrfToken={csrfToken} back={`/p/${project.slug}/c/${campaign.slug}`} /> : null}
       {loaderData.applied ? <Notice tone="ok" title={t(`campaigns.apply.done.${loaderData.applied}`)} /> : null}
+      {campaign.new_feedback ? (
+        <Notice tone="info" title={t("feedback.inbox.newCount", { count: campaign.new_feedback })}>
+          <Link to={`/p/${project.slug}/c/${campaign.slug}/feedback`} className={styles.textLink}>
+            {t("feedback.inbox.open")}
+          </Link>
+        </Notice>
+      ) : null}
       {campaign.open_applications ? (
         <Notice tone="info" title={t("campaigns.apply.openForTeam", { count: campaign.open_applications })}>
           <Link to={`/p/${project.slug}/c/${campaign.slug}/testers`} className={styles.textLink}>
@@ -316,6 +323,8 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
               <ButtonLink to={`/p/${project.slug}/c/${campaign.slug}/feedback/new`} size="sm" icon={ChatTextIcon}>
                 {t("feedback.give")}
               </ButtonLink>
+            ) : campaign.can_edit ? (
+              <Link to={`/p/${project.slug}/c/${campaign.slug}/feedback`}>{t("feedback.inbox.open")}</Link>
             ) : (
               t("feedback.count", { count: loaderData.feedback.length })
             )

@@ -53,7 +53,9 @@ export function ProgressOverviewPanel({ overview }: { overview: ProgressOverview
                 {tasks.map((task) => (
                   <li key={task.id} className={styles.row}>
                     <span>{taskLabel(task)}</span>
-                    <span className={styles.muted}>{t("campaigns.testers.progress.counts", task)}</span>
+                    <span className={styles.muted}>
+                      {t("campaigns.testers.progress.counts", task)} · {t("campaigns.testers.progress.feedbackCount", { count: task.feedback })}
+                    </span>
                   </li>
                 ))}
               </ul>

@@ -85,3 +85,10 @@
   display: grid;
   gap: var(--space-3);
 }
+
+.filters {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  align-items: end;
+}

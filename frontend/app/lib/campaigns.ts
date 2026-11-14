@@ -39,6 +39,8 @@ export type Campaign = {
   can_edit: boolean;
   /** The viewer's own participation (never who else takes part). */
   is_participant: boolean;
+  /** Feedback with status "New" – a number for the team, null for everyone else (ADR 0024). */
+  new_feedback: number | null;
   /** Open applications – a number for the team, null for everyone else. */
   open_applications: number | null;
   /** Status of the viewer's own application, if any. */
@@ -429,7 +431,7 @@ export function progressSummary(tasks: Pick<TestTask, "my_status">[]) {
 
 /** The team's overview of everyone's progress (WP 4.4, `…/progress/`; 404 for everyone else). */
 export type ProgressOverview = {
-  tasks: { id: string; title: string; hidden: boolean; completed: number; blocked: number; in_progress: number }[];
+  tasks: { id: string; title: string; hidden: boolean; completed: number; blocked: number; in_progress: number; feedback: number }[];
   participants: {
     username: string;
     participation: "active" | "left" | "removed";

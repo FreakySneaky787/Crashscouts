@@ -30,6 +30,7 @@ export {
   FingerprintIcon,
   FlagIcon,
   FlaskIcon,
+  FunnelIcon,
   GithubLogoIcon,
   GlobeIcon,
   HourglassMediumIcon,

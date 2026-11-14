@@ -703,7 +703,9 @@
         "left": "Left the campaign",
         "removed": "Removed by the team",
         "hiddenTask": "removed from the task list",
-        "note": "Note"
+        "note": "Note",
+        "feedbackCount_one": "{{count}} feedback",
+        "feedbackCount_other": "{{count}} feedback"
       }
     },
     "invitations": {
@@ -1210,6 +1212,40 @@
       "platform": "Choose your operating system or device.",
       "result": "Choose the result.",
       "task": "Choose a task of this campaign."
+    },
+    "inbox": {
+      "title": "Feedback inbox",
+      "intro": "All feedback of this campaign. Only your team sees who wrote it and the attached files.",
+      "open": "Open the feedback inbox",
+      "filters": "Filter",
+      "kind": "Type",
+      "status": "Status",
+      "task": "Task",
+      "any": "All",
+      "apply": "Apply filter",
+      "reset": "Reset",
+      "none": "No feedback matches.",
+      "newCount_one": "{{count}} new feedback is waiting for your team.",
+      "newCount_other": "{{count}} new feedback are waiting for your team.",
+      "files_one": "{{count}} file",
+      "files_other": "{{count}} files"
+    },
+    "manage": {
+      "title": "Handle this feedback",
+      "status": "New status",
+      "duplicateOf": "Duplicate of (only for “Duplicate”)",
+      "noOriginal": "Choose the original feedback",
+      "setStatus": "Set status",
+      "authorTold": "The author gets a short email about the new status.",
+      "propose": "Propose to make it public",
+      "proposeText": "Only the text becomes public, after the author agrees – never files or the author's name.",
+      "waiting": "Waiting for the author's consent to make it public.",
+      "withdrawProposal": "Withdraw the proposal"
+    },
+    "done": {
+      "status": "The status was saved.",
+      "published": "The feedback is public now.",
+      "private": "The feedback is private again."
     }
   }
 }

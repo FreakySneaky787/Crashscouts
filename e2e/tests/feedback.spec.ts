@@ -6,7 +6,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Browser, type APIRequestContext, type Page } from "@playwright/test";
 
-import { createProject, createSignedInAccount, png } from "./helpers";
+import { createProject, createSignedInAccount, linkFromMail, png } from "./helpers";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -148,6 +148,81 @@ test("only participants can open the feedback form", async ({ page, request, bro
   const stranger = await strangerContext.newPage();
   await createSignedInAccount(stranger, request);
   expect((await stranger.goto(`/p/${project}/c/beta-1/feedback/new`))?.status()).toBe(404);
+  for (const { context } of testers) await context.close();
+  await strangerContext.close();
+});
+
+async function giveGeneral(tester: Page, campaign: string, title: string) {
+  await tester.goto(`${campaign}/feedback/new?kind=general`);
+  await tester.getByLabel("Title").fill(title);
+  await tester.getByLabel("Description").fill(`${title} – details.`);
+  await tester.getByRole("button", { name: "Send feedback" }).click();
+  await expect(tester.getByText("Thank you. Your feedback was sent.")).toBeVisible();
+  return new URL(tester.url()).pathname;
+}
+
+test("the team handles feedback in its inbox; the author verifies the fix", async ({ page, request, browser }) => {
+  test.setTimeout(120_000);
+  const { project, testers } = await campaignWithTesters(page, request, browser);
+  const [{ tester, account }, { tester: other }] = testers;
+  const campaign = `/p/${project}/c/beta-1`;
+  const original = await giveGeneral(other, campaign, "Sync stops after an hour");
+  const report = await giveGeneral(tester, campaign, "Sync stops");
+
+  // The team sees how much is new and opens the inbox.
+  await page.goto(campaign);
+  await expect(page.getByText("2 new feedback are waiting for your team.")).toBeVisible();
+  await page.getByRole("link", { name: "Open the feedback inbox" }).first().click();
+  await expect(page).toHaveURL(new RegExp(`${campaign}/feedback$`));
+  const inbox = page.getByRole("list", { name: "Feedback inbox" });
+  await expect(inbox.getByRole("listitem")).toHaveCount(2);
+  await expect(inbox).toContainText(account.username); // the team sees who wrote it
+  const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+  await page.getByLabel("Status").selectOption("verified");
+  await page.getByRole("button", { name: "Apply filter" }).click();
+  await expect(page.getByText("No feedback matches.")).toBeVisible();
+  await page.getByRole("link", { name: "Reset" }).click();
+
+  // Set statuses; the author is told by email.
+  await inbox.getByRole("link", { name: "Sync stops", exact: true }).click();
+  const manage = page.getByRole("region", { name: "Handle this feedback" });
+  const detail = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(detail.violations.map((v) => v.id)).toEqual([]);
+  const history = page.getByRole("region", { name: "History" });
+  await manage.getByLabel("New status").selectOption("confirmed");
+  await manage.getByRole("button", { name: "Set status" }).click();
+  await expect(page.getByText("The status was saved.")).toBeVisible();
+  await expect(history).toContainText("Confirmed – set by the team");
+  await manage.getByLabel("New status").selectOption("fixed");
+  await manage.getByRole("button", { name: "Set status" }).click();
+  await expect(history).toContainText("Fixed – set by the team");
+  expect(await linkFromMail(request, account.email, "p")).toContain(report);
+
+  // The author confirms the fix.
+  await tester.goto(report);
+  await tester.getByRole("button", { name: "Yes, it is fixed" }).click();
+  await expect(tester.getByRole("heading", { level: 1 }).locator("..")).toContainText("Verified");
+  await expect(tester.getByRole("region", { name: "History" })).toContainText("Verified – set by the author");
+
+  // A duplicate points to the original; publishing waits for the author.
+  await page.goto(report);
+  const handle = page.getByRole("region", { name: "Handle this feedback" });
+  await handle.getByLabel("New status").selectOption("duplicate");
+  await handle.getByLabel("Duplicate of (only for “Duplicate”)").selectOption({ label: "Sync stops after an hour" });
+  await handle.getByRole("button", { name: "Set status" }).click();
+  await expect(page.getByRole("link", { name: "Sync stops after an hour" })).toBeVisible();
+  await handle.getByRole("button", { name: "Propose to make it public" }).click();
+  await expect(page.getByText("Waiting for the author's consent to make it public.")).toBeVisible();
+  await tester.goto(report);
+  await expect(tester.getByRole("region", { name: "The team wants to make this feedback public" })).toBeVisible();
+
+  // The inbox is the team's alone.
+  expect((await tester.goto(`${campaign}/feedback`))?.status()).toBe(404);
+  const strangerContext = await browser.newContext();
+  const stranger = await strangerContext.newPage();
+  await createSignedInAccount(stranger, request);
+  expect((await stranger.goto(`${campaign}/feedback`))?.status()).toBe(404);
   for (const { context } of testers) await context.close();
   await strangerContext.close();
 });

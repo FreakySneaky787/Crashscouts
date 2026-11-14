@@ -80,6 +80,15 @@ The project owner decided (2026-11-14):
 - Files are deleted with their row, with the feedback (withdrawn) and on final account deletion
   (they may contain personal data; the feedback text stays, anonymised).
 
+## The team's inbox (WP 5.4)
+
+- `/p/<p>/c/<c>/feedback`: team only (404 for everyone else); filters kind, status and task as a
+  plain GET form; each entry shows kind, author, task, number of files and date. Campaign page and
+  testers page show "x new feedback" with a link (no email, owner's decision).
+- On the feedback page the team sets the status (Duplicate with the original chosen from the
+  campaign's other feedback), proposes publishing or withdraws the proposal.
+- The progress overview counts feedback per task (`feedback` in `…/progress/`).
+
 ## Alternatives
 
 - Private feedback visible to the team and the author only (recommended at first): the owner

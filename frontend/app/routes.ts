@@ -31,6 +31,7 @@ export default [
   route("p/:slug/c/:campaign/edit", "routes/campaign-edit.tsx"),
   route("p/:slug/c/:campaign/download/:id", "routes/campaign-download.tsx"),
   route("p/:slug/c/:campaign/testers", "routes/campaign-testers.tsx"),
+  route("p/:slug/c/:campaign/feedback", "routes/feedback-inbox.tsx"),
   route("p/:slug/c/:campaign/feedback/new", "routes/feedback-new.tsx"),
   route("p/:slug/c/:campaign/feedback/:id", "routes/feedback.tsx"),
   route("p/:slug/c/:campaign/feedback/:id/edit", "routes/feedback-edit.tsx"),

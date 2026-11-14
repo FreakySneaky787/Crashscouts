@@ -306,6 +306,25 @@ def test_the_team_sees_everyones_progress(world):
     assert people["task-tester"]["progress"][str(world["install"].pk)]["note"] == "Fine"
 
 
+def test_the_overview_counts_feedback_per_task(world):
+    from apps.feedback.models import Feedback
+
+    for _ in range(2):
+        Feedback.objects.create(
+            campaign=world["campaign"],
+            author=world["tester"],
+            kind="general",
+            title="x",
+            description="x",
+            task=world["install"],
+        )
+    tasks = client_for(world["owner"]).get(f"{BASE}progress/").json()["tasks"]
+    assert [(t["title"], t["feedback"]) for t in tasks] == [
+        ("Install the app", 2),
+        ("Start the app", 0),
+    ]
+
+
 def test_hidden_tasks_with_progress_stay_in_the_overview(world):
     put(world["tester"], world["install"], "completed")
     client_for(world["owner"]).delete(f"{TASKS}{world['install'].pk}/")

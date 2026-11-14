@@ -182,8 +182,8 @@ Decisions of 2026-11-14 and the design: [ADR 0024](adr/0024-feedback.md).
 | 5.1 | Backend: feedback types, permissions, status workflow, publishing with consent, author emails, export and anonymisation | ✅ done |
 | 5.2 | Backend: secure attachments (images re-encoded, text download only) | ✅ done |
 | 5.3 | Testers give and follow feedback | ✅ done |
-| 5.4 | The team's feedback inbox | planned (next) |
-| 5.5 | Published feedback and wrap-up of phase 5 | planned |
+| 5.4 | The team's feedback inbox | ✅ done |
+| 5.5 | Published feedback and wrap-up of phase 5 | planned (next) |
 
 ## Metrics (after phase 5)
 

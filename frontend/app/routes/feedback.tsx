@@ -9,7 +9,7 @@ import { data, Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/feedback";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { FactList } from "~/components/ui/Data";
-import { CheckboxField, TextField } from "~/components/ui/Form";
+import { CheckboxField, SelectField, TextField } from "~/components/ui/Form";
 import { ArrowsClockwiseIcon, CheckCircleIcon, DownloadSimpleIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, TrashIcon, UploadSimpleIcon, XIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
@@ -24,6 +24,7 @@ import {
   ATTACHMENT_ACCEPT,
   MAX_ATTACHMENT_REQUEST_BYTES,
   MAX_ATTACHMENTS,
+  TEAM_STATUSES,
   feedbackProblem,
   feedbackStatusStyleKey,
   formatSize,
@@ -54,6 +55,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const { api, feedbackApi } = paths(params);
   const [feedback, campaign] = await Promise.all([backendFetch<Feedback>(request, feedbackApi), backendFetch<Campaign>(request, api)]);
   if (feedback.status !== 200 || !feedback.data) throw data(null, { status: 404, headers: privateNoStoreHeaders() });
+  // The team picks the original of a duplicate from the campaign's other feedback.
+  const others = feedback.data.can_manage ? ((await backendFetch<Feedback[]>(request, `${api}feedback/`)).data ?? []).filter((f) => f.id !== feedback.data!.id) : [];
   const signedIn = Boolean(await getSessionUser(request));
   const csrf = signedIn ? await ensureCsrfToken(request) : null;
   const done = new URL(request.url).searchParams.get("done");
@@ -64,6 +67,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       campaign: campaign.status === 200 && campaign.data ? { title: campaign.data.title, timezone: campaign.data.timezone } : null,
       project: params.slug!.toLowerCase(),
       campaignSlug: params.campaign!.toLowerCase(),
+      others: others.map((f) => ({ id: f.id, title: f.title })),
       csrfToken: csrf?.token ?? null,
       done: (DONE as readonly string[]).includes(done ?? "") ? (done as Done) : null,
     },
@@ -192,7 +196,63 @@ export default function FeedbackPage({ loaderData, actionData }: Route.Component
       {done === "sent" ? <Notice tone="ok" title={t("feedback.sent")} /> : null}
       {done === "saved" ? <Notice tone="ok" title={t("feedback.saved")} /> : null}
       {done === "added" || done === "removed" ? <Notice tone="ok" title={t(`feedback.attachments.${done}`)} /> : null}
+      {done === "status" || done === "published" || done === "private" ? <Notice tone="ok" title={t(`feedback.done.${done}`)} /> : null}
       {problem ? <Notice tone="danger" title={t(`feedback.problem.${problem}`)} /> : null}
+
+      {feedback.can_manage ? (
+        <Panel title={t("feedback.manage.title")}>
+          <div className={styles.stack}>
+            <Form method="post" className={styles.filters}>
+              {hidden("status")}
+              <SelectField
+                id="manage-status"
+                name="status"
+                label={t("feedback.manage.status")}
+                defaultValue={TEAM_STATUSES.includes(feedback.status) ? feedback.status : "reviewed"}
+                options={TEAM_STATUSES.map((s) => ({ value: s, label: t(`feedback.statuses.${s}`) }))}
+              />
+              {loaderData.others.length ? (
+                <SelectField
+                  id="manage-duplicate"
+                  name="duplicate_of"
+                  label={t("feedback.manage.duplicateOf")}
+                  defaultValue={feedback.duplicate_of?.id ?? ""}
+                  options={[{ value: "", label: t("feedback.manage.noOriginal") }, ...loaderData.others.map((o) => ({ value: o.id, label: o.title }))]}
+                />
+              ) : null}
+              <div>
+                <Button type="submit" variant="primary" icon={CheckCircleIcon}>
+                  {t("feedback.manage.setStatus")}
+                </Button>
+              </div>
+            </Form>
+            <p className={styles.muted}>{t("feedback.manage.authorTold")}</p>
+            {!feedback.publish_proposed ? (
+              <Form method="post" className={styles.stackTight}>
+                {hidden("publish")}
+                <input type="hidden" name="step" value="propose" />
+                <p className={styles.muted}>{t("feedback.manage.proposeText")}</p>
+                <div>
+                  <Button type="submit" variant="secondary" icon={EyeIcon}>
+                    {t("feedback.manage.propose")}
+                  </Button>
+                </div>
+              </Form>
+            ) : !feedback.published ? (
+              <Form method="post" className={styles.stackTight}>
+                {hidden("publish")}
+                <input type="hidden" name="step" value="withdraw" />
+                <p>{t("feedback.manage.waiting")}</p>
+                <div>
+                  <Button type="submit" variant="secondary" icon={LockSimpleIcon}>
+                    {t("feedback.manage.withdrawProposal")}
+                  </Button>
+                </div>
+              </Form>
+            ) : null}
+          </div>
+        </Panel>
+      ) : null}
 
       {feedback.is_mine && feedback.can_verify ? (
         <Panel title={t("feedback.verify.title")}>

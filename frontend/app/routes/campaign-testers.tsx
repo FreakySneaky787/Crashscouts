@@ -162,6 +162,11 @@ export default function CampaignTesters({ loaderData, actionData }: Route.Compon
       {done ? <Notice tone="ok" title={t(`campaigns.testers.done.${done}`)} /> : null}
       {actionData?.problem ? <Notice tone="danger" title={t(`campaigns.testers.problem.${actionData.problem}`)} /> : null}
 
+      {campaign.new_feedback ? (
+        <Notice tone="info" title={t("feedback.inbox.newCount", { count: campaign.new_feedback })}>
+          <Link to={`${back}/feedback`}>{t("feedback.inbox.open")}</Link>
+        </Notice>
+      ) : null}
       {campaign.method !== "free" && progress ? <ProgressOverviewPanel overview={progress} /> : null}
 
       <Panel title={t("campaigns.testers.participants")} aside={t("campaigns.placesValue", { count: testers.participants.length, total: campaign.target_testers })}>
