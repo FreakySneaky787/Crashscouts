@@ -1115,25 +1115,35 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
 
 ## Handover – next session (written 2026-11-14)
 
-**Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
-tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
-checklist's operations items need the production server, and only the owner switches the flag.
-Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) with the
-owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
-attachments, status workflow with the author's verification, publishing with consent, the
-team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
-full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Phase 7
-(moderation and security review) is approved with the owner's decisions of 2026-11-14 (plan:
-WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); Phase 7 is complete: reporting
-people and published feedback, account suspensions with a central write guard, several moderators
-with purpose-bound access, moderation statistics, and the ASVS 5.0 level 1 review with its fixes
-(WPs 7.1–7.5, ADRs 0026–0029, [`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)). Next: **phase 8 –
-release (closed beta)** or WP M.1 (statistics page for growth metrics) first; present the work
-packages and open questions before starting. Waiting for the owner: question X (remediation time
-frames, applied as the interim rule) and the two suspension rules of WP 7.2 (no suspension of
-accounts with a platform role, no suspending oneself). Due by 2026-12-14: the moderate `minimatch`
-advisory (ESLint only; fixed in ESLint 10.15.0, published 2026-11-13). Also open: WP M.1 (statistics page; the data for all five metrics now
-exists).
+**Where we are (end of the session on 2026-11-14):** phases 0 to 7 are complete; the last CI
+run on `main` (commit `791644e`, WP 7.5) is green: backend, frontend, gitleaks, Playwright main
+run 88 passed, gate run 4 passed.
+
+- Phases 3A/3B: all eight security-gate items implemented and tested
+  ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays **off**: the
+  checklist's operations items need the production server, and only the owner switches the flag.
+- Phase 4 (testing, ADR 0023), phase 5 (feedback, ADR 0024), phase 6 (Discover, ADR 0025).
+- Phase 7 (moderation and security review, ADRs 0026–0029): reporting people and published
+  feedback, account suspensions with a central write guard, several moderators with
+  purpose-bound access, moderation statistics, and the OWASP ASVS 5.0 level 1 review with its
+  fixes ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md): no open high or critical findings).
+
+**Next session:** decide with the owner whether **phase 8 – release (closed beta)** or **WP M.1**
+(statistics page for the growth metrics of [`METRICS.md`](METRICS.md); the data for all five
+metrics exists) comes first; present the work packages and open questions before starting.
+
+**Waiting for the owner:**
+
+1. Question X – remediation time frames for vulnerable dependencies (ASVS V15.1.1): proposal
+   critical 3 / high 7 / moderate 30 / low 90 days, applied as the interim rule.
+2. The two suspension rules chosen in WP 7.2: accounts with a platform role cannot be suspended
+   (an admin removes the role first); nobody can suspend themselves.
+3. Still open from earlier: U (real GitHub test on the first test server), F (email provider
+   sign-up), legal pages, hosting (phase 8).
+
+**Due dates:** the moderate `minimatch` advisory (ESLint only, not shipped) is due by
+**2026-12-14** under the interim rule; ESLint 10.15.0 fixes it (published 2026-11-13, so wait a
+few days before updating).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles
