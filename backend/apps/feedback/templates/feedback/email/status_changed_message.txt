@@ -1,0 +1,5 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The team of "{{ campaign_title }}" set your feedback "{{ feedback_title }}" to "{{ status }}".
+
+Your feedback: {{ feedback_url }}
+All your feedback: {{ account_url }}{% endautoescape %}{% endblock content %}

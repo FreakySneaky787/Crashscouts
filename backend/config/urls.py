@@ -10,6 +10,8 @@ urlpatterns = [
     path("api/v1/", include("apps.profiles.urls")),
     path("api/v1/", include("apps.accounts.urls")),
     path("api/v1/", include("apps.projects.urls")),
+    # Before the campaigns: their catch-all state route would otherwise take …/feedback/.
+    path("api/v1/", include("apps.feedback.urls")),
     path("api/v1/", include("apps.campaigns.urls")),
     path("api/v1/", include("apps.moderation.urls")),
     # django-allauth headless: /_allauth/browser/v1/...

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "apps.projects",
     "apps.campaigns",
     "apps.moderation",
+    "apps.feedback",
 ]
 
 MIDDLEWARE = [
@@ -326,6 +327,8 @@ REST_FRAMEWORK = {
         "campaign_invite": "50/day",
         "report": "20/day",
         "task_progress": "300/hour",
+        "feedback_create": "30/day",
+        "feedback_create_ip": "60/day",
         # Per IP address in addition to per account (gate item 3); higher because several
         # people can share one address. Keys are hashed (ADR 0022).
         "report_ip": "60/day",
@@ -346,6 +349,7 @@ SPECTACULAR_SETTINGS = {
         "ParticipationStatusEnum": "apps.campaigns.models.Participation.Status",
         "CampaignParticipationEnum": "apps.campaigns.models.Campaign.Participation",
         "ProjectStatusEnum": "apps.projects.models.Project.Status",
+        "FeedbackStatusEnum": "apps.feedback.models.Feedback.Status",
     },
     "TITLE": f"{PLATFORM_NAME} API",
     "VERSION": "0.0.0",

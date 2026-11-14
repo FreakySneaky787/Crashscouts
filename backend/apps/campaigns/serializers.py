@@ -35,6 +35,7 @@ class CampaignSerializer(serializers.ModelSerializer):
     can_edit = serializers.SerializerMethodField()
     is_participant = serializers.SerializerMethodField()
     open_applications = serializers.SerializerMethodField()
+    new_feedback = serializers.SerializerMethodField()
     my_application = serializers.SerializerMethodField()
     moderation = serializers.SerializerMethodField()
     review_note = serializers.SerializerMethodField()
@@ -66,6 +67,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             "can_edit",
             "is_participant",
             "open_applications",
+            "new_feedback",
             "my_application",
             "moderation",
             "review_note",
@@ -101,6 +103,14 @@ class CampaignSerializer(serializers.ModelSerializer):
         from apps.moderation.actions import team_block_info
 
         return team_block_info(campaign)
+
+    def get_new_feedback(self, campaign) -> int | None:
+        """Feedback with status "New", for the team only (owner's decision: shown, not emailed)."""
+        if not is_team(self.context["request"].user, campaign):
+            return None
+        from apps.feedback.models import Feedback  # the feedback app builds on campaigns
+
+        return Feedback.objects.filter(campaign=campaign, status=Feedback.Status.NEW).count()
 
     def get_open_applications(self, campaign) -> int | None:
         """Number of open applications, for the team only (owner's decision: shown, not emailed)."""

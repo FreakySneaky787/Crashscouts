@@ -55,7 +55,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `projects` | Project, membership (owner/maintainer), short names with history, verification, screenshots, status | complete for phase 2: projects, team, images, repository verification (WP 2.2–2.5) |
 | `campaigns` | Campaigns, links, invitations, participations, status machine | model, derived status, policies, API, public-campaign lock, time zones, download links, invitations and participations (WP 3A.1–3A.3, 3A.5) |
 | `testing` | Test tasks, progress | planned |
-| `feedback` | Feedback, attachments, status, publishing | planned |
+| `feedback` | Feedback, status, publishing ([ADR 0024](adr/0024-feedback.md)); attachments in WP 5.2 | in progress |
 | `moderation` | Reports, review queue, actions, blocks | reports, link suspension, blocks, warnings, appeals, moderation pages (WP 3B.2–3B.3) |
 | `notifications` | In-app and email notifications (via tasks) | planned |
 | `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
@@ -140,8 +140,8 @@ erDiagram
 |---|---|
 | Anonymous | read public projects, public campaigns and published feedback |
 | User | profile, create projects, join public campaigns, report |
-| Participant | see campaign content and tasks; create and see **own** feedback |
-| Maintainer | edit project and campaigns, approve participations, manage and individually publish feedback |
+| Participant | see campaign content and tasks; create feedback; read **all** feedback of the campaign, attachments only of their **own** (ADR 0024) |
+| Maintainer | edit project and campaigns, approve participations, manage feedback and propose publishing (the author consents) |
 | Owner | additionally manage maintainers, delete or transfer the project |
 | Moderator | handle reports; access to private content only for the reported object, time-limited and logged |
 | Admin | system administration. Django admin only via a separate access path; day-to-day moderation via the app's moderation pages |

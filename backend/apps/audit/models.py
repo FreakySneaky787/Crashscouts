@@ -90,6 +90,8 @@ class AuditEvent(models.Model):
         CAMPAIGN_REJECTED = "moderation.campaign_rejected", "Public campaign sent back"
         LINK_APPROVED = "moderation.link_approved", "Download link approved"
         LINK_REJECTED = "moderation.link_rejected", "Download link rejected"
+        FEEDBACK_PUBLISHED = "feedback.published", "Feedback published"
+        FEEDBACK_UNPUBLISHED = "feedback.unpublished", "Feedback made private again"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)

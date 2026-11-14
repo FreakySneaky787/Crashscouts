@@ -140,6 +140,12 @@ including the negative cases.
   they published – never other people's data. Final account deletion removes participations,
   invitations, applications and answers; references in campaigns (`published_by`,
   `decided_by`, `invited_by`) become NULL ([`DATABASE.md`](DATABASE.md)).
+- **Feedback (WP 5.1, [ADR 0024](adr/0024-feedback.md)):** private by default – the team, the
+  author and active participants of the campaign; attachments only the team and the author.
+  Public only with the team's proposal **and** the author's consent; withdrawable by either.
+  Other readers never learn who wrote it. Blocked content hides its feedback. On final account
+  deletion the author becomes NULL (the text stays, anonymised); the export contains the person's
+  own feedback. Permission matrix tested per role, including the negative cases.
 - **No tracking:** no analytics scripts, no tracking cookies, no third-party analytics. Growth
   metrics are computed from the platform's own data, as aggregates only, and shown internally
   ([`METRICS.md`](METRICS.md), owner's decision 2026-11-13).

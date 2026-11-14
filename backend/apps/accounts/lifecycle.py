@@ -25,6 +25,7 @@ from apps.campaigns.models import (
     Participation,
     TaskProgress,
 )
+from apps.feedback.models import Feedback
 from apps.moderation.models import Report
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
@@ -188,6 +189,28 @@ def export_data(user) -> dict:
             for t in TaskProgress.objects.filter(participation__user=user).select_related(
                 "participation__campaign", "task"
             )
+        ],
+        # Own feedback (phase 5, ADR 0024; required since WP 1.5): the text and its status.
+        "feedback": [
+            {
+                "campaign": f.campaign.title,
+                "kind": f.kind,
+                "title": f.title,
+                "description": f.description,
+                "steps": f.steps,
+                "expected": f.expected,
+                "actual": f.actual,
+                "location": f.location,
+                "suggestion": f.suggestion,
+                "solution": f.solution,
+                "environment": f.environment,
+                "result": f.result,
+                "version": f.version,
+                "status": f.status,
+                "published": f.published_at is not None,
+                "created_at": _iso(f.created_at),
+            }
+            for f in Feedback.objects.filter(author=user).select_related("campaign")
         ],
         "campaign_invitations": [
             {"campaign": i.campaign.title, "status": i.status, "created_at": _iso(i.created_at)}

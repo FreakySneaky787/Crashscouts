@@ -1,6 +1,6 @@
 # Data model
 
-> State after WP 4.1 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
+> State after WP 5.1 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
 > update this file in the same commit as any model change.
 
 All own tables use a random UUIDv4 primary key and `created_at`/`updated_at`
@@ -29,6 +29,10 @@ erDiagram
   Campaign ||--o{ TestTask : "CASCADE, at most 30 visible"
   Participation ||--o{ TaskProgress : "CASCADE"
   TestTask ||--o{ TaskProgress : "CASCADE"
+  Campaign ||--o{ Feedback : "CASCADE"
+  User ||--o{ Feedback : "author, SET_NULL"
+  TestTask ||--o{ Feedback : "optional, SET_NULL"
+  Feedback ||--o{ FeedbackStatusChange : "CASCADE"
   User ||--o{ Participation : "CASCADE"
   User ||--o{ CampaignInvitation : "invitee, CASCADE"
   User ||--o{ Application : "applicant, CASCADE"
@@ -57,6 +61,8 @@ erDiagram
 | campaigns | `Application` | application (`pending`/`approved`/`rejected`/`withdrawn`) | applicant: CASCADE; `decided_by`: SET_NULL |
 | moderation | `Block` | moderators' block with message, lifting and one appeal (ADR 0020) | `created_by`/`lifted_by`/`appealed_by`: SET_NULL; target: CASCADE |
 | moderation | `ModerationNote` | warning to a project's team, moderators only | `created_by`: SET_NULL |
+| feedback | `Feedback` | tester feedback of five kinds with type-specific fields, status, duplicate link, publishing with the author's consent (ADR 0024) | author: SET_NULL on final deletion (text stays, anonymised); in the data export |
+| feedback | `FeedbackStatusChange` | status history with the role (team or author) | `actor`: SET_NULL; never shown in the API |
 | moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
 | core | `rate_limit_cache` | Django's database cache for rate limits (not a model; created by migration `core/0001`, ADR 0022) | keys are HMAC hashes (no plain IP address); expired entries deleted hourly, at most one day after the last request |
 | campaigns | `TestTask` | test task of a structured or combined campaign (ADR 0023); `hidden_at` when removed after progress was reported | – |
@@ -85,5 +91,5 @@ participations keep their places until the final deletion (owner's decision, 202
 `/api/v1/me/export/` (`apps/accounts/lifecycle.py::export_data`) contains everything above that
 belongs to the person: account, profile, projects and team invitations, connected accounts, 2FA
 method types, security log, campaign participations, campaign invitations, applications with
-their own answers, the campaigns they published, their reports (with their own text) and their task progress with
-notes.
+their own answers, the campaigns they published, their reports (with their own text), their task progress with
+notes and their feedback.

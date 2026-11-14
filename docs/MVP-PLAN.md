@@ -172,7 +172,18 @@ Decisions of 2026-11-13 and the design: [ADR 0023](adr/0023-test-methods-tasks-a
 
 > Phase 5 requirement from WP 1.5: `purge_deleted_accounts` must anonymise feedback of deleted
 > accounts instead of deleting it, and the data export must include the user's own feedback
-> ([ADR 0013](adr/0013-account-deletion-and-data-export.md)).
+> ([ADR 0013](adr/0013-account-deletion-and-data-export.md)). Done in WP 5.1 (author SET_NULL,
+> export); attachments of deleted accounts are deleted in WP 5.2.
+
+Decisions of 2026-11-14 and the design: [ADR 0024](adr/0024-feedback.md).
+
+| WP | Content | State |
+|---|---|---|
+| 5.1 | Backend: feedback types, permissions, status workflow, publishing with consent, author emails, export and anonymisation | ✅ done |
+| 5.2 | Backend: secure attachments (images re-encoded, text download only) | planned (next) |
+| 5.3 | Testers give and follow feedback | planned |
+| 5.4 | The team's feedback inbox | planned |
+| 5.5 | Published feedback and wrap-up of phase 5 | planned |
 
 ## Metrics (after phase 5)
 

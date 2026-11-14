@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 4.4) · **Current phase:** 4 complete – next: 5, Feedback (flag still off)
+**Last update:** 2026-11-14 (WP 5.1) · **Current phase:** 5 – Feedback (flag still off)
 
 ## Work packages
 
@@ -832,16 +832,39 @@ switches the flag.
   participant and a stranger), gate run **1 passed**; ESLint, typecheck, build clean; backend
   unchanged in this WP.
 
+## Phase 5 – Feedback (started 2026-11-14)
+
+### WP 5.1 – Feedback backend: types, permissions, status, publishing (2026-11-14) ✅
+
+- New app `apps.feedback` ([ADR 0024](adr/0024-feedback.md); owner's decisions of 2026-11-14):
+  five kinds with type-specific fields, optional link to a test task, status history, duplicates
+  within the campaign.
+- Visibility in one policy module: team all; author own (also after leaving, via
+  `/api/v1/me/feedback/`); active participants all feedback of their campaign; published
+  feedback everyone who sees the campaign; blocked content hidden; everything else 404. Only the
+  team and the author see who wrote a feedback.
+- Workflow: the team sets the statuses up to Fixed (any order), the author verifies or reopens;
+  team changes email the author. Publishing needs the team's proposal and the author's consent;
+  either side can withdraw (audited). Authors change or withdraw while "New".
+- Team counter `new_feedback` in the campaign response; rate limits 30/day per account and 60/day
+  per IP; export contains own feedback; final account deletion anonymises (author NULL).
+- **Verification (run on 2026-11-14):** pytest **546 passed** (33 new, including the permission
+  matrix for eight roles on private and published feedback); 4 mutation checks caught
+  (publishing without consent, author sets any status, private list open, author name visible);
+  a real bug found by the tests and fixed: row locking with the nullable author join is refused
+  by PostgreSQL – only the feedback row is locked now. Ruff, migrations check, OpenAPI
+  validation, pip-audit clean; Playwright main run **78 passed**, gate run **1 passed** (no
+  frontend change yet).
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
-Phase 4 (testing) is complete: testing method, test tasks, progress per participation and the
-team's overview (WPs 4.1–4.4, ADR 0023). Next: **phase 5 – feedback** (five types with
-type-specific fields, secure attachments, status workflow, private by default, maintainer inbox;
-see the phase 5 requirement from WP 1.5 in MVP-PLAN). Present its work packages and open
-questions before starting.
+Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) is under way with the
+approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WP 5.1 (backend) is done; next
+are WP 5.2 (secure attachments), 5.3 (testers' feedback pages), 5.4 (the team's inbox) and 5.5
+(published feedback, wrap-up).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

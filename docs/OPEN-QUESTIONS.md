@@ -37,6 +37,13 @@
 | – | Assigning admin and moderator roles | **On an admin page in the app** (2026-11-13). The first admin is created once with a server command; role changes need a fresh reauthentication and 2FA, are audited, and the last admin cannot remove themselves (phase 3B). |
 | – | Campaign data during the deletion grace period | Participations, invitations and applications **stay until the final deletion**; the person is hidden from team lists but keeps the place (2026-11-13). |
 | O | Shared cache for rate limits | **Django's database cache in PostgreSQL** (2026-11-13): no extra service, fits ADR 0003 (no Redis in the MVP); introduced in phase 3B. Implemented in WP 3B.5 (ADR 0022); IP addresses only as HMAC hashes, at most one day (owner, 2026-11-13). |
+| – | Who sees private feedback | The team, the author and **all active participants** of the campaign; **attachments only the team and the author** (2026-11-14, [ADR 0024](adr/0024-feedback.md)). |
+| – | Publishing feedback | **The team proposes, the author consents**; attachments stay private (2026-11-14). |
+| – | "Verified" | The team sets the statuses up to "Fixed"; **the author confirms or reopens** (2026-11-14). |
+| – | Feedback notifications | The team sees a **count** (no email per feedback); the author gets a **short email** on status changes and sees them on the account page (2026-11-14). |
+| – | Feedback attachments | At most **5 files**, images up to **5 MB**, text up to **2 MB** (2026-11-14). |
+| – | Changing feedback | The author may change or withdraw it **while it is "New"** (2026-11-14). |
+| – | Feedback and test tasks | **Optional link** to a task of the campaign (2026-11-14). |
 | – | Testing method | **Fixed choice** free / structured / combined; free has no tasks, structured and combined need at least one task before publishing; the free-text field stays as a hint (2026-11-13, [ADR 0023](adr/0023-test-methods-tasks-and-progress.md)). |
 | – | Changing test tasks after publishing | **Allowed**; new tasks start as Not Started for everyone; a task with reported progress is **hidden, not deleted** (2026-11-13). |
 | – | Notes on task statuses | **Optional short note** (at most 1000 characters), visible only to the team and the person (2026-11-13). |

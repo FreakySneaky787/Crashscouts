@@ -29,6 +29,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0021](0021-review-of-public-campaigns.md) | Review of public campaigns | Accepted |
 | [0022](0022-rate-limits-and-shared-cache.md) | Rate limits and the shared cache | Accepted |
 | [0023](0023-test-methods-tasks-and-progress.md) | Test methods, tasks and progress | Accepted |
+| [0024](0024-feedback.md) | Feedback | Accepted |
 
 ## Template
 
