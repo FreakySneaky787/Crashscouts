@@ -1,6 +1,8 @@
 from django.urls import path
 
 from .moderation_views import (
+    AccessesView,
+    AccessView,
     AppealCreateView,
     AppealDecisionView,
     AppealsView,
@@ -21,6 +23,8 @@ urlpatterns = [
     path("reports/", ReportCreateView.as_view(), name="reports"),
     path("me/reports/", MyReportsView.as_view(), name="my-reports"),
     path("me/suspension/", MySuspensionView.as_view(), name="my-suspension"),
+    path("moderation/accesses/", AccessesView.as_view(), name="moderation-accesses"),
+    path("moderation/accesses/<uuid:access_id>/", AccessView.as_view(), name="moderation-access"),
     path("me/suspension/appeal/", MySuspensionAppealView.as_view(), name="my-suspension-appeal"),
     path(
         "moderation/account-suspensions/", SuspensionsView.as_view(), name="moderation-suspensions"

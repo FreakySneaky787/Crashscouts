@@ -99,6 +99,15 @@ class AuditEvent(models.Model):
             "moderation.account_suspension_appeal_decided",
             "Account suspension appeal decided",
         )
+        CASE_TAKEN = "moderation.case_taken", "Moderation case taken"
+        MODERATOR_ACCESS_GRANTED = (
+            "moderation.access_granted",
+            "Moderator access to reported content opened",
+        )
+        MODERATOR_ACCESS_USED = (
+            "moderation.access_used",
+            "Moderator viewed reported content",
+        )
         CAMPAIGN_APPROVED = "moderation.campaign_approved", "Public campaign approved"
         CAMPAIGN_REJECTED = "moderation.campaign_rejected", "Public campaign sent back"
         LINK_APPROVED = "moderation.link_approved", "Download link approved"

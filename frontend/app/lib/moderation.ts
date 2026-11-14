@@ -26,7 +26,25 @@ export type ModerationCase = {
   url?: string;
   suspended?: boolean;
   blocked: boolean;
+  /** The moderator who took the case (WP 7.3). */
+  taken_by: string | null;
 };
+
+/** A moderator's purpose-bound access to reported content (WP 7.3, ADR 0028). */
+export type ModeratorAccess = {
+  id: string;
+  moderator: string | null;
+  target_type: "project" | "campaign" | "feedback";
+  target_label: string;
+  reason: string;
+  created_at: string;
+  expires_at: string;
+  active: boolean;
+  views: number;
+};
+
+/** Kinds of reported content whose text moderators open only through an access. */
+export const ACCESS_TYPES = ["project", "campaign", "feedback"] as const;
 
 /** What a suspended person sees (WP 7.2). */
 export type SuspensionInfo = {
@@ -62,6 +80,8 @@ export function suspensionEnd(permanent: boolean, day: string): string | null | 
 }
 
 export type CaseDetail = Omit<ModerationCase, "reports" | "malware" | "oldest"> & {
+  /** This moderator's valid access to the content (WP 7.3). */
+  access?: ModeratorAccess | null;
   /** People only (WP 7.2). */
   suspensions?: Suspension[];
   active_suspension?: string | null;

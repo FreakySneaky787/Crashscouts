@@ -128,12 +128,18 @@ def _audit(kind, by, target, **data) -> None:
 
 @transaction.atomic
 def take_case(target, by) -> int:
-    """Marks the open reports as being reviewed. Returns how many."""
-    return (
-        open_reports(target)
-        .filter(status=Report.Status.OPEN)
-        .update(status=Report.Status.IN_REVIEW)
-    )
+    """Marks the open reports as being reviewed by ``by`` (WP 7.3: another moderator may take the
+    case over; the audit log keeps who). Returns how many."""
+    taken = open_reports(target).update(status=Report.Status.IN_REVIEW, taken_by=by)
+    if taken:
+        _audit(AuditEvent.Kind.CASE_TAKEN, by, target)
+    return taken
+
+
+def taken_by(target):
+    """The moderator who took the case, or None."""
+    found = open_reports(target).filter(taken_by__isnull=False).select_related("taken_by").first()
+    return found.taken_by if found else None
 
 
 def active_block(target) -> Block | None:

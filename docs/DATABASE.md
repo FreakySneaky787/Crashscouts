@@ -66,7 +66,8 @@ erDiagram
 | feedback | `FeedbackStatusChange` | status history with the role (team or author) | `actor`: SET_NULL; never shown in the API |
 | feedback | `FeedbackAttachment` | screenshot (re-encoded WebP) or text file of a feedback; the file lives under a random key outside the web root (ADR 0024) | deleted with the feedback and on final account deletion (files too) |
 | moderation | `AccountSuspension` | read-only suspension of an account with reason, message, end (NULL = permanent), lifting and one appeal with its decision (ADR 0027) | person: CASCADE; `created_by`/`lifted_by`/`appeal_decided_by`: SET_NULL; in the data export without moderators' names |
-| moderation | `Report` | report of a project, campaign, link, person or published feedback (ADRs 0019, 0026); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
+| moderation | `ModeratorAccess` | a moderator's purpose-bound, 24-hour access to one reported project, campaign or feedback with the reason and the number of views (ADR 0028) | moderator and targets: SET_NULL (label copy) |
+| moderation | `Report` | report of a project, campaign, link, person or published feedback (ADRs 0019, 0026); `target_label` copy; `taken_by` (ADR 0028) | reporter: SET_NULL; targets: SET_NULL |
 | core | `rate_limit_cache` | Django's database cache for rate limits (not a model; created by migration `core/0001`, ADR 0022) | keys are HMAC hashes (no plain IP address); expired entries deleted hourly, at most one day after the last request |
 | campaigns | `TestTask` | test task of a structured or combined campaign (ADR 0023); `hidden_at` when removed after progress was reported | – |
 | campaigns | `TaskProgress` | a participant's status of one task with an optional note (no row = not started) | CASCADE with the participation, i.e. kept on leaving or removal, deleted with the account; in the data export |

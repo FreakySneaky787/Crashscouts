@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 7.2) · **Current phase:** 7, moderation and security review – WPs 7.1–7.2 done, next: 7.3 several moderators and purpose-bound access (flag still off)
+**Last update:** 2026-11-14 (WP 7.3) · **Current phase:** 7, moderation and security review – WPs 7.1–7.3 done, next: 7.4 moderation statistics (flag still off)
 
 ## Work packages
 
@@ -1054,6 +1054,27 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   once in the Discover test (axe in dark mode ran right after clicking the theme switch); the test
   now waits until the dark theme is applied, as the design-system test does (3 local runs passed).
 
+### WP 7.3 – Several moderators and purpose-bound access (2026-11-14) ✅
+
+- Taking a case stores the moderator (`Report.taken_by`, audited); queue and case page show "in
+  review by …"; another moderator may take it over ([ADR 0028](adr/0028-moderator-access.md)).
+- `ModeratorAccess`: only the moderator who took the open case opens the content of the reported
+  project, campaign or feedback, with a purpose (at most 500 characters), for 24 hours. The
+  read-only view (`/moderation/access/<id>`) shows texts as plain text, download links as text and
+  files by name only; every opening and view is audited; 404 for other moderators, admins and
+  after expiry. Admins see every access with moderator, purpose and views
+  (`/moderation/accesses`). The team is not notified.
+- **Verification (run on 2026-11-14):** pytest **737 passed** (5 new, and the write-guard route walk
+  of WP 7.2 now also covers the 2 new routes; new tests: taking and taking over with
+  audit, without access only reports and title, rules for opening (take first, purpose, length,
+  roles, not for people), content for 24 hours with views audited and 404 for others and after
+  expiry, the admins' list without reading through someone else's access); 4 mutation checks
+  caught (no take required, any moderator or no expiry, view not audited, list for all
+  moderators); Vitest **110 passed**; Playwright main run **86 passed** (new: take, purpose, view
+  the content with axe, a second moderator sees "in review by …" and gets 404 for the first one's
+  access, moderators get 404 for the admins' list, the admin sees the purpose, axe), gate run
+  **4 passed**; Ruff, migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -1065,10 +1086,9 @@ attachments, status workflow with the author's verification, publishing with con
 team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
 full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Phase 7
 (moderation and security review) is approved with the owner's decisions of 2026-11-14 (plan:
-WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WPs 7.1 and 7.2 are done. Next: **WP 7.3 –
-several moderators and purpose-bound access** (taking a case shows "in review by …";
-`ModeratorAccess` with a required reason, valid 24 hours, audited, for the reported private
-object only; read-only view; admins' list of accesses; the team is not notified). Also open: WP M.1 (statistics page; the data for all five metrics now
+WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WPs 7.1–7.3 are done. Next: **WP 7.4 –
+moderation statistics** for admins (open cases, reports by reason and target, mean time to a
+decision, suspensions, appeals, accesses; per month; sums only), then WP 7.5 (ASVS L1 review). Also open: WP M.1 (statistics page; the data for all five metrics now
 exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

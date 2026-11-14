@@ -23,3 +23,9 @@
   color: var(--color-fg-secondary);
   white-space: nowrap;
 }
+
+/* Reported texts as plain text with their line breaks (WP 7.3). */
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

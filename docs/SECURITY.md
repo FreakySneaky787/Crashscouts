@@ -178,7 +178,11 @@ including the negative cases.
   objects via SSR and API).
 - Parametrized tests of the permission matrix, including "a stranger sees nothing".
 - Invitation tokens are stored hashed only, expire, and are single-use.
-- Moderators get no blanket access to private content; access is purpose-bound and logged.
+- ✅ Moderators get no blanket access to private content; access is purpose-bound and logged
+  (WP 7.3, [ADR 0028](adr/0028-moderator-access.md)): only after taking the case, with a reason,
+  for 24 hours, only the reported object, as a read-only copy (links as text, files by name);
+  every grant and view is audited; admins see all accesses; tested including 404 for other
+  moderators and after expiry.
 
 - ✅ Account deletion with a 14-day grace period and personal data export, both confirmed by the
   password and throttled; export contains no secrets; final deletion keeps audit events without

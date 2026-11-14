@@ -78,6 +78,10 @@ class Report(BaseModel):
     text = models.TextField(max_length=TEXT_MAX_LENGTH, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN)
     closed_at = models.DateTimeField(null=True, blank=True)
+    # The moderator who took the case (WP 7.3); others may still act, everything is audited.
+    taken_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -233,3 +237,43 @@ class AccountSuspension(BaseModel):
 
     def __str__(self) -> str:
         return f"Suspension ({'lifted' if self.lifted_at else 'active or expired'})"
+
+
+class ModeratorAccess(BaseModel):
+    """Purpose-bound access of a moderator to the content of one reported object (WP 7.3,
+    ADR 0028): only after taking the case, with a required reason, valid for 24 hours, every grant
+    and every view audited; admins see all accesses; the team is not notified (owner's decision
+    2026-11-14). Without it moderators see the reports and the title only."""
+
+    HOURS = 24
+    REASON_MAX_LENGTH = 500
+
+    class TargetType(models.TextChoices):
+        PROJECT = "project", "Project"
+        CAMPAIGN = "campaign", "Campaign"
+        FEEDBACK = "feedback", "Feedback"
+
+    moderator = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    target_type = models.CharField(max_length=10, choices=TargetType.choices)
+    project = models.ForeignKey(
+        Project, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    campaign = models.ForeignKey(
+        Campaign, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    feedback = models.ForeignKey(
+        Feedback, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    # A copy like Report.target_label: the list stays readable after the content is deleted.
+    target_label = models.CharField(max_length=300)
+    reason = models.TextField(max_length=REASON_MAX_LENGTH)
+    expires_at = models.DateTimeField()
+    views = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Moderator access to {self.target_type}"

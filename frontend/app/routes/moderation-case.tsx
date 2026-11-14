@@ -14,7 +14,17 @@ import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { formatInZone } from "~/lib/campaigns";
-import { CASE_ACTIONS, caseTargetHref, isCaseType, suspensionEnd, type Appeal, type CaseAction, type CaseDetail, type Suspension } from "~/lib/moderation";
+import {
+  ACCESS_TYPES,
+  CASE_ACTIONS,
+  caseTargetHref,
+  isCaseType,
+  suspensionEnd,
+  type Appeal,
+  type CaseAction,
+  type CaseDetail,
+  type Suspension,
+} from "~/lib/moderation";
 import { reasonsFor } from "~/lib/reports";
 
 import styles from "./forms.module.css";
@@ -34,6 +44,10 @@ const PROBLEMS = [
   "has_role",
   "not_yourself",
   "account_not_suspended",
+  // Purpose-bound access (WP 7.3).
+  "take_first",
+  "reason_required",
+  "too_long",
 ] as const;
 type Problem = (typeof PROBLEMS)[number];
 
@@ -48,7 +62,8 @@ function target(params: { type?: string; id?: string }) {
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { api } = target(params);
-  if (!(await getSessionUser(request))) throw redirect("/login?next=%2Fmoderation", { headers: privateNoStoreHeaders() });
+  const viewer = await getSessionUser(request);
+  if (!viewer) throw redirect("/login?next=%2Fmoderation", { headers: privateNoStoreHeaders() });
   const [detail, appeals, csrf] = await Promise.all([
     backendFetch<CaseDetail>(request, api),
     backendFetch<Appeal[]>(request, "/api/v1/moderation/appeals/"),
@@ -57,7 +72,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (detail.status !== 200 || !detail.data) throw data(null, { status: 404, headers: privateNoStoreHeaders() });
   const appeal = (appeals.data ?? []).find((a) => a.block === detail.data!.active_block) ?? null;
   const done = new URL(request.url).searchParams.get("done");
-  return data({ detail: detail.data, appeal, csrfToken: csrf.token, done }, { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) });
+  return data(
+    { detail: detail.data, appeal, csrfToken: csrf.token, done, viewer: viewer.username },
+    { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
+  );
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -68,7 +86,9 @@ export async function action({ request, params }: Route.ActionArgs) {
   const headers = privateNoStoreHeaders();
   const here = `/moderation/${type}/${id}`;
   let result;
-  if (intent === "suspend" && type === "user") {
+  if (intent === "access") {
+    result = await backendFetch(request, `${api}access/`, { method: "POST", csrfToken, json: { reason: String(form.get("reason") ?? "") } });
+  } else if (intent === "suspend" && type === "user") {
     if (form.get("confirm") !== "on") return data({ problem: "confirm" as Problem }, { status: 400, headers });
     const end = suspensionEnd(form.get("permanent") === "on", String(form.get("ends_on") ?? ""));
     if (end === "invalid") return data({ problem: "end_required" as Problem }, { status: 400, headers });
@@ -119,6 +139,44 @@ function Hidden({ csrfToken, intent, block, suspension }: { csrfToken: string; i
       {block ? <input type="hidden" name="block" value={block} /> : null}
       {suspension ? <input type="hidden" name="suspension" value={suspension} /> : null}
     </>
+  );
+}
+
+/**
+ * Purpose-bound access (WP 7.3): without it only the reports and the title are shown. Opening it
+ * needs the case taken by this moderator and a reason; it is valid for 24 hours and audited.
+ */
+function AccessPanel({ detail, viewer, csrfToken }: { detail: CaseDetail; viewer: string; csrfToken: string }) {
+  const { t } = useTranslation();
+  const access = detail.access ?? null;
+  return (
+    <Panel title={t("access.title")}>
+      <div className={styles.stack}>
+        {access ? (
+          <>
+            <p>{t("access.open", { end: `${formatInZone(access.expires_at, "UTC")} UTC` })}</p>
+            <div>
+              <ButtonLink to={`/moderation/access/${access.id}`} variant="secondary">
+                {t("access.view")}
+              </ButtonLink>
+            </div>
+          </>
+        ) : detail.taken_by === viewer ? (
+          <Form method="post" className={styles.form}>
+            <Hidden csrfToken={csrfToken} intent="access" />
+            <p className={styles.muted}>{t("access.intro")}</p>
+            <TextAreaField id="access-reason" name="reason" label={t("access.reason")} hint={t("access.reasonHint")} rows={2} maxLength={500} required />
+            <div>
+              <Button type="submit" variant="secondary">
+                {t("access.request")}
+              </Button>
+            </div>
+          </Form>
+        ) : (
+          <p className={styles.muted}>{t("access.takeFirst")}</p>
+        )}
+      </div>
+    </Panel>
   );
 }
 
@@ -198,7 +256,7 @@ function SuspensionPanel({ detail, csrfToken }: { detail: CaseDetail; csrfToken:
 
 export default function ModerationCasePage({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { detail, appeal, csrfToken, done } = loaderData;
+  const { detail, appeal, csrfToken, done, viewer } = loaderData;
   const openReports = detail.reports.filter((r) => r.status === "open" || r.status === "in_review");
   // People are suspended (WP 7.2), not blocked; feedback is hidden; other content is blocked.
   const person = detail.target_type === "user";
@@ -219,6 +277,7 @@ export default function ModerationCasePage({ loaderData, actionData }: Route.Com
           {detail.url ? <code className={styles.secret}>{detail.url}</code> : null}
           {detail.suspended ? <Notice tone="info" title={t("campaigns.links.suspended")} /> : null}
           {detail.blocked ? <Notice tone="danger" title={t(feedback ? "moderation.hidden" : "moderation.blocked")} /> : null}
+          <p className={styles.muted}>{detail.taken_by ? t("access.takenBy", { name: detail.taken_by }) : t("access.notTaken")}</p>
           {open ? (
             <p>
               <a href={open}>{t(person ? "moderation.openProfile" : "moderation.openFeedback")}</a>
@@ -263,6 +322,7 @@ export default function ModerationCasePage({ loaderData, actionData }: Route.Com
       ) : null}
 
       {person ? <SuspensionPanel detail={detail} csrfToken={csrfToken} /> : null}
+      {(ACCESS_TYPES as readonly string[]).includes(detail.target_type) ? <AccessPanel detail={detail} viewer={viewer} csrfToken={csrfToken} /> : null}
 
       {appeal ? (
         <Panel title={t("moderation.appeal")}>

@@ -1054,7 +1054,9 @@
       "already_suspended": "This account is already suspended.",
       "has_role": "Accounts with a platform role cannot be suspended; an admin removes the role first.",
       "not_yourself": "You cannot suspend your own account.",
-      "account_not_suspended": "This account is not suspended any more."
+      "account_not_suspended": "This account is not suspended any more.",
+      "take_first": "Take the case first.",
+      "reason_required": "Give a reason."
     },
     "team": {
       "title": "Blocked by the moderators",
@@ -1382,6 +1384,66 @@
         "upheld": "Kept",
         "lifted": "Accepted"
       }
+    }
+  },
+  "access": {
+    "title": "Access to the content",
+    "takenBy": "in review by {{name}}",
+    "notTaken": "Nobody has taken this case yet.",
+    "intro": "Without access you see the reports and the title only. Access shows a read-only copy of this content for 24 hours; it is recorded with your reason, and admins can see it. The team is not notified.",
+    "reason": "Purpose of the access",
+    "reasonHint": "Why do you need to see the content? Recorded and visible to admins; at most 500 characters.",
+    "request": "Open the content for 24 hours",
+    "takeFirst": "Take the case first to open its content.",
+    "open": "Your access is open until {{end}}.",
+    "view": "View the content",
+    "contentTitle": "Reported content",
+    "notice": "Read-only access until {{end}}. Every view is recorded.",
+    "yourReason": "Your purpose: {{reason}}",
+    "facts": "Details",
+    "links": "Download links (not opened)",
+    "files": "Attached files (names only)",
+    "campaigns": "Campaigns",
+    "backToCase": "Back to the case",
+    "admin": {
+      "title": "Moderator accesses",
+      "intro": "Every access of a moderator to reported content, with the reason and the number of views.",
+      "all": "All accesses",
+      "none": "No accesses yet.",
+      "moderator": "Moderator",
+      "content": "Content",
+      "opened": "Opened",
+      "state": "State",
+      "views": "Views",
+      "active": "Open",
+      "expired": "Expired"
+    },
+    "yes": "Yes",
+    "no": "No",
+    "fields": {
+      "name": "Name",
+      "slug": "Short name",
+      "visibility": "Visibility",
+      "summary": "Summary",
+      "description": "Description",
+      "repository_url": "Repository",
+      "title": "Title",
+      "project": "Project",
+      "state": "State",
+      "version": "Version",
+      "changelog": "Changes",
+      "prerequisites": "Prerequisites",
+      "campaign": "Campaign",
+      "kind": "Kind",
+      "status": "Status",
+      "published": "Public",
+      "steps": "Steps to reproduce",
+      "expected": "Expected result",
+      "actual": "Actual result",
+      "suggestion": "Suggestion",
+      "solution": "Proposed solution",
+      "environment": "Environment",
+      "location": "Where in the product"
     }
   }
 }

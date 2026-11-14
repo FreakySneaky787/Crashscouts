@@ -14,7 +14,7 @@ from apps.accounts.roles import is_admin, is_moderator
 from apps.campaigns.models import Campaign, CampaignLink
 from apps.projects.policies import can_edit
 
-from . import suspensions
+from . import access, suspensions
 from .actions import (
     ModerationError,
     active_block,
@@ -27,9 +27,10 @@ from .actions import (
     lift_suspension,
     owning_project,
     take_case,
+    taken_by,
     warn,
 )
-from .models import OPEN_STATES, AccountSuspension, Block, ModerationNote, Report
+from .models import OPEN_STATES, AccountSuspension, Block, ModerationNote, ModeratorAccess, Report
 from .reviews import (
     approve_campaign,
     approve_link,
@@ -122,6 +123,7 @@ class CasesView(ModeratorView):
                         "reports": entry["count"],
                         "malware": entry["malware"] > 0,
                         "oldest": entry["oldest"].isoformat(),
+                        "taken_by": getattr(taken_by(target), "username", None),
                         **_summary(field, target),
                     }
                 )
@@ -187,6 +189,9 @@ class CaseView(ModeratorView):
                     for b in blocks
                 ],
                 "active_block": str(current.pk) if current else None,
+                # WP 7.3: who took the case, and this moderator's access to the content.
+                "taken_by": getattr(taken_by(target), "username", None),
+                "access": _own_access(target, request.user),
                 **extra,
             }
         )
@@ -199,6 +204,10 @@ class ActionSerializer(serializers.Serializer):
     )
     # Suspensions (WP 7.2): the end, or null for a permanent suspension.
     ends_at = serializers.DateTimeField(required=False, allow_null=True)
+    # Purpose-bound access (WP 7.3): why the moderator needs to see the content.
+    reason = serializers.CharField(
+        max_length=ModeratorAccess.REASON_MAX_LENGTH, required=False, allow_blank=True
+    )
 
 
 class CaseActionView(ModeratorView):
@@ -224,6 +233,8 @@ class CaseActionView(ModeratorView):
                 dismiss(target, request.user)
             elif action == "lift-suspension" and target_type == "link":
                 lift_suspension(target, request.user)
+            elif action == "access":
+                access.grant(target, request.user, data.get("reason", ""))
             elif action == "suspend" and target_type == "user":
                 if "ends_at" not in data:
                     raise ModerationError("end_required")  # a date, or null for permanently
@@ -478,3 +489,42 @@ class SuspensionsView(ModeratorView):
             raise Http404
         found = _with_people(AccountSuspension.objects.all())[:500]
         return Response([suspensions.describe(s) for s in found])
+
+
+# --- Purpose-bound access (WP 7.3, ADR 0028) ----------------------------------------------------
+
+
+def _own_access(target, moderator) -> dict | None:
+    found = access.current_access(target, moderator)
+    return access.describe(found) if found else None
+
+
+class AccessView(ModeratorView):
+    """The read-only content behind the moderator's own access while it is valid; 404 otherwise
+    (also for other moderators). Every view is audited."""
+
+    @extend_schema(
+        operation_id="moderation_access_view",
+        responses=inline_serializer("ModeratorAccessContent", {"x": serializers.CharField()}),
+    )
+    def get(self, request: Request, access_id) -> Response:
+        found = access.view(access_id, request.user)
+        if found is None:
+            raise Http404
+        response = Response(found)
+        response["Cache-Control"] = "private, no-store"
+        return response
+
+
+class AccessesView(ModeratorView):
+    """Every access with moderator, reason and number of views; admins only."""
+
+    @extend_schema(
+        operation_id="moderation_accesses_list",
+        responses=inline_serializer("ModeratorAccesses", {"x": serializers.CharField()}),
+    )
+    def get(self, request: Request) -> Response:
+        if not is_admin(request.user):
+            raise Http404
+        found = ModeratorAccess.objects.select_related("moderator")[:500]
+        return Response([access.describe(a) for a in found])
