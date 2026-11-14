@@ -32,7 +32,17 @@ export async function loader({ request }: Route.LoaderArgs) {
       request,
       "/api/v1/me/campaign-invitations/",
     ),
-    backendFetch<{ campaign_title: string; campaign_slug: string; project_name: string; project_slug: string }[]>(request, "/api/v1/me/participations/"),
+    backendFetch<
+      {
+        campaign_title: string;
+        campaign_slug: string;
+        project_name: string;
+        project_slug: string;
+        tasks_total: number;
+        tasks_completed: number;
+        tasks_blocked: number;
+      }[]
+    >(request, "/api/v1/me/participations/"),
     backendFetch<{ campaign_title: string; campaign_slug: string; project_name: string; project_slug: string; status: "pending" | "rejected" }[]>(
       request,
       "/api/v1/me/applications/",
@@ -135,7 +145,16 @@ export default function Account({ loaderData }: Route.ComponentProps) {
             {loaderData.participations.map((p) => (
               <li key={`${p.project_slug}/${p.campaign_slug}`} className={styles.listRow}>
                 <Link to={`/p/${p.project_slug}/c/${p.campaign_slug}`}>{p.campaign_title}</Link>
-                <span className={styles.muted}>{p.project_name}</span>
+                <span className={styles.muted}>
+                  {p.project_name}
+                  {p.tasks_total
+                    ? ` · ${t(p.tasks_blocked ? "campaigns.tasks.progress.summaryBlocked" : "campaigns.tasks.progress.summary", {
+                        completed: p.tasks_completed,
+                        total: p.tasks_total,
+                        blocked: p.tasks_blocked,
+                      })}`
+                    : ""}
+                </span>
               </li>
             ))}
           </ul>

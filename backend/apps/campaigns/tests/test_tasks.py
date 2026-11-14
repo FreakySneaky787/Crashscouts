@@ -359,3 +359,14 @@ def test_own_progress_is_in_the_export_and_goes_with_the_account(world):
     ]
     world["tester"].delete()
     assert list(TaskProgress.objects.values_list("note", flat=True)) == ["Their note"]
+
+
+def test_the_account_page_lists_own_progress_in_short(world):
+    put(world["tester"], world["install"], "completed")
+    put(world["other"], world["start"], "blocked")
+    mine = client_for(world["tester"]).get("/api/v1/me/participations/").json()
+    assert [(p["tasks_total"], p["tasks_completed"], p["tasks_blocked"]) for p in mine] == [
+        (2, 1, 0)
+    ]
+    theirs = client_for(world["other"]).get("/api/v1/me/participations/").json()
+    assert [(p["tasks_completed"], p["tasks_blocked"]) for p in theirs] == [(0, 1)]

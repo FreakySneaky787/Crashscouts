@@ -25,7 +25,7 @@ from .invitations import (
     pending_invitations,
     revoke,
 )
-from .models import Participation
+from .models import Participation, TaskProgress, TestTask
 from .policies import is_team
 from .services import CampaignError
 from .views import ErrorSerializer, _campaign, _error
@@ -173,6 +173,33 @@ class MyParticipationSerializer(serializers.Serializer):
     project_name = serializers.CharField(source="campaign.project.name")
     project_slug = serializers.CharField(source="campaign.project.slug")
     joined_at = serializers.DateTimeField(source="created_at")
+    # Own progress in short form for the account page (WP 4.3, ADR 0023); visible tasks only.
+    tasks_total = serializers.SerializerMethodField()
+    tasks_completed = serializers.SerializerMethodField()
+    tasks_blocked = serializers.SerializerMethodField()
+
+    def _counts(self, participation) -> dict:
+        cache = self.context.setdefault("task_counts", {})
+        if participation.pk not in cache:
+            visible = TestTask.objects.filter(
+                campaign_id=participation.campaign_id, hidden_at__isnull=True
+            )
+            mine = TaskProgress.objects.filter(participation=participation, task__in=visible)
+            cache[participation.pk] = {
+                "total": visible.count(),
+                "completed": mine.filter(status=TaskProgress.Status.COMPLETED).count(),
+                "blocked": mine.filter(status=TaskProgress.Status.BLOCKED).count(),
+            }
+        return cache[participation.pk]
+
+    def get_tasks_total(self, participation) -> int:
+        return self._counts(participation)["total"]
+
+    def get_tasks_completed(self, participation) -> int:
+        return self._counts(participation)["completed"]
+
+    def get_tasks_blocked(self, participation) -> int:
+        return self._counts(participation)["blocked"]
 
 
 class MyParticipationsView(APIView):

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 4.2) · **Current phase:** 4 – Testing (3B complete, flag off)
+**Last update:** 2026-11-14 (WP 4.3) · **Current phase:** 4 – Testing (3B complete, flag off)
 
 ## Work packages
 
@@ -798,13 +798,31 @@ switches the flag.
   passed**; ESLint, typecheck, build clean; `pnpm audit` only the known moderate `minimatch`
   advisory (development only).
 
+### WP 4.3 – Testers report their progress (2026-11-14) ✅
+
+- Campaign page: active participants see their own status per task (design-system task status
+  with icon and text) and a plain form per task – status (not started, in progress, completed,
+  blocked) and an optional note; the panel shows "x of y completed · z blocked". After completing
+  or cancelling, or after leaving, the statuses and the note stay visible to the person,
+  read-only. Nobody else sees them on this page – not other participants, not the team (the team's
+  overview follows in WP 4.4).
+- Account page: running participations show the own progress in short.
+- API: `…/me/participations/` adds `tasks_total`, `tasks_completed`, `tasks_blocked` (own, visible
+  tasks only).
+- Pages that show own progress are only ever served to signed-in people with `private, no-store`.
+- **Verification (run on 2026-11-14):** pytest **513 passed** (1 new); Vitest **93 passed** (2
+  new); Playwright main run **78 passed** (new: two invited testers, one reports completed and
+  blocked with a note, the other tester and the team do not see it, a stranger gets 404, the
+  account page shows the summary, the completed campaign is read-only; axe on the tester's page),
+  gate run **1 passed**; Ruff, migrations check, ESLint, typecheck and build clean.
+
 ## Handover – next session (written 2026-11-13)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
-Phase 4 (testing) is under way: WPs 4.1 (backend, ADR 0023) and 4.2 (team pages) are done; next
-are WP 4.3 (testers report progress) and 4.4 (the team's progress overview), as approved in the
+Phase 4 (testing) is under way: WPs 4.1 (backend, ADR 0023), 4.2 (team pages) and 4.3 (testers
+report progress) are done; next is WP 4.4 (the team's progress overview), as approved in the
 phase 4 plan.
 Next: **phase 4 – testing** (test tasks, progress per participation, overview for maintainers);
 present its work packages and open questions before starting.

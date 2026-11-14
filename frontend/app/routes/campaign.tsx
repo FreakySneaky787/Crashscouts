@@ -27,13 +27,15 @@ import {
   campaignStatusStyleKey,
   canJoinDirectly,
   formatInZone,
+  progressPayload,
+  progressSummary,
   type ApplicationQuestion,
   type Campaign,
   type CampaignLink,
   type CampaignTasks,
 } from "~/lib/campaigns";
 import { reportHref } from "~/lib/reports";
-import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+import { cacheHeadersFor, isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -93,6 +95,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       appeal,
       questions,
       tasks: tasks.status === 200 ? (tasks.data?.tasks ?? []) : [],
+      canReport: tasks.status === 200 && Boolean(tasks.data?.can_report),
+      progressSaved: search.get("progress") === "saved",
       applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
     },
     { headers },
@@ -126,6 +130,16 @@ export async function action({ request, params }: Route.ActionArgs) {
     if (result.status === 204) throw redirect(`/p/${slug}/c/${campaignSlug}?applied=withdrawn`, { headers });
     return data({ problem: campaignProblem(result.status, result.data) }, { status: 400, headers });
   }
+  if (intent === "task-progress") {
+    const task = String(form.get("task") ?? "");
+    const progress = progressPayload(form);
+    if (!isUuid(task) || !progress) throw data(null, { status: 400, headers });
+    const result = await backendFetch(request, `${api}tasks/${task}/progress/`, { method: "PUT", csrfToken, json: progress });
+    if (result.status === 200) throw redirect(`/p/${slug}/c/${campaignSlug}?progress=saved#task-${task}`, { headers });
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    const problem = result.status === 429 ? ("rateLimitedProgress" as const) : campaignProblem(result.status, result.data);
+    return data({ problem }, { status: 400, headers });
+  }
   if (intent === "leave") {
     if (form.get("confirm") !== "on") return data({ problem: "confirmLeave" as const }, { status: 400, headers });
     const result = await backendFetch(request, `${api}leave/`, { method: "POST", csrfToken });
@@ -152,6 +166,12 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
     { key: "prerequisites", title: t("campaigns.prerequisites"), body: campaign.prerequisites },
     { key: "methodology", title: t("campaigns.methodology"), body: campaign.methodology },
   ].filter((s) => s.body.trim());
+  // The viewer's own progress only: participants, and former participants who reported something.
+  const showMine = campaign.is_participant || loaderData.tasks.some((task) => task.my_status !== "not_started" || task.my_note);
+  const summary = progressSummary(loaderData.tasks);
+  const tasksAside = showMine
+    ? t(summary.blocked ? "campaigns.tasks.progress.summaryBlocked" : "campaigns.tasks.progress.summary", summary)
+    : t("campaigns.tasks.count", { count: summary.total });
   return (
     <div className={styles.stack}>
       <PageHeader
@@ -183,6 +203,7 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
         }
       />
       {loaderData.joined ? <Notice tone="ok" title={t("campaigns.join.joined")} /> : null}
+      {loaderData.progressSaved ? <Notice tone="ok" title={t("campaigns.tasks.progress.saved")} /> : null}
       {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
       {loaderData.appeal ? (
         <Notice tone={loaderData.appeal === "sent" ? "ok" : "danger"} title={t(loaderData.appeal === "sent" ? "moderation.team.sent" : "moderation.team.failed")} />
@@ -277,8 +298,8 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
         </Panel>
       </div>
       {campaign.method !== "free" ? (
-        <Panel title={t("campaigns.tasks.title")} aside={t("campaigns.tasks.count", { count: loaderData.tasks.length })}>
-          <CampaignTaskList tasks={loaderData.tasks} />
+        <Panel title={t("campaigns.tasks.title")} aside={tasksAside}>
+          <CampaignTaskList tasks={loaderData.tasks} showMine={showMine} canReport={loaderData.canReport} csrfToken={csrfToken} />
         </Panel>
       ) : null}
       {links !== null ? (

@@ -159,8 +159,8 @@ Decisions of 2026-11-13 and the design: [ADR 0023](adr/0023-test-methods-tasks-a
 |---|---|---|
 | 4.1 | Backend: testing method, test tasks, progress per participation, team overview API | ✅ done |
 | 4.2 | Team pages: choose the method, maintain tasks; tasks on the campaign page | ✅ done |
-| 4.3 | Testers report status and notes per task; progress on the account page | planned (next) |
-| 4.4 | The team's progress overview (participants × tasks) | planned |
+| 4.3 | Testers report status and notes per task; progress on the account page | ✅ done |
+| 4.4 | The team's progress overview (participants × tasks) | planned (next) |
 
 ## Phase 5 – Feedback
 

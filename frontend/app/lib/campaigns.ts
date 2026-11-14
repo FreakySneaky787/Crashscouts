@@ -305,7 +305,7 @@ export const CAMPAIGN_PROBLEMS = [
   "free_method_has_no_tasks",
   "task_hidden",
 ] as const;
-export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "confirmReject" | "generic";
+export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "rateLimitedProgress" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "confirmReject" | "generic";
 
 export function campaignProblem(status: number, body: unknown): CampaignProblem {
   if (status === 429) return "rateLimited";
@@ -392,5 +392,37 @@ export function taskPayload(form: FormData) {
     title: String(form.get("title") ?? ""),
     instructions: String(form.get("instructions") ?? ""),
     expected_result: String(form.get("expected_result") ?? ""),
+  };
+}
+
+const TASK_STATUS_LABELS: Record<TaskStatus, "Not Started" | "In Progress" | "Completed" | "Blocked"> = {
+  not_started: "Not Started",
+  in_progress: "In Progress",
+  completed: "Completed",
+  blocked: "Blocked",
+};
+
+/** Key into the design system's task status map (tone and icon; never colour alone). */
+export function taskStatusStyleKey(status: TaskStatus) {
+  return TASK_STATUS_LABELS[status] ?? "Not Started";
+}
+
+export function isTaskStatus(value: unknown): value is TaskStatus {
+  return typeof value === "string" && (TASK_STATUSES as string[]).includes(value);
+}
+
+/** The status form of one task as API payload; unknown statuses are refused (null). */
+export function progressPayload(form: FormData): { status: TaskStatus; note: string } | null {
+  const status = String(form.get("status") ?? "");
+  if (!isTaskStatus(status)) return null;
+  return { status, note: String(form.get("note") ?? "") };
+}
+
+/** How many of the viewer's tasks are completed or blocked. */
+export function progressSummary(tasks: Pick<TestTask, "my_status">[]) {
+  return {
+    total: tasks.length,
+    completed: tasks.filter((task) => task.my_status === "completed").length,
+    blocked: tasks.filter((task) => task.my_status === "blocked").length,
   };
 }

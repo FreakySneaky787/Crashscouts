@@ -568,7 +568,8 @@
       "too_many_tasks": "A campaign can have at most 30 tasks.",
       "last_task": "A published campaign keeps at least one task. Add another task before removing this one.",
       "free_method_has_no_tasks": "Free testing has no tasks. Choose structured or combined testing first.",
-      "task_hidden": "This task was removed by the team."
+      "task_hidden": "This task was removed by the team.",
+      "rateLimitedProgress": "You saved many statuses in a short time. Try again in a while."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -827,6 +828,24 @@
         "title": "Enter a task of at most 120 characters.",
         "instructions": "At most 4,000 characters.",
         "expected_result": "At most 1,000 characters."
+      },
+      "progress": {
+        "status": "Your status",
+        "statuses": {
+          "not_started": "Not started",
+          "in_progress": "In progress",
+          "completed": "Completed",
+          "blocked": "Blocked"
+        },
+        "note": "Note (optional)",
+        "noteHint": "Only the project team and you see this note. At most 1,000 characters.",
+        "yourNote": "Your note",
+        "save": "Save status",
+        "saveNamed": "Save status for “{{title}}”",
+        "saved": "Your status was saved.",
+        "summary": "{{completed}} of {{total}} completed",
+        "summaryBlocked": "{{completed}} of {{total}} completed · {{blocked}} blocked",
+        "readOnly": "You can no longer change your statuses here."
       }
     }
   },

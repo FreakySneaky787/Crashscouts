@@ -13,7 +13,10 @@ import {
   formatInZone,
   groupedTimeZones,
   isTestMethod,
+  progressPayload,
+  progressSummary,
   taskPayload,
+  taskStatusStyleKey,
   timeZones,
   utcToZonedInput,
   zonedToUtc,
@@ -232,5 +235,30 @@ describe("test tasks", () => {
     for (const code of ["tasks_required", "tasks_exist", "too_many_tasks", "last_task", "free_method_has_no_tasks", "task_hidden"]) {
       expect(campaignProblem(400, { code })).toBe(code);
     }
+  });
+});
+
+describe("task progress", () => {
+  const form = (entries: [string, string][]) => {
+    const data = new FormData();
+    for (const [k, v] of entries) data.append(k, v);
+    return data;
+  };
+
+  it("accepts only the four statuses and keeps the note", () => {
+    expect(progressPayload(form([["status", "blocked"], ["note", "Crashes on start"]]))).toEqual({ status: "blocked", note: "Crashes on start" });
+    expect(progressPayload(form([["status", "completed"]]))).toEqual({ status: "completed", note: "" });
+    expect(progressPayload(form([["status", "done"]]))).toBeNull();
+    expect(progressPayload(form([]))).toBeNull();
+  });
+
+  it("maps statuses to the design system and counts the viewer's progress", () => {
+    expect(taskStatusStyleKey("not_started")).toBe("Not Started");
+    expect(taskStatusStyleKey("blocked")).toBe("Blocked");
+    expect(progressSummary([{ my_status: "completed" }, { my_status: "blocked" }, { my_status: "not_started" }, { my_status: "completed" }])).toEqual({
+      total: 4,
+      completed: 2,
+      blocked: 1,
+    });
   });
 });

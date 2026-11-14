@@ -121,6 +121,79 @@ test("the team runs a structured campaign with test tasks", async ({ page, reque
   await expect(page.getByRole("radio", { name: "Free testing" })).toHaveCount(0);
 });
 
+test("testers report their own task progress; nobody else sees it", async ({ page, request, browser }) => {
+  await createSignedInAccount(page, request);
+  const project = await createProject(page);
+  await createCampaign(page, project, { method: "Combined testing" });
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  const panel = page.getByRole("region", { name: "Test tasks" });
+  for (const title of ["Install the app", "Import a file"]) {
+    await panel.getByRole("textbox", { name: "Task", exact: true }).fill(title);
+    await panel.getByRole("button", { name: "Add task" }).click();
+    await expect(page.getByText("The task was added.")).toBeVisible();
+  }
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page).toHaveURL(new RegExp(`/p/${project}/c/beta-1$`));
+
+  // Two testers take part through invitations.
+  const testers = [];
+  for (let n = 0; n < 2; n++) {
+    const context = await browser.newContext();
+    const tester = await context.newPage();
+    const account = await createSignedInAccount(tester, request);
+    await page.goto(`/p/${project}/c/beta-1/testers`);
+    await page.getByLabel("Username").fill(account.username);
+    await page.getByRole("button", { name: "Invite" }).click();
+    await expect(page.getByText("The invitation was sent.")).toBeVisible();
+    await tester.goto("/account");
+    await tester.getByRole("button", { name: "Accept the invitation to Beta 1" }).click();
+    await expect(tester.getByText("You take part in the campaign now.")).toBeVisible();
+    testers.push({ context, tester });
+  }
+  const [{ tester }, { tester: other }] = testers;
+
+  // The first tester reports progress, task by task.
+  await tester.goto(`/p/${project}/c/beta-1`);
+  const tasks = tester.getByRole("region", { name: "Test tasks" });
+  await expect(tasks).toContainText("0 of 2 completed");
+  const item = (title: string) => tasks.getByRole("listitem").filter({ has: tester.getByRole("heading", { name: title }) });
+  await item("Install the app").getByLabel("Your status").selectOption("completed");
+  await item("Install the app").getByRole("button", { name: "Save status for “Install the app”" }).click();
+  await expect(tester.getByText("Your status was saved.")).toBeVisible();
+  await item("Import a file").getByLabel("Your status").selectOption("blocked");
+  await item("Import a file").getByLabel("Note (optional)").fill("The import button does nothing.");
+  await item("Import a file").getByRole("button", { name: "Save status for “Import a file”" }).click();
+  await expect(tester.getByText("Your status was saved.")).toBeVisible();
+  await expect(tasks).toContainText("1 of 2 completed · 1 blocked");
+  await expect(item("Install the app")).toContainText("Completed");
+  await expect(item("Import a file").getByLabel("Note (optional)")).toHaveValue("The import button does nothing.");
+  const results = await new AxeBuilder({ page: tester }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+  await tester.goto("/account");
+  await expect(tester.getByText("1 of 2 completed · 1 blocked")).toBeVisible();
+
+  // Nobody else sees it: not the other tester, not the team on the campaign page, not strangers.
+  await other.goto(`/p/${project}/c/beta-1`);
+  await expect(other.getByRole("region", { name: "Test tasks" })).toContainText("0 of 2 completed");
+  await expect(other.getByText("The import button does nothing.")).toHaveCount(0);
+  await page.goto(`/p/${project}/c/beta-1`);
+  await expect(page.getByText("The import button does nothing.")).toHaveCount(0);
+  const strangerContext = await browser.newContext();
+  const stranger = await strangerContext.newPage();
+  await createSignedInAccount(stranger, request);
+  expect((await stranger.goto(`/p/${project}/c/beta-1`))?.status()).toBe(404);
+
+  // Completed by the team: the tester's statuses stay, read-only.
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  await page.getByRole("button", { name: "Complete campaign" }).click();
+  await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+  await tester.goto(`/p/${project}/c/beta-1`);
+  await expect(tester.getByRole("button", { name: /Save status/ })).toHaveCount(0);
+  await expect(tester.getByText("Your note: The import button does nothing.")).toBeVisible();
+  for (const { context } of testers) await context.close();
+  await strangerContext.close();
+});
+
 test("public campaigns stay drafts while the gate is closed", async ({ page, request, browser }) => {
   await createSignedInAccount(page, request);
   const project = await createProject(page);
