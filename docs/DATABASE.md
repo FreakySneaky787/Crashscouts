@@ -1,6 +1,6 @@
 # Data model
 
-> State after WP 3B.5 (2026-11-13). Generated from the models in `backend/apps/*/models.py`;
+> State after WP 4.1 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
 > update this file in the same commit as any model change.
 
 All own tables use a random UUIDv4 primary key and `created_at`/`updated_at`
@@ -26,6 +26,9 @@ erDiagram
   Campaign ||--o{ ApplicationQuestion : "CASCADE, at most 10"
   Campaign ||--o{ Application : "CASCADE"
   Application ||--o{ ApplicationAnswer : "CASCADE"
+  Campaign ||--o{ TestTask : "CASCADE, at most 30 visible"
+  Participation ||--o{ TaskProgress : "CASCADE"
+  TestTask ||--o{ TaskProgress : "CASCADE"
   User ||--o{ Participation : "CASCADE"
   User ||--o{ CampaignInvitation : "invitee, CASCADE"
   User ||--o{ Application : "applicant, CASCADE"
@@ -45,7 +48,7 @@ erDiagram
 | projects | `Invitation` | team invitations | invitee: CASCADE; `invited_by`: SET_NULL |
 | projects | `Screenshot`, `SlugHistory` | images, former short names | – |
 | projects | `RepositoryVerification` | proof of repository ownership (ADR 0015) | `verified_by`: SET_NULL |
-| campaigns | `Campaign` | test campaign; stored state (draft, in review, published, completed, cancelled) plus `published_at`, `completed_at`, `cancelled_at`, `blocked_at`, `review_note` | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
+| campaigns | `Campaign` | test campaign; `method` (free, structured, combined – ADR 0023); stored state (draft, in review, published, completed, cancelled) plus `published_at`, `completed_at`, `cancelled_at`, `blocked_at`, `review_note` | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
 | campaigns | `CampaignSlugHistory` | former short names | – |
 | campaigns | `CampaignLink` | download links (ADR 0017); suspension (ADR 0019), `blocked_at` (ADR 0020), `review_status`/`review_note` (ADR 0021) | – |
 | campaigns | `CampaignInvitation` | invitations to private campaigns | invitee: CASCADE; `invited_by`: SET_NULL |
@@ -56,6 +59,8 @@ erDiagram
 | moderation | `ModerationNote` | warning to a project's team, moderators only | `created_by`: SET_NULL |
 | moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
 | core | `rate_limit_cache` | Django's database cache for rate limits (not a model; created by migration `core/0001`, ADR 0022) | keys are HMAC hashes (no plain IP address); expired entries deleted hourly, at most one day after the last request |
+| campaigns | `TestTask` | test task of a structured or combined campaign (ADR 0023); `hidden_at` when removed after progress was reported | – |
+| campaigns | `TaskProgress` | a participant's status of one task with an optional note (no row = not started) | CASCADE with the participation, i.e. kept on leaving or removal, deleted with the account; in the data export |
 | campaigns | `ApplicationAnswer` | answers (question text kept) | deleted on rejection, withdrawal, leaving, removal, 30 days after the campaign ends, and with the account |
 
 ## Retention jobs
@@ -80,4 +85,5 @@ participations keep their places until the final deletion (owner's decision, 202
 `/api/v1/me/export/` (`apps/accounts/lifecycle.py::export_data`) contains everything above that
 belongs to the person: account, profile, projects and team invitations, connected accounts, 2FA
 method types, security log, campaign participations, campaign invitations, applications with
-their own answers, the campaigns they published, and their reports (with their own text).
+their own answers, the campaigns they published, their reports (with their own text) and their task progress with
+notes.

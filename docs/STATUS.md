@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-13 (WP 3B.6; WP 4.1 in progress) · **Current phase:** 3B complete (flag off) – next: 4, Testing
+**Last update:** 2026-11-14 (WP 4.1) · **Current phase:** 4 – Testing (3B complete, flag off)
 
 ## Work packages
 
@@ -757,25 +757,36 @@ switches the flag.
   mutation check caught (a blocked link still served: the warning page answered 200 instead of
   404). No application code changed in this WP.
 
-## Handover – next session (written 2026-11-13)
+## Phase 4 – Testing (started 2026-11-14)
 
-**In progress – phase 4, WP 4.1 (backend), saved mid-work on 2026-11-13:** the plan for phase 4
-(WPs 4.1–4.4) is approved; `docs/OPEN-QUESTIONS.md` is still to be updated. Owner decisions
-of 2026-11-13: testing method as a fixed choice (free / structured / combined; structured
-and combined need a task before publishing), tasks editable after publishing (a task with progress
-is hidden, not deleted), optional short note per status (team and the tester only), progress kept
-when someone leaves or is removed (deleted with the account). Done so far (not yet covered by new
-tests): `Campaign.method`, `TestTask`, `TaskProgress` (migration 0012), `apps/campaigns/tasks.py`,
-`task_views.py` (tasks, move, own progress, team overview `…/progress/` = 404 for non-team), rules
-in `services.py` (`tasks_required`, `tasks_exist`, `method` locked after publishing), tasks in the
-review queue, own progress in the data export, throttle `task_progress` 300/hour. **Next:** pytest
-for WP 4.1 (permissions incl. negatives, rules, hide vs delete, closed campaign read-only, leaving
-and rejoining, export) and mutation checks; ADR 0023; DATABASE, OPEN-QUESTIONS, MVP-PLAN; then
-WPs 4.2–4.4.
+### WP 4.1 – Testing method, tasks and progress: backend (2026-11-14) ✅
+
+- `Campaign.method` (free, structured, combined; frozen after publishing; existing campaigns are
+  free), `TestTask` (at most 30 visible per campaign) and `TaskProgress` per participation and task
+  with an optional note ([ADR 0023](adr/0023-test-methods-tasks-and-progress.md); owner's decisions
+  of 2026-11-13).
+- Rules: structured and combined need a task to publish or submit (`tasks_required`); no switch to
+  free while tasks exist; a task with reported progress is hidden, not deleted; the last task of a
+  published campaign stays; closed and blocked campaigns are read-only; only active participants
+  report, throttled at 300 per hour.
+- API: tasks (everyone who sees the campaign reads them, with their own status only), move, own
+  progress, and the team's overview `…/progress/` (404 for everyone else, moderators included;
+  people who left or were removed are marked; hidden tasks with progress stay listed).
+- Tasks appear in the moderators' review queue; own progress with notes is in the data export and
+  goes with the account.
+- **Verification (run on 2026-11-14):** pytest **512 passed** (22 new); 4 mutation checks caught
+  (overview open to everyone, minimum task ignored, hiding deletes, others' progress visible);
+  Ruff, migrations check, OpenAPI validation (enum names fixed for the new choices) and pip-audit
+  clean; Playwright main run **76 passed**, gate run **1 passed** (no frontend change in this WP).
+
+## Handover – next session (written 2026-11-13)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
+Phase 4 (testing) is under way: WP 4.1 (backend for methods, tasks and progress, ADR 0023) is done;
+next are WP 4.2 (team pages: method and tasks), 4.3 (testers report progress) and 4.4 (the
+team's progress overview), as approved in the phase 4 plan.
 Next: **phase 4 – testing** (test tasks, progress per participation, overview for maintainers);
 present its work packages and open questions before starting.
 
