@@ -932,7 +932,7 @@ switches the flag.
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
-Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) is under way with the
+Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) with the
 owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
 attachments, status workflow with the author's verification, publishing with consent, the
 team's inbox (WPs 5.1–5.5). Next: **phase 6 – Discover** (PostgreSQL full-text search with
