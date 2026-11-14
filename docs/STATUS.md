@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 6.3) · **Current phase:** 6 complete – next: 7, moderation and security review (flag still off)
+**Last update:** 2026-11-14 (WP 7.1) · **Current phase:** 7, moderation and security review – WP 7.1 done, next: 7.2 account suspensions (flag still off)
 
 ## Work packages
 
@@ -983,6 +983,42 @@ with "new" selectable (never by popularity), the filter "open source only" prese
   places, the method filter applies, the project tab counts the open campaign); ESLint,
   typecheck, build clean.
 
+## Phase 7 – Extend moderation and security review (started 2026-11-14)
+
+Owner's decisions of 2026-11-14 (in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)): reasons for
+reporting people; spam in published feedback is hidden (reversible, logged); suspensions are
+read-only with a free end date or permanent, set by any moderator, one appeal decided by any
+moderator; purpose-bound 24-hour access to the reported private object, logged and listed for
+admins; a moderation statistics page; IP addresses stay out of the audit log.
+
+### WP 7.1 – Report people and published feedback (2026-11-14) ✅
+
+- `Report` targets `user` and `feedback` with reasons per target kind; a person is reported
+  through a visible profile (never oneself), feedback only while published and never one's own
+  ([ADR 0026](adr/0026-moderating-people-and-feedback.md)).
+- Moderators warn a person (email, note for moderators); blocking a person is refused until the
+  suspensions of WP 7.2. Hiding feedback (`Block` on the feedback, `Feedback.blocked_at`) makes it
+  private, hides it from participants, shows the team and the author the reason; only the team
+  appeals; publishing is refused until the block is lifted.
+- Frontend: "Report" on public profiles and published feedback, reasons per target, moderation
+  queue and case page for people (no block form, "Warn the person") and feedback ("Hide", "Show
+  the feedback again"), block notice on the feedback page.
+- **Verification (run on 2026-11-14):** pytest **622 passed** (10 new: reasons for people, rules
+  for reporting people, published feedback only, private and own feedback refused, queue and case
+  page, hide and restore with emails, warning a person, `not_supported`); 4 mutation checks caught
+  (hidden feedback readable by participants, content reasons accepted for people, unpublished
+  feedback reportable, a block that leaves feedback published); Vitest **106 passed** (3 new);
+  Playwright main run **84 passed** (new: a person is reported from the profile with the reasons for
+  people only, not from one's own profile, the moderator's case has no block form, the warning
+  reaches the person by mail, axe on the report form and the case page), gate run **4 passed**
+  (new: the author and the team see no "Report", a reader reports with feedback reasons only, the
+  moderator hides it, the reader gets 404, the author sees the reason without an appeal form, the
+  team cannot propose publishing and appeals, accepting the appeal shows it to the team again while
+  it stays private for others, axe); Ruff, migrations check, OpenAPI, pip-audit, ESLint,
+  typecheck, build clean. `pnpm audit` reports one new **moderate** advisory in a development-only
+  dependency (ESLint → minimatch, GHSA-g3hv-75wg-m249; not shipped to users; CI fails on high and
+  critical only) – to be fixed in a separate commit.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -992,12 +1028,14 @@ Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) with
 owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
 attachments, status workflow with the author's verification, publishing with consent, the
 team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
-full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Next:
-**phase 7 – extend moderation and security review** (reporting of users and published feedback,
-account suspensions with deadlines and appeals, several moderators with purpose-bound logged
-access, statistics, OWASP ASVS level 1 review), or WP M.1 (statistics page) first. Present the
-work packages and open questions before starting. Also open: WP M.1 (statistics page; the data for all
-five metrics now exists).
+full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Phase 7
+(moderation and security review) is approved with the owner's decisions of 2026-11-14 (plan:
+WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WP 7.1 is done. Next: **WP 7.2 – account
+suspensions** (read-only write guard with exceptions for logout, export, deletion, appeal,
+password and 2FA; hidden profile; emails; one appeal; admin list). Note for 7.2: any moderator may
+suspend permanently and decide the appeal – no four-eyes principle; compensated by the audit log
+and the admins' list. Also open: WP M.1 (statistics page; the data for all five metrics now
+exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

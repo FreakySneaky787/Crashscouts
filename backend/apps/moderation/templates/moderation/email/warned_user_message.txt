@@ -1,0 +1,6 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The moderators reviewed reports about your account and send you this warning:
+
+{{ message }}
+
+Nothing was restricted. Your account: {{ account_url }}{% endautoescape %}{% endblock content %}

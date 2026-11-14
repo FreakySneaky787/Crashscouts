@@ -154,6 +154,11 @@ including the negative cases.
   Other readers never learn who wrote it. Blocked content hides its feedback. On final account
   deletion the author becomes NULL (the text stays, anonymised); the export contains the person's
   own feedback. Permission matrix tested per role, including the negative cases.
+- **Reporting people and feedback (WP 7.1, [ADR 0026](adr/0026-moderating-people-and-feedback.md)):**
+  a person is reportable only through a visible profile, never oneself; feedback only while
+  published, by people who can read it, never one's own (404 otherwise, tested). The reported
+  person or team never learns who reported. Hidden feedback becomes private, is hidden from
+  participants too and cannot be republished until the block is lifted (tested).
 - **Discover (WP 6.2, [ADR 0025](adr/0025-discover.md)):** only public, unblocked projects and
   live public campaigns (none while the gate is closed); drafts, reviews, private and blocked
   content never appear, also not through a search term (tested). Search terms are reduced to word

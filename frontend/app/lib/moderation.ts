@@ -11,15 +11,18 @@ export type ModerationInfo = {
 };
 
 export type ModerationCase = {
-  target_type: "project" | "campaign" | "link";
+  target_type: "project" | "campaign" | "link" | "feedback" | "user";
   target_id: string;
   reports: number;
   malware: boolean;
   oldest: string;
-  project: string;
-  project_name: string;
+  /** Null for a person (WP 7.1). */
+  project: string | null;
+  project_name: string | null;
   title: string;
   campaign?: string;
+  feedback?: string;
+  username?: string;
   url?: string;
   suspended?: boolean;
   blocked: boolean;
@@ -44,10 +47,17 @@ export type Appeal = {
   appealed_at: string;
 };
 
-export const CASE_TYPES = ["project", "campaign", "link"] as const;
+export const CASE_TYPES = ["project", "campaign", "link", "feedback", "user"] as const;
 
 export function isCaseType(value: string | undefined): value is ModerationCase["target_type"] {
   return (CASE_TYPES as readonly string[]).includes(value ?? "");
+}
+
+/** Where moderators open the reported person or feedback; null when there is no page for it. */
+export function caseTargetHref(c: Pick<ModerationCase, "target_type" | "project" | "campaign" | "feedback" | "username" | "blocked">): string | null {
+  if (c.target_type === "user" && c.username) return `/u/${c.username}`;
+  if (c.target_type === "feedback" && c.feedback && !c.blocked) return `/p/${c.project}/c/${c.campaign}/feedback/${c.feedback}`;
+  return null;
 }
 
 export const CASE_ACTIONS = ["take", "block", "warn", "dismiss", "lift-suspension"] as const;

@@ -17,9 +17,11 @@ from .services import NotVisible, ReportError, report, reports_of, resolve_targe
 
 class ReportCreateSerializer(serializers.Serializer):
     target_type = serializers.ChoiceField(choices=Report.TargetType.choices)
-    project = serializers.CharField(max_length=40)
+    project = serializers.CharField(max_length=40, required=False, allow_blank=True)
     campaign = serializers.CharField(max_length=40, required=False, allow_blank=True)
     link = serializers.UUIDField(required=False, allow_null=True)
+    username = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    feedback = serializers.UUIDField(required=False, allow_null=True)
     reason = serializers.ChoiceField(choices=Report.Reason.choices)
     text = serializers.CharField(max_length=TEXT_MAX_LENGTH, required=False, allow_blank=True)
 
@@ -53,9 +55,11 @@ class ReportCreateView(APIView):
             target = resolve_target(
                 request.user,
                 data["target_type"],
-                data["project"],
+                data.get("project", ""),
                 data.get("campaign", ""),
                 data.get("link"),
+                username=data.get("username", ""),
+                feedback=data.get("feedback"),
             )
         except NotVisible:
             raise Http404 from None

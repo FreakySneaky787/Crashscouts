@@ -15,6 +15,9 @@ from apps.audit.services import record
 from apps.campaigns.models import Campaign, CampaignLink
 from apps.campaigns.policies import can_see_links
 from apps.campaigns.selectors import campaign_for
+from apps.feedback import policies as feedback_policies
+from apps.feedback.models import Feedback
+from apps.profiles.selectors import visible_profiles
 from apps.projects.models import Membership, Project
 from apps.projects.selectors import project_for
 from apps.projects.services import has_confirmed_email
@@ -22,6 +25,12 @@ from apps.projects.services import has_confirmed_email
 from .models import OPEN_STATES, Report
 
 SUSPENSION_THRESHOLD = 3
+
+R = Report.Reason
+# Reasons per kind of target (owner's decisions 2026-11-13 and 2026-11-14).
+CONTENT_REASONS = {R.MALWARE, R.DECEPTION, R.NOT_OWN_SOFTWARE, R.SPAM, R.LEGAL, R.OTHER}
+USER_REASONS = {R.SPAM, R.HARASSMENT, R.IMPERSONATION, R.INAPPROPRIATE_PROFILE, R.OTHER}
+FEEDBACK_REASONS = {R.SPAM, R.HARASSMENT, R.DECEPTION, R.LEGAL, R.OTHER}
 
 
 class ReportError(Exception):
@@ -34,9 +43,24 @@ class NotVisible(Exception):
     """The content does not exist for this person (answered with 404)."""
 
 
-def resolve_target(user, target_type: str, project: str, campaign: str = "", link=None):
+def resolve_target(
+    user,
+    target_type: str,
+    project: str = "",
+    campaign: str = "",
+    link=None,
+    *,
+    username: str = "",
+    feedback=None,
+):
     """The reported object, if this person may see it; else NotVisible. Uses the same selectors
     as the pages, so nobody can report (or probe) what they cannot see."""
+    if target_type == Report.TargetType.USER:
+        # Visible profiles only (active, confirmed, not waiting for deletion); not oneself.
+        found_profile = visible_profiles().filter(user__username__iexact=username).first()
+        if found_profile is None or found_profile.user_id == user.pk:
+            raise NotVisible
+        return found_profile.user
     found = project_for(user, project) if project else None
     if found is None:
         raise NotVisible
@@ -47,6 +71,20 @@ def resolve_target(user, target_type: str, project: str, campaign: str = "", lin
         raise NotVisible
     if target_type == Report.TargetType.CAMPAIGN:
         return found_campaign
+    if target_type == Report.TargetType.FEEDBACK:
+        # Published feedback only (owner's decision); the author does not report their own.
+        found_feedback = (
+            Feedback.objects.select_related("campaign__project")
+            .filter(campaign=found_campaign, pk=feedback, published_at__isnull=False)
+            .first()
+        )
+        if (
+            found_feedback is None
+            or not feedback_policies.can_view(user, found_feedback)
+            or feedback_policies.is_author(user, found_feedback)
+        ):
+            raise NotVisible
+        return found_feedback
     if target_type != Report.TargetType.LINK or not can_see_links(user, found_campaign):
         raise NotVisible
     found_link = (
@@ -59,7 +97,33 @@ def resolve_target(user, target_type: str, project: str, campaign: str = "", lin
     return found_link
 
 
+def kind_of(target) -> tuple[str, str]:
+    """The report's target type and the field that holds the target."""
+    if isinstance(target, Project):
+        return Report.TargetType.PROJECT, "project"
+    if isinstance(target, Campaign):
+        return Report.TargetType.CAMPAIGN, "campaign"
+    if isinstance(target, CampaignLink):
+        return Report.TargetType.LINK, "link"
+    if isinstance(target, Feedback):
+        return Report.TargetType.FEEDBACK, "feedback"
+    return Report.TargetType.USER, "user"
+
+
+def reasons_for(kind: str) -> set[str]:
+    if kind == Report.TargetType.USER:
+        return USER_REASONS
+    if kind == Report.TargetType.FEEDBACK:
+        return FEEDBACK_REASONS
+    return CONTENT_REASONS
+
+
 def _label(target) -> str:
+    if isinstance(target, Feedback):
+        campaign = target.campaign
+        return f"{target.title} (/p/{campaign.project.slug}/c/{campaign.slug}/feedback/{target.pk})"
+    if not isinstance(target, Project | Campaign | CampaignLink):
+        return f"@{target.username} (/u/{target.username})"
     if isinstance(target, Project):
         return f"{target.name} (/p/{target.slug})"
     if isinstance(target, Campaign):
@@ -71,14 +135,9 @@ def _label(target) -> str:
 def report(user, target, reason: str, text: str = "") -> Report:
     if not has_confirmed_email(user):
         raise ReportError("email_unconfirmed")
-    if reason not in Report.Reason.values:
+    kind, field = kind_of(target)
+    if reason not in reasons_for(kind):
         raise ReportError("invalid_reason")
-    if isinstance(target, Project):
-        kind, field = Report.TargetType.PROJECT, "project"
-    elif isinstance(target, Campaign):
-        kind, field = Report.TargetType.CAMPAIGN, "campaign"
-    else:
-        kind, field = Report.TargetType.LINK, "link"
     if Report.objects.filter(
         reporter=user, target_type=kind, status__in=OPEN_STATES, **{field: target}
     ).exists():

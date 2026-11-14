@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { reportHref, reportTarget } from "./reports";
+import { reasonsFor, reportHref, reportTarget } from "./reports";
 
 const LINK = "0f8fad5b-d9cb-469f-a165-70867728950e";
 
@@ -22,6 +22,17 @@ describe("reportTarget", () => {
     ]) {
       expect(reportTarget(new URLSearchParams(query))).toBeNull();
     }
+  });
+
+  it("reads people and published feedback (WP 7.1)", () => {
+    expect(reportTarget(new URLSearchParams("type=user&username=Tess"))).toEqual({ type: "user", project: "", username: "tess", back: "/u/tess" });
+    expect(reportTarget(new URLSearchParams("type=user&username=../x"))).toBeNull();
+    expect(reportTarget(new URLSearchParams(`type=feedback&project=tidewater&campaign=beta-1&feedback=${LINK}`))?.back).toBe(`/p/tidewater/c/beta-1/feedback/${LINK}`);
+    expect(reportTarget(new URLSearchParams("type=feedback&project=tidewater&campaign=beta-1&feedback=x"))).toBeNull();
+    expect(reasonsFor("user")).toContain("impersonation");
+    expect(reasonsFor("user")).not.toContain("malware");
+    expect(reasonsFor("feedback")).not.toContain("malware");
+    expect(reportHref({ type: "user", project: "", username: "tess" })).toBe("/report?type=user&username=tess");
   });
 
   it("round-trips through reportHref", () => {

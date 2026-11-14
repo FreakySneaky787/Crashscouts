@@ -78,6 +78,8 @@ class Feedback(BaseModel):
     publish_proposed_at = models.DateTimeField(null=True, blank=True, editable=False)
     author_consented_at = models.DateTimeField(null=True, blank=True, editable=False)
     published_at = models.DateTimeField(null=True, blank=True, editable=False)
+    # Hidden by moderators (WP 7.1, ADR 0026): private again and cannot be published until lifted.
+    blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     class Meta:
         ordering = ["-created_at"]

@@ -13,8 +13,8 @@ import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
-import { CASE_ACTIONS, isCaseType, type Appeal, type CaseAction, type CaseDetail } from "~/lib/moderation";
-import { REPORT_REASONS } from "~/lib/reports";
+import { CASE_ACTIONS, caseTargetHref, isCaseType, type Appeal, type CaseAction, type CaseDetail } from "~/lib/moderation";
+import { reasonsFor } from "~/lib/reports";
 
 import styles from "./forms.module.css";
 
@@ -91,12 +91,16 @@ export default function ModerationCasePage({ loaderData, actionData }: Route.Com
   const { t } = useTranslation();
   const { detail, appeal, csrfToken, done } = loaderData;
   const openReports = detail.reports.filter((r) => r.status === "open" || r.status === "in_review");
+  // People are suspended (WP 7.2), not blocked; feedback is hidden; other content is blocked.
+  const person = detail.target_type === "user";
+  const feedback = detail.target_type === "feedback";
+  const open = caseTargetHref(detail);
   return (
     <div className={styles.stack}>
       <PageHeader
         breadcrumbs={[{ label: t("moderation.title"), to: "/moderation" }, { label: detail.title }]}
         title={detail.title}
-        subtitle={`${t(`moderation.types.${detail.target_type}`)} · ${detail.project_name}`}
+        subtitle={[t(`moderation.types.${detail.target_type}`), detail.project_name].filter(Boolean).join(" · ")}
       />
       {done ? <Notice tone="ok" title={t("moderation.done")} /> : null}
       {actionData?.problem ? <Notice tone="danger" title={t(`moderation.problem.${actionData.problem}`)} /> : null}
@@ -105,7 +109,12 @@ export default function ModerationCasePage({ loaderData, actionData }: Route.Com
         <div className={styles.stackTight}>
           {detail.url ? <code className={styles.secret}>{detail.url}</code> : null}
           {detail.suspended ? <Notice tone="info" title={t("campaigns.links.suspended")} /> : null}
-          {detail.blocked ? <Notice tone="danger" title={t("moderation.blocked")} /> : null}
+          {detail.blocked ? <Notice tone="danger" title={t(feedback ? "moderation.hidden" : "moderation.blocked")} /> : null}
+          {open ? (
+            <p>
+              <a href={open}>{t(person ? "moderation.openProfile" : "moderation.openFeedback")}</a>
+            </p>
+          ) : null}
           <ButtonLink to="/moderation" variant="quiet" icon={ArrowLeftIcon}>
             {t("moderation.backToQueue")}
           </ButtonLink>
@@ -188,27 +197,35 @@ export default function ModerationCasePage({ loaderData, actionData }: Route.Com
             <Form method="post">
               <Hidden csrfToken={csrfToken} intent="lift" block={detail.active_block} />
               <Button type="submit" variant="secondary">
-                {t("moderation.liftBlock")}
+                {t(feedback ? "moderation.unhide" : "moderation.liftBlock")}
               </Button>
             </Form>
-          ) : (
+          ) : person ? null : (
             <Form method="post" className={styles.form}>
               <Hidden csrfToken={csrfToken} intent="block" />
-              <h3 className={styles.subhead}>{t("moderation.blockTitle")}</h3>
-              <SelectField id="block-category" name="category" label={t("moderation.category")} options={REPORT_REASONS.map((r) => ({ value: r, label: t(`reports.reasons.${r}`) }))} />
-              <TextAreaField id="block-message" name="message" label={t("moderation.message")} hint={t("moderation.messageHint")} rows={3} maxLength={1000} required />
-              <CheckboxField id="block-confirm" name="confirm" label={t("moderation.blockConfirm")} />
+              <h3 className={styles.subhead}>{t(feedback ? "moderation.hideTitle" : "moderation.blockTitle")}</h3>
+              <SelectField id="block-category" name="category" label={t("moderation.category")} options={reasonsFor(detail.target_type).map((r) => ({ value: r, label: t(`reports.reasons.${r}`) }))} />
+              <TextAreaField
+                id="block-message"
+                name="message"
+                label={t("moderation.message")}
+                hint={t(feedback ? "moderation.messageHintFeedback" : "moderation.messageHint")}
+                rows={3}
+                maxLength={1000}
+                required
+              />
+              <CheckboxField id="block-confirm" name="confirm" label={t(feedback ? "moderation.hideConfirm" : "moderation.blockConfirm")} />
               <div>
                 <Button type="submit" variant="danger" icon={ProhibitIcon}>
-                  {t("moderation.blockButton")}
+                  {t(feedback ? "moderation.hideButton" : "moderation.blockButton")}
                 </Button>
               </div>
             </Form>
           )}
           <Form method="post" className={styles.form}>
             <Hidden csrfToken={csrfToken} intent="warn" />
-            <h3 className={styles.subhead}>{t("moderation.warnTitle")}</h3>
-            <TextAreaField id="warn-message" name="message" label={t("moderation.warnMessage")} rows={3} maxLength={1000} required />
+            <h3 className={styles.subhead}>{t(person ? "moderation.warnTitlePerson" : "moderation.warnTitle")}</h3>
+            <TextAreaField id="warn-message" name="message" label={t(person ? "moderation.warnMessagePerson" : "moderation.warnMessage")} rows={3} maxLength={1000} required />
             <div>
               <Button type="submit" variant="secondary" icon={WarningIcon}>
                 {t("moderation.warnButton")}

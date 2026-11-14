@@ -9,8 +9,9 @@ import { data, Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/feedback";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { FactList } from "~/components/ui/Data";
+import { BlockNotice } from "~/components/moderation/BlockNotice";
 import { CheckboxField, SelectField, TextField } from "~/components/ui/Form";
-import { ArrowsClockwiseIcon, CheckCircleIcon, DownloadSimpleIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, TrashIcon, UploadSimpleIcon, XIcon } from "~/components/ui/icons";
+import { ArrowsClockwiseIcon, CheckCircleIcon, DownloadSimpleIcon, EyeIcon, FlagIcon, LockSimpleIcon, PencilSimpleIcon, TrashIcon, UploadSimpleIcon, XIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -33,6 +34,7 @@ import {
 } from "~/lib/feedback";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug } from "~/lib/projects";
+import { reportHref } from "~/lib/reports";
 
 import styles from "~/components/feedback/Feedback.module.css";
 
@@ -59,7 +61,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const others = feedback.data.can_manage ? ((await backendFetch<Feedback[]>(request, `${api}feedback/`)).data ?? []).filter((f) => f.id !== feedback.data!.id) : [];
   const signedIn = Boolean(await getSessionUser(request));
   const csrf = signedIn ? await ensureCsrfToken(request) : null;
-  const done = new URL(request.url).searchParams.get("done");
+  const search = new URL(request.url).searchParams;
+  const done = search.get("done");
   return data(
     {
       feedback: feedback.data,
@@ -70,6 +73,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       others: others.map((f) => ({ id: f.id, title: f.title })),
       csrfToken: csrf?.token ?? null,
       done: (DONE as readonly string[]).includes(done ?? "") ? (done as Done) : null,
+      reported: search.get("reported") === "1",
+      appeal: search.get("appeal"),
     },
     { headers: csrf ? setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) : privateNoStoreHeaders() },
   );
@@ -190,9 +195,21 @@ export default function FeedbackPage({ loaderData, actionData }: Route.Component
             <ButtonLink to={`${base}/feedback/${feedback.id}/edit`} icon={PencilSimpleIcon}>
               {t("feedback.edit")}
             </ButtonLink>
+          ) : feedback.published && !feedback.is_mine && !feedback.can_manage ? (
+            // Published feedback can be reported by everyone who sees it (WP 7.1).
+            <ButtonLink to={reportHref({ type: "feedback", project, campaign: campaignSlug, feedback: feedback.id })} variant="quiet" icon={FlagIcon}>
+              {t("reports.action")}
+            </ButtonLink>
           ) : null
         }
       />
+      {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
+      {loaderData.appeal ? (
+        <Notice tone={loaderData.appeal === "sent" ? "ok" : "danger"} title={t(loaderData.appeal === "sent" ? "moderation.team.sent" : "moderation.team.failed")} />
+      ) : null}
+      {feedback.moderation ? (
+        <BlockNotice info={feedback.moderation} csrfToken={csrfToken} back={`${base}/feedback/${feedback.id}`} feedback canAppeal={feedback.can_manage} />
+      ) : null}
       {done === "sent" ? <Notice tone="ok" title={t("feedback.sent")} /> : null}
       {done === "saved" ? <Notice tone="ok" title={t("feedback.saved")} /> : null}
       {done === "added" || done === "removed" ? <Notice tone="ok" title={t(`feedback.attachments.${done}`)} /> : null}
@@ -227,7 +244,7 @@ export default function FeedbackPage({ loaderData, actionData }: Route.Component
               </div>
             </Form>
             <p className={styles.muted}>{t("feedback.manage.authorTold")}</p>
-            {!feedback.publish_proposed ? (
+            {feedback.moderation ? null : !feedback.publish_proposed ? (
               <Form method="post" className={styles.stackTight}>
                 {hidden("publish")}
                 <input type="hidden" name="step" value="propose" />

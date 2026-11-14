@@ -128,6 +128,7 @@ class FeedbackSerializer(serializers.Serializer):
     can_manage = serializers.SerializerMethodField()
     can_verify = serializers.SerializerMethodField()
     attachments = serializers.SerializerMethodField()
+    moderation = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
 
@@ -173,6 +174,14 @@ class FeedbackSerializer(serializers.Serializer):
             {"key": str(a.key), "kind": a.kind, "name": a.name, "size": a.size}
             for a in feedback.attachments.all()
         ]
+
+    def get_moderation(self, feedback) -> dict | None:
+        """A moderators' block with its reason, for the team and the author only (WP 7.1)."""
+        if feedback.blocked_at is None or not policies.can_see_author(self._user(), feedback):
+            return None
+        from apps.moderation.actions import team_block_info  # moderation builds on feedback
+
+        return team_block_info(feedback)
 
     def get_can_verify(self, feedback) -> bool:
         return self.get_is_mine(feedback) and feedback.status == Feedback.Status.FIXED

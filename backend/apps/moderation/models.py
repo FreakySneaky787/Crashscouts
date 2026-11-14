@@ -1,4 +1,5 @@
-"""Reports of projects, campaigns and download links (WP 3B.2, ADR 0019).
+"""Reports of projects, campaigns, download links, users and published feedback (WP 3B.2,
+ADR 0019; users and feedback since WP 7.1, ADR 0026).
 
 The report keeps a copy of what was reported (``target_label``), so moderators can follow a case
 even after the content was deleted; the references are set to NULL then. Reporters are set to
@@ -11,6 +12,7 @@ from django.db.models import Q
 
 from apps.campaigns.models import Campaign, CampaignLink
 from apps.core.models import BaseModel
+from apps.feedback.models import Feedback
 from apps.projects.models import Project
 
 TEXT_MAX_LENGTH = 1000
@@ -22,6 +24,8 @@ class Report(BaseModel):
         PROJECT = "project", "Project"
         CAMPAIGN = "campaign", "Campaign"
         LINK = "link", "Download link"
+        USER = "user", "User"
+        FEEDBACK = "feedback", "Published feedback"
 
     class Reason(models.TextChoices):
         # Owner's decision (2026-11-13); malware comes first in the moderation queue.
@@ -31,6 +35,10 @@ class Report(BaseModel):
         SPAM = "spam", "Spam"
         LEGAL = "legal", "Legal violation"
         OTHER = "other", "Other"
+        # Reasons for reporting a person (owner's decision 2026-11-14).
+        HARASSMENT = "harassment", "Harassment or insults"
+        IMPERSONATION = "impersonation", "Impersonation"
+        INAPPROPRIATE_PROFILE = "inappropriate_profile", "Inappropriate profile"
 
     class Status(models.TextChoices):
         OPEN = "open", "Open"
@@ -48,6 +56,16 @@ class Report(BaseModel):
     link = models.ForeignKey(
         CampaignLink, null=True, blank=True, on_delete=models.SET_NULL, related_name="reports"
     )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="reports_about",
+    )
+    feedback = models.ForeignKey(
+        Feedback, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
     target_label = models.CharField(max_length=300)
     reporter = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -56,7 +74,7 @@ class Report(BaseModel):
         on_delete=models.SET_NULL,
         related_name="reports",
     )
-    reason = models.CharField(max_length=20, choices=Reason.choices)
+    reason = models.CharField(max_length=24, choices=Reason.choices)
     text = models.TextField(max_length=TEXT_MAX_LENGTH, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN)
     closed_at = models.DateTimeField(null=True, blank=True)
@@ -71,7 +89,7 @@ class Report(BaseModel):
                     condition=Q(target_type=field, status__in=OPEN_STATES),
                     name=f"moderation_one_open_report_per_{field}",
                 )
-                for field in ("project", "campaign", "link")
+                for field in ("project", "campaign", "link", "user", "feedback")
             ),
         ]
 
@@ -99,7 +117,10 @@ class Block(BaseModel):
     link = models.ForeignKey(
         CampaignLink, null=True, blank=True, on_delete=models.CASCADE, related_name="+"
     )
-    category = models.CharField(max_length=20, choices=Report.Reason.choices)
+    feedback = models.ForeignKey(
+        Feedback, null=True, blank=True, on_delete=models.CASCADE, related_name="+"
+    )
+    category = models.CharField(max_length=24, choices=Report.Reason.choices)
     message = models.TextField(max_length=MESSAGE_MAX_LENGTH)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
@@ -125,7 +146,7 @@ class Block(BaseModel):
                     condition=Q(target_type=field, lifted_at__isnull=True),
                     name=f"moderation_one_active_block_per_{field}",
                 )
-                for field in ("project", "campaign", "link")
+                for field in ("project", "campaign", "link", "feedback")
             ),
         ]
 
@@ -142,13 +163,25 @@ class Block(BaseModel):
             return self.project
         if self.target_type == Report.TargetType.CAMPAIGN:
             return self.campaign.project
+        if self.target_type == Report.TargetType.FEEDBACK:
+            return self.feedback.campaign.project
         return self.link.campaign.project
 
 
 class ModerationNote(BaseModel):
-    """A warning to a project's team, kept for moderators only (owner's decision 2026-11-13)."""
+    """A warning to a project's team or to a person, kept for moderators only (owner's decisions
+    2026-11-13 and 2026-11-14). Exactly one of ``project`` and ``user`` is set."""
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="+")
+    project = models.ForeignKey(
+        Project, null=True, blank=True, on_delete=models.CASCADE, related_name="+"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="moderation_notes",
+    )
     text = models.TextField(max_length=Block.MESSAGE_MAX_LENGTH)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
@@ -158,4 +191,4 @@ class ModerationNote(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Warning for {self.project}"
+        return f"Warning for {self.project or self.user}"

@@ -3,14 +3,17 @@ import { useTranslation } from "react-i18next";
 import { data } from "react-router";
 
 import type { Route } from "./+types/profile";
+import { ButtonLink } from "~/components/ui/Button";
 import { Avatar, Chips } from "~/components/ui/Data";
-import { ArrowSquareOutIcon } from "~/components/ui/icons";
+import { ArrowSquareOutIcon, FlagIcon } from "~/components/ui/icons";
+import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
-import { backendFetch } from "~/lib/backend.server";
-import { cacheHeadersFor } from "~/lib/http";
+import { backendFetch, getSessionUser } from "~/lib/backend.server";
+import { cacheHeadersFor, hasSessionCookie } from "~/lib/http";
 import { avatarSrc, isValidUsername, linkLabel, type PublicProfile } from "~/lib/profile";
+import { reportHref } from "~/lib/reports";
 
 import styles from "./forms.module.css";
 
@@ -33,7 +36,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (result.status !== 200 || !result.data) {
     throw data(null, { status: 404 });
   }
-  return data({ profile: result.data }, { headers: cacheHeadersFor(request) });
+  // Everyone but the person themself sees "Report" (WP 7.1); visitors are asked to sign in first.
+  const viewer = hasSessionCookie(request) ? await getSessionUser(request) : null;
+  const reported = new URL(request.url).searchParams.get("reported") === "1";
+  return data({ profile: result.data, own: viewer?.username === result.data.username, reported }, { headers: cacheHeadersFor(request) });
 }
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
@@ -51,7 +57,15 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       <PageHeader
         title={profile.username}
         leading={<Avatar name={profile.username} id={profile.username} size="lg" src={avatarSrc(profile.avatar_key)} />}
+        actions={
+          loaderData.own ? null : (
+            <ButtonLink to={reportHref({ type: "user", project: "", username: profile.username })} variant="quiet" icon={FlagIcon}>
+              {t("reports.action")}
+            </ButtonLink>
+          )
+        }
       />
+      {loaderData.reported ? <Notice tone="ok" title={t("reports.thanks")} /> : null}
       {hasDetails ? (
         <Panel title={t("profile.about")}>
           <div className={styles.stack}>

@@ -60,12 +60,12 @@ erDiagram
 | campaigns | `Participation` | taking part (`active`/`left`/`removed`; one per person and campaign) | CASCADE with the account (frees the place) |
 | campaigns | `ApplicationQuestion` | per-campaign questions | – |
 | campaigns | `Application` | application (`pending`/`approved`/`rejected`/`withdrawn`) | applicant: CASCADE; `decided_by`: SET_NULL |
-| moderation | `Block` | moderators' block with message, lifting and one appeal (ADR 0020) | `created_by`/`lifted_by`/`appealed_by`: SET_NULL; target: CASCADE |
-| moderation | `ModerationNote` | warning to a project's team, moderators only | `created_by`: SET_NULL |
-| feedback | `Feedback` | tester feedback of five kinds with type-specific fields, status, duplicate link, publishing with the author's consent (ADR 0024) | author: SET_NULL on final deletion (text stays, anonymised); in the data export |
+| moderation | `Block` | moderators' block with message, lifting and one appeal (ADR 0020); also hides published feedback (ADR 0026) | `created_by`/`lifted_by`/`appealed_by`: SET_NULL; target: CASCADE |
+| moderation | `ModerationNote` | warning to a project's team or to a person (ADR 0026), moderators only | `created_by`: SET_NULL; person: CASCADE |
+| feedback | `Feedback` | tester feedback of five kinds with type-specific fields, status, duplicate link, publishing with the author's consent (ADR 0024), `blocked_at` when hidden by moderators (ADR 0026) | author: SET_NULL on final deletion (text stays, anonymised); in the data export |
 | feedback | `FeedbackStatusChange` | status history with the role (team or author) | `actor`: SET_NULL; never shown in the API |
 | feedback | `FeedbackAttachment` | screenshot (re-encoded WebP) or text file of a feedback; the file lives under a random key outside the web root (ADR 0024) | deleted with the feedback and on final account deletion (files too) |
-| moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
+| moderation | `Report` | report of a project, campaign, link, person or published feedback (ADRs 0019, 0026); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
 | core | `rate_limit_cache` | Django's database cache for rate limits (not a model; created by migration `core/0001`, ADR 0022) | keys are HMAC hashes (no plain IP address); expired entries deleted hourly, at most one day after the last request |
 | campaigns | `TestTask` | test task of a structured or combined campaign (ADR 0023); `hidden_at` when removed after progress was reported | – |
 | campaigns | `TaskProgress` | a participant's status of one task with an optional note (no row = not started) | CASCADE with the participation, i.e. kept on leaving or removal, deleted with the account; in the data export |

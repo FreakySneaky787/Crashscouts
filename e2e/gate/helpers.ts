@@ -1,7 +1,7 @@
 /** Shared steps of the security-gate run (public campaigns switched on for this run only). */
 import { expect, type Browser, type Page } from "@playwright/test";
 
-import { createSignedInAccount, enableTotp, setRole } from "../tests/helpers";
+import { createProject, createSignedInAccount, enableTotp, setRole } from "../tests/helpers";
 
 export async function publicCampaign(page: Page, project: string, title: string) {
   await page.goto(`/p/${project}/c/new`);
@@ -33,4 +33,42 @@ export async function approve(mod: Page, title: string) {
   const review = mod.getByRole("list", { name: "Reviews" }).getByRole("listitem").filter({ hasText: title });
   await review.getByRole("button", { name: "Approve" }).click();
   await expect(mod.getByText("Done.")).toBeVisible();
+}
+
+/**
+ * A live public campaign with one published feedback (WP 5.5 steps): the owner's page, the
+ * tester (author), a signed-in moderator and the feedback's path.
+ */
+export async function publishedFeedbackScene(page: Page, browser: Browser, request: Parameters<typeof createSignedInAccount>[1], feedbackTitle: string) {
+  const title = `Open beta ${feedbackTitle.slice(-6)}`;
+  const owner = await createSignedInAccount(page, request);
+  await enableTotp(page, owner.password);
+  const project = await createProject(page);
+  await publicCampaign(page, project, title);
+  const campaign = `/p/${project}/c/open-beta`;
+  await page.goto(`${campaign}/edit`);
+  await page.getByRole("button", { name: "Submit for review" }).click();
+  await expect(page).toHaveURL(new RegExp(`${campaign}$`));
+  const { context: modContext, mod } = await signedInModerator(browser, request);
+  await approve(mod, title);
+
+  const testerContext = await browser.newContext();
+  const tester = await testerContext.newPage();
+  await createSignedInAccount(tester, request);
+  await tester.goto(campaign);
+  await tester.getByRole("button", { name: "Join campaign" }).click();
+  await expect(tester.getByText("You take part in this campaign now.")).toBeVisible();
+  await tester.goto(`${campaign}/feedback/new?kind=general`);
+  await tester.getByLabel("Title").fill(feedbackTitle);
+  await tester.getByLabel("Description").fill("Visit my shop for cheap licences.");
+  await tester.getByRole("button", { name: "Send feedback" }).click();
+  await expect(tester.getByText("Thank you. Your feedback was sent.")).toBeVisible();
+  const feedback = new URL(tester.url()).pathname;
+  await page.goto(feedback);
+  await page.getByRole("button", { name: "Propose to make it public" }).click();
+  await expect(page.getByText("Waiting for the author's consent to make it public.")).toBeVisible();
+  await tester.goto(feedback);
+  await tester.getByRole("button", { name: "Make it public" }).click();
+  await expect(tester.getByText("The feedback is public now.")).toBeVisible();
+  return { feedback, tester, mod, contexts: [modContext, testerContext] };
 }

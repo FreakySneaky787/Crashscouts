@@ -63,11 +63,21 @@ def _target_or_404(target_type: str, target_id):
 
 def _summary(target_type: str, target) -> dict:
     project = owning_project(target)
+    if project is None:  # a person (WP 7.1)
+        return {
+            "project": None,
+            "project_name": None,
+            "title": f"@{target.username}",
+            "username": target.username,
+            "blocked": False,
+        }
     data = {"project": project.slug, "project_name": project.name}
     if target_type == "project":
         data["title"] = project.name
     elif target_type == "campaign":
         data.update(title=target.title, campaign=target.slug)
+    elif target_type == "feedback":
+        data.update(title=target.title, campaign=target.campaign.slug, feedback=str(target.pk))
     else:
         data.update(
             title=target.label,
@@ -88,7 +98,7 @@ class CasesView(ModeratorView):
     )
     def get(self, request: Request) -> Response:
         rows = []
-        for field in ("project", "campaign", "link"):
+        for field in ("project", "campaign", "link", "feedback", "user"):
             grouped = (
                 Report.objects.filter(
                     target_type=field, status__in=OPEN_STATES, **{f"{field}__isnull": False}
@@ -126,9 +136,17 @@ class CaseView(ModeratorView):
         reports = Report.objects.filter(
             target_type=target_type, **{target_type: target}
         ).select_related("reporter")
-        blocks = Block.objects.filter(
-            Q(project=project) | Q(campaign__project=project) | Q(link__campaign__project=project)
-        )
+        if project is None:  # a person: notes about them, no content blocks
+            notes = ModerationNote.objects.filter(user=target)
+            blocks = Block.objects.none()
+        else:
+            notes = ModerationNote.objects.filter(project=project)
+            blocks = Block.objects.filter(
+                Q(project=project)
+                | Q(campaign__project=project)
+                | Q(link__campaign__project=project)
+                | Q(feedback__campaign__project=project)
+            )
         current = active_block(target)
         return Response(
             {
@@ -145,10 +163,7 @@ class CaseView(ModeratorView):
                     }
                     for r in reports
                 ],
-                "notes": [
-                    {"text": n.text, "created_at": n.created_at.isoformat()}
-                    for n in ModerationNote.objects.filter(project=project)
-                ],
+                "notes": [{"text": n.text, "created_at": n.created_at.isoformat()} for n in notes],
                 "blocks": [
                     {
                         "id": str(b.pk),

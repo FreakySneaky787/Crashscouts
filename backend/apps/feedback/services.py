@@ -160,6 +160,8 @@ def publish_action(feedback: Feedback, user, action: str) -> Feedback:
     the feedback is private again and both steps start over)."""
     feedback = _locked(feedback)
     ensure_unblocked(feedback.campaign)
+    if feedback.blocked_at is not None and action != "withdraw":
+        raise FeedbackError("blocked")  # hidden by moderators (WP 7.1)
     team = policies.is_team(user, feedback.campaign)
     author = policies.is_author(user, feedback)
     now = timezone.now()

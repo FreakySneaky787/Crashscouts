@@ -1,6 +1,7 @@
 /**
- * Report a project, a campaign or a download link (WP 3B.2, ADR 0019). Only what the person can
- * see can be reported: the target is loaded through the normal API first (404 otherwise).
+ * Report a project, a campaign, a download link (WP 3B.2, ADR 0019), a person or published
+ * feedback (WP 7.1, ADR 0026). Only what the person can see can be reported: the target is loaded
+ * through the normal API first (404 otherwise); Django checks again.
  */
 import { useTranslation } from "react-i18next";
 import { data, Form, redirect } from "react-router";
@@ -14,7 +15,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
-import { REPORT_REASONS, reportTarget, type ReportTarget } from "~/lib/reports";
+import { reasonsFor, reportTarget, type ReportTarget } from "~/lib/reports";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 
 import styles from "./forms.module.css";
@@ -28,7 +29,13 @@ export function meta(_: Route.MetaArgs) {
 
 async function loadTarget(request: Request, target: ReportTarget): Promise<string> {
   const base = `/api/v1/projects/${target.project}/`;
-  if (target.type === "project") {
+  if (target.type === "user") {
+    const result = await backendFetch<{ username: string }>(request, `/api/v1/profiles/${target.username}/`);
+    if (result.status === 200 && result.data) return `@${result.data.username}`;
+  } else if (target.type === "feedback") {
+    const result = await backendFetch<{ title: string; published: boolean }>(request, `${base}campaigns/${target.campaign}/feedback/${target.feedback}/`);
+    if (result.status === 200 && result.data?.published) return result.data.title;
+  } else if (target.type === "project") {
     const result = await backendFetch<{ name: string }>(request, base);
     if (result.status === 200 && result.data) return result.data.name;
   } else if (target.type === "campaign") {
@@ -65,6 +72,8 @@ export async function action({ request }: Route.ActionArgs) {
       project: target.project,
       campaign: target.campaign ?? "",
       link: target.link ?? null,
+      username: target.username ?? "",
+      feedback: target.feedback ?? null,
       reason: String(form.get("reason") ?? ""),
       text: String(form.get("text") ?? ""),
     },
@@ -95,8 +104,8 @@ export default function Report({ loaderData, actionData }: Route.ComponentProps)
               id="report-reason"
               name="reason"
               label={t("reports.reason")}
-              hint={t("reports.reasonHint")}
-              options={REPORT_REASONS.map((r) => ({ value: r, label: t(`reports.reasons.${r}`) }))}
+              hint={target.type === "user" || target.type === "feedback" ? undefined : t("reports.reasonHint")}
+              options={reasonsFor(target.type).map((r) => ({ value: r, label: t(`reports.reasons.${r}`) }))}
             />
             <TextAreaField id="report-text" name="text" label={t("reports.text")} hint={t("reports.textHint")} rows={4} maxLength={1000} />
             <p className={styles.muted}>{t("reports.privacy")}</p>

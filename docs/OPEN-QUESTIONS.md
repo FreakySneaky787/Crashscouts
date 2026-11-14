@@ -1,6 +1,6 @@
 # Open Questions
 
-> As of: 2026-11-13. Every question is clarified **before** the phase that needs it. Until then,
+> As of: 2026-11-14. Every question is clarified **before** the phase that needs it. Until then,
 > nothing that depends on it is implemented.
 > The "Proposal" column is a recommendation, **not** a decision.
 
@@ -37,6 +37,11 @@
 | – | Assigning admin and moderator roles | **On an admin page in the app** (2026-11-13). The first admin is created once with a server command; role changes need a fresh reauthentication and 2FA, are audited, and the last admin cannot remove themselves (phase 3B). |
 | – | Campaign data during the deletion grace period | Participations, invitations and applications **stay until the final deletion**; the person is hidden from team lists but keeps the place (2026-11-13). |
 | O | Shared cache for rate limits | **Django's database cache in PostgreSQL** (2026-11-13): no extra service, fits ADR 0003 (no Redis in the MVP); introduced in phase 3B. Implemented in WP 3B.5 (ADR 0022); IP addresses only as HMAC hashes, at most one day (owner, 2026-11-13). |
+| – | Reporting people | Reasons **spam · harassment or insults · pretending to be someone else · inappropriate profile · other**, free text optional (2026-11-14, [ADR 0026](adr/0026-moderating-people-and-feedback.md)). |
+| – | Spam in published feedback | Moderators **hide** it: reversible, logged; it becomes private again and cannot be republished until the block is lifted (2026-11-14). |
+| – | Account suspensions | **Read only** (sign in, read, export, delete; no creating, reporting, feedback, joining or inviting); hidden profile; reason visible, **one appeal**; **free end date or permanent**, set by **any moderator**; any moderator decides the appeal, also the one who suspended (2026-11-14; WP 7.2). |
+| – | Moderators and private content | Only the reported object, only after taking the case, with a **required reason**, **valid 24 hours**, in the audit log; admins see a list of all accesses; the team is not notified (2026-11-14; WP 7.3). |
+| – | Statistics in phase 7 | A **moderation statistics** page for admins; growth metrics stay in WP M.1 (2026-11-14; WP 7.4). |
 | – | Discover content | **Two tabs:** public projects and public test campaigns (2026-11-14). |
 | – | Software type | **New project field**, fixed choice, several possible: desktop app, mobile app, web app, command-line tool, library or framework, game, server or self-hosted, browser extension (2026-11-14). |
 | – | Discover sort order | Default **"recently active"**, selectable **"new"**; never by popularity (2026-11-14). |

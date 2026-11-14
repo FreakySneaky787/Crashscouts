@@ -153,7 +153,7 @@ export default function Moderation({ loaderData, actionData }: Route.ComponentPr
                 <span className={styles.stackTight}>
                   <Link to={`/moderation/${c.target_type}/${c.target_id}`}>{c.title}</Link>
                   <span className={styles.muted}>
-                    {t(`moderation.types.${c.target_type}`)} · {c.project_name} · {t("moderation.reportCount", { count: c.reports })}
+                    {[t(`moderation.types.${c.target_type}`), c.project_name, t("moderation.reportCount", { count: c.reports })].filter(Boolean).join(" · ")}
                   </span>
                 </span>
                 <span className={styles.buttonRow}>

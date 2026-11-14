@@ -6,6 +6,7 @@
 - Published feedback (team proposed, author consented) is readable by everyone who can see the
   campaign, without attachments.
 - Feedback of blocked campaigns and projects is hidden from everyone but the team (ADR 0020).
+- Feedback hidden by moderators (WP 7.1) is seen only by the team and its author.
 """
 
 from django.db.models import Q, QuerySet
@@ -49,6 +50,8 @@ def can_view(user, feedback: Feedback) -> bool:
         return False
     if is_author(user, feedback):
         return True
+    if feedback.blocked_at is not None:
+        return False
     if reads_all(user, campaign):
         return True
     return feedback.published_at is not None and campaign_policies.can_view(user, campaign)
@@ -57,12 +60,14 @@ def can_view(user, feedback: Feedback) -> bool:
 def visible_feedback(user, campaign: Campaign) -> QuerySet[Feedback]:
     """The feedback of a campaign the user may see (the campaign itself is already visible)."""
     feedback = Feedback.objects.filter(campaign=campaign)
-    if reads_all(user, campaign):
+    if is_team(user, campaign):
         return feedback
     if _blocked(campaign):
         return feedback.none()
     mine = Q(author=user) if getattr(user, "is_authenticated", False) else Q(pk__in=[])
-    return feedback.filter(Q(published_at__isnull=False) | mine)
+    if reads_all(user, campaign):
+        return feedback.filter(Q(blocked_at__isnull=True) | mine)
+    return feedback.filter(Q(published_at__isnull=False, blocked_at__isnull=True) | mine)
 
 
 def can_see_attachments(user, feedback: Feedback) -> bool:

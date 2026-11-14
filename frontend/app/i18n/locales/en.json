@@ -957,7 +957,9 @@
     "subtitle": {
       "project": "Project: {{label}}",
       "campaign": "Campaign: {{label}}",
-      "link": "Download link: {{label}}"
+      "link": "Download link: {{label}}",
+      "feedback": "Feedback: {{label}}",
+      "user": "Person: {{label}}"
     },
     "panel": "What is wrong?",
     "reason": "Reason",
@@ -968,11 +970,14 @@
       "not_own_software": "Someone else's software passed off as own",
       "spam": "Spam",
       "legal": "Legal violation (copyright, illegal content)",
-      "other": "Other"
+      "other": "Other",
+      "harassment": "Harassment or insults",
+      "impersonation": "Pretending to be someone else",
+      "inappropriate_profile": "Inappropriate profile"
     },
     "text": "Details (optional)",
     "textHint": "What did you notice? At most 1,000 characters.",
-    "privacy": "Only moderators see your report and your name. The project team does not learn who reported. You can follow the status on your account page.",
+    "privacy": "Only moderators see your report and your name. Neither the team nor the person you report learns who reported. You can follow the status on your account page.",
     "send": "Send report",
     "back": "Back",
     "thanks": "Thank you. Moderators will review your report.",
@@ -1000,7 +1005,9 @@
     "types": {
       "project": "Project",
       "campaign": "Campaign",
-      "link": "Download link"
+      "link": "Download link",
+      "feedback": "Feedback",
+      "user": "Person"
     },
     "reportCount_one": "{{count}} report",
     "reportCount_other": "{{count}} reports",
@@ -1056,6 +1063,15 @@
         "pending": "Your appeal is waiting for the moderators' decision.",
         "upheld": "The moderators reviewed your appeal and kept the block.",
         "lifted": "The block was lifted."
+      },
+      "hiddenTitle": "Hidden by the moderators",
+      "hidden": "Hidden: {{reason}}",
+      "effectFeedback": "This feedback is private again: only the team and the author see it. It cannot be published until the moderators show it again.",
+      "teamMayAppeal": "The project team can appeal once.",
+      "appealStateAuthor": {
+        "pending": "The team appealed; the moderators will decide.",
+        "upheld": "The moderators reviewed the team's appeal and kept the feedback hidden.",
+        "lifted": "The feedback is shown again."
       }
     },
     "reviews": "Reviews",
@@ -1066,7 +1082,17 @@
     "reject": "Send back",
     "rejectMessage": "Reason for the team",
     "rejectConfirm": "Send it back with this reason.",
-    "links": "Download links"
+    "links": "Download links",
+    "hidden": "Hidden",
+    "openProfile": "Open the profile",
+    "openFeedback": "Open the feedback",
+    "unhide": "Show the feedback again",
+    "hideTitle": "Hide",
+    "hideConfirm": "Hide this feedback: it becomes private again, and only the team and the author see it with your message.",
+    "hideButton": "Hide",
+    "messageHintFeedback": "The team and the author see this message. Reporters only learn that their report was reviewed.",
+    "warnTitlePerson": "Warn the person",
+    "warnMessagePerson": "Warning to the person"
   },
   "feedback": {
     "title": "Feedback",

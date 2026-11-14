@@ -31,6 +31,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0023](0023-test-methods-tasks-and-progress.md) | Test methods, tasks and progress | Accepted |
 | [0024](0024-feedback.md) | Feedback | Accepted |
 | [0025](0025-discover.md) | Discover | Accepted |
+| [0026](0026-moderating-people-and-feedback.md) | Moderating people and published feedback | Accepted |
 
 ## Template
 

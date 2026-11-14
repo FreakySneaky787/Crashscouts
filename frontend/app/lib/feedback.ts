@@ -56,6 +56,8 @@ export type Feedback = {
   can_change: boolean;
   can_manage: boolean;
   can_verify: boolean;
+  /** A moderators' block (WP 7.1); only for the team and the author. */
+  moderation?: import("./moderation").ModerationInfo | null;
   /** Only for the team and the author; empty for everyone else. */
   attachments: FeedbackAttachment[];
   created_at: string;
