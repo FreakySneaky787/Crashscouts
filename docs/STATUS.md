@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 5.4) · **Current phase:** 5 – Feedback (flag still off)
+**Last update:** 2026-11-14 (WP 5.5) · **Current phase:** 5 complete – next: 6, Discover (flag still off)
 
 ## Work packages
 
@@ -832,7 +832,7 @@ switches the flag.
   participant and a stranger), gate run **1 passed**; ESLint, typecheck, build clean; backend
   unchanged in this WP.
 
-## Phase 5 – Feedback (started 2026-11-14)
+## Phase 5 – Feedback (2026-11-14) ✅
 
 ### WP 5.1 – Feedback backend: types, permissions, status, publishing (2026-11-14) ✅
 
@@ -913,15 +913,32 @@ switches the flag.
   a stranger; axe on the inbox and the team's view of a feedback), gate run **1 passed**; Ruff,
   migrations check, ESLint, typecheck, build clean.
 
+### WP 5.5 – Published feedback and wrap-up of phase 5 (2026-11-14) ✅
+
+- Published feedback is listed on the campaign page and readable on its own page by everyone who
+  can see the campaign – the text only, without files and without the author. The publishing
+  controls of WPs 5.3/5.4 (propose, consent, decline, make private again) are verified end to end
+  with a real public campaign in the security-gate run.
+- The gate run's shared steps moved to `e2e/gate/helpers.ts`; GATE-CHECKLIST lists that published
+  feedback cannot be reported before phase 7; ADR 0024 notes the 60-second public cache of the
+  campaign page's feedback list.
+- **Verification (run on 2026-11-14):** Playwright main run **81 passed**, gate run **2 passed**
+  (new: proposed but not consented stays 404 for a visitor, after consent the visitor reads the
+  text, sees "A tester", no files section and gets 404 for the file, axe on the public feedback
+  page, made private again → 404); no application code changed in this WP.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
 Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) is under way with the
-approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WPs 5.1 (backend), 5.2
-(secure attachments), 5.3 (testers' pages) and 5.4 (the team's inbox) are done; next is WP 5.5
-(published feedback, wrap-up).
+owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
+attachments, status workflow with the author's verification, publishing with consent, the
+team's inbox (WPs 5.1–5.5). Next: **phase 6 – Discover** (PostgreSQL full-text search with
+filters; fairness rule: default sort by new or active, not by popularity). Present its work
+packages and open questions before starting. Also open: WP M.1 (statistics page; the data for all
+five metrics now exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

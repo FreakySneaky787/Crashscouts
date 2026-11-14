@@ -101,3 +101,6 @@ The project owner decided (2026-11-14):
 - Participants read each other's texts: the form must say so before sending.
 - Attachments (WP 5.2) need their own, stricter delivery checks.
 - Reporting published feedback follows in phase 7.
+- Published feedback appears in the feedback list of a public campaign page, which anonymous
+  visitors may get from a shared cache for up to 60 seconds; after it is made private again it
+  can stay in that list for up to 60 seconds. The feedback page itself is never cached.

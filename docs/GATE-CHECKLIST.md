@@ -49,6 +49,9 @@ server.
 
 ## Part 3 – Deliberately open, known risks
 
+- Published feedback (phase 5, ADR 0024) cannot be reported yet (phase 7); it is public only with
+  the author's consent and can be made private again by the team or the author at any time.
+
 - Rate-limit values are provisional (ADR 0022); every limited request writes to PostgreSQL – to
   be measured before the beta.
 - One moderator (the owner, decision H): reviews and reports wait while the owner is away.

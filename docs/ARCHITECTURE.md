@@ -55,7 +55,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `projects` | Project, membership (owner/maintainer), short names with history, verification, screenshots, status | complete for phase 2: projects, team, images, repository verification (WP 2.2–2.5) |
 | `campaigns` | Campaigns, links, invitations, participations, status machine | model, derived status, policies, API, public-campaign lock, time zones, download links, invitations and participations (WP 3A.1–3A.3, 3A.5) |
 | `testing` | Test tasks, progress | planned |
-| `feedback` | Feedback, status, publishing, secure attachments ([ADR 0024](adr/0024-feedback.md)) | in progress (pages follow) |
+| `feedback` | Feedback, status, publishing, secure attachments ([ADR 0024](adr/0024-feedback.md)) | ✅ |
 | `moderation` | Reports, review queue, actions, blocks | reports, link suspension, blocks, warnings, appeals, moderation pages (WP 3B.2–3B.3) |
 | `notifications` | In-app and email notifications (via tasks) | planned |
 | `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
