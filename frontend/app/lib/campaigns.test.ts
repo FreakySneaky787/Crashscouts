@@ -12,6 +12,8 @@ import {
   linkPayload,
   formatInZone,
   groupedTimeZones,
+  isTestMethod,
+  taskPayload,
   timeZones,
   utcToZonedInput,
   zonedToUtc,
@@ -103,6 +105,12 @@ describe("campaignPayload", () => {
     const { values } = campaignPayload(form(base));
     expect(values).not.toHaveProperty("visibility");
     expect(values).not.toHaveProperty("participation");
+  });
+
+  it("sends the testing method only when the form offers it, and only known methods", () => {
+    expect(campaignPayload(form([...base, ["method", "structured"]])).values).toMatchObject({ method: "structured" });
+    expect(campaignPayload(form([...base, ["method", "<script>"]])).values).toMatchObject({ method: "free" });
+    expect(campaignPayload(form(base)).values).not.toHaveProperty("method"); // frozen after publishing
   });
 
   it("reports unreadable dates as field errors", () => {
@@ -203,5 +211,26 @@ describe("applications", () => {
     form.set("answer:q1", "  Laptop  ");
     form.set("answer:q2", "yes");
     expect(answersPayload(form)).toEqual({ q1: "Laptop", q2: "yes" });
+  });
+});
+
+describe("test tasks", () => {
+  it("recognises the three testing methods only", () => {
+    expect(["free", "structured", "combined"].every(isTestMethod)).toBe(true);
+    expect(isTestMethod("Structured")).toBe(false);
+    expect(isTestMethod(undefined)).toBe(false);
+  });
+
+  it("builds the task payload from the form, with empty optional fields", () => {
+    const data = new FormData();
+    data.append("title", "Import a file");
+    data.append("instructions", "Use **File > Import**.");
+    expect(taskPayload(data)).toEqual({ title: "Import a file", instructions: "Use **File > Import**.", expected_result: "" });
+  });
+
+  it("maps the task problems to known codes", () => {
+    for (const code of ["tasks_required", "tasks_exist", "too_many_tasks", "last_task", "free_method_has_no_tasks", "task_hidden"]) {
+      expect(campaignProblem(400, { code })).toBe(code);
+    }
   });
 });

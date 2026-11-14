@@ -1,7 +1,8 @@
 /**
  * Create/edit form for campaigns (WP 3A.2); a plain form, works without JavaScript.
  * Start and end are entered as local date and time in a chosen time zone (owner's decision).
- * Visibility and participation are offered only for drafts: they are frozen after publishing.
+ * Visibility, participation and the testing method (ADR 0023) are offered only for drafts: they
+ * are frozen after publishing.
  */
 import { useTranslation } from "react-i18next";
 import { Form } from "react-router";
@@ -11,7 +12,7 @@ import { CheckboxGroup, SelectField, TextAreaField, TextField } from "~/componen
 import { CheckIcon } from "~/components/ui/icons";
 import { Notice } from "~/components/ui/Notice";
 import { Panel } from "~/components/ui/Panel";
-import { DEFAULT_TIME_ZONE, groupedTimeZones, type CampaignFormValues } from "~/lib/campaigns";
+import { DEFAULT_TIME_ZONE, groupedTimeZones, TEST_METHODS, type CampaignFormValues } from "~/lib/campaigns";
 
 import styles from "./CampaignForm.module.css";
 
@@ -115,6 +116,30 @@ export function CampaignForm({
           <TextAreaField id="methodology" name="methodology" label={t("campaigns.methodology")} hint={t("campaigns.methodologyHint")} rows={4} maxLength={4000} defaultValue={values.methodology} error={fieldError("methodology")} />
         </div>
       </Panel>
+
+      {editableAccess ? (
+        <Panel title={t("campaigns.method")}>
+          <fieldset className={styles.radios} aria-describedby="method-hint">
+            <legend className="visually-hidden">{t("campaigns.method")}</legend>
+            <p id="method-hint" className={styles.radioHint}>
+              {t("campaigns.methodHint")}
+            </p>
+            {TEST_METHODS.map((m) => (
+              <div key={m} className={styles.radio}>
+                <input id={`method-${m}`} type="radio" name="method" value={m} defaultChecked={(values.method ?? "free") === m} aria-describedby={`method-${m}-hint`} />
+                <span>
+                  <label htmlFor={`method-${m}`} className={styles.radioLabel}>
+                    {t(`campaigns.methods.${m}`)}
+                  </label>
+                  <span id={`method-${m}-hint`} className={styles.radioHint}>
+                    {t(`campaigns.methodHints.${m}`)}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </fieldset>
+        </Panel>
+      ) : null}
 
       {editableAccess ? (
         <Panel title={t("campaigns.access")}>

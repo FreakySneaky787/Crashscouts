@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 4.1) · **Current phase:** 4 – Testing (3B complete, flag off)
+**Last update:** 2026-11-14 (WP 4.2) · **Current phase:** 4 – Testing (3B complete, flag off)
 
 ## Work packages
 
@@ -779,14 +779,33 @@ switches the flag.
   Ruff, migrations check, OpenAPI validation (enum names fixed for the new choices) and pip-audit
   clean; Playwright main run **76 passed**, gate run **1 passed** (no frontend change in this WP).
 
+### WP 4.2 – Team pages: testing method and tasks (2026-11-14) ✅
+
+- Campaign form: "Testing method" with free, structured and combined (each with a short
+  explanation), offered only for drafts like visibility and participation. The free-text field
+  is now labelled "How to test".
+- Edit page: "Test tasks" panel – add (title, Markdown instructions, expected result), edit in a
+  disclosure, move up and down, remove; after removing, the page says whether the task was
+  deleted or hidden because testers had already reported progress. Free campaigns explain that
+  they have no tasks. All plain forms, no JavaScript needed.
+- Campaign page: the method in the details and a "Test tasks" section with the tasks in order
+  (instructions rendered with the safe Markdown allowlist).
+- Accessibility finding fixed during the WP: the move buttons' names now start with their
+  visible text ("Move up “…”", WCAG 2.5.3 Label in Name, found by axe).
+- **Verification (run on 2026-11-14):** Vitest **91 passed** (4 new); Playwright main run **77
+  passed** (new: a structured campaign refuses publishing without a task, tasks are added,
+  reordered, edited and removed, shown on the campaign page; axe on both pages), gate run **1
+  passed**; ESLint, typecheck, build clean; `pnpm audit` only the known moderate `minimatch`
+  advisory (development only).
+
 ## Handover – next session (written 2026-11-13)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
-Phase 4 (testing) is under way: WP 4.1 (backend for methods, tasks and progress, ADR 0023) is done;
-next are WP 4.2 (team pages: method and tasks), 4.3 (testers report progress) and 4.4 (the
-team's progress overview), as approved in the phase 4 plan.
+Phase 4 (testing) is under way: WPs 4.1 (backend, ADR 0023) and 4.2 (team pages) are done; next
+are WP 4.3 (testers report progress) and 4.4 (the team's progress overview), as approved in the
+phase 4 plan.
 Next: **phase 4 – testing** (test tasks, progress per participation, overview for maintainers);
 present its work packages and open questions before starting.
 

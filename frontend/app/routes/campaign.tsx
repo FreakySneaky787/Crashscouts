@@ -7,6 +7,7 @@ import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign";
 import { ApplicationPanel } from "~/components/campaigns/ApplicationPanel";
+import { CampaignTaskList } from "~/components/campaigns/CampaignTaskList";
 import { BlockNotice } from "~/components/moderation/BlockNotice";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
@@ -29,6 +30,7 @@ import {
   type ApplicationQuestion,
   type Campaign,
   type CampaignLink,
+  type CampaignTasks,
 } from "~/lib/campaigns";
 import { reportHref } from "~/lib/reports";
 import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
@@ -51,11 +53,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const slug = params.slug?.toLowerCase();
   const campaignSlug = params.campaign?.toLowerCase();
   if (!isValidProjectSlug(slug) || !isValidProjectSlug(campaignSlug)) throw data(null, { status: 404 });
-  const [project, result, links] = await Promise.all([
+  const [project, result, links, tasks] = await Promise.all([
     backendFetch<Project>(request, `/api/v1/projects/${slug}/`),
     backendFetch<Campaign>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/`),
     // Only the team and participants get the links; everyone else gets 404 and sees none.
     backendFetch<CampaignLink[]>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/links/`),
+    // Tasks are part of the description (ADR 0023); progress in them is the viewer's own only.
+    backendFetch<CampaignTasks>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/tasks/`),
   ]);
   if (project.status !== 200 || !project.data || result.status !== 200 || !result.data) {
     throw data(null, { status: 404, headers: privateNoStoreHeaders() });
@@ -88,6 +92,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       reported,
       appeal,
       questions,
+      tasks: tasks.status === 200 ? (tasks.data?.tasks ?? []) : [],
       applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
     },
     { headers },
@@ -259,6 +264,7 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
                   value: t("campaigns.placesValue", { count: campaign.participant_count, total: campaign.target_testers }),
                 },
                 { label: t("campaigns.participation"), value: t(`campaigns.participations.${campaign.participation}`) },
+                { label: t("campaigns.method"), value: t(`campaigns.methods.${campaign.method}`) },
               ]}
             />
             {campaign.platforms.length ? (
@@ -270,6 +276,11 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
           </div>
         </Panel>
       </div>
+      {campaign.method !== "free" ? (
+        <Panel title={t("campaigns.tasks.title")} aside={t("campaigns.tasks.count", { count: loaderData.tasks.length })}>
+          <CampaignTaskList tasks={loaderData.tasks} />
+        </Panel>
+      ) : null}
       {links !== null ? (
         <Panel title={t("campaigns.links.title")} flush={links.length > 0}>
           {links.length ? (

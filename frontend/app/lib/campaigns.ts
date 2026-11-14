@@ -6,6 +6,14 @@ import type { CatalogItem } from "./profile";
 export type CampaignState = "draft" | "in_review" | "published" | "completed" | "cancelled";
 export type CampaignStatusCode = "draft" | "in_review" | "open" | "full" | "in_progress" | "completed" | "cancelled";
 
+/** Testing method (ADR 0023): free has no tasks; structured and combined need at least one. */
+export type TestMethod = "free" | "structured" | "combined";
+export const TEST_METHODS: TestMethod[] = ["free", "structured", "combined"];
+
+export function isTestMethod(value: unknown): value is TestMethod {
+  return typeof value === "string" && (TEST_METHODS as string[]).includes(value);
+}
+
 export type Campaign = {
   project: string;
   slug: string;
@@ -17,6 +25,7 @@ export type Campaign = {
   hardware_requirements: string;
   prerequisites: string;
   methodology: string;
+  method: TestMethod;
   starts_at: string;
   ends_at: string;
   timezone: string;
@@ -168,6 +177,8 @@ export function campaignPayload(form: FormData) {
     target_testers: Number.parseInt(text("target_testers"), 10),
     platforms: form.getAll("platforms").map(String),
   };
+  // Like visibility, the method is only offered (and sent) while the campaign is a draft.
+  if (form.has("method")) values.method = isTestMethod(text("method")) ? text("method") : "free";
   if (form.has("visibility")) {
     const visibility = text("visibility") === "public" ? "public" : "private";
     values.visibility = visibility;
@@ -196,6 +207,7 @@ export function campaignFormEcho(form: FormData) {
     platforms: form.getAll("platforms").map(String),
     visibility: text("visibility") === "public" ? "public" : "private",
     participation: text("participation") === "approval" ? "approval" : "direct",
+    method: (isTestMethod(text("method")) ? text("method") : "free") as TestMethod,
   };
 }
 
@@ -220,6 +232,7 @@ export function campaignFormValues(campaign: Campaign): CampaignFormValues {
     platforms: campaign.platforms.map((p) => p.slug),
     visibility: campaign.visibility,
     participation: campaign.participation === "approval" ? "approval" : "direct",
+    method: campaign.method,
   };
 }
 
@@ -285,6 +298,12 @@ export const CAMPAIGN_PROBLEMS = [
   "already_applied",
   "rejected",
   "no_open_application",
+  "tasks_required",
+  "tasks_exist",
+  "too_many_tasks",
+  "last_task",
+  "free_method_has_no_tasks",
+  "task_hidden",
 ] as const;
 export type CampaignProblem = (typeof CAMPAIGN_PROBLEMS)[number] | "rateLimited" | "forbidden" | "invalid" | "confirmDelete" | "confirmCancel" | "confirmLeave" | "confirmReject" | "generic";
 
@@ -347,4 +366,31 @@ export function answersPayload(form: FormData): Record<string, string> {
     if (name.startsWith("answer:") && typeof value === "string") answers[name.slice("answer:".length)] = value.trim();
   }
   return answers;
+}
+
+/** Status of one test task for one participant (ADR 0023); "not_started" when nothing is stored. */
+export type TaskStatus = "not_started" | "in_progress" | "completed" | "blocked";
+export const TASK_STATUSES: TaskStatus[] = ["not_started", "in_progress", "completed", "blocked"];
+
+/** A task as everyone who sees the campaign reads it, with the viewer's own progress only. */
+export type TestTask = {
+  id: string;
+  title: string;
+  instructions: string;
+  expected_result: string;
+  my_status: TaskStatus;
+  my_note: string;
+};
+
+export type CampaignTasks = { method: TestMethod; tasks: TestTask[]; can_report: boolean };
+
+export const MAX_TASKS = 30;
+
+/** The add/edit task form as API payload (the server trims and checks lengths). */
+export function taskPayload(form: FormData) {
+  return {
+    title: String(form.get("title") ?? ""),
+    instructions: String(form.get("instructions") ?? ""),
+    expected_result: String(form.get("expected_result") ?? ""),
+  };
 }

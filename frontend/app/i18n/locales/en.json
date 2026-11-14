@@ -473,8 +473,8 @@
     "platforms": "Operating systems and devices",
     "hardware": "Hardware requirements",
     "prerequisites": "Prerequisites",
-    "methodology": "Testing method",
-    "methodologyHint": "How testers should test, e.g. free testing or specific scenarios. Markdown.",
+    "methodology": "How to test",
+    "methodologyHint": "Notes for testers on how to test, e.g. focus areas or scenarios. Markdown.",
     "access": "Who can take part",
     "visibility": "Visibility",
     "visibilities": {
@@ -532,7 +532,7 @@
       "public_campaigns_locked": "Public campaigns cannot be published yet. Make the campaign private or keep it as a draft.",
       "project_not_public": "A public campaign needs a public project.",
       "invalid_transition": "This status change is not possible.",
-      "locked_after_publish": "Visibility and participation cannot be changed after publishing.",
+      "locked_after_publish": "Visibility, participation and the testing method cannot be changed after publishing.",
       "campaign_closed": "Completed and cancelled campaigns can no longer be changed.",
       "not_a_draft": "Only drafts can be deleted.",
       "below_participants": "The number of testers cannot be lower than the number of current participants.",
@@ -562,7 +562,13 @@
       "confirmReject": "Tick the box to confirm the rejection.",
       "link_suspended": "This link is suspended while moderators review reports about it.",
       "blocked": "Moderators blocked this content; it cannot be changed. You can appeal on its page.",
-      "needs_2fa": "Turn on two-factor authentication before submitting a public campaign."
+      "needs_2fa": "Turn on two-factor authentication before submitting a public campaign.",
+      "tasks_required": "Structured and combined testing need at least one task. Add a task before publishing.",
+      "tasks_exist": "Remove the tasks before switching to free testing.",
+      "too_many_tasks": "A campaign can have at most 30 tasks.",
+      "last_task": "A published campaign keeps at least one task. Add another task before removing this one.",
+      "free_method_has_no_tasks": "Free testing has no tasks. Choose structured or combined testing first.",
+      "task_hidden": "This task was removed by the team."
     },
     "errors": {
       "slug_taken": "This short name is already used in this project.",
@@ -773,7 +779,56 @@
     },
     "submitReview": "Submit for review",
     "reviewRejected": "The moderators sent this campaign back:",
-    "publicReviewNotice": "Public campaigns are reviewed by moderators before they go live. Submitting needs two-factor authentication. While the platform is not open for public campaigns yet, they stay drafts."
+    "publicReviewNotice": "Public campaigns are reviewed by moderators before they go live. Submitting needs two-factor authentication. While the platform is not open for public campaigns yet, they stay drafts.",
+    "method": "Testing method",
+    "methodHint": "Fixed once the campaign is published.",
+    "methods": {
+      "free": "Free testing",
+      "structured": "Structured testing",
+      "combined": "Combined testing"
+    },
+    "methodHints": {
+      "free": "Testers try the software freely and give general feedback. No tasks.",
+      "structured": "Testers work through the tasks you define. Add at least one task before publishing.",
+      "combined": "Tasks you define plus free testing. Add at least one task before publishing."
+    },
+    "tasks": {
+      "title": "Test tasks",
+      "intro": "Tasks testers work through, in this order. Everyone who can see the campaign sees them; only you and each tester see their progress.",
+      "freeIntro": "This campaign uses free testing, so it has no tasks. To add tasks, choose structured or combined testing while the campaign is a draft.",
+      "none": "No tasks yet.",
+      "noneRequired": "No tasks yet. Add at least one task before publishing.",
+      "add": "Add a task",
+      "addButton": "Add task",
+      "taskTitle": "Task",
+      "taskTitleHint": "A short instruction, e.g. “Import a CSV file”.",
+      "instructions": "Instructions (optional)",
+      "expected": "Expected result (optional)",
+      "expectedHint": "What testers should see when the task works.",
+      "edit": "Edit",
+      "editNamed": "Edit the task “{{title}}”",
+      "save": "Save task",
+      "moveUp": "Move up",
+      "moveUpNamed": "Move up “{{title}}”",
+      "moveDown": "Move down",
+      "moveDownNamed": "Move down “{{title}}”",
+      "remove": "Remove",
+      "removeNamed": "Remove the task “{{title}}”",
+      "expectedLabel": "Expected result",
+      "count_one": "{{count}} task",
+      "count_other": "{{count}} tasks",
+      "done": {
+        "added": "The task was added.",
+        "saved": "The task was saved.",
+        "removed": "The task was removed.",
+        "hidden": "The task was hidden: testers had already reported progress on it, so the team keeps what they reported."
+      },
+      "errors": {
+        "title": "Enter a task of at most 120 characters.",
+        "instructions": "At most 4,000 characters.",
+        "expected_result": "At most 1,000 characters."
+      }
+    }
   },
   "team": {
     "title": "Team",

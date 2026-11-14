@@ -14,7 +14,7 @@ const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 async function createCampaign(
   page: Page,
   project: string,
-  { slug = "beta-1", visibility = "private", zone = "America/New_York", ends = "2027-03-15T18:00", expectError = false } = {},
+  { slug = "beta-1", visibility = "private", zone = "America/New_York", ends = "2027-03-15T18:00", expectError = false, method = "" } = {},
 ) {
   await page.goto(`/p/${project}/c/new`);
   await page.getByLabel("Title").fill("Beta 1");
@@ -28,6 +28,7 @@ async function createCampaign(
   await page.getByLabel("Testers wanted").fill("5");
   await page.getByRole("group", { name: "Operating systems and devices" }).getByLabel("Linux").check();
   await page.getByLabel(visibility === "public" ? "Public" : "Private", { exact: true }).check();
+  if (method) await page.getByLabel(method, { exact: true }).check();
   await page.getByRole("button", { name: "Create draft" }).click();
   // Wait for the result itself, not just the click (otherwise the next step can race the POST).
   if (expectError) await expect(page.getByRole("alert").first()).toBeVisible();
@@ -67,6 +68,57 @@ test("the team creates, publishes and completes a private campaign", async ({ pa
   await page.goto(`/p/${project}/c/beta-1/edit`);
   await expect(page.getByText("Completed and cancelled campaigns can no longer be edited.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Save changes" })).toHaveCount(0);
+});
+
+test("the team runs a structured campaign with test tasks", async ({ page, request }) => {
+  await createSignedInAccount(page, request);
+  const project = await createProject(page);
+  await createCampaign(page, project, { method: "Structured testing" });
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+
+  // Structured testing needs a task before publishing.
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page.getByRole("alert")).toContainText("Structured and combined testing need at least one task");
+
+  const tasks = page.getByRole("region", { name: "Test tasks" });
+  const add = async (title: string, instructions = "", expected = "") => {
+    await tasks.getByRole("textbox", { name: "Task", exact: true }).fill(title);
+    await tasks.getByRole("textbox", { name: "Instructions (optional)" }).fill(instructions);
+    await tasks.getByRole("textbox", { name: "Expected result (optional)" }).fill(expected);
+    await tasks.getByRole("button", { name: "Add task" }).click();
+    await expect(page.getByText("The task was added.")).toBeVisible();
+  };
+  await add("Install the app", "Download the **AppImage** and run it.", "The welcome screen opens.");
+  await add("Import a file");
+  await add("Typo tsak");
+  const list = tasks.getByRole("list", { name: "Test tasks" });
+  await expect(list.getByRole("listitem")).toHaveCount(3);
+
+  // Reorder, edit and remove (no progress yet, so removing deletes).
+  await tasks.getByRole("button", { name: "Move up “Import a file”" }).click();
+  await expect(list.getByRole("listitem").first()).toContainText("Import a file");
+  await tasks.getByLabel("Edit the task “Typo tsak”").click();
+  await tasks.getByRole("textbox", { name: "Task", exact: true }).first().fill("Change the settings");
+  await tasks.getByRole("button", { name: "Save task" }).click();
+  await expect(page.getByText("The task was saved.")).toBeVisible();
+  await tasks.getByRole("button", { name: "Remove the task “Change the settings”" }).click();
+  await expect(page.getByText("The task was removed.")).toBeVisible();
+  await expect(list.getByRole("listitem")).toHaveCount(2);
+  const edit = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(edit.violations.map((v) => v.id)).toEqual([]);
+
+  // Published: the method is frozen, the tasks show on the campaign page in order.
+  await page.getByRole("button", { name: "Publish" }).click();
+  await expect(page).toHaveURL(new RegExp(`/p/${project}/c/beta-1$`));
+  await expect(page.getByText("Structured testing")).toBeVisible();
+  const shown = page.getByRole("region", { name: "Test tasks" });
+  await expect(shown.getByRole("heading", { level: 3 })).toHaveText(["Import a file", "Install the app"]);
+  await expect(shown.getByText("AppImage", { exact: true })).toBeVisible(); // Markdown rendered
+  await expect(shown.getByText("The welcome screen opens.")).toBeVisible();
+  const campaignPage = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(campaignPage.violations.map((v) => v.id)).toEqual([]);
+  await page.goto(`/p/${project}/c/beta-1/edit`);
+  await expect(page.getByRole("radio", { name: "Free testing" })).toHaveCount(0);
 });
 
 test("public campaigns stay drafts while the gate is closed", async ({ page, request, browser }) => {

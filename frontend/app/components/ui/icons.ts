@@ -5,9 +5,11 @@
 export {
   AndroidLogoIcon,
   AppleLogoIcon,
+  ArrowDownIcon,
   ArrowLeftIcon,
   ArrowsClockwiseIcon,
   ArrowSquareOutIcon,
+  ArrowUpIcon,
   BellIcon,
   BugIcon,
   CalendarIcon,

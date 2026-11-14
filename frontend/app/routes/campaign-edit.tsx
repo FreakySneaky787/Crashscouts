@@ -10,6 +10,7 @@ import type { Route } from "./+types/campaign-edit";
 import { CampaignForm } from "~/components/campaigns/CampaignForm";
 import { LinksPanel } from "~/components/campaigns/LinksPanel";
 import { QuestionsPanel } from "~/components/campaigns/QuestionsPanel";
+import { TasksPanel, type TaskDone } from "~/components/campaigns/TasksPanel";
 import { Button } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { CheckCircleIcon, PaperPlaneTiltIcon, TrashIcon, XCircleIcon } from "~/components/ui/icons";
@@ -25,9 +26,11 @@ import {
   campaignProblem,
   linkPayload,
   questionPayload,
+  taskPayload,
   type ApplicationQuestion,
   type Campaign,
   type CampaignLink,
+  type CampaignTasks,
 } from "~/lib/campaigns";
 import { loadCampaignFormData } from "~/lib/campaigns.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
@@ -36,6 +39,12 @@ import { isValidProjectSlug, projectErrorCodes, type Project } from "~/lib/proje
 import styles from "./forms.module.css";
 
 const ACTIONS = { publish: "publish", complete: "complete", cancel: "cancel" } as const;
+const TASK_DONE = ["added", "saved", "removed", "hidden"] as const;
+
+function taskDoneFrom(done: string | null): TaskDone | null {
+  const value = done?.startsWith("task-") ? done.slice("task-".length) : "";
+  return (TASK_DONE as readonly string[]).includes(value) ? (value as TaskDone) : null;
+}
 
 export function meta(_: Route.MetaArgs) {
   return [{ title: `Edit campaign · ${brand.name}` }, { name: "robots", content: "noindex" }];
@@ -60,10 +69,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (project.data.slug !== params.slug || campaign.data.slug !== params.campaign) {
     throw redirect(`/p/${project.data.slug}/c/${campaign.data.slug}/edit`, { headers: privateNoStoreHeaders() });
   }
-  const [{ platforms, timeZones, csrf }, links, questions] = await Promise.all([
+  const [{ platforms, timeZones, csrf }, links, questions, tasks] = await Promise.all([
     loadCampaignFormData(request),
     backendFetch<CampaignLink[]>(request, `${api}links/`),
     backendFetch<{ questions: ApplicationQuestion[] }>(request, `${api}questions/`),
+    backendFetch<CampaignTasks>(request, `${api}tasks/`),
   ]);
   const done = new URL(request.url).searchParams.get("done");
   return data(
@@ -77,6 +87,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       links: links.data ?? [],
       questions: questions.data?.questions ?? [],
       linkDone: done === "link-added" ? ("added" as const) : done === "link-removed" ? ("removed" as const) : null,
+      tasks: tasks.data?.tasks ?? [],
+      taskDone: taskDoneFrom(done),
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -116,6 +128,31 @@ export async function action({ request, params }: Route.ActionArgs) {
     const body = result.data as Record<string, unknown> | null;
     const questionErrors = body && typeof body.code === "string" ? { code: body.code } : projectErrorCodes(body);
     return data({ values: null, errors: {}, problem: null, questionErrors }, { status: 400, headers });
+  }
+  if (intent === "task-add" || intent === "task-change" || intent === "task-move" || intent === "task-remove") {
+    const back = (done: TaskDone) => redirect(`/p/${slug}/c/${params.campaign}/edit?done=task-${done}#tasks`, { headers });
+    const id = String(form.get("task") ?? "");
+    if (intent !== "task-add" && !isUuid(id)) throw data(null, { status: 404, headers });
+    let result;
+    if (intent === "task-add") {
+      result = await backendFetch(request, `${api}tasks/`, { method: "POST", csrfToken, json: taskPayload(form) });
+      if (result.status === 201) throw back("added");
+    } else if (intent === "task-change") {
+      result = await backendFetch(request, `${api}tasks/${id}/`, { method: "PATCH", csrfToken, json: taskPayload(form) });
+      if (result.status === 200) throw back("saved");
+    } else if (intent === "task-move") {
+      const direction = form.get("direction") === "up" ? "up" : "down";
+      result = await backendFetch(request, `${api}tasks/${id}/move/`, { method: "POST", csrfToken, json: { direction } });
+      if (result.status === 204) throw redirect(`/p/${slug}/c/${params.campaign}/edit#tasks`, { headers });
+    } else {
+      result = await backendFetch<{ hidden: boolean }>(request, `${api}tasks/${id}/`, { method: "DELETE", csrfToken });
+      if (result.status === 200) throw back(result.data?.hidden ? "hidden" : "removed");
+    }
+    if (result.status === 404) throw data(null, { status: 404, headers });
+    const body = result.data as Record<string, unknown> | null;
+    const taskErrors = body && typeof body.code === "string" ? { code: body.code } : projectErrorCodes(body);
+    const taskValues = intent === "task-add" ? taskPayload(form) : null;
+    return data({ values: null, errors: {}, problem: null, taskErrors, taskValues }, { status: 400, headers });
   }
   if (intent === "link-add") {
     const linkValues = linkPayload(form);
@@ -236,6 +273,18 @@ export default function CampaignEdit({ loaderData, actionData }: Route.Component
           errors={actionData && "questionErrors" in actionData ? actionData.questionErrors : {}}
         />
       ) : null}
+
+      <div id="tasks">
+        <TasksPanel
+          method={campaign.method}
+          tasks={loaderData.tasks}
+          csrfToken={csrfToken}
+          editable={!closed}
+          errors={actionData && "taskErrors" in actionData ? actionData.taskErrors : {}}
+          values={actionData && "taskValues" in actionData ? actionData.taskValues : null}
+          done={loaderData.taskDone}
+        />
+      </div>
 
       <LinksPanel
         links={loaderData.links}
