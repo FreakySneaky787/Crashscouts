@@ -10,12 +10,36 @@ from .moderation_views import (
     CaseView,
     ReviewDecisionView,
     ReviewsView,
+    SuspensionAppealDecisionView,
+    SuspensionAppealsView,
+    SuspensionLiftView,
+    SuspensionsView,
 )
-from .views import MyReportsView, ReportCreateView
+from .views import MyReportsView, MySuspensionAppealView, MySuspensionView, ReportCreateView
 
 urlpatterns = [
     path("reports/", ReportCreateView.as_view(), name="reports"),
     path("me/reports/", MyReportsView.as_view(), name="my-reports"),
+    path("me/suspension/", MySuspensionView.as_view(), name="my-suspension"),
+    path("me/suspension/appeal/", MySuspensionAppealView.as_view(), name="my-suspension-appeal"),
+    path(
+        "moderation/account-suspensions/", SuspensionsView.as_view(), name="moderation-suspensions"
+    ),
+    path(
+        "moderation/account-suspensions/appeals/",
+        SuspensionAppealsView.as_view(),
+        name="moderation-suspension-appeals",
+    ),
+    path(
+        "moderation/account-suspensions/<uuid:suspension_id>/lift/",
+        SuspensionLiftView.as_view(),
+        name="moderation-suspension-lift",
+    ),
+    path(
+        "moderation/account-suspensions/<uuid:suspension_id>/appeal/<str:decision>/",
+        SuspensionAppealDecisionView.as_view(),
+        name="moderation-suspension-appeal-decide",
+    ),
     path("moderation/cases/", CasesView.as_view(), name="moderation-cases"),
     path(
         "moderation/cases/<str:target_type>/<uuid:target_id>/",

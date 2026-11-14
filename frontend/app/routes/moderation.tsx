@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/moderation";
-import { Button } from "~/components/ui/Button";
+import { Button, ButtonLink } from "~/components/ui/Button";
 import { CheckboxField, TextAreaField } from "~/components/ui/Form";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Notice } from "~/components/ui/Notice";
@@ -15,7 +15,7 @@ import { StatusPill } from "~/components/ui/StatusPill";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
-import type { Appeal, ModerationCase, Reviews } from "~/lib/moderation";
+import type { Appeal, ModerationCase, Reviews, Suspension } from "~/lib/moderation";
 
 import styles from "./forms.module.css";
 
@@ -25,16 +25,26 @@ export function meta(_: Route.MetaArgs) {
 
 export async function loader({ request }: Route.LoaderArgs) {
   if (!(await getSessionUser(request))) throw redirect("/login?next=%2Fmoderation", { headers: privateNoStoreHeaders() });
-  const [cases, appeals, reviews, csrf] = await Promise.all([
+  const [cases, appeals, reviews, suspensionAppeals, role, csrf] = await Promise.all([
     backendFetch<ModerationCase[]>(request, "/api/v1/moderation/cases/"),
     backendFetch<Appeal[]>(request, "/api/v1/moderation/appeals/"),
     backendFetch<Reviews>(request, "/api/v1/moderation/reviews/"),
+    backendFetch<Suspension[]>(request, "/api/v1/moderation/account-suspensions/appeals/"),
+    backendFetch<{ platform_role: string }>(request, "/api/v1/me/platform-role/"),
     ensureCsrfToken(request),
   ]);
   if (cases.status !== 200 || !cases.data) throw data(null, { status: 404, headers: privateNoStoreHeaders() });
   const done = new URL(request.url).searchParams.get("done");
   return data(
-    { cases: cases.data, appeals: appeals.data ?? [], reviews: reviews.data ?? { campaigns: [], links: [] }, done, csrfToken: csrf.token },
+    {
+      cases: cases.data,
+      appeals: appeals.data ?? [],
+      suspensionAppeals: suspensionAppeals.data ?? [],
+      isAdmin: role.data?.platform_role === "admin",
+      reviews: reviews.data ?? { campaigns: [], links: [] },
+      done,
+      csrfToken: csrf.token,
+    },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
 }
@@ -101,7 +111,17 @@ export default function Moderation({ loaderData, actionData }: Route.ComponentPr
   const reviewCount = reviews.campaigns.length + reviews.links.length;
   return (
     <div className={styles.stack}>
-      <PageHeader title={t("moderation.title")} subtitle={t("moderation.intro")} />
+      <PageHeader
+        title={t("moderation.title")}
+        subtitle={t("moderation.intro")}
+        actions={
+          loaderData.isAdmin ? (
+            <ButtonLink to="/moderation/suspensions" variant="quiet">
+              {t("suspension.admin.title")}
+            </ButtonLink>
+          ) : null
+        }
+      />
       {loaderData.done ? <Notice tone="ok" title={t("moderation.done")} /> : null}
       {actionData?.problem ? <Notice tone="danger" title={t(`moderation.problem.${actionData.problem}`)} /> : null}
       <Panel title={t("moderation.reviews")} aside={String(reviewCount)}>
@@ -175,6 +195,20 @@ export default function Moderation({ loaderData, actionData }: Route.ComponentPr
               <li key={a.block} className={styles.stackTight}>
                 <Link to={`/moderation/${a.target_type}/${a.target_id}`}>{a.title}</Link>
                 <span className={styles.muted}>{a.appeal_text}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState kind="empty" title={t("moderation.noAppeals")} />
+        )}
+      </Panel>
+      <Panel title={t("suspension.moderation.appeals")} aside={String(loaderData.suspensionAppeals.length)}>
+        {loaderData.suspensionAppeals.length ? (
+          <ul className={styles.plainList} aria-label={t("suspension.moderation.appeals")}>
+            {loaderData.suspensionAppeals.map((s) => (
+              <li key={s.id} className={styles.stackTight}>
+                <Link to={`/moderation/user/${s.user_id}`}>@{s.username}</Link>
+                <span className={styles.muted}>{s.appeal_text}</span>
               </li>
             ))}
           </ul>

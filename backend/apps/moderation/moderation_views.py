@@ -10,10 +10,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.roles import is_moderator
+from apps.accounts.roles import is_admin, is_moderator
 from apps.campaigns.models import Campaign, CampaignLink
 from apps.projects.policies import can_edit
 
+from . import suspensions
 from .actions import (
     ModerationError,
     active_block,
@@ -28,7 +29,7 @@ from .actions import (
     take_case,
     warn,
 )
-from .models import OPEN_STATES, Block, ModerationNote, Report
+from .models import OPEN_STATES, AccountSuspension, Block, ModerationNote, Report
 from .reviews import (
     approve_campaign,
     approve_link,
@@ -136,9 +137,19 @@ class CaseView(ModeratorView):
         reports = Report.objects.filter(
             target_type=target_type, **{target_type: target}
         ).select_related("reporter")
-        if project is None:  # a person: notes about them, no content blocks
+        extra = {}
+        if project is None:  # a person: notes and suspensions, no content blocks
             notes = ModerationNote.objects.filter(user=target)
             blocks = Block.objects.none()
+            found = AccountSuspension.objects.filter(user=target).select_related(
+                "user", "created_by", "lifted_by", "appeal_decided_by"
+            )
+            in_force = suspensions.active_suspension(target)
+            extra = {
+                "suspensions": [suspensions.describe(s) for s in found],
+                "active_suspension": str(in_force.pk) if in_force else None,
+                "can_suspend": not target.platform_role and target.pk != request.user.pk,
+            }
         else:
             notes = ModerationNote.objects.filter(project=project)
             blocks = Block.objects.filter(
@@ -176,6 +187,7 @@ class CaseView(ModeratorView):
                     for b in blocks
                 ],
                 "active_block": str(current.pk) if current else None,
+                **extra,
             }
         )
 
@@ -185,6 +197,8 @@ class ActionSerializer(serializers.Serializer):
     message = serializers.CharField(
         max_length=Block.MESSAGE_MAX_LENGTH, required=False, allow_blank=True
     )
+    # Suspensions (WP 7.2): the end, or null for a permanent suspension.
+    ends_at = serializers.DateTimeField(required=False, allow_null=True)
 
 
 class CaseActionView(ModeratorView):
@@ -210,6 +224,16 @@ class CaseActionView(ModeratorView):
                 dismiss(target, request.user)
             elif action == "lift-suspension" and target_type == "link":
                 lift_suspension(target, request.user)
+            elif action == "suspend" and target_type == "user":
+                if "ends_at" not in data:
+                    raise ModerationError("end_required")  # a date, or null for permanently
+                suspensions.suspend(
+                    target,
+                    request.user,
+                    data.get("category", ""),
+                    data.get("message", ""),
+                    data["ends_at"],
+                )
             else:
                 raise Http404
         except ModerationError as exc:
@@ -374,3 +398,83 @@ class ReviewDecisionView(ModeratorView):
         except ModerationError as exc:
             return _error(exc)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# --- Account suspensions (WP 7.2, ADR 0027) ---------------------------------------------------
+
+
+def _suspension_or_404(suspension_id) -> AccountSuspension:
+    found = AccountSuspension.objects.filter(pk=suspension_id).select_related("user").first()
+    if found is None:
+        raise Http404
+    return found
+
+
+def _with_people(queryset):
+    return queryset.select_related("user", "created_by", "lifted_by", "appeal_decided_by")
+
+
+class SuspensionLiftView(ModeratorView):
+    """Any moderator lifts a suspension (also early)."""
+
+    @extend_schema(
+        operation_id="moderation_suspension_lift", request=None, responses={204: None, 400: CODE}
+    )
+    def post(self, request: Request, suspension_id) -> Response:
+        try:
+            suspensions.lift(_suspension_or_404(suspension_id), request.user)
+        except ModerationError as exc:
+            return _error(exc)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SuspensionAppealDecisionView(ModeratorView):
+    """Any moderator decides an appeal, also the one who suspended (owner's decision)."""
+
+    @extend_schema(
+        operation_id="moderation_suspension_appeal_decide",
+        request=None,
+        responses={204: None, 400: CODE},
+    )
+    def post(self, request: Request, suspension_id, decision: str) -> Response:
+        if decision not in {"uphold", "lift"}:
+            raise Http404
+        found = _suspension_or_404(suspension_id)
+        try:
+            suspensions.decide_appeal(
+                found, request.user, "upheld" if decision == "uphold" else "lifted"
+            )
+        except ModerationError as exc:
+            return _error(exc)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SuspensionAppealsView(ModeratorView):
+    """Open appeals against suspensions, oldest first."""
+
+    @extend_schema(
+        operation_id="moderation_suspension_appeals_list",
+        responses=inline_serializer("SuspensionAppeals", {"x": serializers.CharField()}),
+    )
+    def get(self, request: Request) -> Response:
+        found = _with_people(
+            AccountSuspension.objects.filter(
+                appealed_at__isnull=False, appeal_decision="", lifted_at__isnull=True
+            ).order_by("appealed_at")
+        )
+        return Response([suspensions.describe(s) for s in found])
+
+
+class SuspensionsView(ModeratorView):
+    """Every suspension with who suspended, lifted and decided; admins only (owner's decision:
+    no four-eyes principle, so admins keep an overview)."""
+
+    @extend_schema(
+        operation_id="moderation_suspensions_list",
+        responses=inline_serializer("Suspensions", {"x": serializers.CharField()}),
+    )
+    def get(self, request: Request) -> Response:
+        if not is_admin(request.user):
+            raise Http404
+        found = _with_people(AccountSuspension.objects.all())[:500]
+        return Response([suspensions.describe(s) for s in found])

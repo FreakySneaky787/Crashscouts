@@ -35,3 +35,28 @@ describe("backendFetch", () => {
     expect(sent.headers().has("X-Forwarded-For")).toBe(false);
   });
 });
+
+describe("refused writes of suspended accounts (WP 7.2)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  function answer(status: number, body: unknown) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } })),
+    );
+  }
+
+  it("lead to the explanation on the account page", async () => {
+    answer(403, { code: "account_suspended" });
+    const thrown = await backendFetch(new Request("http://localhost/x"), "/api/v1/reports/", { method: "POST", json: {} }).catch((e: unknown) => e);
+    expect(thrown).toBeInstanceOf(Response);
+    expect((thrown as Response).headers.get("Location")).toBe("/account?suspended=1");
+  });
+
+  it("leave other answers and reading alone", async () => {
+    answer(403, { code: "account_suspended" });
+    expect((await backendFetch(new Request("http://localhost/x"), "/api/v1/me/")).status).toBe(403);
+    answer(403, { detail: "forbidden" });
+    expect((await backendFetch(new Request("http://localhost/x"), "/api/v1/reports/", { method: "POST", json: {} })).status).toBe(403);
+  });
+});

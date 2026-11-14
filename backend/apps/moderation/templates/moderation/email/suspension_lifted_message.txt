@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The moderators lifted the suspension of your account. You can use it fully again.
+
+{{ account_url }}{% endautoescape %}{% endblock content %}

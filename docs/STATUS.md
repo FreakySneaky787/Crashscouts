@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 7.1) · **Current phase:** 7, moderation and security review – WP 7.1 done, next: 7.2 account suspensions (flag still off)
+**Last update:** 2026-11-14 (WP 7.2) · **Current phase:** 7, moderation and security review – WPs 7.1–7.2 done, next: 7.3 several moderators and purpose-bound access (flag still off)
 
 ## Work packages
 
@@ -1021,6 +1021,37 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   (a race: the moderator's page already showed "Done." from the earlier action); fixed by waiting
   for the new address, gate run again **4 passed**.
 
+### WP 7.2 – Account suspensions (2026-11-14) ✅
+
+- `AccountSuspension` (reason, message, end or permanent, lifting, one appeal with its decision)
+  and the central write guard `SuspensionGuard` in Django's middleware
+  ([ADR 0027](adr/0027-account-suspensions.md)): every writing request of a suspended account is
+  refused (403 `account_suspended`) except signing out and in, password, two-factor methods, data
+  export, account deletion and the appeal. The end needs no background job.
+- Hidden profile and avatar while suspended; open reports about the person are closed; emails
+  when suspended, lifted and when the appeal is decided; audit events with the person as subject;
+  the suspension is in the person's data export (without moderators' names).
+- Moderators suspend from the person's case page (date or permanently, confirmation), lift, and
+  decide the appeal (also the one who suspended); moderators cannot suspend themselves or accounts
+  with a platform role. Appeals against suspensions appear in the queue. Admins see every
+  suspension with who suspended, lifted and decided (`/moderation/suspensions`; 404 for
+  moderators).
+- Frontend: a notice on every page for the suspended person; a refused write leads to the account
+  page with the explanation (one place in `backendFetch`); the account page shows reason, message,
+  end and the appeal form.
+- **Verification (run on 2026-11-14):** pytest **730 passed** (108 new: the write guard over
+  every API and authentication route with POST, PUT, PATCH and DELETE (97 routes), the allow list
+  names existing routes only, other accounts and reading unaffected, allowed routes pass, rules
+  for suspending, reports closed, mail, hidden profile, audit, the end on its own, lifting, one
+  appeal decided either way by the moderator who suspended, the case page, the admins' list,
+  the data export); 5 mutation checks caught (a gap in the guard, profile not hidden, end
+  ignored, a second appeal, suspending an admin); Vitest **110 passed** (4 new); Playwright main
+  run **85 passed** (new: suspend with a date after a missing confirmation, notice on every page,
+  a write leads to the explanation, hidden profile, one appeal, accepted by the moderator who
+  suspended, profile visible again, mail, moderators get 404 for the admins' list, the admin sees
+  who acted, axe on the case page, the account page and the list), gate run **4 passed**; Ruff,
+  migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -1032,11 +1063,10 @@ attachments, status workflow with the author's verification, publishing with con
 team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
 full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Phase 7
 (moderation and security review) is approved with the owner's decisions of 2026-11-14 (plan:
-WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WP 7.1 is done. Next: **WP 7.2 – account
-suspensions** (read-only write guard with exceptions for logout, export, deletion, appeal,
-password and 2FA; hidden profile; emails; one appeal; admin list). Note for 7.2: any moderator may
-suspend permanently and decide the appeal – no four-eyes principle; compensated by the audit log
-and the admins' list. Also open: WP M.1 (statistics page; the data for all five metrics now
+WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WPs 7.1 and 7.2 are done. Next: **WP 7.3 –
+several moderators and purpose-bound access** (taking a case shows "in review by …";
+`ModeratorAccess` with a required reason, valid 24 hours, audited, for the reported private
+object only; read-only view; admins' list of accesses; the team is not notified). Also open: WP M.1 (statistics page; the data for all five metrics now
 exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

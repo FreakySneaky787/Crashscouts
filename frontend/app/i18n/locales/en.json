@@ -1048,7 +1048,13 @@
       "confirm": "Tick the box to confirm.",
       "generic": "Something went wrong. Please try again.",
       "not_in_review": "This is no longer waiting for review.",
-      "too_long": "At most 1,000 characters."
+      "too_long": "At most 1,000 characters.",
+      "end_required": "Choose the day the suspension ends, or tick \"Permanently\".",
+      "end_in_past": "The end must be in the future.",
+      "already_suspended": "This account is already suspended.",
+      "has_role": "Accounts with a platform role cannot be suspended; an admin removes the role first.",
+      "not_yourself": "You cannot suspend your own account.",
+      "account_not_suspended": "This account is not suspended any more."
     },
     "team": {
       "title": "Blocked by the moderators",
@@ -1317,5 +1323,65 @@
     "noCampaigns": "No test campaigns match.",
     "noProjectsText": "Try fewer filters or other words. Projects that are not open source appear when you choose “All licences”.",
     "campaignsLocked": "Public test campaigns are not open yet. They appear here once the platform opens them."
+  },
+  "suspension": {
+    "banner": "Your account is suspended: you can read, but not create, change or report anything.",
+    "bannerLink": "Reason, end and appeal",
+    "title": "Your account is suspended",
+    "reason": "Suspended: {{reason}}",
+    "until": "Until {{end}}",
+    "permanent": "Permanently, unless an appeal is accepted.",
+    "effect": "You can sign in, read, export your data, change your password and two-factor methods and delete your account. You cannot create, change, report, give feedback, join or invite, and your profile is hidden from others.",
+    "appeal": "Appeal",
+    "appealHint": "Explain why the suspension is a mistake. You can appeal once; at most 1,000 characters.",
+    "send": "Send appeal",
+    "appeal_sent": "Your appeal was sent. The moderators will decide.",
+    "appeal_failed": "The appeal could not be sent.",
+    "refused": "This is not possible while your account is suspended.",
+    "appealState": {
+      "pending": "Your appeal is waiting for the moderators' decision.",
+      "upheld": "The moderators reviewed your appeal and kept the suspension.",
+      "lifted": "The suspension was lifted."
+    },
+    "moderation": {
+      "title": "Suspension",
+      "active": "Suspended by {{by}}: {{reason}}",
+      "appeal": "Appeal by the person",
+      "accept": "Accept appeal and lift the suspension",
+      "uphold": "Keep the suspension",
+      "lift": "Lift the suspension",
+      "message": "Message to the person",
+      "messageHint": "The person sees this message with the reason and the end. Reporters only learn that their report was reviewed.",
+      "endsOn": "Suspended until",
+      "endsOnHint": "The suspension ends at the end of this day (UTC). Leave empty for a permanent suspension and tick the box below.",
+      "permanent": "Permanently (until an appeal is accepted or a moderator lifts it)",
+      "confirm": "Suspend this account: read only, hidden profile; the person is emailed and can appeal once.",
+      "suspend": "Suspend",
+      "cannot": "This account cannot be suspended here: it is your own or has a platform role (an admin removes the role first).",
+      "history": "Earlier suspensions",
+      "liftedBy": "lifted by {{by}}",
+      "ended": "ended",
+      "appeals": "Appeals against suspensions"
+    },
+    "admin": {
+      "title": "Suspensions",
+      "intro": "Every suspension with who suspended, lifted and decided the appeal. Any moderator may suspend and decide appeals, so this list keeps the overview.",
+      "all": "All suspensions",
+      "none": "No suspensions yet.",
+      "person": "Person",
+      "state": "State",
+      "suspendedBy": "Suspended by",
+      "end": "End",
+      "liftedBy": "Lifted by",
+      "appeal": "Appeal",
+      "active": "In force",
+      "over": "Over",
+      "permanent": "Permanent",
+      "appealStates": {
+        "pending": "Waiting",
+        "upheld": "Kept",
+        "lifted": "Accepted"
+      }
+    }
   }
 }

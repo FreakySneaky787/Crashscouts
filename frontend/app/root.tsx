@@ -26,7 +26,7 @@ import { AppShell, type ShellUser } from "./components/layout/AppShell";
 import { EmptyState } from "./components/ui/EmptyState";
 import { brand } from "./config/brand";
 import { createI18n, defaultLanguage } from "./i18n";
-import { getSessionUser } from "./lib/backend.server";
+import { backendFetch, getSessionUser } from "./lib/backend.server";
 import { hasSessionCookie } from "./lib/http";
 import { isTheme, themeAttribute, themeFromCookieHeader, type Theme } from "./lib/theme";
 
@@ -35,7 +35,13 @@ export const links: Route.LinksFunction = () => [{ rel: "icon", href: "/favicon.
 export async function loader({ request }: Route.LoaderArgs) {
   const theme = themeFromCookieHeader(request.headers.get("Cookie"));
   // Only ask Django when a session cookie exists: anonymous public pages stay backend-free and cacheable.
-  const user: ShellUser = hasSessionCookie(request) ? await getSessionUser(request) : null;
+  if (!hasSessionCookie(request)) return data({ theme, user: null as ShellUser });
+  // A suspended account sees a notice on every page (WP 7.2); both requests run in parallel.
+  const [session, suspension] = await Promise.all([
+    getSessionUser(request),
+    backendFetch<{ suspension: unknown }>(request, "/api/v1/me/suspension/"),
+  ]);
+  const user: ShellUser = session ? { ...session, suspended: suspension.status === 200 && Boolean(suspension.data?.suspension) } : null;
   return data({ theme, user });
 }
 

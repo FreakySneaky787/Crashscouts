@@ -41,7 +41,7 @@ test("a person is reported from the profile and warned by a moderator", async ({
   setRole(moderator.username, "moderator");
   await mod.goto("/moderation");
   await mod.getByRole("list", { name: "Open cases" }).getByRole("link", { name: `@${person.username}` }).click();
-  await expect(mod.getByText("Pretending to be someone else")).toBeVisible();
+  await expect(mod.getByRole("list", { name: "Reports" }).getByText("Pretending to be someone else")).toBeVisible();
   await expect(mod.getByRole("link", { name: "Open the profile" })).toHaveAttribute("href", `/u/${person.username}`);
   await expect(mod.getByRole("button", { name: "Block" })).toHaveCount(0);
   const caseResults = await new AxeBuilder({ page: mod }).withTags(WCAG).analyze();

@@ -46,6 +46,8 @@ export default [
   route("moderation", "routes/moderation.tsx"),
   route("moderation/:type/:id", "routes/moderation-case.tsx"),
   route("blocks/:id/appeal", "routes/block-appeal.tsx"),
+  route("suspension/appeal", "routes/suspension-appeal.tsx"),
+  route("moderation/suspensions", "routes/moderation-suspensions.tsx"),
   route("u/:username", "routes/profile.tsx"),
   route("avatars/:key", "routes/avatar.tsx"),
   route("theme", "routes/theme.tsx"),

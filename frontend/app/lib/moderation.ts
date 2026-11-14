@@ -28,7 +28,44 @@ export type ModerationCase = {
   blocked: boolean;
 };
 
+/** What a suspended person sees (WP 7.2). */
+export type SuspensionInfo = {
+  id: string;
+  category: ReportReason;
+  message: string;
+  created_at: string;
+  ends_at: string | null;
+  appeal: "none" | "pending" | "upheld" | "lifted";
+};
+
+/** What moderators and admins see about a suspension. */
+export type Suspension = SuspensionInfo & {
+  user_id: string;
+  username: string;
+  active: boolean;
+  created_by: string | null;
+  lifted_at: string | null;
+  lifted_by: string | null;
+  appeal_text: string;
+  appealed_at: string | null;
+  appeal_decided_by: string | null;
+};
+
+/**
+ * The end of a suspension from the moderator's form: the end of the chosen day in UTC, or null
+ * for "permanently". Returns "invalid" for anything else.
+ */
+export function suspensionEnd(permanent: boolean, day: string): string | null | "invalid" {
+  if (permanent) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(`${day}T23:59:59Z`))) return "invalid";
+  return `${day}T23:59:59Z`;
+}
+
 export type CaseDetail = Omit<ModerationCase, "reports" | "malware" | "oldest"> & {
+  /** People only (WP 7.2). */
+  suspensions?: Suspension[];
+  active_suspension?: string | null;
+  can_suspend?: boolean;
   reports: { reason: ReportReason; text: string; status: string; reporter: string | null; created_at: string }[];
   notes: { text: string; created_at: string }[];
   blocks: { id: string; target_type: string; category: ReportReason; message: string; created_at: string; lifted_at: string | null }[];

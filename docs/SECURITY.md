@@ -159,6 +159,13 @@ including the negative cases.
   published, by people who can read it, never one's own (404 otherwise, tested). The reported
   person or team never learns who reported. Hidden feedback becomes private, is hidden from
   participants too and cannot be republished until the block is lifted (tested).
+- **Account suspensions (WP 7.2, [ADR 0027](adr/0027-account-suspensions.md)):** one central
+  write guard in Django's middleware refuses every writing request of a suspended account (403
+  `account_suspended`) except signing out and in, password, two-factor methods, data export,
+  account deletion and the appeal; a test walks every API and authentication route with every
+  writing method. The profile is hidden while the suspension lasts. No four-eyes principle (owner's
+  decision): every step is audited and admins see all suspensions with who acted. Moderators cannot
+  suspend themselves or accounts with a platform role.
 - **Discover (WP 6.2, [ADR 0025](adr/0025-discover.md)):** only public, unblocked projects and
   live public campaigns (none while the gate is closed); drafts, reviews, private and blocked
   content never appear, also not through a search term (tested). Search terms are reduced to word

@@ -5,7 +5,7 @@ import { data, Form, redirect } from "react-router";
 
 import type { Route } from "./+types/moderation-case";
 import { Button, ButtonLink } from "~/components/ui/Button";
-import { CheckboxField, SelectField, TextAreaField } from "~/components/ui/Form";
+import { CheckboxField, SelectField, TextAreaField, TextField } from "~/components/ui/Form";
 import { ArrowLeftIcon, CheckIcon, ProhibitIcon, WarningIcon, XIcon } from "~/components/ui/icons";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -13,12 +13,28 @@ import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
-import { CASE_ACTIONS, caseTargetHref, isCaseType, type Appeal, type CaseAction, type CaseDetail } from "~/lib/moderation";
+import { formatInZone } from "~/lib/campaigns";
+import { CASE_ACTIONS, caseTargetHref, isCaseType, suspensionEnd, type Appeal, type CaseAction, type CaseDetail, type Suspension } from "~/lib/moderation";
 import { reasonsFor } from "~/lib/reports";
 
 import styles from "./forms.module.css";
 
-const PROBLEMS = ["message_required", "already_blocked", "nothing_open", "not_suspended", "no_open_appeal", "confirm", "generic"] as const;
+const PROBLEMS = [
+  "message_required",
+  "already_blocked",
+  "nothing_open",
+  "not_suspended",
+  "no_open_appeal",
+  "confirm",
+  "generic",
+  // Account suspensions (WP 7.2).
+  "end_required",
+  "end_in_past",
+  "already_suspended",
+  "has_role",
+  "not_yourself",
+  "account_not_suspended",
+] as const;
 type Problem = (typeof PROBLEMS)[number];
 
 export function meta(_: Route.MetaArgs) {
@@ -52,7 +68,25 @@ export async function action({ request, params }: Route.ActionArgs) {
   const headers = privateNoStoreHeaders();
   const here = `/moderation/${type}/${id}`;
   let result;
-  if ((CASE_ACTIONS as readonly string[]).includes(intent)) {
+  if (intent === "suspend" && type === "user") {
+    if (form.get("confirm") !== "on") return data({ problem: "confirm" as Problem }, { status: 400, headers });
+    const end = suspensionEnd(form.get("permanent") === "on", String(form.get("ends_on") ?? ""));
+    if (end === "invalid") return data({ problem: "end_required" as Problem }, { status: 400, headers });
+    result = await backendFetch(request, `${api}suspend/`, {
+      method: "POST",
+      csrfToken,
+      json: { category: String(form.get("category") ?? ""), message: String(form.get("message") ?? ""), ends_at: end },
+    });
+  } else if (intent === "suspension-lift" || intent === "suspension-uphold" || intent === "suspension-accept") {
+    const suspension = String(form.get("suspension") ?? "");
+    if (!isUuid(suspension)) throw data(null, { status: 404, headers });
+    const base = `/api/v1/moderation/account-suspensions/${suspension}/`;
+    const path = intent === "suspension-lift" ? `${base}lift/` : `${base}appeal/${intent === "suspension-accept" ? "lift" : "uphold"}/`;
+    result = await backendFetch(request, path, { method: "POST", csrfToken });
+    if (result.status === 400 && (result.data as { code?: string } | null)?.code === "not_suspended") {
+      return data({ problem: "account_not_suspended" as Problem }, { status: 400, headers });
+    }
+  } else if ((CASE_ACTIONS as readonly string[]).includes(intent)) {
     if ((intent === "block" || intent === "dismiss") && form.get("confirm") !== "on") return data({ problem: "confirm" as Problem }, { status: 400, headers });
     result = await backendFetch(request, `${api}${intent as CaseAction}/`, {
       method: "POST",
@@ -77,13 +111,88 @@ export function headers({ actionHeaders, loaderHeaders }: Route.HeadersArgs) {
   return [...actionHeaders].length > 0 ? actionHeaders : loaderHeaders;
 }
 
-function Hidden({ csrfToken, intent, block }: { csrfToken: string; intent: string; block?: string }) {
+function Hidden({ csrfToken, intent, block, suspension }: { csrfToken: string; intent: string; block?: string; suspension?: string }) {
   return (
     <>
       <input type="hidden" name="csrf_token" value={csrfToken} />
       <input type="hidden" name="intent" value={intent} />
       {block ? <input type="hidden" name="block" value={block} /> : null}
+      {suspension ? <input type="hidden" name="suspension" value={suspension} /> : null}
     </>
+  );
+}
+
+/** A person's suspensions: the one in force with lifting and the appeal, the history, the form. */
+function SuspensionPanel({ detail, csrfToken }: { detail: CaseDetail; csrfToken: string }) {
+  const { t } = useTranslation();
+  const all = detail.suspensions ?? [];
+  const current = all.find((s) => s.id === detail.active_suspension) ?? null;
+  const past = all.filter((s) => s !== current);
+  const end = (s: Suspension) => (s.ends_at ? t("suspension.until", { end: `${formatInZone(s.ends_at, "UTC")} UTC` }) : t("suspension.permanent"));
+  return (
+    <Panel title={t("suspension.moderation.title")}>
+      <div className={styles.stack}>
+        {current ? (
+          <div className={styles.stackTight}>
+            <Notice tone="danger" title={t("suspension.moderation.active", { reason: t(`reports.reasons.${current.category}`), by: current.created_by ?? "?" })}>
+              {current.message}
+            </Notice>
+            <p>{end(current)}</p>
+            {current.appeal === "pending" ? (
+              <div className={styles.stackTight}>
+                <h3 className={styles.subhead}>{t("suspension.moderation.appeal")}</h3>
+                <p>{current.appeal_text}</p>
+                <div className={styles.buttonRow}>
+                  <Form method="post">
+                    <Hidden csrfToken={csrfToken} intent="suspension-accept" suspension={current.id} />
+                    <Button type="submit" variant="primary" icon={CheckIcon}>
+                      {t("suspension.moderation.accept")}
+                    </Button>
+                  </Form>
+                  <Form method="post">
+                    <Hidden csrfToken={csrfToken} intent="suspension-uphold" suspension={current.id} />
+                    <Button type="submit" variant="secondary">
+                      {t("suspension.moderation.uphold")}
+                    </Button>
+                  </Form>
+                </div>
+              </div>
+            ) : null}
+            <Form method="post">
+              <Hidden csrfToken={csrfToken} intent="suspension-lift" suspension={current.id} />
+              <Button type="submit" variant="secondary">
+                {t("suspension.moderation.lift")}
+              </Button>
+            </Form>
+          </div>
+        ) : detail.can_suspend ? (
+          <Form method="post" className={styles.form}>
+            <Hidden csrfToken={csrfToken} intent="suspend" />
+            <SelectField id="suspend-category" name="category" label={t("moderation.category")} options={reasonsFor("user").map((r) => ({ value: r, label: t(`reports.reasons.${r}`) }))} />
+            <TextAreaField id="suspend-message" name="message" label={t("suspension.moderation.message")} hint={t("suspension.moderation.messageHint")} rows={3} maxLength={1000} required />
+            <TextField id="suspend-ends-on" name="ends_on" type="date" label={t("suspension.moderation.endsOn")} hint={t("suspension.moderation.endsOnHint")} />
+            <CheckboxField id="suspend-permanent" name="permanent" label={t("suspension.moderation.permanent")} />
+            <CheckboxField id="suspend-confirm" name="confirm" label={t("suspension.moderation.confirm")} />
+            <div>
+              <Button type="submit" variant="danger" icon={ProhibitIcon}>
+                {t("suspension.moderation.suspend")}
+              </Button>
+            </div>
+          </Form>
+        ) : (
+          <p className={styles.muted}>{t("suspension.moderation.cannot")}</p>
+        )}
+        {past.length ? (
+          <ul className={styles.plainList} aria-label={t("suspension.moderation.history")}>
+            {past.map((s) => (
+              <li key={s.id}>
+                {t(`reports.reasons.${s.category}`)} · {end(s)} · {s.lifted_at ? t("suspension.moderation.liftedBy", { by: s.lifted_by ?? "?" }) : t("suspension.moderation.ended")}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </Panel>
   );
 }
 
@@ -152,6 +261,8 @@ export default function ModerationCasePage({ loaderData, actionData }: Route.Com
           </ul>
         </Panel>
       ) : null}
+
+      {person ? <SuspensionPanel detail={detail} csrfToken={csrfToken} /> : null}
 
       {appeal ? (
         <Panel title={t("moderation.appeal")}>

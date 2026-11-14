@@ -1,0 +1,4 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}{% if lifted %}The moderators accepted your appeal: the suspension of your account was lifted.{% else %}The moderators reviewed your appeal and kept the suspension of your account. This decision is final.{% endif %}
+
+{{ account_url }}{% endautoescape %}{% endblock content %}

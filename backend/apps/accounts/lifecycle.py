@@ -26,7 +26,7 @@ from apps.campaigns.models import (
     TaskProgress,
 )
 from apps.feedback.models import Feedback
-from apps.moderation.models import Report
+from apps.moderation.models import AccountSuspension, Report
 from apps.profiles.avatars import delete_avatar
 from apps.profiles.models import Profile
 from apps.projects.models import Invitation, Membership
@@ -236,6 +236,19 @@ def export_data(user) -> dict:
                 "created_at": _iso(r.created_at),
             }
             for r in Report.objects.filter(reporter=user)
+        ],
+        # Suspensions of the account (WP 7.2) as the person saw them, without moderators' names.
+        "suspensions": [
+            {
+                "reason": s.category,
+                "message": s.message,
+                "created_at": _iso(s.created_at),
+                "ends_at": _iso(s.ends_at),
+                "lifted_at": _iso(s.lifted_at),
+                "appeal": s.appeal_text,
+                "appeal_decision": s.appeal_decision,
+            }
+            for s in AccountSuspension.objects.filter(user=user)
         ],
         "campaigns_published": [
             {

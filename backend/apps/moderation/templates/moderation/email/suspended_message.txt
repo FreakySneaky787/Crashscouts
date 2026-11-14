@@ -1,0 +1,6 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}The moderators suspended your account {{ until }}. Their message:
+
+{{ message }}
+
+While it is suspended you can sign in and read, export your data and delete your account, but not create, change, report, give feedback, join or invite. Your profile is hidden from others. You can appeal once on your account page: {{ account_url }}{% endautoescape %}{% endblock content %}

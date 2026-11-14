@@ -10,6 +10,8 @@
  * - Every call is bound to exactly one browser request; there is no shared state.
  * - `X-Forwarded-For` from the reverse proxy is passed on unchanged (rate limits per IP, ADR 0022).
  */
+import { redirect } from "react-router";
+
 import { CSRF_COOKIE, readCookie, readSetCookie } from "./http";
 
 const BACKEND_URL = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";
@@ -87,6 +89,11 @@ export async function backendFetch<T = unknown>(
   } else {
     await response.body?.cancel();
   }
+  // A suspended account is read only (WP 7.2): every refused write leads to the explanation on
+  // the account page instead of each form's generic error.
+  if (method !== "GET" && isSuspendedRefusal(response.status, data)) {
+    throw redirect("/account?suspended=1", { headers: { "Cache-Control": "private, no-store" } });
+  }
 
   return {
     status: response.status,
@@ -97,6 +104,11 @@ export async function backendFetch<T = unknown>(
 }
 
 export type SessionUser = { username: string };
+
+/** Django's write guard answers 403 `{"code": "account_suspended"}` (ADR 0027). */
+export function isSuspendedRefusal(status: number, body: unknown): boolean {
+  return status === 403 && Boolean(body) && typeof body === "object" && (body as { code?: unknown }).code === "account_suspended";
+}
 
 /**
  * Fetches a binary resource (e.g. an image) from Django for streaming it to the browser.

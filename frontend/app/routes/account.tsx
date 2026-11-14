@@ -5,6 +5,7 @@ import type { Route } from "./+types/account";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { Notice } from "~/components/ui/Notice";
 import { Avatar } from "~/components/ui/Data";
+import { SuspensionNotice } from "~/components/moderation/SuspensionNotice";
 import { DatabaseIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
@@ -13,6 +14,7 @@ import { FEEDBACK_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
 import { feedbackStatusStyleKey, type MyFeedback } from "~/lib/feedback";
+import type { SuspensionInfo } from "~/lib/moderation";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { verificationOutcome } from "~/lib/verification";
 
@@ -27,7 +29,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects, invitations, campaignInvitations, participations, applications, role, reports, feedback] = await Promise.all([
+  const [csrf, projects, invitations, campaignInvitations, participations, applications, role, reports, feedback, suspension] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
     backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
@@ -53,6 +55,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     backendFetch<{ platform_role: string }>(request, "/api/v1/me/platform-role/"),
     backendFetch<{ target_label: string; reason: string; status: string; created_at: string }[]>(request, "/api/v1/me/reports/"),
     backendFetch<MyFeedback[]>(request, "/api/v1/me/feedback/"),
+    backendFetch<{ suspension: SuspensionInfo | null }>(request, "/api/v1/me/suspension/"),
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
@@ -88,6 +91,10 @@ export async function loader({ request }: Route.LoaderArgs) {
       participationLeft,
       feedbackWithdrawn,
       feedback: feedback.data ?? [],
+      suspension: suspension.data?.suspension ?? null,
+      // A write was refused because the account is suspended (redirect from backendFetch).
+      refusedWhileSuspended: params.get("suspended") === "1",
+      suspensionAppeal: ((value): "sent" | "failed" | null => (value === "sent" || value === "failed" ? value : null))(params.get("suspension_appeal")),
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -106,6 +113,11 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         leading={<Avatar name={loaderData.username} id={loaderData.username} size="lg" />}
         subtitle={<span data-testid="signed-in-as">{t("account.signedInAs", { username: loaderData.username })}</span>}
       />
+      {loaderData.refusedWhileSuspended && loaderData.suspension ? <Notice tone="danger" title={t("suspension.refused")} /> : null}
+      {loaderData.suspensionAppeal ? (
+        <Notice tone={loaderData.suspensionAppeal === "sent" ? "ok" : "danger"} title={t(`suspension.appeal_${loaderData.suspensionAppeal}`)} />
+      ) : null}
+      {loaderData.suspension ? <SuspensionNotice info={loaderData.suspension} csrfToken={loaderData.csrfToken} /> : null}
       {loaderData.deleted ? <Notice tone="ok" title={t("projects.deleted")} /> : null}
       {loaderData.verificationError ? <Notice tone="danger" title={t(`verification.errors.${loaderData.verificationError}`)} /> : null}
       {loaderData.invitationResult ? (

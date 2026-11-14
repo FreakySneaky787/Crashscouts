@@ -10,12 +10,18 @@ def visible_profiles() -> QuerySet[Profile]:
     """Profiles that may be shown publicly: active accounts with a confirmed email address.
 
     Unconfirmed accounts stay invisible (no public pages for throwaway or spam signups);
-    deactivated accounts and accounts waiting for deletion disappear at once.
+    deactivated accounts and accounts waiting for deletion disappear at once, suspended accounts
+    while the suspension lasts (WP 7.2).
     """
+    from apps.moderation.models import AccountSuspension  # moderation builds on profiles
+    from apps.moderation.suspensions import active_q
+
     confirmed = EmailAddress.objects.filter(user=OuterRef("user"), verified=True)
+    suspended = AccountSuspension.objects.filter(active_q(), user=OuterRef("user"))
     return (
         Profile.objects.filter(user__is_active=True, user__deletion_scheduled_for__isnull=True)
         .filter(Exists(confirmed))
+        .exclude(Exists(suspended))
         .select_related("user")
         .prefetch_related("interests", "platforms", "skills")
     )

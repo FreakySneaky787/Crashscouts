@@ -86,6 +86,19 @@ class AuditEvent(models.Model):
         REPORTS_DISMISSED = "moderation.reports_dismissed", "Reports dismissed"
         APPEALED = "moderation.appealed", "Block appealed"
         APPEAL_DECIDED = "moderation.appeal_decided", "Appeal decided"
+        ACCOUNT_SUSPENDED = "moderation.account_suspended", "Account suspended"
+        ACCOUNT_SUSPENSION_LIFTED = (
+            "moderation.account_suspension_lifted",
+            "Account suspension lifted",
+        )
+        ACCOUNT_SUSPENSION_APPEALED = (
+            "moderation.account_suspension_appealed",
+            "Account suspension appealed",
+        )
+        ACCOUNT_SUSPENSION_APPEAL_DECIDED = (
+            "moderation.account_suspension_appeal_decided",
+            "Account suspension appeal decided",
+        )
         CAMPAIGN_APPROVED = "moderation.campaign_approved", "Public campaign approved"
         CAMPAIGN_REJECTED = "moderation.campaign_rejected", "Public campaign sent back"
         LINK_APPROVED = "moderation.link_approved", "Download link approved"

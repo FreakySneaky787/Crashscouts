@@ -192,3 +192,44 @@ class ModerationNote(BaseModel):
 
     def __str__(self) -> str:
         return f"Warning for {self.project or self.user}"
+
+
+class AccountSuspension(BaseModel):
+    """A moderator suspends an account (WP 7.2, ADR 0027): read only until ``ends_at`` (``None``
+    = permanent) or until lifted. One appeal by the person, decided by any moderator.
+
+    Owner's decisions (2026-11-14): sign-in, reading, export and deletion stay possible; creating,
+    reporting, feedback, joining and inviting do not; the profile is hidden from others; any
+    moderator suspends with a free end date or permanently and decides the appeal.
+    """
+
+    MESSAGE_MAX_LENGTH = Block.MESSAGE_MAX_LENGTH
+    Decision = Block.Decision
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="suspensions"
+    )
+    category = models.CharField(max_length=24, choices=Report.Reason.choices)
+    message = models.TextField(max_length=MESSAGE_MAX_LENGTH)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    lifted_at = models.DateTimeField(null=True, blank=True)
+    lifted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    appeal_text = models.TextField(max_length=MESSAGE_MAX_LENGTH, blank=True)
+    appealed_at = models.DateTimeField(null=True, blank=True)
+    appeal_decision = models.CharField(max_length=8, choices=Decision.choices, blank=True)
+    appeal_decided_at = models.DateTimeField(null=True, blank=True)
+    appeal_decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["user", "lifted_at"])]
+
+    def __str__(self) -> str:
+        return f"Suspension ({'lifted' if self.lifted_at else 'active or expired'})"

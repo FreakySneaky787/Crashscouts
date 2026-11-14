@@ -5,12 +5,14 @@ import { useTranslation } from "react-i18next";
 import { brand } from "~/config/brand";
 import type { Theme } from "~/lib/theme";
 import { Avatar } from "~/components/ui/Data";
+import { Notice } from "~/components/ui/Notice";
 import { ThemeToggle } from "~/components/ui/ThemeToggle";
 import { CompassIcon, HouseIcon, ListIcon, PaletteIcon, SignInIcon, UserCircleIcon, UserPlusIcon, type IconComponent } from "~/components/ui/icons";
 
 import styles from "./AppShell.module.css";
 
-export type ShellUser = { username: string } | null;
+/** `suspended`: the account is read only (WP 7.2); a notice links to the explanation. */
+export type ShellUser = { username: string; suspended?: boolean } | null;
 
 type NavItem = { to: string; label: string; icon: IconComponent; end?: boolean };
 
@@ -90,6 +92,11 @@ export function AppShell({ user, theme, children }: { user: ShellUser; theme: Th
           ) : null}
         </header>
         <main id="main" tabIndex={-1} className={styles.main}>
+          {user?.suspended ? (
+            <Notice tone="info" title={t("suspension.banner")}>
+              <NavLink to="/account#suspension">{t("suspension.bannerLink")}</NavLink>
+            </Notice>
+          ) : null}
           {children}
         </main>
       </div>

@@ -50,6 +50,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    # Suspended accounts are read only (WP 7.2, ADR 0027).
+    "apps.moderation.middleware.SuspensionGuard",
 ]
 
 ROOT_URLCONF = "config.urls"
