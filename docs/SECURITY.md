@@ -42,8 +42,13 @@ including the negative cases.
   - ✅ Passkeys and passwordless login (WP 1.3b): relying party = public frontend host; adding
     and removing need a fresh confirmation; tested with Chromium's virtual authenticator.
 - ✅ Session cookie `HttpOnly` and `SameSite=Lax` (verified in E2E); `Secure` enforced in
-  production settings.
-- New session on login; session list with "sign out everywhere" (phase 1).
+  production settings; in production the cookies are named `__Host-sessionid`,
+  `__Host-csrftoken` and `__Host-theme` (HTTPS only, this host only; ASVS 5.0 V3.3.1, WP 7.5).
+- ✅ New session ID on login (Django) and after every re-authentication
+  (`RotateSessionOnReauthentication`, ASVS 5.0 V7.2.4, WP 7.5); the old ID is deleted and is
+  useless after logout (tested). Session list with "sign out everywhere": open.
+- ✅ Password change with the current and the new password on `/settings/security` (ASVS 5.0
+  V6.2.2/V6.2.3, WP 7.5).
 - ✅ Signup can be closed with `DJANGO_SIGNUP_ENABLED` (production default: closed).
 
 - ✅ GitHub login ([ADR 0012](adr/0012-github-login.md)): no automatic linking or login by email;
@@ -60,8 +65,11 @@ including the negative cases.
   `form-action 'self'`), a fresh nonce per response.
 - ✅ `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`,
   `Cross-Origin-Opener-Policy: same-origin` (Django and SSR).
-- ✅ HSTS for one year in production settings; `includeSubDomains`/`preload` once the domain is
-  decided.
+- ✅ HSTS for one year in production settings and on the SSR server's production responses
+  (WP 7.5); `includeSubDomains`/`preload` once the domain is decided.
+- ✅ OWASP ASVS 5.0 level 1 reviewed requirement by requirement in
+  [`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md) (WP 7.5): no open high or critical findings; the TLS
+  and deployment items are part of the gate checklist for phase 8.
 - ✅ ORM only; raw SQL only with review.
 - ✅ React escapes output; `dangerouslySetInnerHTML`, `eval` and implied eval are forbidden by lint
   rules.
@@ -252,6 +260,13 @@ admin logins, deletions and exports.
 - ✅ Tools and images only from official sources with checksums or digests (e.g. `postgres:18`
   pinned by digest).
 - ✅ pnpm 10 does not run dependency install scripts unless explicitly allowed.
+- **Remediation time frames (ASVS 5.0 V15.1.1; proposal, question X, applied as the interim
+  rule):** a published advisory for a dependency is fixed within **3 days** (critical), **7 days**
+  (high), **30 days** (moderate) or with the next regular update, at most **90 days** (low);
+  development-only tools in the same tiers. A fix release younger than 7 days is taken only for
+  critical and high findings. All dependency updates are reviewed monthly. Exceptions with reason
+  go into `docs/STATUS.md`. Open finding: `minimatch` (moderate, ESLint only, since 2026-11-14;
+  due 2026-12-14).
 
 ## 11. Claude Code in the development environment
 

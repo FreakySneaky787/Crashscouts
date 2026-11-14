@@ -1,5 +1,6 @@
 /**
- * Security settings: authenticator app (TOTP) and recovery codes (WP 1.3a). Changes need a fresh
+ * Security settings: password change (ASVS 5.0 V6.2.2/V6.2.3, WP 7.5: current and new password),
+ * authenticator app (TOTP) and recovery codes (WP 1.3a). Changes need a fresh
  * password confirmation; the backend answers 401 "reauthenticate" and we send the user to
  * /reauthenticate and back. Recovery codes are only shown in an action response (never cached).
  */
@@ -70,15 +71,33 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 type ActionResult = {
-  done?: "activated" | "deactivated" | "regenerated" | "passkeyRemoved" | "githubDisconnected";
+  done?: "activated" | "deactivated" | "regenerated" | "passkeyRemoved" | "githubDisconnected" | "passwordChanged";
   codes?: string[];
-  error?: "incorrect" | "forbidden" | "rateLimited" | "generic";
+  error?: "incorrect" | "forbidden" | "rateLimited" | "generic" | "wrongPassword" | "weakPassword";
 };
+
+/** Password change: allauth checks the current password and the password rules (ADR 0009). */
+async function changePassword(request: Request, form: FormData, csrfToken: string) {
+  const result = await backendFetch<{ errors?: { param?: string }[] }>(request, `${AUTH_BASE}/account/password/change`, {
+    method: "POST",
+    csrfToken,
+    json: { current_password: String(form.get("current_password") ?? ""), new_password: String(form.get("new_password") ?? "") },
+  });
+  // Django gives the session a new ID on a password change: pass the cookie on.
+  const headers = setCookieHeaders(result.setCookies, privateNoStoreHeaders());
+  if (result.status === 200) return data<ActionResult>({ done: "passwordChanged" }, { headers });
+  if (result.status === 401) throw redirect(`/login?next=${encodeURIComponent(SELF)}`, { headers });
+  const params = (result.data?.errors ?? []).map((e) => e.param);
+  const error: ActionResult["error"] =
+    result.status === 429 ? "rateLimited" : params.includes("current_password") ? "wrongPassword" : params.includes("new_password") ? "weakPassword" : "generic";
+  return data<ActionResult>({ error }, { status: result.status === 429 ? 429 : 400, headers });
+}
 
 export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const csrfToken = String(form.get("csrf_token") ?? "");
   const intent = String(form.get("intent") ?? "");
+  if (intent === "password-change") return changePassword(request, form, csrfToken);
   const path =
     intent === "activate" || intent === "deactivate" ? "totp" : intent === "passkey-remove" ? "webauthn" : "recovery-codes";
   const endpoint =
@@ -148,7 +167,31 @@ export default function SettingsSecurity({ loaderData, actionData }: Route.Compo
 
       {actionData?.done ? <Notice tone="ok" title={t(`mfa.done.${actionData.done}`)} /> : null}
       {actionData?.error === "incorrect" ? <Notice tone="danger" title={t("mfa.incorrect")} /> : null}
-      {actionData?.error && actionData.error !== "incorrect" ? <Notice tone="danger" title={t(`formError.${actionData.error}`)} /> : null}
+      {actionData?.error === "wrongPassword" || actionData?.error === "weakPassword" ? <Notice tone="danger" title={t(`passwordChange.${actionData.error}`)} /> : null}
+      {actionData?.error && !["incorrect", "wrongPassword", "weakPassword"].includes(actionData.error) ? (
+        <Notice tone="danger" title={t(`formError.${actionData.error as "forbidden" | "rateLimited" | "generic"}`)} />
+      ) : null}
+
+      <Panel title={t("passwordChange.title")}>
+        <Form method="post" className={styles.form}>
+          <Hidden csrfToken={csrfToken} intent="password-change" />
+          <TextField id="current-password" name="current_password" type="password" label={t("passwordChange.current")} autoComplete="current-password" required />
+          <TextField
+            id="new-password"
+            name="new_password"
+            type="password"
+            label={t("passwordChange.new")}
+            hint={t("signup.passwordHint")}
+            autoComplete="new-password"
+            minLength={12}
+            maxLength={256}
+            required
+          />
+          <div>
+            <Button type="submit">{t("passwordChange.submit")}</Button>
+          </div>
+        </Form>
+      </Panel>
 
       <Panel
         title={t("mfa.appTitle")}

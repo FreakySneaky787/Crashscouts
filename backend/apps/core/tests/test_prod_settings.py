@@ -21,6 +21,8 @@ django.setup()
 print(json.dumps({
     "DEBUG": settings.DEBUG,
     "SESSION_COOKIE_SECURE": settings.SESSION_COOKIE_SECURE,
+    "COOKIE_NAMES": [settings.SESSION_COOKIE_NAME, settings.CSRF_COOKIE_NAME],
+    "COOKIE_DOMAINS": [settings.SESSION_COOKIE_DOMAIN, settings.CSRF_COOKIE_DOMAIN],
     "CSRF_COOKIE_SECURE": settings.CSRF_COOKIE_SECURE,
     "SECURE_SSL_REDIRECT": settings.SECURE_SSL_REDIRECT,
     "SECURE_HSTS_SECONDS": settings.SECURE_HSTS_SECONDS,
@@ -79,6 +81,8 @@ def test_prod_settings_are_secure():
     assert values == {
         "DEBUG": False,
         "SESSION_COOKIE_SECURE": True,
+        "COOKIE_NAMES": ["__Host-sessionid", "__Host-csrftoken"],  # ASVS 5.0 V3.3.1
+        "COOKIE_DOMAINS": [None, None],  # "__Host-" cookies must not carry a Domain
         "CSRF_COOKIE_SECURE": True,
         "SECURE_SSL_REDIRECT": True,
         "SECURE_HSTS_SECONDS": 31_536_000,

@@ -13,6 +13,7 @@
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
+| X | Remediation time frames for vulnerable dependencies (ASVS 5.0 V15.1.1) | end of phase 7 | **critical** 3 days, **high** 7 days, **moderate** 30 days, **low** with the next regular update (at most 90 days); development-only tools in the same tiers; a fix release younger than 7 days is taken only for critical and high findings (supply-chain caution); a monthly review of all dependency updates; exceptions documented in `docs/STATUS.md`. Interim rule until confirmed ([`SECURITY.md`](SECURITY.md) §10) |
 
 ### Resolved
 

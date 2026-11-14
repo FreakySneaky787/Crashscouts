@@ -12,7 +12,7 @@
  */
 import { redirect } from "react-router";
 
-import { CSRF_COOKIE, readCookie, readSetCookie } from "./http";
+import { CSRF_COOKIES, readAnyCookie, readAnySetCookie } from "./http";
 
 const BACKEND_URL = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";
 
@@ -148,11 +148,11 @@ export async function getSessionUser(request: Request): Promise<SessionUser | nu
 export async function ensureCsrfToken(
   request: Request,
 ): Promise<{ token: string; setCookies: string[] }> {
-  const existing = readCookie(request.headers.get("Cookie"), CSRF_COOKIE);
+  const existing = readAnyCookie(request.headers.get("Cookie"), CSRF_COOKIES);
   if (existing) return { token: existing, setCookies: [] };
 
   const result = await backendFetch(request, `${AUTH_BASE}/config`);
-  const token = readSetCookie(result.setCookies, CSRF_COOKIE);
+  const token = readAnySetCookie(result.setCookies, CSRF_COOKIES);
   if (!token) throw new Error("Backend did not issue a CSRF token");
-  return { token, setCookies: result.setCookies.filter((c) => c.startsWith(`${CSRF_COOKIE}=`)) };
+  return { token, setCookies: result.setCookies.filter((c) => CSRF_COOKIES.some((name) => c.startsWith(`${name}=`))) };
 }

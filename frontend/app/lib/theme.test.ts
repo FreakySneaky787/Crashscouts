@@ -14,12 +14,14 @@ describe("theme preference", () => {
 
   it("reads the cookie and falls back to system", () => {
     expect(themeFromCookieHeader("a=1; theme=dark")).toBe("dark");
+    expect(themeFromCookieHeader("theme=light; __Host-theme=dark")).toBe("dark"); // HTTPS name wins
     expect(themeFromCookieHeader("theme=<script>")).toBe("system");
     expect(themeFromCookieHeader(null)).toBe("system");
   });
 
   it("serializes a long-lived, SameSite=Lax cookie and deletes it for system", () => {
-    expect(themeCookie("dark", true)).toBe("theme=dark; Max-Age=31536000; Path=/; SameSite=Lax; Secure");
+    expect(themeCookie("dark", true)).toBe("__Host-theme=dark; Max-Age=31536000; Path=/; SameSite=Lax; Secure");
+    expect(themeCookie("system", true)).toBe("__Host-theme=; Max-Age=0; Path=/; SameSite=Lax; Secure");
     expect(themeCookie("light", false)).toBe("theme=light; Max-Age=31536000; Path=/; SameSite=Lax");
     expect(themeCookie("system", false)).toBe("theme=; Max-Age=0; Path=/; SameSite=Lax");
   });

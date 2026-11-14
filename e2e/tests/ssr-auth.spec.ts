@@ -135,6 +135,9 @@ test("(3) the session persists; Set-Cookie and CSRF work", async ({ page, contex
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(/\/$/);
   expect((await context.cookies()).find((c) => c.name === "sessionid")).toBeUndefined();
+  // ASVS 5.0 V7.4.1: the old session ID is useless in the backend, not only gone from the browser.
+  const replay = await page.request.get(`${BACKEND_URL}/_allauth/browser/v1/auth/session`, { headers: { Cookie: `sessionid=${sessionCookie}` } });
+  expect(replay.status()).toBe(401);
   await page.goto("/account");
   await expect(page).toHaveURL(/\/login/);
 

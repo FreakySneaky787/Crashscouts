@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CSRF_COOKIES,
+  SESSION_COOKIES,
   cacheHeadersFor,
+  hasSessionCookie,
+  readAnyCookie,
+  readAnySetCookie,
   isUuid,
   privateNoStoreHeaders,
   publicCacheHeaders,
@@ -94,5 +99,19 @@ describe("safeRedirectPath (open redirect protection)", () => {
     42,
   ])("rejects %s", (target) => {
     expect(safeRedirectPath(target, "/fallback")).toBe("/fallback");
+  });
+});
+
+describe("prefixed cookie names (ASVS 5.0 V3.3.1)", () => {
+  it("reads the production names and the development names", () => {
+    expect(readAnyCookie("__Host-csrftoken=abc; theme=dark", CSRF_COOKIES)).toBe("abc");
+    expect(readAnyCookie("csrftoken=dev", CSRF_COOKIES)).toBe("dev");
+    expect(readAnyCookie("theme=dark", CSRF_COOKIES)).toBeNull();
+    expect(readAnySetCookie(["__Host-csrftoken=xyz; Path=/; Secure"], CSRF_COOKIES)).toBe("xyz");
+    const request = (cookie: string) => new Request("http://localhost/", { headers: { Cookie: cookie } });
+    expect(hasSessionCookie(request("__Host-sessionid=s"))).toBe(true);
+    expect(hasSessionCookie(request("sessionid=s"))).toBe(true);
+    expect(hasSessionCookie(request("theme=dark"))).toBe(false);
+    expect(SESSION_COOKIES[0]).toBe("__Host-sessionid");
   });
 });

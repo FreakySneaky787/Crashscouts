@@ -28,6 +28,10 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+# ASVS 5.0 V3.3.1: the "__Host-" prefix binds the cookies to HTTPS, this host and path "/" (no
+# Domain attribute); browsers refuse them otherwise. The frontend reads both names.
+SESSION_COOKIE_NAME = "__Host-sessionid"
+CSRF_COOKIE_NAME = "__Host-csrftoken"
 
 # Client IP for rate limits (ADR 0022). Required: with 0, every visitor of the SSR pages would
 # share the SSR server's address and its limits. The reverse proxy must overwrite

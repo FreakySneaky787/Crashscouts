@@ -15,18 +15,22 @@ export function isTheme(value: unknown): value is Theme {
 }
 
 /** Reads the preference from a `Cookie` header; anything unknown falls back to "system". */
+/** Over HTTPS the preference cookie carries the "__Host-" prefix (ASVS 5.0 V3.3.1). */
+export const SECURE_THEME_COOKIE = `__Host-${THEME_COOKIE}`;
+
 export function themeFromCookieHeader(cookieHeader: string | null): Theme {
-  const value = readCookie(cookieHeader, THEME_COOKIE);
+  const value = readCookie(cookieHeader, SECURE_THEME_COOKIE) ?? readCookie(cookieHeader, THEME_COOKIE);
   return isTheme(value) ? value : "system";
 }
 
 /** Serializes the preference cookie. "system" deletes the cookie. */
 export function themeCookie(theme: Theme, secure: boolean): string {
   const attributes = ["Path=/", "SameSite=Lax", ...(secure ? ["Secure"] : [])];
+  const name = secure ? SECURE_THEME_COOKIE : THEME_COOKIE;
   if (theme === "system") {
-    return [`${THEME_COOKIE}=`, "Max-Age=0", ...attributes].join("; ");
+    return [`${name}=`, "Max-Age=0", ...attributes].join("; ");
   }
-  return [`${THEME_COOKIE}=${theme}`, `Max-Age=${ONE_YEAR}`, ...attributes].join("; ");
+  return [`${name}=${theme}`, `Max-Age=${ONE_YEAR}`, ...attributes].join("; ");
 }
 
 /** Value for the `data-theme` attribute on <html>; undefined lets the system setting decide. */

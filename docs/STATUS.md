@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 7.4) · **Current phase:** 7, moderation and security review – WPs 7.1–7.4 done, next: 7.5 ASVS level 1 review (flag still off)
+**Last update:** 2026-11-14 (WP 7.5) · **Current phase:** 7 complete – next: 8, release preparation (closed beta), or WP M.1 (flag still off)
 
 ## Work packages
 
@@ -1091,6 +1091,28 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   moderation page, 12 months, axe, no sideways scrolling at 390 px), gate run **4 passed**; Ruff,
   migrations check, OpenAPI, ESLint, typecheck, build clean.
 
+### WP 7.5 – OWASP ASVS 5.0 level 1 review and phase close (2026-11-14) ✅
+
+- [`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md): all 70 level 1 requirements of ASVS 5.0.0 (official
+  repository OWASP/ASVS, CSV at commit `62981c6`) with status, evidence and action: 47 met, 6
+  fixed in this WP, 12 not applicable (no JWT, no own OAuth server, no XML, no WebSockets), 4 for
+  phase 8 (TLS, certificate, no `.git` on the server; in the gate checklist), 1 pending the owner's
+  decision (remediation time frames, question X). No open high or critical findings.
+- Fixes: `__Host-` cookie names in production for session, CSRF and theme (V3.3.1); HSTS also on
+  the SSR server's production responses (V3.4.1); the malicious-lockout note in ADR 0022
+  (V6.1.1); password change with current and new password on `/settings/security` (V6.2.2,
+  V6.2.3); a new session ID after every re-authentication (V7.2.4); E2E check that the old session
+  ID is useless after logout (V7.4.1).
+- **Verification (run on 2026-11-14):** pytest **742 passed** (new: re-authentication rotates the
+  session and keeps the confirmation; production cookie names and no cookie domain); 1 mutation
+  check caught (rotation middleware removed); Vitest **111 passed** (cookie names, theme cookie over
+  HTTPS); Playwright main run **88 passed** (new: password change with a wrong current password, a
+  common new password, success, old password refused in a fresh browser, new one works; old session
+  ID answers 401 after logout), gate run **4 passed**; Ruff, migrations check, OpenAPI, pip-audit,
+  ESLint, typecheck, build clean.
+
+**Phase 7 is complete** (WPs 7.1–7.5, ADRs 0026–0029).
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -1102,11 +1124,15 @@ attachments, status workflow with the author's verification, publishing with con
 team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
 full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Phase 7
 (moderation and security review) is approved with the owner's decisions of 2026-11-14 (plan:
-WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WPs 7.1–7.4 are done. Next: **WP 7.5 – OWASP
-ASVS 5.0 level 1 review** (requirements from the official OWASP repository on GitHub; result in
-`docs/ASVS-L1-REVIEW.md` with status, evidence and action per requirement; fixes in small
-commits; then phase close). Also pending there: the moderate `minimatch` advisory (ESLint only,
-fixed by ESLint 10.15.0, published 2026-11-13; wait a few days before updating). Also open: WP M.1 (statistics page; the data for all five metrics now
+WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); Phase 7 is complete: reporting
+people and published feedback, account suspensions with a central write guard, several moderators
+with purpose-bound access, moderation statistics, and the ASVS 5.0 level 1 review with its fixes
+(WPs 7.1–7.5, ADRs 0026–0029, [`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)). Next: **phase 8 –
+release (closed beta)** or WP M.1 (statistics page for growth metrics) first; present the work
+packages and open questions before starting. Waiting for the owner: question X (remediation time
+frames, applied as the interim rule) and the two suspension rules of WP 7.2 (no suspension of
+accounts with a platform role, no suspending oneself). Due by 2026-12-14: the moderate `minimatch`
+advisory (ESLint only; fixed in ESLint 10.15.0, published 2026-11-13). Also open: WP M.1 (statistics page; the data for all five metrics now
 exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

@@ -208,7 +208,7 @@ Decisions of 2026-11-14 in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
 | 6.2 | Discover API: full-text search, filters, sort, open-source default, paging ([ADR 0025](adr/0025-discover.md)) | ✅ done |
 | 6.3 | Discover page with tabs, filters and paging | ✅ done |
 
-## Phase 7 – Extend moderation and security review
+## Phase 7 – Extend moderation and security review ✅ (2026-11-14)
 
 - Reporting of users and published feedback.
 - Account suspensions with deadlines, appeals.
@@ -222,7 +222,7 @@ Decisions of 2026-11-14 in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
 | 7.2 | Account suspensions: read-only, free end date or permanent, one appeal, admin list ([ADR 0027](adr/0027-account-suspensions.md)) | ✅ |
 | 7.3 | Taking cases, purpose-bound 24-hour access to the reported private object, admin list of accesses ([ADR 0028](adr/0028-moderator-access.md)) | ✅ |
 | 7.4 | Moderation statistics for admins (sums per month only, [ADR 0029](adr/0029-moderation-statistics.md)) | ✅ |
-| 7.5 | OWASP ASVS 5.0 level 1 review, fixes, phase close | open |
+| 7.5 | OWASP ASVS 5.0 level 1 review, fixes, phase close ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)) | ✅ |
 
 ## Phase 8 – Release (closed beta)
 

@@ -54,6 +54,13 @@ Findings before this work package:
    address), now effective across processes. allauth refuses further failed logins with the form
    error `too_many_login_attempts` (status 400), not with 429.
 
+   **Malicious lockout (ASVS 5.0 V6.1.1):** the per-account limit is a short throttle, not a
+   lockout: after five failed passwords in five minutes the account accepts password logins again
+   five minutes later, nothing is stored permanently and the owner is not locked out of the other
+   ways in – a passkey login and the password reset stay available. An attacker can therefore only slow down password logins for one account, at most
+   for five minutes at a time, and needs many IP addresses to do even that at scale (10 failed
+   logins per minute and address).
+
 ## Alternatives
 
 - **Valkey/Redis:** faster, but one more service to run and secure; not needed at the expected

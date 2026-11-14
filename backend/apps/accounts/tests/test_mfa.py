@@ -190,3 +190,23 @@ def test_passkey_registration_needs_login_and_uses_the_frontend_host(verified_us
     assert public_key["rp"]["id"] == "testing.example.org"
     # Passwordless passkeys must be discoverable (resident) credentials.
     assert public_key["authenticatorSelection"]["residentKey"] == "required"
+
+
+def test_reauthentication_issues_a_new_session_id(verified_user):
+    """ASVS 5.0 V7.2.4: the session ID observed before the sensitive step stops working."""
+    from django.contrib.sessions.models import Session
+
+    user, password = verified_user
+    client = logged_in(user, password)
+    before = client.cookies["sessionid"].value
+    assert post(client, "/auth/reauthenticate", {"password": "wrong-password"}).status_code == 400
+    assert client.cookies["sessionid"].value == before  # nothing happens without success
+    assert post(client, "/auth/reauthenticate", {"password": password}).status_code == 200
+    after = client.cookies["sessionid"].value
+    assert after != before
+    assert not Session.objects.filter(session_key=before).exists()
+    assert client.get(f"{BASE}/auth/session").status_code == 200  # still signed in
+    # The fresh confirmation survives the rotation: a sensitive step works right away.
+    secret = client.get(f"{BASE}/account/authenticators/totp").json()["meta"]["secret"]
+    response = post(client, "/account/authenticators/totp", {"code": totp(secret)})
+    assert response.status_code == 200, response.content

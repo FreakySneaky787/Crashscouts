@@ -214,7 +214,8 @@
       "deactivated": "Two-factor authentication is off.",
       "regenerated": "New recovery codes were created. The old ones no longer work.",
       "passkeyRemoved": "The passkey was removed.",
-      "githubDisconnected": "The GitHub account was disconnected."
+      "githubDisconnected": "The GitHub account was disconnected.",
+      "passwordChanged": "Your password was changed. You stay signed in on this device."
     }
   },
   "reauth": {
@@ -1474,5 +1475,13 @@
       "appeals_upheld": "Appeals rejected",
       "accesses": "Content accesses"
     }
+  },
+  "passwordChange": {
+    "title": "Password",
+    "current": "Current password",
+    "new": "New password",
+    "submit": "Change password",
+    "wrongPassword": "The current password is not correct.",
+    "weakPassword": "The new password does not meet the rules: at least 12 characters, not a common password and not similar to your name or email address."
   }
 }

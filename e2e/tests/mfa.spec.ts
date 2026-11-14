@@ -104,3 +104,38 @@ test("security pages have no WCAG A/AA violations in light and dark", async ({ p
   const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(results.violations.map((v) => `/login/2fa: ${v.id}`)).toEqual([]);
 });
+
+test("ASVS V6.2.2/V6.2.3: change the password with the current one; the new one signs in", async ({ page, request, browser }) => {
+  const account = await createSignedInAccount(page, request);
+  await page.goto("/settings/security");
+  const panel = page.getByRole("region", { name: "Password" });
+  await expect(panel.getByLabel("Current password")).toHaveAttribute("type", "password");
+  await expect(panel.getByLabel("New password")).toHaveAttribute("type", "password");
+  const newPassword = `${account.password}-renewed`;
+  // A wrong current password is refused.
+  await panel.getByLabel("Current password").fill("not-my-password");
+  await panel.getByLabel("New password").fill(newPassword);
+  await panel.getByRole("button", { name: "Change password" }).click();
+  await expect(page.getByText("The current password is not correct.")).toBeVisible();
+  // A common password is refused.
+  await panel.getByLabel("Current password").fill(account.password);
+  await panel.getByLabel("New password").fill("password1234");
+  await panel.getByRole("button", { name: "Change password" }).click();
+  await expect(page.getByText(/The new password does not meet the rules/)).toBeVisible();
+  // The change works and keeps this session signed in.
+  await panel.getByLabel("Current password").fill(account.password);
+  await panel.getByLabel("New password").fill(newPassword);
+  await panel.getByRole("button", { name: "Change password" }).click();
+  await expect(page.getByText("Your password was changed. You stay signed in on this device.")).toBeVisible();
+  await page.goto("/account");
+  await expect(page.getByTestId("signed-in-as")).toBeVisible();
+  // In a fresh browser: the old password no longer works, the new one does.
+  const fresh = await browser.newContext();
+  const other = await fresh.newPage();
+  await other.goto("/login");
+  await logIn(other, account.email, account.password);
+  await expect(other.getByRole("alert")).toContainText("incorrect");
+  await logIn(other, account.email, newPassword);
+  await expect(other).toHaveURL(/\/account$/);
+  await fresh.close();
+});

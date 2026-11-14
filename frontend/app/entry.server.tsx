@@ -37,6 +37,9 @@ function applySecurityHeaders(headers: Headers, nonce: string): void {
   // The dev server (Vite/HMR) needs inline scripts, so the CSP applies to the production build.
   if (import.meta.env.PROD) {
     headers.set("Content-Security-Policy", contentSecurityPolicy(nonce));
+    // ASVS 5.0 V3.4.1: HSTS on every response, one year (like Django's production settings).
+    // Browsers ignore it over plain HTTP; includeSubDomains/preload follow the domain (question N).
+    headers.set("Strict-Transport-Security", "max-age=31536000");
   }
   // Safe default: anything a route does not explicitly mark as cacheable is never stored.
   if (!headers.has("Cache-Control")) {

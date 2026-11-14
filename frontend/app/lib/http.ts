@@ -3,9 +3,30 @@
  * Deliberately side-effect free so they can be tested in isolation (http.test.ts).
  */
 
-/** Django's cookie names (defaults). */
-export const SESSION_COOKIE = "sessionid";
-export const CSRF_COOKIE = "csrftoken";
+/**
+ * Django's cookie names: production uses the "__Host-" prefix (ASVS 5.0 V3.3.1: HTTPS only, this
+ * host only), development over plain HTTP the defaults. The first name found wins.
+ */
+export const SESSION_COOKIES = ["__Host-sessionid", "sessionid"] as const;
+export const CSRF_COOKIES = ["__Host-csrftoken", "csrftoken"] as const;
+
+/** Reads the first of several cookie names from a `Cookie` request header. */
+export function readAnyCookie(cookieHeader: string | null, names: readonly string[]): string | null {
+  for (const name of names) {
+    const value = readCookie(cookieHeader, name);
+    if (value !== null) return value;
+  }
+  return null;
+}
+
+/** Reads the first of several cookie names from `Set-Cookie` headers. */
+export function readAnySetCookie(setCookies: readonly string[], names: readonly string[]): string | null {
+  for (const name of names) {
+    const value = readSetCookie(setCookies, name);
+    if (value !== null) return value;
+  }
+  return null;
+}
 
 /** Reads a cookie value from a `Cookie` request header. */
 export function readCookie(cookieHeader: string | null, name: string): string | null {
@@ -45,7 +66,7 @@ export function isUuid(value: unknown): value is string {
 
 /** Does the request carry a (possible) session? Then the response must never be shared-cached. */
 export function hasSessionCookie(request: Request): boolean {
-  return readCookie(request.headers.get("Cookie"), SESSION_COOKIE) !== null;
+  return readAnyCookie(request.headers.get("Cookie"), SESSION_COOKIES) !== null;
 }
 
 /** Headers for responses with user-specific or private data (docs/SECURITY.md §8). */

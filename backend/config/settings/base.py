@@ -52,6 +52,8 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     # Suspended accounts are read only (WP 7.2, ADR 0027).
     "apps.moderation.middleware.SuspensionGuard",
+    # A new session ID after re-authentication (ASVS 5.0 V7.2.4).
+    "apps.accounts.middleware.RotateSessionOnReauthentication",
 ]
 
 ROOT_URLCONF = "config.urls"

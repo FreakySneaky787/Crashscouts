@@ -2,7 +2,7 @@
 
 > For the project owner. Public campaigns stay locked (`PUBLIC_CAMPAIGNS_ENABLED=false`) until
 > **every** line below is ticked. Only the project owner switches the flag, and records the date
-> in [`STATUS.md`](STATUS.md). State: 2026-11-13, after WP 3B.6.
+> in [`STATUS.md`](STATUS.md). State: 2026-11-14, after WP 7.5.
 
 ## Part 1 – The eight gate items (code and tests)
 
@@ -46,15 +46,21 @@ server.
       `<frontend>/projects/github/verify/callback`.
 - [ ] Legal pages (terms, privacy, imprint) published for public content (see the legal section
       of [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
+- [ ] ASVS 5.0 level 1 operations items ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)): the proxy
+      offers TLS 1.2 and 1.3 only (V12.1.1) with a publicly trusted certificate (V12.2.2), plain
+      HTTP only redirects (V12.2.1); the deployed files contain no `.git` folder (V13.4.1); the
+      browser receives `__Host-sessionid`, `__Host-csrftoken` and `Strict-Transport-Security` on
+      every response (V3.3.1, V3.4.1).
 
 ## Part 3 – Deliberately open, known risks
 
-- Published feedback (phase 5, ADR 0024) cannot be reported yet (phase 7); it is public only with
-  the author's consent and can be made private again by the team or the author at any time.
+- Published feedback can be reported and hidden since phase 7 (ADR 0026).
 
 - Rate-limit values are provisional (ADR 0022); every limited request writes to PostgreSQL – to
   be measured before the beta.
-- One moderator (the owner, decision H): reviews and reports wait while the owner is away.
+- One moderator at the start (the owner, decision H): reviews and reports wait while the owner is
+  away. Several moderators are supported since phase 7 (ADR 0028); any moderator may suspend and
+  decide the appeal (no four-eyes principle, ADR 0027), reviewable in the admins' lists.
 - IP addresses in the cache are HMAC hashes: pseudonymised, not anonymised (ADR 0022); deleted at
   most one day after the last request plus up to one hour until the hourly cleanup.
 - No IP addresses in the audit log (open question T).
