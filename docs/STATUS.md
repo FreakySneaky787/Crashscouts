@@ -1017,7 +1017,9 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   it stays private for others, axe); Ruff, migrations check, OpenAPI, pip-audit, ESLint,
   typecheck, build clean. `pnpm audit` reports one new **moderate** advisory in a development-only
   dependency (ESLint → minimatch, GHSA-g3hv-75wg-m249; not shipped to users; CI fails on high and
-  critical only) – to be fixed in a separate commit.
+  critical only) – to be fixed in a separate commit. The first CI run failed in the new gate test
+  (a race: the moderator's page already showed "Done." from the earlier action); fixed by waiting
+  for the new address, gate run again **4 passed**.
 
 ## Handover – next session (written 2026-11-14)
 

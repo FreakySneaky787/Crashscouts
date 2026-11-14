@@ -46,7 +46,7 @@ test("published feedback is reported, hidden with a reason and shown again", asy
   await mod.getByLabel(/Hide this feedback/).check();
   await mod.getByRole("button", { name: "Hide", exact: true }).click();
   await expect(mod.getByText("Done.")).toBeVisible();
-  const caseUrl = mod.url();
+  const caseUrl = new URL(mod.url()).pathname; // without "?done=block"
 
   // Hidden: 404 for the reader; the author sees the reason, the team can appeal.
   expect((await reader.goto(feedback))?.status()).toBe(404);
@@ -67,6 +67,7 @@ test("published feedback is reported, hidden with a reason and shown again", asy
   // private until the team and the author publish it again.
   await mod.goto(caseUrl);
   await mod.getByRole("button", { name: "Accept appeal and lift the block" }).click();
+  await expect(mod).toHaveURL(/\?done=appeal-lift$/);
   await expect(mod.getByText("Done.")).toBeVisible();
   await page.goto(feedback);
   await expect(page.getByText("Hidden: Spam")).toHaveCount(0);
