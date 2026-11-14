@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 6.1) · **Current phase:** 6 – Discover (flag still off)
+**Last update:** 2026-11-14 (WP 6.2) · **Current phase:** 6 – Discover (flag still off)
 
 ## Work packages
 
@@ -945,6 +945,25 @@ with "new" selectable (never by popularity), the filter "open source only" prese
   project page and the edit form), gate run **2 passed**; Ruff, migrations check, OpenAPI,
   pip-audit, ESLint, typecheck, build clean.
 
+### WP 6.2 – Discover API (2026-11-14) ✅
+
+- New app `apps.discover` (queries only, [ADR 0025](adr/0025-discover.md)):
+  `/api/v1/discover/projects/` and `/api/v1/discover/campaigns/`, public, read-only, 120
+  requests per minute and IP address.
+- Only public, unblocked projects and live public campaigns of public projects (none while the
+  gate is closed); "open source only" unless `open_source=all`; every result says whether it is
+  open source.
+- Sort "recently active" (default; project or live campaign changes) or "new"; never by
+  popularity. Full-text search (`simple`, prefixes, every word, word characters only; weighted
+  name/title first) ordered by rank, then by the chosen sort. Filters as in ADR 0025; 20 per page.
+- **Verification (run on 2026-11-14):** pytest **612 passed** (34 new: public only, open-source
+  default and labels, private and blocked never found even by name, sort active/new, eight project
+  filters, prefixes and weights, odd search input, paging, live campaigns only, empty while the
+  gate is closed, seven campaign filters and searches, live-campaign counts, rate limit); 4
+  mutation checks caught (private projects, gate ignored, open-source default ignored, any campaign
+  state); Ruff, migrations check, OpenAPI, pip-audit clean; Playwright main run **81 passed**, gate
+  run **2 passed** (no frontend change yet).
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -954,7 +973,7 @@ Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) with
 owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
 attachments, status workflow with the author's verification, publishing with consent, the
 team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is under way with the approved plan: WP 6.1
-(software type) is done; next are WP 6.2 (Discover API) and 6.3 (Discover page). Also open: WP M.1 (statistics page; the data for all
+(software type) and WP 6.2 (Discover API) are done; next is WP 6.3 (Discover page). Also open: WP M.1 (statistics page; the data for all
 five metrics now exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

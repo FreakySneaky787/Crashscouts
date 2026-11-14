@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.campaigns",
     "apps.moderation",
     "apps.feedback",
+    "apps.discover",
 ]
 
 MIDDLEWARE = [
@@ -331,6 +332,8 @@ REST_FRAMEWORK = {
         "feedback_create_ip": "60/day",
         "feedback_attachment": "60/hour",
         "feedback_attachment_ip": "120/hour",
+        # Discover is public; this keeps the full-text search from being abused (ADR 0025).
+        "discover_ip": "120/min",
         # Per IP address in addition to per account (gate item 3); higher because several
         # people can share one address. Keys are hashed (ADR 0022).
         "report_ip": "60/day",

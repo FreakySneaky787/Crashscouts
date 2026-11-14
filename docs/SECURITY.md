@@ -154,6 +154,10 @@ including the negative cases.
   Other readers never learn who wrote it. Blocked content hides its feedback. On final account
   deletion the author becomes NULL (the text stays, anonymised); the export contains the person's
   own feedback. Permission matrix tested per role, including the negative cases.
+- **Discover (WP 6.2, [ADR 0025](adr/0025-discover.md)):** only public, unblocked projects and
+  live public campaigns (none while the gate is closed); drafts, reviews, private and blocked
+  content never appear, also not through a search term (tested). Search terms are reduced to word
+  characters before they reach PostgreSQL; 120 requests per minute and IP address.
 - **No tracking:** no analytics scripts, no tracking cookies, no third-party analytics. Growth
   metrics are computed from the platform's own data, as aggregates only, and shown internally
   ([`METRICS.md`](METRICS.md), owner's decision 2026-11-13).

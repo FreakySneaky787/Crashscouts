@@ -59,7 +59,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `moderation` | Reports, review queue, actions, blocks | reports, link suspension, blocks, warnings, appeals, moderation pages (WP 3B.2–3B.3) |
 | `notifications` | In-app and email notifications (via tasks) | planned |
 | `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
-| `discover` | Search and filters (PostgreSQL full text) | planned |
+| `discover` | Search and filters (PostgreSQL full text), queries only ([ADR 0025](adr/0025-discover.md)) | API done; page follows |
 
 **Convention:** logic lives in `services.py` (writes) and `selectors.py` (reads). Views stay thin.
 Authorization is checked by a central, server-side policy layer.
