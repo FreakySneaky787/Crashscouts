@@ -8,11 +8,12 @@ import { data, Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/campaign";
 import { ApplicationPanel } from "~/components/campaigns/ApplicationPanel";
 import { CampaignTaskList } from "~/components/campaigns/CampaignTaskList";
+import { FeedbackList } from "~/components/feedback/FeedbackList";
 import { BlockNotice } from "~/components/moderation/BlockNotice";
 import { Button, ButtonLink } from "~/components/ui/Button";
 import { CheckboxField } from "~/components/ui/Form";
 import { Chips, FactList, RowList } from "~/components/ui/Data";
-import { DownloadSimpleIcon, FlagIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, SignInIcon, SignOutIcon, UserPlusIcon, UsersIcon } from "~/components/ui/icons";
+import { ChatTextIcon, DownloadSimpleIcon, FlagIcon, LockSimpleIcon, PencilSimpleIcon, ShieldCheckIcon, SignInIcon, SignOutIcon, UserPlusIcon, UsersIcon } from "~/components/ui/icons";
 import { Markdown } from "~/components/ui/Markdown";
 import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -34,6 +35,7 @@ import {
   type CampaignLink,
   type CampaignTasks,
 } from "~/lib/campaigns";
+import type { Feedback } from "~/lib/feedback";
 import { reportHref } from "~/lib/reports";
 import { cacheHeadersFor, isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
@@ -55,13 +57,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const slug = params.slug?.toLowerCase();
   const campaignSlug = params.campaign?.toLowerCase();
   if (!isValidProjectSlug(slug) || !isValidProjectSlug(campaignSlug)) throw data(null, { status: 404 });
-  const [project, result, links, tasks] = await Promise.all([
+  const [project, result, links, tasks, feedback] = await Promise.all([
     backendFetch<Project>(request, `/api/v1/projects/${slug}/`),
     backendFetch<Campaign>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/`),
     // Only the team and participants get the links; everyone else gets 404 and sees none.
     backendFetch<CampaignLink[]>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/links/`),
     // Tasks are part of the description (ADR 0023); progress in them is the viewer's own only.
     backendFetch<CampaignTasks>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/tasks/`),
+    // Feedback the viewer may read (ADR 0024): Django filters (published, own, or all for
+    // participants and the team).
+    backendFetch<Feedback[]>(request, `/api/v1/projects/${slug}/campaigns/${campaignSlug}/feedback/`),
   ]);
   if (project.status !== 200 || !project.data || result.status !== 200 || !result.data) {
     throw data(null, { status: 404, headers: privateNoStoreHeaders() });
@@ -96,6 +101,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       questions,
       tasks: tasks.status === 200 ? (tasks.data?.tasks ?? []) : [],
       canReport: tasks.status === 200 && Boolean(tasks.data?.can_report),
+      feedback: feedback.status === 200 ? (feedback.data ?? []) : [],
       progressSaved: search.get("progress") === "saved",
       applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
     },
@@ -300,6 +306,22 @@ export default function CampaignPage({ loaderData, actionData }: Route.Component
       {campaign.method !== "free" ? (
         <Panel title={t("campaigns.tasks.title")} aside={tasksAside}>
           <CampaignTaskList tasks={loaderData.tasks} showMine={showMine} canReport={loaderData.canReport} csrfToken={csrfToken} />
+        </Panel>
+      ) : null}
+      {campaign.is_participant || campaign.can_edit || loaderData.feedback.length ? (
+        <Panel
+          title={t("feedback.title")}
+          aside={
+            campaign.is_participant && campaign.state === "published" ? (
+              <ButtonLink to={`/p/${project.slug}/c/${campaign.slug}/feedback/new`} size="sm" icon={ChatTextIcon}>
+                {t("feedback.give")}
+              </ButtonLink>
+            ) : (
+              t("feedback.count", { count: loaderData.feedback.length })
+            )
+          }
+        >
+          <FeedbackList items={loaderData.feedback} base={`/p/${project.slug}/c/${campaign.slug}`} />
         </Panel>
       ) : null}
       {links !== null ? (

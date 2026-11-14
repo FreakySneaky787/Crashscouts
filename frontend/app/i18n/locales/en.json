@@ -1063,5 +1063,153 @@
     "rejectMessage": "Reason for the team",
     "rejectConfirm": "Send it back with this reason.",
     "links": "Download links"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "give": "Give feedback",
+    "giveTitle": "Give feedback on {{campaign}}",
+    "intro": "Report bugs, ideas and results. The project team and the other testers of this campaign read your feedback; screenshots and logs only the team and you.",
+    "mine": "Your feedback",
+    "none": "No feedback yet.",
+    "tester": "A tester",
+    "yours": "yours",
+    "public": "Public",
+    "count_one": "{{count}} feedback",
+    "count_other": "{{count}} feedback",
+    "kinds": {
+      "bug": "Bug report",
+      "ux": "UX feedback",
+      "feature": "Feature suggestion",
+      "compatibility": "Compatibility report",
+      "general": "General feedback"
+    },
+    "kindHints": {
+      "bug": "Something does not work as it should.",
+      "ux": "Something is hard to understand or to use.",
+      "feature": "An idea for something new.",
+      "compatibility": "How the software runs on your system.",
+      "general": "Anything else you want to tell the team."
+    },
+    "chooseKind": "What do you want to report?",
+    "changeKind": "Choose another type",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "descriptionFeature": "Problem",
+      "steps": "Steps to reproduce",
+      "expected": "Expected behaviour",
+      "actual": "Actual behaviour",
+      "location": "Where in the product (optional)",
+      "suggestion": "Suggestion (optional)",
+      "solution": "Proposed solution",
+      "environment": "Hardware and environment (optional)",
+      "result": "Result",
+      "platform": "Operating system or device",
+      "platformOptional": "Operating system or device (optional)",
+      "anyPlatform": "Not specified",
+      "version": "Software version",
+      "task": "Test task (optional)",
+      "noTask": "No task"
+    },
+    "hints": {
+      "description": "Markdown. Do not include passwords, keys or other personal data.",
+      "steps": "One step per line, as precise as possible.",
+      "version": "Prefilled with the version of this campaign.",
+      "environment": "For example the device model, graphics card or browser."
+    },
+    "results": {
+      "works": "Works",
+      "partly": "Works partly",
+      "fails": "Does not work"
+    },
+    "statuses": {
+      "new": "New",
+      "reviewed": "Reviewed",
+      "confirmed": "Confirmed",
+      "in_progress": "In progress",
+      "fixed": "Fixed",
+      "verified": "Verified",
+      "duplicate": "Duplicate",
+      "cannot_reproduce": "Cannot reproduce",
+      "rejected": "Rejected"
+    },
+    "send": "Send feedback",
+    "save": "Save changes",
+    "sent": "Thank you. Your feedback was sent. You can add screenshots or logs below while the team has not looked at it yet.",
+    "saved": "Your changes were saved.",
+    "privacyNotice": "The project team and the other testers of this campaign can read this text, but not who wrote it. Do not include passwords, keys or other personal data.",
+    "detail": {
+      "kind": "Type",
+      "status": "Status",
+      "task": "Task",
+      "author": "From",
+      "history": "History",
+      "sent": "Sent",
+      "duplicateOf": "Duplicate of",
+      "historyTeam": "{{status}} – set by the team",
+      "historyAuthor": "{{status}} – set by the author"
+    },
+    "edit": "Edit",
+    "editTitle": "Edit feedback",
+    "withdrawTitle": "Withdraw",
+    "withdrawText": "You can withdraw your feedback while the team has not looked at it yet. It is deleted with its files.",
+    "withdraw": "Withdraw feedback",
+    "withdrawConfirm": "Withdraw “{{title}}” for good.",
+    "withdrawn": "Your feedback was withdrawn.",
+    "verify": {
+      "title": "Is it fixed?",
+      "text": "The team marked this as fixed. Please check it in the current version.",
+      "verified": "Yes, it is fixed",
+      "reopen": "No, it still happens"
+    },
+    "publish": {
+      "proposedTitle": "The team wants to make this feedback public",
+      "proposedText": "Only the text becomes public – never screenshots or logs, and not your name. You can make it private again at any time.",
+      "consent": "Make it public",
+      "decline": "Keep it private",
+      "publicNotice": "This feedback is public: everyone who can see the campaign can read the text.",
+      "makePrivate": "Make it private again"
+    },
+    "attachments": {
+      "title": "Screenshots and logs",
+      "intro": "Only the project team and you see these files. PNG, JPEG or WebP up to 5 MB; TXT, LOG or JSON up to 2 MB; at most 5 files.",
+      "none": "No files.",
+      "file": "File",
+      "add": "Add file",
+      "remove": "Remove",
+      "removeNamed": "Remove the file “{{name}}”",
+      "download": "Download {{name}}",
+      "added": "The file was added.",
+      "removed": "The file was removed.",
+      "imageAlt": "Screenshot {{name}}"
+    },
+    "problem": {
+      "not_participant": "Only testers who take part in this campaign can give feedback.",
+      "campaign_closed": "This campaign no longer takes feedback.",
+      "blocked": "Moderators blocked this content; it cannot be changed.",
+      "not_author": "Only the author can do this.",
+      "feedback_locked": "The team already looked at this feedback, so it can no longer be changed.",
+      "invalid_status": "This status change is not possible.",
+      "invalid_duplicate": "Choose another feedback of this campaign.",
+      "not_allowed": "You cannot do this.",
+      "not_proposed": "The team has not proposed to publish this feedback.",
+      "invalid_file": "Upload a PNG, JPEG or WebP image of at most 5 MB, or a UTF-8 TXT, LOG or JSON file of at most 2 MB.",
+      "too_many_attachments": "A feedback can have at most 5 files.",
+      "rateLimited": "You sent a lot in a short time. Try again later.",
+      "confirmWithdraw": "Tick the box to confirm.",
+      "invalid": "Some entries need your attention.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "errors": {
+      "title": "Enter a title of at most 120 characters.",
+      "description": "Describe your feedback.",
+      "steps": "Describe the steps.",
+      "expected": "Describe what you expected.",
+      "actual": "Describe what happened.",
+      "solution": "Describe your proposal.",
+      "platform": "Choose your operating system or device.",
+      "result": "Choose the result.",
+      "task": "Choose a task of this campaign."
+    }
   }
 }

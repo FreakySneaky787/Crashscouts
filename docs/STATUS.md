@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 5.2) · **Current phase:** 5 – Feedback (flag still off)
+**Last update:** 2026-11-14 (WP 5.3) · **Current phase:** 5 – Feedback (flag still off)
 
 ## Work packages
 
@@ -875,15 +875,37 @@ switches the flag.
   removed, files kept on account deletion); Ruff, migrations check, OpenAPI, pip-audit clean;
   Playwright main run **78 passed**, gate run **1 passed** (no frontend change yet).
 
+### WP 5.3 – Testers give and follow feedback (2026-11-14) ✅
+
+- Campaign page: "Feedback" panel for participants and the team (and for others when published
+  feedback exists) with title, kind, status (icon and text), "yours" and "public"; "Give
+  feedback" for active participants of a published campaign.
+- `/p/<p>/c/<c>/feedback/new`: choose the kind (plain links), then the kind's fields, an optional
+  test task and a notice that other testers read the text; works without JavaScript. 404 for the
+  team and everyone who does not take part.
+- `/p/<p>/c/<c>/feedback/<id>`: content (safe Markdown), details, history; for the author: edit
+  (`…/edit`) and withdraw (with confirmation) while "New", add and remove files, confirm or
+  reopen a fix, consent to or decline publishing. Others never see who wrote it.
+- `/feedback-attachments/<key>`: SSR resource route that forwards the session; passes on only an
+  image (`inline`) or a text file (`attachment`) with a checked file name, sandbox CSP, `nosniff`,
+  `private, no-store`. Uploads larger than 5 MB are refused before the body is read.
+- Account page: "Your feedback" with status, also of campaigns one left.
+- **Verification (run on 2026-11-14):** Vitest **99 passed** (5 new); Playwright main run **80
+  passed** (2 new: choose type, bug report with task, Markdown, screenshot re-encoded and shown,
+  log download headers, disguised file refused, edit, the other tester reads the text but not the
+  files or the author and gets 404 for the file, stranger 404, account list, withdraw with
+  confirmation; the team and strangers get 404 for the form; axe on the type choice, the form and
+  the detail page), gate run **1 passed**; ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
 Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) is under way with the
-approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WPs 5.1 (backend) and 5.2
-(secure attachments) are done; next are WP 5.3 (testers' feedback pages), 5.4 (the team's inbox)
-and 5.5 (published feedback, wrap-up).
+approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WPs 5.1 (backend), 5.2
+(secure attachments) and 5.3 (testers' pages) are done; next are WP 5.4 (the team's inbox) and
+5.5 (published feedback, wrap-up).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

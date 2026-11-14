@@ -8,8 +8,11 @@ import { Avatar } from "~/components/ui/Data";
 import { DatabaseIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
+import { StatusPill } from "~/components/ui/StatusPill";
+import { FEEDBACK_STATUS } from "~/components/ui/statuses";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
+import { feedbackStatusStyleKey, type MyFeedback } from "~/lib/feedback";
 import { privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { verificationOutcome } from "~/lib/verification";
 
@@ -24,7 +27,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (!user) {
     throw redirect("/login?next=/account", { headers: privateNoStoreHeaders() });
   }
-  const [csrf, projects, invitations, campaignInvitations, participations, applications, role, reports] = await Promise.all([
+  const [csrf, projects, invitations, campaignInvitations, participations, applications, role, reports, feedback] = await Promise.all([
     ensureCsrfToken(request),
     backendFetch<{ slug: string; name: string; role: string; visibility: string }[]>(request, "/api/v1/me/projects/"),
     backendFetch<{ id: string; project_name: string; invited_by: string | null }[]>(request, "/api/v1/me/invitations/"),
@@ -49,10 +52,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     ),
     backendFetch<{ platform_role: string }>(request, "/api/v1/me/platform-role/"),
     backendFetch<{ target_label: string; reason: string; status: string; created_at: string }[]>(request, "/api/v1/me/reports/"),
+    backendFetch<MyFeedback[]>(request, "/api/v1/me/feedback/"),
   ]);
   const params = new URL(request.url).searchParams;
   const deleted = params.get("project") === "deleted";
   const participationLeft = params.get("participation") === "left";
+  const feedbackWithdrawn = params.get("feedback") === "withdrawn";
   const campaignAnswer = params.get("campaign_invitation");
   const campaignInvitationResult: "joined" | "declined" | "full" | "closed" | "gone" | null =
     campaignAnswer === "joined" || campaignAnswer === "declined" || campaignAnswer === "full" || campaignAnswer === "closed" || campaignAnswer === "gone"
@@ -81,6 +86,8 @@ export async function loader({ request }: Route.LoaderArgs) {
       reports: reports.data ?? [],
       campaignInvitationResult,
       participationLeft,
+      feedbackWithdrawn,
+      feedback: feedback.data ?? [],
     },
     { headers: setCookieHeaders(csrf.setCookies, privateNoStoreHeaders()) },
   );
@@ -105,6 +112,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         <Notice tone={loaderData.invitationResult === "gone" ? "danger" : "ok"} title={t(`invitations.${loaderData.invitationResult}`)} />
       ) : null}
       {loaderData.participationLeft ? <Notice tone="ok" title={t("campaigns.join.left")} /> : null}
+      {loaderData.feedbackWithdrawn ? <Notice tone="ok" title={t("feedback.withdrawn")} /> : null}
       {loaderData.campaignInvitationResult ? (
         <Notice
           tone={["joined", "declined"].includes(loaderData.campaignInvitationResult) ? "ok" : "danger"}
@@ -157,6 +165,27 @@ export default function Account({ loaderData }: Route.ComponentProps) {
                 </span>
               </li>
             ))}
+          </ul>
+        </Panel>
+      ) : null}
+      {loaderData.feedback.length ? (
+        <Panel title={t("feedback.mine")}>
+          <ul className={styles.plainList} aria-label={t("feedback.mine")}>
+            {loaderData.feedback.map((f) => {
+              const style = FEEDBACK_STATUS[feedbackStatusStyleKey(f.status)];
+              return (
+                <li key={f.id} className={styles.listRow}>
+                  <span className={styles.stackTight}>
+                    <Link to={`/p/${f.project_slug}/c/${f.campaign_slug}/feedback/${f.id}`}>{f.title}</Link>
+                    <span className={styles.muted}>
+                      {f.campaign_title} · {t(`feedback.kinds.${f.kind}`)}
+                      {f.published ? ` · ${t("feedback.public")}` : ""}
+                    </span>
+                  </span>
+                  <StatusPill tone={style.tone} icon={"icon" in style ? style.icon : undefined} label={t(`feedback.statuses.${f.status}`)} />
+                </li>
+              );
+            })}
           </ul>
         </Panel>
       ) : null}
