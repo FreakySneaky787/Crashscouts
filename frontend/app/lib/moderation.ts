@@ -43,6 +43,29 @@ export type ModeratorAccess = {
   views: number;
 };
 
+/** Moderation statistics (WP 7.4): sums per calendar month, newest first. */
+export type ModerationStatistics = {
+  generated_at: string;
+  now: { open_cases: number; open_reports: number; active_blocks: number; open_appeals: number };
+  months: {
+    month: string;
+    reports: number;
+    by_reason: Record<string, number>;
+    by_target: Record<string, number>;
+    resolved: number;
+    dismissed: number;
+    hours_to_decision: number | null;
+    blocks: number;
+    block_appeals: number;
+    suspensions: number;
+    permanent_suspensions: number;
+    suspension_appeals: number;
+    appeals_lifted: number;
+    appeals_upheld: number;
+    accesses: number;
+  }[];
+};
+
 /** Kinds of reported content whose text moderators open only through an access. */
 export const ACCESS_TYPES = ["project", "campaign", "feedback"] as const;
 

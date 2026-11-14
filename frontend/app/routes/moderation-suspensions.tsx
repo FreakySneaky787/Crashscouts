@@ -45,7 +45,7 @@ export default function ModerationSuspensions({ loaderData }: Route.ComponentPro
       <PageHeader breadcrumbs={[{ label: t("moderation.title"), to: "/moderation" }, { label: t("suspension.admin.title") }]} title={t("suspension.admin.title")} subtitle={t("suspension.admin.intro")} />
       <Panel title={t("suspension.admin.all")} aside={String(suspensions.length)}>
         {suspensions.length ? (
-          <div className={table.tableWrap}>
+          <div className={table.tableWrap} role="region" aria-label={t("suspension.admin.all")} tabIndex={0}>
             <table className={table.table}>
               <caption className="visually-hidden">{t("suspension.admin.all")}</caption>
               <thead>

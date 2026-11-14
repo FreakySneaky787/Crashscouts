@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 7.3) · **Current phase:** 7, moderation and security review – WPs 7.1–7.3 done, next: 7.4 moderation statistics (flag still off)
+**Last update:** 2026-11-14 (WP 7.4) · **Current phase:** 7, moderation and security review – WPs 7.1–7.4 done, next: 7.5 ASVS level 1 review (flag still off)
 
 ## Work packages
 
@@ -1075,6 +1075,22 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   access, moderators get 404 for the admins' list, the admin sees the purpose, axe), gate run
   **4 passed**; Ruff, migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean.
 
+### WP 7.4 – Moderation statistics (2026-11-14) ✅
+
+- `/moderation/statistics` for admins ([ADR 0029](adr/0029-moderation-statistics.md)): right now
+  (open cases, open reports, active blocks, open appeals) and per calendar month for 12 months
+  (reports by reason and kind, resolved, dismissed, mean hours to decision, blocks and appeals,
+  suspensions and how many permanent, suspension appeals and decisions, moderator accesses). Sums
+  only, computed at request time; 404 for everyone but admins.
+- The wide admin tables (statistics, suspensions, accesses) scroll inside a focusable, labelled
+  region (axe `scrollable-region-focusable`, found by the new E2E test at narrow width).
+- **Verification (run on 2026-11-14):** pytest **741 passed** (3 new, plus the new route in the write-guard route walk; with fixed example data: sums
+  per month, mean hours to decision, now-figures, nothing but sums, admins only); 3 mutation checks
+  caught (dismissed counted as all, mean time wrong, statistics for moderators); Vitest **110
+  passed**; Playwright main run **87 passed** (new: 404 for moderators, admin opens the page from the
+  moderation page, 12 months, axe, no sideways scrolling at 390 px), gate run **4 passed**; Ruff,
+  migrations check, OpenAPI, ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -1086,9 +1102,11 @@ attachments, status workflow with the author's verification, publishing with con
 team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is complete: software type, Discover API with
 full-text search, filters and fair sorting, and the Discover page (WPs 6.1–6.3, ADR 0025). Phase 7
 (moderation and security review) is approved with the owner's decisions of 2026-11-14 (plan:
-WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WPs 7.1–7.3 are done. Next: **WP 7.4 –
-moderation statistics** for admins (open cases, reports by reason and target, mean time to a
-decision, suspensions, appeals, accesses; per month; sums only), then WP 7.5 (ASVS L1 review). Also open: WP M.1 (statistics page; the data for all five metrics now
+WPs 7.1–7.5 in [`MVP-PLAN.md`](MVP-PLAN.md)); WPs 7.1–7.4 are done. Next: **WP 7.5 – OWASP
+ASVS 5.0 level 1 review** (requirements from the official OWASP repository on GitHub; result in
+`docs/ASVS-L1-REVIEW.md` with status, evidence and action per requirement; fixes in small
+commits; then phase close). Also pending there: the moderate `minimatch` advisory (ESLint only,
+fixed by ESLint 10.15.0, published 2026-11-13; wait a few days before updating). Also open: WP M.1 (statistics page; the data for all five metrics now
 exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

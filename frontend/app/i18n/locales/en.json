@@ -1445,5 +1445,34 @@
       "environment": "Environment",
       "location": "Where in the product"
     }
+  },
+  "statistics": {
+    "title": "Moderation statistics",
+    "intro": "Sums per calendar month (UTC) for the last 12 months. No single cases or people.",
+    "now": "Right now",
+    "openCases": "open cases",
+    "openReports": "open reports",
+    "activeBlocks": "active blocks",
+    "openAppeals": "open appeals",
+    "perMonth": "Per month",
+    "month": "Month",
+    "breakdown": "Reports by reason and by kind",
+    "byReason": "By reason",
+    "byTarget": "By kind",
+    "note": "Months without reports are left out of this table. Reports count in the month they were sent; decisions in the month they were made.",
+    "columns": {
+      "reports": "Reports",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed",
+      "hours_to_decision": "Hours to decision (mean)",
+      "blocks": "Blocks",
+      "block_appeals": "Block appeals",
+      "suspensions": "Suspensions",
+      "permanent_suspensions": "of them permanent",
+      "suspension_appeals": "Suspension appeals",
+      "appeals_lifted": "Appeals accepted",
+      "appeals_upheld": "Appeals rejected",
+      "accesses": "Content accesses"
+    }
   }
 }

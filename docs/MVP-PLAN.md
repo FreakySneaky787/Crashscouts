@@ -221,7 +221,7 @@ Decisions of 2026-11-14 in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
 | 7.1 | Report people and published feedback; hide feedback ([ADR 0026](adr/0026-moderating-people-and-feedback.md)) | ✅ |
 | 7.2 | Account suspensions: read-only, free end date or permanent, one appeal, admin list ([ADR 0027](adr/0027-account-suspensions.md)) | ✅ |
 | 7.3 | Taking cases, purpose-bound 24-hour access to the reported private object, admin list of accesses ([ADR 0028](adr/0028-moderator-access.md)) | ✅ |
-| 7.4 | Moderation statistics for admins (sums per month only) | open |
+| 7.4 | Moderation statistics for admins (sums per month only, [ADR 0029](adr/0029-moderation-statistics.md)) | ✅ |
 | 7.5 | OWASP ASVS 5.0 level 1 review, fixes, phase close | open |
 
 ## Phase 8 – Release (closed beta)

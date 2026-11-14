@@ -40,7 +40,7 @@ export default function ModerationAccesses({ loaderData }: Route.ComponentProps)
       <PageHeader breadcrumbs={[{ label: t("moderation.title"), to: "/moderation" }, { label: t("access.admin.title") }]} title={t("access.admin.title")} subtitle={t("access.admin.intro")} />
       <Panel title={t("access.admin.all")} aside={String(accesses.length)}>
         {accesses.length ? (
-          <div className={table.tableWrap}>
+          <div className={table.tableWrap} role="region" aria-label={t("access.admin.all")} tabIndex={0}>
             <table className={table.table}>
               <caption className="visually-hidden">{t("access.admin.all")}</caption>
               <thead>

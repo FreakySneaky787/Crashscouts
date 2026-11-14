@@ -83,3 +83,21 @@ test("take a case, open its content with a reason, the admins' list", async ({ p
 
   for (const context of [reporterContext, first.context, second.context, admin.context]) await context.close();
 });
+
+test("WP 7.4: moderation statistics for admins only, accessible, no sideways scrolling", async ({ request, browser }) => {
+  test.setTimeout(60_000);
+  const mod = await signedInWithRole(browser, request, "moderator");
+  expect((await mod.page.goto("/moderation/statistics"))?.status()).toBe(404);
+  const admin = await signedInWithRole(browser, request, "admin");
+  await admin.page.goto("/moderation");
+  await admin.page.getByRole("link", { name: "Moderation statistics" }).click();
+  await expect(admin.page.getByRole("heading", { level: 1, name: "Moderation statistics" })).toBeVisible();
+  await expect(admin.page.getByText("open reports")).toBeVisible();
+  const perMonth = admin.page.getByRole("region", { name: "Per month" }).getByRole("table");
+  await expect(perMonth.getByRole("row")).toHaveCount(13); // header and 12 months
+  const results = await new AxeBuilder({ page: admin.page }).withTags(WCAG).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
+  await admin.page.setViewportSize({ width: 390, height: 800 });
+  expect(await admin.page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  for (const context of [mod.context, admin.context]) await context.close();
+});

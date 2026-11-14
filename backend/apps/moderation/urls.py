@@ -12,6 +12,7 @@ from .moderation_views import (
     CaseView,
     ReviewDecisionView,
     ReviewsView,
+    StatisticsView,
     SuspensionAppealDecisionView,
     SuspensionAppealsView,
     SuspensionLiftView,
@@ -24,6 +25,7 @@ urlpatterns = [
     path("me/reports/", MyReportsView.as_view(), name="my-reports"),
     path("me/suspension/", MySuspensionView.as_view(), name="my-suspension"),
     path("moderation/accesses/", AccessesView.as_view(), name="moderation-accesses"),
+    path("moderation/statistics/", StatisticsView.as_view(), name="moderation-statistics"),
     path("moderation/accesses/<uuid:access_id>/", AccessView.as_view(), name="moderation-access"),
     path("me/suspension/appeal/", MySuspensionAppealView.as_view(), name="my-suspension-appeal"),
     path(

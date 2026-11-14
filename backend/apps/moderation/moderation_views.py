@@ -528,3 +528,23 @@ class AccessesView(ModeratorView):
             raise Http404
         found = ModeratorAccess.objects.select_related("moderator")[:500]
         return Response([access.describe(a) for a in found])
+
+
+# --- Statistics (WP 7.4, ADR 0029) ---------------------------------------------------------------
+
+
+class StatisticsView(ModeratorView):
+    """Sums per month for the last 12 months; admins only."""
+
+    @extend_schema(
+        operation_id="moderation_statistics",
+        responses=inline_serializer("ModerationStatistics", {"x": serializers.CharField()}),
+    )
+    def get(self, request: Request) -> Response:
+        if not is_admin(request.user):
+            raise Http404
+        from .statistics import statistics
+
+        response = Response(statistics())
+        response["Cache-Control"] = "private, no-store"
+        return response

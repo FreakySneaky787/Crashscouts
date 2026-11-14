@@ -56,7 +56,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `campaigns` | Campaigns, links, invitations, participations, status machine | model, derived status, policies, API, public-campaign lock, time zones, download links, invitations and participations (WP 3A.1–3A.3, 3A.5) |
 | `testing` | Test tasks, progress | planned |
 | `feedback` | Feedback, status, publishing, secure attachments ([ADR 0024](adr/0024-feedback.md)) | ✅ |
-| `moderation` | Reports, review queue, actions, blocks | reports, link suspension, blocks, warnings, appeals, moderation pages (WP 3B.2–3B.3); reports of people and published feedback, hiding feedback ([ADR 0026](adr/0026-moderating-people-and-feedback.md), WP 7.1); account suspensions with the central write guard ([ADR 0027](adr/0027-account-suspensions.md), WP 7.2); taking cases and purpose-bound access ([ADR 0028](adr/0028-moderator-access.md), WP 7.3) |
+| `moderation` | Reports, review queue, actions, blocks | reports, link suspension, blocks, warnings, appeals, moderation pages (WP 3B.2–3B.3); reports of people and published feedback, hiding feedback ([ADR 0026](adr/0026-moderating-people-and-feedback.md), WP 7.1); account suspensions with the central write guard ([ADR 0027](adr/0027-account-suspensions.md), WP 7.2); taking cases and purpose-bound access ([ADR 0028](adr/0028-moderator-access.md), WP 7.3); moderation statistics for admins ([ADR 0029](adr/0029-moderation-statistics.md), WP 7.4) |
 | `notifications` | In-app and email notifications (via tasks) | planned |
 | `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
 | `discover` | Search and filters (PostgreSQL full text), queries only ([ADR 0025](adr/0025-discover.md)) | ✅ |
