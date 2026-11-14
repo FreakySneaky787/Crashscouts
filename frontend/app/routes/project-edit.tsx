@@ -153,6 +153,7 @@ export default function ProjectEdit({ loaderData, actionData }: Route.ComponentP
     categories: project.categories.map((i) => i.slug),
     platforms: project.platforms.map((i) => i.slug),
     languages: project.languages.map((i) => i.slug),
+    software_types: project.software_types.map((i) => i.slug),
   };
   const deleteProblem = actionData?.problem === "confirmDelete" || actionData?.problem === "ownerOnly" ? actionData.problem : null;
   const mediaProblem = actionData?.problem && MEDIA_PROBLEMS.concat("rateLimited").includes(actionData.problem) ? actionData.problem : null;

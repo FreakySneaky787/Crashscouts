@@ -21,6 +21,8 @@ export type Project = {
   categories: CatalogItem[];
   platforms: CatalogItem[];
   languages: CatalogItem[];
+  /** What kind of software it is (WP 6.1), e.g. desktop app or library. */
+  software_types: CatalogItem[];
   team: { username: string; role: "owner" | "maintainer" }[];
   role: "owner" | "maintainer" | null;
   logo_key: string | null;
@@ -81,6 +83,7 @@ export function projectPayload(form: FormData) {
     categories: form.getAll("categories").map(String),
     platforms: form.getAll("platforms").map(String),
     languages: form.getAll("languages").map(String),
+    software_types: form.getAll("software_types").map(String),
   };
 }
 

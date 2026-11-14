@@ -1,6 +1,6 @@
 # Data model
 
-> State after WP 5.2 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
+> State after WP 6.1 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
 > update this file in the same commit as any model change.
 
 All own tables use a random UUIDv4 primary key and `created_at`/`updated_at`
@@ -47,8 +47,8 @@ erDiagram
 | accounts | `User` | account (email login, username, age confirmation, deletion schedule, `platform_role` – ADR 0018) | deleted after the 14-day grace period (ADR 0013) |
 | profiles | `Profile` | bio, link, interests, platforms, skills, avatar; `show_*` visibility per field | deleted with the account (CASCADE) |
 | audit | `AuditEvent` | append-only security log | `actor`/`subject` set to NULL when an account is deleted; no IPs, no tokens |
-| catalog | `Category`, `Platform`, `Skill`, `ProgrammingLanguage`, `License` | fixed lists (SPDX licences) | none |
-| projects | `Project` | project with short name, visibility, licence, repository link, logo, `blocked_at` (ADR 0020) | – |
+| catalog | `Category`, `Platform`, `Skill`, `ProgrammingLanguage`, `SoftwareType`, `License` | fixed lists (SPDX licences; software types since WP 6.1) | none |
+| projects | `Project` | project with short name, visibility, licence, repository link, logo, `blocked_at` (ADR 0020), catalog lists (categories, platforms, languages, software types) | – |
 | projects | `Membership` | owner/maintainer | deleted with the account; projects are handed over first |
 | projects | `Invitation` | team invitations | invitee: CASCADE; `invited_by`: SET_NULL |
 | projects | `Screenshot`, `SlugHistory` | images, former short names | – |

@@ -37,6 +37,10 @@
 | – | Assigning admin and moderator roles | **On an admin page in the app** (2026-11-13). The first admin is created once with a server command; role changes need a fresh reauthentication and 2FA, are audited, and the last admin cannot remove themselves (phase 3B). |
 | – | Campaign data during the deletion grace period | Participations, invitations and applications **stay until the final deletion**; the person is hidden from team lists but keeps the place (2026-11-13). |
 | O | Shared cache for rate limits | **Django's database cache in PostgreSQL** (2026-11-13): no extra service, fits ADR 0003 (no Redis in the MVP); introduced in phase 3B. Implemented in WP 3B.5 (ADR 0022); IP addresses only as HMAC hashes, at most one day (owner, 2026-11-13). |
+| – | Discover content | **Two tabs:** public projects and public test campaigns (2026-11-14). |
+| – | Software type | **New project field**, fixed choice, several possible: desktop app, mobile app, web app, command-line tool, library or framework, game, server or self-hosted, browser extension (2026-11-14). |
+| – | Discover sort order | Default **"recently active"**, selectable **"new"**; never by popularity (2026-11-14). |
+| – | Open source in Discover | The filter **"open source only" is preselected**; other projects appear after unticking it and are clearly labelled (2026-11-14). |
 | – | Who sees private feedback | The team, the author and **all active participants** of the campaign; **attachments only the team and the author** (2026-11-14, [ADR 0024](adr/0024-feedback.md)). |
 | – | Publishing feedback | **The team proposes, the author consents**; attachments stay private (2026-11-14). |
 | – | "Verified" | The team sets the statuses up to "Fixed"; **the author confirms or reopens** (2026-11-14). |

@@ -33,6 +33,10 @@ class Platform(CatalogItem):
     """Operating systems and device types."""
 
 
+class SoftwareType(CatalogItem):
+    """What kind of software a project is, e.g. a desktop app or a library (WP 6.1, ADR 0025)."""
+
+
 class Skill(CatalogItem):
     """Testing skills a tester can offer."""
 

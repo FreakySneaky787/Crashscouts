@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 5.5) · **Current phase:** 5 complete – next: 6, Discover (flag still off)
+**Last update:** 2026-11-14 (WP 6.1) · **Current phase:** 6 – Discover (flag still off)
 
 ## Work packages
 
@@ -927,6 +927,24 @@ switches the flag.
   text, sees "A tester", no files section and gets 404 for the file, axe on the public feedback
   page, made private again → 404); no application code changed in this WP.
 
+## Phase 6 – Discover (started 2026-11-14)
+
+Owner's decisions of 2026-11-14 (in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)): two tabs
+(projects and campaigns), software type as a new project field, default sort "recently active"
+with "new" selectable (never by popularity), the filter "open source only" preselected.
+
+### WP 6.1 – Software type (2026-11-14) ✅
+
+- Catalog list `SoftwareType` (desktop app, mobile app, web app, command-line tool, library or
+  framework, game, server or self-hosted, browser extension; seeded by migration, editable by
+  staff) and `Project.software_types`; part of `/api/v1/catalog/` and the project API (create and
+  change by the team only, unknown values refused). Project form ("Software type" checkboxes) and
+  project page (list). The project's catalog lists now come from one constant (`LIST_FIELDS`).
+- **Verification (run on 2026-11-14):** pytest **578 passed** (3 new); Vitest **99 passed**;
+  Playwright main run **81 passed** (the rename test also chooses software types, checks the
+  project page and the edit form), gate run **2 passed**; Ruff, migrations check, OpenAPI,
+  pip-audit, ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
@@ -935,9 +953,8 @@ checklist's operations items need the production server, and only the owner swit
 Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) with the
 owner's decisions of 2026-11-14 (ADR 0024) is complete: feedback of five kinds, secure
 attachments, status workflow with the author's verification, publishing with consent, the
-team's inbox (WPs 5.1–5.5). Next: **phase 6 – Discover** (PostgreSQL full-text search with
-filters; fairness rule: default sort by new or active, not by popularity). Present its work
-packages and open questions before starting. Also open: WP M.1 (statistics page; the data for all
+team's inbox (WPs 5.1–5.5). Phase 6 (Discover) is under way with the approved plan: WP 6.1
+(software type) is done; next are WP 6.2 (Discover API) and 6.3 (Discover page). Also open: WP M.1 (statistics page; the data for all
 five metrics now exists).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for

@@ -6,7 +6,7 @@ import { privateNoStoreHeaders } from "./http";
 import type { Catalog } from "./profile";
 import type { License } from "./projects";
 
-type FullCatalog = Catalog & { languages: { slug: string; name: string }[] };
+type FullCatalog = Catalog & { languages: { slug: string; name: string }[]; software_types: { slug: string; name: string }[] };
 
 export async function loadFormData(request: Request) {
   const [catalog, licenses, csrf] = await Promise.all([

@@ -153,6 +153,28 @@ def test_confirmed_users_can_create_and_become_owner(people):
     assert response.json()["open_source"] is True
 
 
+def test_projects_name_their_software_types(people):
+    """WP 6.1: what kind of software it is, for the Discover filter (ADR 0025)."""
+    owner = client_for(people["stranger"])
+    response = owner.post(
+        "/api/v1/projects/",
+        create_payload(software_types=["desktop-app", "command-line"]),
+        format="json",
+    )
+    assert response.status_code == 201, response.content
+    assert [t["slug"] for t in response.json()["software_types"]] == ["desktop-app", "command-line"]
+    changed = owner.patch(
+        "/api/v1/projects/new-app/", {"software_types": ["library"]}, format="json"
+    ).json()
+    assert [t["slug"] for t in changed["software_types"]] == ["library"]
+    outsider = client_for(people["owner"])  # not in the new project's team
+    response = outsider.patch("/api/v1/projects/new-app/", {"software_types": []}, format="json")
+    assert response.status_code in {403, 404}
+    assert list(
+        Project.objects.get(slug="new-app").software_types.values_list("slug", flat=True)
+    ) == ["library"]
+
+
 @pytest.mark.django_db
 def test_unconfirmed_and_anonymous_users_cannot_create():
     unconfirmed = make_user("unconfirmed-user", verified=False)
@@ -188,6 +210,7 @@ def test_new_projects_default_to_private(people):
         ({"repository_url": "javascript:alert(1)"}, "repository_url"),
         ({"description": "x" * 10_001}, "description"),
         ({"platforms": ["plan9"]}, "platforms"),
+        ({"software_types": ["mainframe"]}, "software_types"),
         ({"status": "released"}, "status"),
     ],
 )

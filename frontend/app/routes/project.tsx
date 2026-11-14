@@ -193,7 +193,7 @@ export default function ProjectPage({ loaderData }: Route.ComponentProps) {
                   : []),
               ]}
             />
-            {(["platforms", "languages", "categories"] as const).map((field) =>
+            {(["software_types", "platforms", "languages", "categories"] as const).map((field) =>
               project[field].length ? (
                 <div key={field} className={styles.stackTight}>
                   <h2 className={styles.subhead}>{t(`projects.${field}`)}</h2>

@@ -14,6 +14,21 @@ def test_languages_are_part_of_the_public_catalog():
 
 
 @pytest.mark.django_db
+def test_software_types_are_part_of_the_public_catalog():
+    data = APIClient().get("/api/v1/catalog/").json()
+    assert [item["slug"] for item in data["software_types"]] == [
+        "desktop-app",
+        "mobile-app",
+        "web-app",
+        "command-line",
+        "library",
+        "game",
+        "server",
+        "browser-extension",
+    ]
+
+
+@pytest.mark.django_db
 def test_licences_come_from_the_spdx_list_with_the_open_source_label():
     response = APIClient().get("/api/v1/catalog/licenses/")
     assert response.status_code == 200

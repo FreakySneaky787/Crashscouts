@@ -53,8 +53,15 @@ test("renaming keeps the old address working; strangers cannot edit public proje
 
   await page.getByRole("link", { name: "Edit" }).click();
   await page.getByLabel("Short name").fill(renamed);
+  // Software type (WP 6.1): chosen in the form, shown on the project page.
+  const types = page.getByRole("group", { name: "Software type" });
+  await types.getByLabel("Desktop app").check();
+  await types.getByLabel("Command-line tool").check();
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page).toHaveURL(new RegExp(`/p/${renamed}$`));
+  await expect(page.getByRole("list", { name: "Software type" })).toContainText("Desktop app");
+  await page.goto(`/p/${renamed}/edit`);
+  await expect(page.getByRole("group", { name: "Software type" }).getByLabel("Command-line tool")).toBeChecked();
 
   const old = await request.get(`/p/${slug}`, { maxRedirects: 0 });
   expect(old.status()).toBe(301);

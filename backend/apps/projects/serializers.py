@@ -1,7 +1,7 @@
 from django.core.validators import URLValidator
 from rest_framework import serializers
 
-from apps.catalog.models import Category, License, Platform, ProgrammingLanguage
+from apps.catalog.models import Category, License, Platform, ProgrammingLanguage, SoftwareType
 from apps.catalog.serializers import CatalogItemSerializer
 
 from .models import Membership, Project, SlugHistory
@@ -36,6 +36,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     categories = CatalogItemSerializer(many=True)
     platforms = CatalogItemSerializer(many=True)
     languages = CatalogItemSerializer(many=True)
+    software_types = CatalogItemSerializer(many=True)
     team = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
     logo_key = serializers.UUIDField(allow_null=True)
@@ -58,6 +59,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "categories",
             "platforms",
             "languages",
+            "software_types",
             "team",
             "role",
             "logo_key",
@@ -111,6 +113,9 @@ class ProjectWriteSerializer(serializers.ModelSerializer):
     languages = serializers.SlugRelatedField(
         slug_field="slug", queryset=ProgrammingLanguage.objects.all(), many=True, required=False
     )
+    software_types = serializers.SlugRelatedField(
+        slug_field="slug", queryset=SoftwareType.objects.all(), many=True, required=False
+    )
 
     class Meta:
         model = Project
@@ -126,6 +131,7 @@ class ProjectWriteSerializer(serializers.ModelSerializer):
             "categories",
             "platforms",
             "languages",
+            "software_types",
         )
 
     def validate_slug(self, value: str) -> str:

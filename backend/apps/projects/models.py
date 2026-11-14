@@ -11,7 +11,7 @@ from django.core.validators import URLValidator
 from django.db import models
 from django.db.models.functions import Lower
 
-from apps.catalog.models import Category, License, Platform, ProgrammingLanguage
+from apps.catalog.models import Category, License, Platform, ProgrammingLanguage, SoftwareType
 from apps.core.models import BaseModel
 
 from .validators import validate_project_slug
@@ -48,6 +48,7 @@ class Project(BaseModel):
     categories = models.ManyToManyField(Category, blank=True, related_name="+")
     platforms = models.ManyToManyField(Platform, blank=True, related_name="+")
     languages = models.ManyToManyField(ProgrammingLanguage, blank=True, related_name="+")
+    software_types = models.ManyToManyField(SoftwareType, blank=True, related_name="+")
     # Random name of the stored logo (projects/logos/<key>.webp); a new upload gets a new key.
     logo_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
     # Blocked by moderators (WP 3B.3, ADR 0020): invisible to everyone but the team.

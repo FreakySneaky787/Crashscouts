@@ -200,6 +200,14 @@ Own data only, aggregates only, internal.
 - PostgreSQL full-text search with filters.
 - Fairness rule: default sort by new or active instead of popularity.
 
+Decisions of 2026-11-14 in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
+
+| WP | Content | State |
+|---|---|---|
+| 6.1 | Software type: catalog list and project field | ✅ done |
+| 6.2 | Discover API: full-text search, filters, sort, open-source default, paging | planned (next) |
+| 6.3 | Discover page with tabs, filters and paging | planned |
+
 ## Phase 7 – Extend moderation and security review
 
 - Reporting of users and published feedback.

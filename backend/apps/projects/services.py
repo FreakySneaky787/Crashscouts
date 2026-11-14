@@ -12,9 +12,13 @@ def has_confirmed_email(user) -> bool:
     return EmailAddress.objects.filter(user=user, verified=True).exists()
 
 
+# Catalog lists of a project (many-to-many); set as a whole on create and update.
+LIST_FIELDS = ("categories", "platforms", "languages", "software_types")
+
+
 @transaction.atomic
 def create_project(user, **fields) -> Project:
-    lists = {key: fields.pop(key, []) for key in ("categories", "platforms", "languages")}
+    lists = {key: fields.pop(key, []) for key in LIST_FIELDS}
     project = Project.objects.create(**fields)
     for key, items in lists.items():
         getattr(project, key).set(items)

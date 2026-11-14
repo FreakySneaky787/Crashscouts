@@ -20,11 +20,13 @@ describe("projectPayload", () => {
     form.set("license", "MIT");
     form.append("platforms", "linux");
     form.append("platforms", "android");
+    form.append("software_types", "desktop-app");
     const payload = projectPayload(form);
     expect(payload.slug).toBe("tidewater");
     expect(payload.visibility).toBe("private");
     expect(payload.platforms).toEqual(["linux", "android"]);
     expect(payload.categories).toEqual([]);
+    expect(payload.software_types).toEqual(["desktop-app"]);
   });
 });
 

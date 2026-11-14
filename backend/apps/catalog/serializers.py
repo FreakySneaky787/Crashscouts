@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Category, Platform, ProgrammingLanguage, Skill
+from .models import Category, Platform, ProgrammingLanguage, Skill, SoftwareType
 
 
 class CatalogItemSerializer(serializers.Serializer):
@@ -13,6 +13,7 @@ class CatalogSerializer(serializers.Serializer):
     platforms = CatalogItemSerializer(many=True, read_only=True)
     skills = CatalogItemSerializer(many=True, read_only=True)
     languages = CatalogItemSerializer(many=True, read_only=True)
+    software_types = CatalogItemSerializer(many=True, read_only=True)
 
     @staticmethod
     def current() -> dict:
@@ -21,6 +22,7 @@ class CatalogSerializer(serializers.Serializer):
             "platforms": Platform.objects.all(),
             "skills": Skill.objects.all(),
             "languages": ProgrammingLanguage.objects.all(),
+            "software_types": SoftwareType.objects.all(),
         }
 
 

@@ -25,7 +25,7 @@ export function ProjectForm({
   intent,
 }: {
   csrfToken: string;
-  catalog: Catalog & { languages: { slug: string; name: string }[] };
+  catalog: Catalog & { languages: { slug: string; name: string }[]; software_types: { slug: string; name: string }[] };
   licenses: License[];
   values: Partial<ProjectFormValues>;
   errors: Record<string, string>;
@@ -120,6 +120,7 @@ export function ProjectForm({
             groups={[{ label: t("projects.allLicenses"), options: licenses.filter((l) => !common.has(l.spdx_id)).map((l) => ({ value: l.spdx_id, label: label(l) })) }]}
           />
           <CheckboxGroup name="categories" legend={t("projects.categories")} options={options(catalog.categories)} selected={values.categories ?? []} />
+          <CheckboxGroup name="software_types" legend={t("projects.software_types")} options={options(catalog.software_types)} selected={values.software_types ?? []} />
           <CheckboxGroup name="platforms" legend={t("projects.platforms")} options={options(catalog.platforms)} selected={values.platforms ?? []} />
           <CheckboxGroup name="languages" legend={t("projects.languages")} options={options(catalog.languages)} selected={values.languages ?? []} />
         </div>

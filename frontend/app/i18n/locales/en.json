@@ -397,7 +397,8 @@
       "alt_text_required": "Describe the screenshot (at most 200 characters).",
       "too_many_screenshots": "A project can have at most 8 screenshots. Remove one first.",
       "rateLimited": "Too many uploads. Try again later."
-    }
+    },
+    "software_types": "Software type"
   },
   "verification": {
     "title": "Repository verification",

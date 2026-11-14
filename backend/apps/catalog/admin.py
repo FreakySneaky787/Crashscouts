@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import Category, License, Platform, ProgrammingLanguage, Skill
+from .models import Category, License, Platform, ProgrammingLanguage, Skill, SoftwareType
 
 
-@admin.register(Category, Platform, Skill, ProgrammingLanguage)
+@admin.register(Category, Platform, Skill, ProgrammingLanguage, SoftwareType)
 class CatalogItemAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "position")
     ordering = ("position", "name")
