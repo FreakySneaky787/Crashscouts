@@ -1050,7 +1050,9 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   a write leads to the explanation, hidden profile, one appeal, accepted by the moderator who
   suspended, profile visible again, mail, moderators get 404 for the admins' list, the admin sees
   who acted, axe on the case page, the account page and the list), gate run **4 passed**; Ruff,
-  migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean.
+  migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean. The first CI run failed
+  once in the Discover test (axe in dark mode ran right after clicking the theme switch); the test
+  now waits until the dark theme is applied, as the design-system test does (3 local runs passed).
 
 ## Handover – next session (written 2026-11-14)
 

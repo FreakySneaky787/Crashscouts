@@ -76,6 +76,9 @@ test("search and filter public projects; open source first, private never", asyn
   expect(narrow.violations.map((v) => v.id)).toEqual([]);
   expect(await visitor.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await visitor.getByRole("button", { name: "Dark theme" }).click();
+  // Check only once the switch is complete (axe right after the click raced with it in CI).
+  await expect(visitor.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(visitor.getByRole("button", { name: "Dark theme" })).toHaveAttribute("aria-pressed", "true");
   const dark = await new AxeBuilder({ page: visitor }).withTags(WCAG).analyze();
   expect(dark.violations.map((v) => v.id)).toEqual([]);
   await visitorContext.close();
