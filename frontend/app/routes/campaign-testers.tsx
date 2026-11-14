@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { data, Form, Link, redirect } from "react-router";
 
 import type { Route } from "./+types/campaign-testers";
+import { ProgressOverviewPanel } from "~/components/campaigns/ProgressOverviewPanel";
 import { Button } from "~/components/ui/Button";
 import { CheckboxField, TextField } from "~/components/ui/Form";
 import { UserPlusIcon, XIcon } from "~/components/ui/icons";
@@ -14,7 +15,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
 import { backendFetch, ensureCsrfToken, getSessionUser } from "~/lib/backend.server";
-import { type Campaign } from "~/lib/campaigns";
+import { type Campaign, type ProgressOverview } from "~/lib/campaigns";
 import { isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
 import { isValidUsername } from "~/lib/profile";
 import { isValidProjectSlug } from "~/lib/projects";
@@ -74,10 +75,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (!(await getSessionUser(request))) {
     throw redirect(`/login?next=${encodeURIComponent(`/p/${slug}/c/${campaignSlug}/testers`)}`, { headers: privateNoStoreHeaders() });
   }
-  const [campaign, testers, applications, csrf] = await Promise.all([
+  const [campaign, testers, applications, progress, csrf] = await Promise.all([
     backendFetch<Campaign>(request, api),
     backendFetch<Testers>(request, `${api}invitations/`),
     backendFetch<PendingApplication[]>(request, `${api}applications/`),
+    // Everyone's task progress (WP 4.4): the team only; 404 for everyone else, like this page.
+    backendFetch<ProgressOverview>(request, `${api}progress/`),
     ensureCsrfToken(request),
   ]);
   if (campaign.status !== 200 || !campaign.data || testers.status !== 200 || !testers.data) {
@@ -92,6 +95,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       campaign: campaign.data,
       testers: testers.data,
       applications: applications.status === 200 ? (applications.data ?? []) : [],
+      progress: progress.status === 200 ? progress.data : null,
       csrfToken: csrf.token,
       done: (RESULTS as readonly string[]).includes(done ?? "") ? (done as (typeof RESULTS)[number]) : null,
     },
@@ -145,7 +149,7 @@ export function headers({ actionHeaders, loaderHeaders }: Route.HeadersArgs) {
 
 export default function CampaignTesters({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { campaign, testers, applications, csrfToken, done } = loaderData;
+  const { campaign, testers, applications, progress, csrfToken, done } = loaderData;
   const canInvite = campaign.visibility === "private" && campaign.state === "published";
   const back = `/p/${campaign.project}/c/${campaign.slug}`;
   return (
@@ -157,6 +161,8 @@ export default function CampaignTesters({ loaderData, actionData }: Route.Compon
       />
       {done ? <Notice tone="ok" title={t(`campaigns.testers.done.${done}`)} /> : null}
       {actionData?.problem ? <Notice tone="danger" title={t(`campaigns.testers.problem.${actionData.problem}`)} /> : null}
+
+      {campaign.method !== "free" && progress ? <ProgressOverviewPanel overview={progress} /> : null}
 
       <Panel title={t("campaigns.testers.participants")} aside={t("campaigns.placesValue", { count: testers.participants.length, total: campaign.target_testers })}>
         {testers.participants.length ? (

@@ -426,3 +426,19 @@ export function progressSummary(tasks: Pick<TestTask, "my_status">[]) {
     blocked: tasks.filter((task) => task.my_status === "blocked").length,
   };
 }
+
+/** The team's overview of everyone's progress (WP 4.4, `…/progress/`; 404 for everyone else). */
+export type ProgressOverview = {
+  tasks: { id: string; title: string; hidden: boolean; completed: number; blocked: number; in_progress: number }[];
+  participants: {
+    username: string;
+    participation: "active" | "left" | "removed";
+    progress: Record<string, { status: TaskStatus; note: string; updated_at: string }>;
+  }[];
+};
+
+/** One person's status of one task in the overview; "not_started" when nothing was reported. */
+export function overviewCell(participant: ProgressOverview["participants"][number], taskId: string) {
+  const entry = participant.progress[taskId];
+  return { status: entry?.status ?? ("not_started" as TaskStatus), note: entry?.note ?? "" };
+}

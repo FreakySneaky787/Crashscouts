@@ -1,0 +1,124 @@
+.stack {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.stackTight {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.subhead {
+  font-size: var(--text-sec);
+  font-weight: var(--weight-semibold);
+  color: var(--color-fg-secondary);
+}
+
+.muted {
+  font-size: var(--text-sec);
+  color: var(--color-fg-secondary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.person {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.mark {
+  font-size: var(--text-sec);
+  font-weight: var(--weight-regular);
+  color: var(--color-fg-secondary);
+}
+
+.cell {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.note > summary {
+  cursor: pointer;
+  min-height: var(--target-min);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-sec);
+  color: var(--color-accent);
+}
+
+.note p {
+  font-size: var(--text-sec);
+  max-width: 24rem;
+  overflow-wrap: anywhere;
+}
+
+/* The table scrolls inside its own container; the page never scrolls sideways. */
+.tableWrap {
+  display: none;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: var(--text-sec);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table thead th {
+  font-weight: var(--weight-semibold);
+  color: var(--color-fg-secondary);
+  min-width: 9rem;
+}
+
+.pairs {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.pairs > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.pairs dd {
+  margin: 0;
+}
+
+/* Wide screens: the table; narrow screens: the list per tester. Only one is displayed. */
+@media (min-width: 48rem) {
+  .tableWrap {
+    display: block;
+  }
+
+  .byTester {
+    display: none;
+  }
+}

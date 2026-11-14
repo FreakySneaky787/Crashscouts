@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 4.3) · **Current phase:** 4 – Testing (3B complete, flag off)
+**Last update:** 2026-11-14 (WP 4.4) · **Current phase:** 4 complete – next: 5, Feedback (flag still off)
 
 ## Work packages
 
@@ -757,7 +757,7 @@ switches the flag.
   mutation check caught (a blocked link still served: the warning page answered 200 instead of
   404). No application code changed in this WP.
 
-## Phase 4 – Testing (started 2026-11-14)
+## Phase 4 – Testing (2026-11-14) ✅
 
 ### WP 4.1 – Testing method, tasks and progress: backend (2026-11-14) ✅
 
@@ -816,16 +816,32 @@ switches the flag.
   account page shows the summary, the completed campaign is read-only; axe on the tester's page),
   gate run **1 passed**; Ruff, migrations check, ESLint, typecheck and build clean.
 
-## Handover – next session (written 2026-11-13)
+### WP 4.4 – The team's progress overview (2026-11-14) ✅
+
+- Testers page (team only; 404 for everyone else): new "Progress" panel for structured and
+  combined campaigns – per task the number of completed, blocked and in-progress statuses; per
+  tester the status of every task (design-system task status with icon and text) with notes
+  behind a disclosure. People who left or were removed and tasks removed after progress was
+  reported are marked.
+- A table with row and column headers on wide screens (scrolling inside its own focusable
+  container, the page never scrolls sideways); a list per tester below 48rem. Only one of the two
+  is displayed at a time.
+- **Verification (run on 2026-11-14):** Vitest **94 passed** (1 new); Playwright main run **78
+  passed** (the progress test now also checks the team's overview: per-task counts, the table
+  with headers, the note, axe at 1280 and 390 px, the list on narrow screens, and 404 for a
+  participant and a stranger), gate run **1 passed**; ESLint, typecheck, build clean; backend
+  unchanged in this WP.
+
+## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
-Phase 4 (testing) is under way: WPs 4.1 (backend, ADR 0023), 4.2 (team pages) and 4.3 (testers
-report progress) are done; next is WP 4.4 (the team's progress overview), as approved in the
-phase 4 plan.
-Next: **phase 4 – testing** (test tasks, progress per participation, overview for maintainers);
-present its work packages and open questions before starting.
+Phase 4 (testing) is complete: testing method, test tasks, progress per participation and the
+team's overview (WPs 4.1–4.4, ADR 0023). Next: **phase 5 – feedback** (five types with
+type-specific fields, secure attachments, status workflow, private by default, maintainer inbox;
+see the phase 5 requirement from WP 1.5 in MVP-PLAN). Present its work packages and open
+questions before starting.
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

@@ -689,7 +689,22 @@
       "approve": "Approve",
       "approveNamed": "Approve {{username}}",
       "reject": "Reject",
-      "rejectConfirm": "Reject {{username}}; their answers are deleted"
+      "rejectConfirm": "Reject {{username}}; their answers are deleted",
+      "progress": {
+        "title": "Progress",
+        "intro": "Each tester's status per task. Notes are visible to your team and the tester only.",
+        "none": "Nobody has reported progress yet.",
+        "noTasks": "This campaign has no tasks yet.",
+        "perTask": "Per task",
+        "counts": "{{completed}} completed · {{blocked}} blocked · {{in_progress}} in progress",
+        "caption": "Status of each tester per task",
+        "tester": "Tester",
+        "byTester": "By tester",
+        "left": "Left the campaign",
+        "removed": "Removed by the team",
+        "hiddenTask": "removed from the task list",
+        "note": "Note"
+      }
     },
     "invitations": {
       "title": "Campaign invitations",

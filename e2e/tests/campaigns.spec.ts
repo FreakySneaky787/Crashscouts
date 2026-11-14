@@ -148,9 +148,9 @@ test("testers report their own task progress; nobody else sees it", async ({ pag
     await tester.goto("/account");
     await tester.getByRole("button", { name: "Accept the invitation to Beta 1" }).click();
     await expect(tester.getByText("You take part in the campaign now.")).toBeVisible();
-    testers.push({ context, tester });
+    testers.push({ context, tester, account });
   }
-  const [{ tester }, { tester: other }] = testers;
+  const [{ tester, account: testerAccount }, { tester: other }] = testers;
 
   // The first tester reports progress, task by task.
   await tester.goto(`/p/${project}/c/beta-1`);
@@ -182,6 +182,31 @@ test("testers report their own task progress; nobody else sees it", async ({ pag
   const stranger = await strangerContext.newPage();
   await createSignedInAccount(stranger, request);
   expect((await stranger.goto(`/p/${project}/c/beta-1`))?.status()).toBe(404);
+
+  // The team's overview (WP 4.4): everyone's status per task, notes behind a disclosure.
+  const testerName = testerAccount.username;
+  await page.goto(`/p/${project}/c/beta-1/testers`);
+  const overview = page.getByRole("region", { name: "Progress" });
+  await expect(overview.getByRole("listitem").filter({ hasText: "Install the app" })).toContainText("1 completed · 0 blocked · 0 in progress");
+  await expect(overview.getByRole("listitem").filter({ hasText: "Import a file" })).toContainText("0 completed · 1 blocked · 0 in progress");
+  const table = overview.getByRole("table");
+  await expect(table.getByRole("columnheader")).toHaveText(["Tester", "Install the app", "Import a file"]);
+  const row = table.getByRole("row").filter({ has: page.getByRole("rowheader", { name: testerName }) });
+  await expect(row.getByRole("cell")).toHaveText([/Completed/, /Blocked/]);
+  await row.getByText("Note").click();
+  await expect(row.getByText("The import button does nothing.")).toBeVisible();
+  const team = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(team.violations.map((v) => v.id)).toEqual([]);
+  // Narrow screens get a list per tester instead of the table.
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(overview.getByRole("table")).toBeHidden();
+  await expect(overview.getByRole("region", { name: "By tester" })).toContainText("Blocked");
+  const narrow = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(narrow.violations.map((v) => v.id)).toEqual([]);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  // Participants and strangers get 404 for the overview.
+  expect((await other.goto(`/p/${project}/c/beta-1/testers`))?.status()).toBe(404);
+  expect((await stranger.goto(`/p/${project}/c/beta-1/testers`))?.status()).toBe(404);
 
   // Completed by the team: the tester's statuses stay, read-only.
   await page.goto(`/p/${project}/c/beta-1/edit`);

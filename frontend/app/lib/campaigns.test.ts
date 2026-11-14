@@ -13,6 +13,7 @@ import {
   formatInZone,
   groupedTimeZones,
   isTestMethod,
+  overviewCell,
   progressPayload,
   progressSummary,
   taskPayload,
@@ -260,5 +261,17 @@ describe("task progress", () => {
       completed: 2,
       blocked: 1,
     });
+  });
+});
+
+describe("progress overview", () => {
+  it("reads a person's status per task and defaults to not started", () => {
+    const person = {
+      username: "tess",
+      participation: "active" as const,
+      progress: { t1: { status: "blocked" as const, note: "Crash", updated_at: "2026-11-14T10:00:00Z" } },
+    };
+    expect(overviewCell(person, "t1")).toEqual({ status: "blocked", note: "Crash" });
+    expect(overviewCell(person, "t2")).toEqual({ status: "not_started", note: "" });
   });
 });
