@@ -132,6 +132,14 @@ including the negative cases.
   and a decompression bomb; GPS data verifiably removed.
 - ✅ Project logos and screenshots (WP 2.4) use the same pipeline; images of private projects are
   delivered only to the team, checked on every request, never cached.
+- ✅ Feedback attachments (WP 5.2, [ADR 0024](adr/0024-feedback.md)): images through the same
+  pipeline (5 MB, re-encoded WebP, longest side 2560 px, no metadata); text files (TXT, LOG,
+  JSON, 2 MB) must be UTF-8 without NUL bytes, JSON must parse, and are only ever downloads
+  (`attachment`, `text/plain`, `nosniff`, sandbox CSP); at most 5 per feedback; only the team and
+  the author, checked on every request, never cached, never public; deleted with the feedback and
+  the account. Tested against SVG with script, disguised HTML, executables, binaries named
+  `.log`, invalid UTF-8, NUL bytes, broken JSON, oversized files and a decompression bomb; GPS
+  data verifiably removed.
 
 ## 6. Privacy and authorization
 

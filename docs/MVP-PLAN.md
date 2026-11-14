@@ -180,8 +180,8 @@ Decisions of 2026-11-14 and the design: [ADR 0024](adr/0024-feedback.md).
 | WP | Content | State |
 |---|---|---|
 | 5.1 | Backend: feedback types, permissions, status workflow, publishing with consent, author emails, export and anonymisation | ✅ done |
-| 5.2 | Backend: secure attachments (images re-encoded, text download only) | planned (next) |
-| 5.3 | Testers give and follow feedback | planned |
+| 5.2 | Backend: secure attachments (images re-encoded, text download only) | ✅ done |
+| 5.3 | Testers give and follow feedback | planned (next) |
 | 5.4 | The team's feedback inbox | planned |
 | 5.5 | Published feedback and wrap-up of phase 5 | planned |
 

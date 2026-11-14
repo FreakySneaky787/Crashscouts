@@ -329,6 +329,8 @@ REST_FRAMEWORK = {
         "task_progress": "300/hour",
         "feedback_create": "30/day",
         "feedback_create_ip": "60/day",
+        "feedback_attachment": "60/hour",
+        "feedback_attachment_ip": "120/hour",
         # Per IP address in addition to per account (gate item 3); higher because several
         # people can share one address. Keys are hashed (ADR 0022).
         "report_ip": "60/day",

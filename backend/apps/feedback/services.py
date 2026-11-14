@@ -54,7 +54,7 @@ def create_feedback(campaign: Campaign, user, **fields) -> Feedback:
     return Feedback.objects.create(campaign=campaign, author=user, **fields)
 
 
-def _ensure_author_can_change(feedback: Feedback, user) -> None:
+def ensure_author_can_change(feedback: Feedback, user) -> None:
     ensure_unblocked(feedback.campaign)
     if not policies.is_author(user, feedback):
         raise FeedbackError("not_author")
@@ -65,7 +65,7 @@ def _ensure_author_can_change(feedback: Feedback, user) -> None:
 @transaction.atomic
 def change_feedback(feedback: Feedback, user, **fields) -> Feedback:
     feedback = _locked(feedback)
-    _ensure_author_can_change(feedback, user)
+    ensure_author_can_change(feedback, user)
     for key, value in fields.items():
         setattr(feedback, key, value)
     feedback.save()
@@ -75,7 +75,7 @@ def change_feedback(feedback: Feedback, user, **fields) -> Feedback:
 @transaction.atomic
 def withdraw_feedback(feedback: Feedback, user) -> None:
     feedback = _locked(feedback)
-    _ensure_author_can_change(feedback, user)
+    ensure_author_can_change(feedback, user)
     feedback.delete()
 
 

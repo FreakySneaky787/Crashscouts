@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 5.1) · **Current phase:** 5 – Feedback (flag still off)
+**Last update:** 2026-11-14 (WP 5.2) · **Current phase:** 5 – Feedback (flag still off)
 
 ## Work packages
 
@@ -856,15 +856,34 @@ switches the flag.
   validation, pip-audit clean; Playwright main run **78 passed**, gate run **1 passed** (no
   frontend change yet).
 
+### WP 5.2 – Secure feedback attachments (2026-11-14) ✅
+
+- `FeedbackAttachment`: at most 5 per feedback, added and removed by the author while "New".
+  Images (PNG, JPEG, WebP, 5 MB) are re-encoded through the shared pipeline as WebP (longest side
+  2560 px, no metadata) and served inline in a sandbox; text files (TXT, LOG, JSON, 2 MB) must be
+  UTF-8 without NUL bytes, JSON must parse, and are served only as downloads. Everything else is
+  refused; oversized requests are refused before parsing.
+- Delivery `/api/v1/feedback-attachments/<key>/`: team and author only, checked on every request,
+  `nosniff`, sandbox CSP, `private, no-store`; never public, also not for published feedback.
+  Files go with the attachment, the withdrawn feedback and the deleted account. Rate limits 60 per
+  hour and account, 120 per IP address.
+- **Verification (run on 2026-11-14):** pytest **574 passed** (28 new: re-encoding and GPS
+  removal, scaling, text downloads with their headers, ten refused file kinds, size limits and the
+  decompression bomb, the limit of five and cleaned names, who may add and remove, 404 for five
+  roles also on published feedback, blocked content, deletion with attachment, feedback and
+  account); 4 mutation checks caught (participants see attachments, text served inline, NUL check
+  removed, files kept on account deletion); Ruff, migrations check, OpenAPI, pip-audit clean;
+  Playwright main run **78 passed**, gate run **1 passed** (no frontend change yet).
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are:** phases 3A and 3B complete – all eight security-gate items are implemented and
 tested ([`GATE-CHECKLIST.md`](GATE-CHECKLIST.md)). `PUBLIC_CAMPAIGNS_ENABLED` stays off: the
 checklist's operations items need the production server, and only the owner switches the flag.
 Phase 4 (testing) is complete (WPs 4.1–4.4, ADR 0023). Phase 5 (feedback) is under way with the
-approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WP 5.1 (backend) is done; next
-are WP 5.2 (secure attachments), 5.3 (testers' feedback pages), 5.4 (the team's inbox) and 5.5
-(published feedback, wrap-up).
+approved plan and the owner's decisions of 2026-11-14 (ADR 0024): WPs 5.1 (backend) and 5.2
+(secure attachments) are done; next are WP 5.3 (testers' feedback pages), 5.4 (the team's inbox)
+and 5.5 (published feedback, wrap-up).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

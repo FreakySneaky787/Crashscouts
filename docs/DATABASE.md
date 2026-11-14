@@ -1,6 +1,6 @@
 # Data model
 
-> State after WP 5.1 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
+> State after WP 5.2 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
 > update this file in the same commit as any model change.
 
 All own tables use a random UUIDv4 primary key and `created_at`/`updated_at`
@@ -33,6 +33,7 @@ erDiagram
   User ||--o{ Feedback : "author, SET_NULL"
   TestTask ||--o{ Feedback : "optional, SET_NULL"
   Feedback ||--o{ FeedbackStatusChange : "CASCADE"
+  Feedback ||--o{ FeedbackAttachment : "CASCADE, at most 5"
   User ||--o{ Participation : "CASCADE"
   User ||--o{ CampaignInvitation : "invitee, CASCADE"
   User ||--o{ Application : "applicant, CASCADE"
@@ -63,6 +64,7 @@ erDiagram
 | moderation | `ModerationNote` | warning to a project's team, moderators only | `created_by`: SET_NULL |
 | feedback | `Feedback` | tester feedback of five kinds with type-specific fields, status, duplicate link, publishing with the author's consent (ADR 0024) | author: SET_NULL on final deletion (text stays, anonymised); in the data export |
 | feedback | `FeedbackStatusChange` | status history with the role (team or author) | `actor`: SET_NULL; never shown in the API |
+| feedback | `FeedbackAttachment` | screenshot (re-encoded WebP) or text file of a feedback; the file lives under a random key outside the web root (ADR 0024) | deleted with the feedback and on final account deletion (files too) |
 | moderation | `Report` | report of a project, campaign or link (ADR 0019); `target_label` copy | reporter: SET_NULL; targets: SET_NULL |
 | core | `rate_limit_cache` | Django's database cache for rate limits (not a model; created by migration `core/0001`, ADR 0022) | keys are HMAC hashes (no plain IP address); expired entries deleted hourly, at most one day after the last request |
 | campaigns | `TestTask` | test task of a structured or combined campaign (ADR 0023); `hidden_at` when removed after progress was reported | – |

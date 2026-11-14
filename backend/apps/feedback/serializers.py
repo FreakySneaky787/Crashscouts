@@ -127,6 +127,7 @@ class FeedbackSerializer(serializers.Serializer):
     can_change = serializers.SerializerMethodField()
     can_manage = serializers.SerializerMethodField()
     can_verify = serializers.SerializerMethodField()
+    attachments = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
 
@@ -163,6 +164,15 @@ class FeedbackSerializer(serializers.Serializer):
 
     def get_can_manage(self, feedback) -> bool:
         return policies.is_team(self._user(), feedback.campaign)
+
+    def get_attachments(self, feedback) -> list[dict]:
+        """Only for the team and the author; everyone else gets an empty list (ADR 0024)."""
+        if not policies.can_see_attachments(self._user(), feedback):
+            return []
+        return [
+            {"key": str(a.key), "kind": a.kind, "name": a.name, "size": a.size}
+            for a in feedback.attachments.all()
+        ]
 
     def get_can_verify(self, feedback) -> bool:
         return self.get_is_mine(feedback) and feedback.status == Feedback.Status.FIXED

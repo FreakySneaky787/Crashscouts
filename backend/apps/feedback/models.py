@@ -106,3 +106,27 @@ class FeedbackStatusChange(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.feedback_id}: {self.status} by {self.role}"
+
+
+class FeedbackAttachment(BaseModel):
+    """A screenshot or a text file of a feedback (WP 5.2, ADR 0024). Seen only by the team and
+    the author. Images are re-encoded (no uploaded bytes, no metadata); text files are checked
+    and only ever delivered as downloads. Files live outside the web root under a random key."""
+
+    MAX_PER_FEEDBACK = 5
+
+    class Kind(models.TextChoices):
+        IMAGE = "image", "Image"
+        TEXT = "text", "Text"
+
+    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE, related_name="attachments")
+    kind = models.CharField(max_length=8, choices=Kind.choices)
+    name = models.CharField(max_length=100)
+    size = models.PositiveIntegerField()
+    key = models.UUIDField(unique=True, editable=False)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.feedback_id}: {self.name}"

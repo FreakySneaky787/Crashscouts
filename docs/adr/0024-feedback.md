@@ -61,6 +61,25 @@ The project owner decided (2026-11-14):
   response for the team. The feedback routes are included before the campaign routes, whose
   catch-all state route would otherwise take `…/feedback/`.
 
+## Attachments (WP 5.2)
+
+- `FeedbackAttachment` (kind image or text, cleaned display name, size, random key); at most 5
+  per feedback; added and removed only by the author while the feedback is "New".
+- **Images** (`.png`, `.jpg`, `.jpeg`, `.webp`) go through the shared pipeline
+  (`apps/core/images.py`, ADR 0010): at most 5 MB, signature and Pillow checks, pixel limit
+  against decompression bombs, re-encoded as WebP with the longest side at most 2560 px and no
+  metadata. Served inline with `Content-Security-Policy: default-src 'none'; sandbox`.
+- **Text** (`.txt`, `.log`, `.json`): at most 2 MB, valid UTF-8, no NUL bytes, JSON must parse.
+  Stored as uploaded, served **only as a download** (`Content-Disposition: attachment`,
+  `text/plain; charset=utf-8`), never rendered.
+- Every other type (SVG, executables, scripts, binaries named `.log`, files without an extension)
+  is refused. Requests larger than the image limit are refused before the body is parsed.
+- Delivery (`/api/v1/feedback-attachments/<key>/`) checks on every request that the person is in
+  the team or the author (404 otherwise, also for published feedback), with `nosniff` and
+  `private, no-store`. Rate limits: 60 uploads per hour and account, 120 per IP address.
+- Files are deleted with their row, with the feedback (withdrawn) and on final account deletion
+  (they may contain personal data; the feedback text stays, anonymised).
+
 ## Alternatives
 
 - Private feedback visible to the team and the author only (recommended at first): the owner
