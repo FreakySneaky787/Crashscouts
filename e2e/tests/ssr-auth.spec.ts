@@ -82,9 +82,10 @@ test("(3) the session persists; Set-Cookie and CSRF work", async ({ page, contex
   expect(session?.sameSite).toBe("Lax");
 
   // Several (client-side) navigations and a reload.
-  await page.getByRole("link", { name: "Home" }).click();
+  // Exact names: "Account" would also match "Data and account" on the account page.
+  await page.getByRole("link", { name: "Home", exact: true }).click();
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole("link", { name: "Account" }).click();
+  await page.getByRole("link", { name: "Account", exact: true }).click();
   await expect(page.getByTestId("signed-in-as")).toHaveText("Signed in as probe-owner");
   await page.reload();
   await expect(page.getByTestId("signed-in-as")).toHaveText("Signed in as probe-owner");
