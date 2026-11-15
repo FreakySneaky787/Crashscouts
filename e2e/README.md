@@ -64,3 +64,10 @@ with `--no-build`. The login rate-limit test needs a fresh minute between two ru
 
 `tests/ssr-auth.spec.ts` covers the six acceptance criteria of the SSR auth spike (WP 0.4, see
 [`docs/MVP-PLAN.md`](../docs/MVP-PLAN.md)) plus security headers/CSP and "no logout via GET".
+
+Accessibility (WP 8.6, [`docs/ACCESSIBILITY.md`](../docs/ACCESSIBILITY.md)):
+`tests/a11y.spec.ts` checks every page with axe at 390 px in both themes and ends with the route
+inventory (run the whole file: the inventory reads which pages the earlier tests visited);
+`tests/keyboard.spec.ts` runs the core flows with the keyboard only; `tests/display.spec.ts`
+covers reduced motion, 400 % zoom and 200 % text. A new page needs an axe check, or the inventory
+test fails.

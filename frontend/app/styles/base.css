@@ -63,7 +63,11 @@ pre {
   font-size: 0.9em;
 }
 
-:focus-visible {
+:focus-visible,
+/* Date and time fields: their last focus stop is the browser's calendar button inside the field,
+   where the field itself is no longer :focus, so the ring vanished (found by the keyboard test,
+   WP 8.6). */
+input:is([type="date"], [type="time"], [type="datetime-local"]):focus-within {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }

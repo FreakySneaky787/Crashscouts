@@ -139,4 +139,9 @@ accessible name.
   `/login` in light and dark at 1280px and 390px; no horizontal overflow; no console errors;
   server-rendered theme without inline styles; theme switch with and without JavaScript; `/theme`
   input validation; self-hosted fonts; mobile menu without JavaScript.
+- E2E for all pages (WP 8.6, [ACCESSIBILITY.md](ACCESSIBILITY.md)): axe at 390px in both themes
+  with a route inventory, keyboard-only core flows with a visible focus at every stop, reduced
+  motion, 400 % zoom and 200 % text.
+- Focus ring: `:focus-visible`, and for date and time fields `:focus-within` (their last focus
+  stop is the browser's calendar button, where the field itself is no longer focused).
 - Vitest: theme cookie parsing and serialisation, identity hue and initials.

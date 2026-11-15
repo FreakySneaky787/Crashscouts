@@ -2,6 +2,7 @@
  * WP 1.4 – GitHub login. GitHub itself is never contacted: requests to github.com are intercepted,
  * and the way back is checked with a forged state that Django must reject before any network call.
  */
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { FRONTEND_URL } from "../playwright.config";
@@ -45,6 +46,9 @@ test("a forged state on the way back is rejected with a clear message", async ({
   await page.goto("/accounts/github/login/callback/?code=forged&state=forged");
   await expect(page).toHaveURL(/\/login\/provider\/callback\?error=/);
   await expect(page.getByRole("alert")).toContainText("The GitHub sign-in did not work.");
+  // WP 8.6: the error page is checked here (a11y.spec.ts inventory).
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  expect(results.violations.map((v) => v.id)).toEqual([]);
   await page.goto("/account");
   await expect(page).toHaveURL(/\/login/);
 });

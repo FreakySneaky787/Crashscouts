@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-15 (WP 8.6 part B) · **Current phase:** 8 (closed beta) – WP 8.5 and 8.6 parts A–B done, part C (accessibility) next (flag still off)
+**Last update:** 2026-11-15 (WP 8.6 part C) · **Current phase:** 8 (closed beta) – WP 8.5 and 8.6 done; next WP 8.1 (server) once the owner is ready (flag still off)
 
 ## Work packages
 
@@ -1235,6 +1235,27 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   because of the generated columns); the deploy-check test uses the test database for it.
 - Measured on the development container (4 vCPUs), not on the VPS (2 vCPUs): WP 8.1 repeats the
   run there.
+
+## WP 8.6 part C – Accessibility pass (2026-11-15) ✅
+
+- Report and the owner's screen reader checklist (Orca on Linux, TalkBack on Android, the owner's
+  devices): [`ACCESSIBILITY.md`](ACCESSIBILITY.md).
+- `e2e/tests/a11y.spec.ts`: axe (WCAG 2.2 A/AA) on every page at 390 px in light and dark, no
+  horizontal scrolling; a route inventory reads `routes.ts` and fails for a page without an axe
+  check (here, in a named spec, or listed with a reason: `/signup/github` needs GitHub, the probe
+  routes are test-only). `github.spec.ts` now also checks the provider error page.
+- `e2e/tests/keyboard.spec.ts`: sign-up to sign-in, creating and publishing a campaign, invitation
+  and joining, feedback and reporting with the keyboard only; visible focus inside the viewport
+  and no keyboard trap at every stop.
+- `e2e/tests/display.spec.ts`: reduced motion switches transitions off; 320 CSS px (400 % zoom)
+  and 200 % text without horizontal scrolling.
+- **Finding, fixed:** date and time fields lost the focus ring at their last focus stop (the
+  calendar button inside the field); `base.css` uses `:focus-within` for them.
+- **Verification (run on 2026-11-15):** a11y spec **4 passed** (no violations on any page),
+  keyboard spec **2 passed**, display spec **3 passed**; 2 mutation checks caught (inventory entry
+  removed; date focus fix removed). Full runs: Playwright main run **101 passed** (9 new), gate
+  run **4 passed**; Vitest **122 passed**; ESLint and typecheck clean (backend unchanged).
+- Open for the owner: the screen reader check in [`ACCESSIBILITY.md`](ACCESSIBILITY.md).
 
 ## Handover – next session (written 2026-11-14)
 
