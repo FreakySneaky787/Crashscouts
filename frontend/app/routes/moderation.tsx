@@ -126,6 +126,9 @@ export default function Moderation({ loaderData, actionData }: Route.ComponentPr
               <ButtonLink to="/moderation/statistics" variant="quiet">
                 {t("statistics.title")}
               </ButtonLink>
+              <ButtonLink to="/platform/metrics" variant="quiet">
+                {t("metrics.title")}
+              </ButtonLink>
             </>
           ) : null
         }

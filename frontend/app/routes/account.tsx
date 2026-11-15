@@ -6,7 +6,7 @@ import { Button, ButtonLink } from "~/components/ui/Button";
 import { Notice } from "~/components/ui/Notice";
 import { Avatar } from "~/components/ui/Data";
 import { SuspensionNotice } from "~/components/moderation/SuspensionNotice";
-import { DatabaseIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
+import { ChartBarIcon, DatabaseIcon, EyeIcon, LockSimpleIcon, PencilSimpleIcon, PlusIcon, ShieldCheckIcon, SignOutIcon } from "~/components/ui/icons";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { StatusPill } from "~/components/ui/StatusPill";
@@ -275,9 +275,14 @@ export default function Account({ loaderData }: Route.ComponentProps) {
                 {t("moderation.title")}
               </ButtonLink>
               {loaderData.isAdmin ? (
-                <ButtonLink to="/platform/roles" variant="secondary" icon={ShieldCheckIcon}>
-                  {t("platform.roles.title")}
-                </ButtonLink>
+                <>
+                  <ButtonLink to="/platform/roles" variant="secondary" icon={ShieldCheckIcon}>
+                    {t("platform.roles.title")}
+                  </ButtonLink>
+                  <ButtonLink to="/platform/metrics" variant="secondary" icon={ChartBarIcon}>
+                    {t("metrics.title")}
+                  </ButtonLink>
+                </>
               ) : null}
             </div>
           </div>

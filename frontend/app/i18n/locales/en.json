@@ -1483,5 +1483,36 @@
     "submit": "Change password",
     "wrongPassword": "The current password is not correct.",
     "weakPassword": "The new password does not meet the rules: at least 12 characters, not a common password and not similar to your name or email address."
+  },
+  "metrics": {
+    "title": "Growth metrics",
+    "intro": "The five measures of success from the metrics concept, computed from the platform's own data. Counts, shares and medians only; never single people.",
+    "allTime": "All time",
+    "basis": "Based on {{campaigns}} published campaigns, {{testers}} testers and {{developers}} publishing accounts.",
+    "perMonth": "Per month of publication",
+    "cohorts": "Returning people per cohort",
+    "month": "Month published",
+    "cohortMonth": "First month",
+    "of": "{{part}} of {{whole}}",
+    "definitions": "How the metrics are computed",
+    "privacy": "No tracking: no page views, visits or click paths are recorded. Deleted accounts drop out. Months are calendar months in UTC.",
+    "columns": {
+      "campaigns": "Campaigns published",
+      "withoutTester": "Without a tester so far"
+    },
+    "names": {
+      "firstTester": "Time to first tester",
+      "completion": "Completion rate",
+      "usefulFeedback": "Useful feedback rate",
+      "returningTesters": "Returning testers",
+      "returningDevelopers": "Returning developers"
+    },
+    "explain": {
+      "firstTester": "Median time from publishing a campaign to its first participant (direct joining, accepted invitation or approved application; removed participants do not count). Campaigns without a participant appear in \"Without a tester so far\".",
+      "completion": "Completed campaigns divided by ended ones (completed or cancelled). Running campaigns do not count yet; teams close campaigns by hand.",
+      "usefulFeedback": "Share of completed campaigns with at least one feedback that was not marked as duplicate, cannot reproduce or rejected. Unprocessed feedback counts as useful.",
+      "returningTesters": "Share of people who took part in at least two campaigns, by the month of their first participation. Left participations count, removed ones do not.",
+      "returningDevelopers": "Share of accounts that published at least two campaigns, by the month of their first publication. The account that pressed \"Publish\" counts."
+    }
   }
 }

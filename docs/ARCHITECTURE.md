@@ -60,6 +60,7 @@ Versions are re-checked in every WP and pinned via lockfiles.
 | `notifications` | In-app and email notifications (via tasks) | planned |
 | `audit` | Append-only audit log | foundation: authentication events (WP 1.1) |
 | `discover` | Search and filters (PostgreSQL full text), queries only ([ADR 0025](adr/0025-discover.md)) | ✅ |
+| `metrics` | The five growth metrics for admins, queries only ([ADR 0030](adr/0030-growth-metrics.md)) | ✅ |
 
 **Convention:** logic lives in `services.py` (writes) and `selectors.py` (reads). Views stay thin.
 Authorization is checked by a central, server-side policy layer.

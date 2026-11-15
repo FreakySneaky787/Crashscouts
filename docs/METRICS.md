@@ -80,5 +80,7 @@ unless stated otherwise. Only published campaigns count; drafts never.
   `campaigns/0006_backfill_state_timestamps` fills them for existing campaigns from the audit
   events (tested).
 - **Phase 5:** feedback with status (needed for metric 3).
-- **WP M.1 (after phase 5):** internal statistics page for platform admins, computed with
+- **WP M.1 (✅ implemented 2026-11-15, [ADR 0030](adr/0030-growth-metrics.md)):** `/platform/metrics`;
+  the exact query rules (removed participations, deleted publishers, empty denominators) are in
+  the ADR. Originally planned as: internal statistics page for platform admins, computed with
   aggregate database queries; tests with fixed example data per metric.

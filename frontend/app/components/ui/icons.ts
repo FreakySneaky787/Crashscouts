@@ -10,6 +10,7 @@ export {
   ArrowsClockwiseIcon,
   ArrowSquareOutIcon,
   ArrowUpIcon,
+  ChartBarIcon,
   BellIcon,
   BugIcon,
   CalendarIcon,

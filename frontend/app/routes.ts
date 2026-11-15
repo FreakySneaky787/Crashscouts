@@ -42,6 +42,7 @@ export default [
   route("projects/github/verify/callback", "routes/verification-github-callback.tsx"),
   route("invitations/:id/:answer", "routes/invitation-answer.tsx"),
   route("platform/roles", "routes/platform-roles.tsx"),
+  route("platform/metrics", "routes/platform-metrics.tsx"),
   route("report", "routes/report.tsx"),
   route("moderation", "routes/moderation.tsx"),
   route("moderation/:type/:id", "routes/moderation-case.tsx"),

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-15 (owner decisions after phase 7) · **Current phase:** 7 complete – next: WP M.1, phase 8 being planned (flag still off)
+**Last update:** 2026-11-15 (WP M.1) · **Current phase:** 7 complete, WP M.1 done – next: phase 8 decisions (flag still off)
 
 ## Work packages
 
@@ -1113,6 +1113,26 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
 
 **Phase 7 is complete** (WPs 7.1–7.5, ADRs 0026–0029).
 
+## WP M.1 – Growth metrics page (2026-11-15) ✅
+
+- New app `apps.metrics` (queries only, [ADR 0030](adr/0030-growth-metrics.md)):
+  `GET /api/v1/platform/metrics/`, admins only, `no-store`. The five metrics of
+  [`METRICS.md`](METRICS.md) for the last 12 months (UTC) and all time: median time to first
+  tester with the share of campaigns without one, completion rate, useful feedback rate, returning
+  testers and developers by cohort; counts next to every share, "–" without a denominator.
+- `/platform/metrics` ("Growth metrics"), linked for admins from the account page and the
+  moderation page: key figures, a monthly table, a cohort table, the definitions with their limits.
+  The month buckets moved to `core/months.py` (shared with the moderation statistics).
+- **Verification (run on 2026-11-15):** pytest **752 passed** (9 new, plus the new route in the write-guard route walk; with fixed example data:
+  median, left counts and removed never, completion and useful rate, the three turned-down
+  statuses, returning testers and developers, deleted publisher, empty platform, 12 months and
+  nothing but numbers, admins only); 5 mutation checks caught (removed participations counted,
+  rejected or duplicate feedback counted as useful, deleted publisher counted, admin check
+  missing); Vitest **113 passed** (2 new); Playwright main run **89 passed** (new: 404 and no link
+  for moderators, the admin opens the page from the account page, both tables with 12 months,
+  axe in light and dark, no sideways scrolling at 390 px), gate run **4 passed**; Ruff,
+  migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are (end of the session on 2026-11-14):** phases 0 to 7 are complete; the last CI
@@ -1134,7 +1154,8 @@ metrics exists) comes first; present the work packages and open questions before
 
 **Decided by the owner on 2026-11-15:** question X (remediation time frames: critical 7 / high 14 /
 moderate 60 / low 180 days), the two suspension rules of WP 7.2 confirmed, and the next step:
-plan phase 8 with all open questions and implement WP M.1 meanwhile.
+plan phase 8 with all open questions and implement WP M.1 meanwhile. WP M.1 is done (see above);
+next: the owner's answers to the phase 8 questions.
 
 **Still open from earlier:** U (real GitHub test on the first test server), F (email provider
 sign-up), legal pages, hosting (phase 8).

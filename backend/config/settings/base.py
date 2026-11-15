@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.moderation",
     "apps.feedback",
     "apps.discover",
+    "apps.metrics",
 ]
 
 MIDDLEWARE = [

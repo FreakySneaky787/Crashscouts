@@ -193,7 +193,7 @@ Own data only, aggregates only, internal.
 
 | WP | Content | State |
 |---|---|---|
-| M.1 | Internal statistics page for platform admins with the five metrics per month (aggregate queries, tests with fixed example data) | planned |
+| M.1 | Internal statistics page for platform admins with the five metrics per month (aggregate queries, tests with fixed example data; [ADR 0030](adr/0030-growth-metrics.md)) | ✅ |
 
 ## Phase 6 – Discover
 

@@ -1,24 +1,17 @@
 """Moderation statistics for admins (WP 7.4, ADR 0029): sums per calendar month (UTC), never
 single cases or people. Computed from the moderation tables at request time; no extra storage."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from django.db.models import Avg, Count, F, Q
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 
+from apps.core.months import month_starts
+
 from .models import OPEN_STATES, AccountSuspension, Block, ModeratorAccess, Report
 
 MONTHS = 12
-
-
-def _month_starts(now: datetime, months: int) -> list[datetime]:
-    first = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    starts = [first]
-    for _ in range(months - 1):
-        first = (first - timedelta(days=1)).replace(day=1)
-        starts.append(first)
-    return sorted(starts)
 
 
 def _per_month(queryset, field: str, since, **aggregates) -> dict:
@@ -47,7 +40,7 @@ def _counts_by(queryset, field: str, key: str, since) -> dict:
 
 def statistics(now: datetime | None = None, months: int = MONTHS) -> dict:
     now = now or timezone.now()
-    starts = _month_starts(now, months)
+    starts = month_starts(now, months)
     since = starts[0]
     created = _per_month(Report.objects.all(), "created_at", since, n=Count("id"))
     by_reason = _counts_by(Report.objects.all(), "created_at", "reason", since)
