@@ -226,6 +226,8 @@ Decisions of 2026-11-14 in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md).
 
 ## Phase 8 – Release (closed beta)
 
+Work packages, decisions and the open questions: [`PHASE-8-PLAN.md`](PHASE-8-PLAN.md).
+
 - Integration, performance and accessibility testing.
 - Legal texts and legal review.
 - Hosting decision and production setup.

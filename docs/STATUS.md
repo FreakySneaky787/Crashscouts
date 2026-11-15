@@ -1154,8 +1154,10 @@ metrics exists) comes first; present the work packages and open questions before
 
 **Decided by the owner on 2026-11-15:** question X (remediation time frames: critical 7 / high 14 /
 moderate 60 / low 180 days), the two suspension rules of WP 7.2 confirmed, and the next step:
-plan phase 8 with all open questions and implement WP M.1 meanwhile. WP M.1 is done (see above);
-next: the owner's answers to the phase 8 questions.
+plan phase 8 with all open questions and implement WP M.1 meanwhile. WP M.1 is done (see above).
+Phase 8: plan, the owner's first decisions, the hosting comparison and name proposals are in
+[`PHASE-8-PLAN.md`](PHASE-8-PLAN.md). **Next: the owner chooses name and domain (K) and the
+host**; until then only work that needs neither (legal drafts, WP 8.6, preparing 8.7).
 
 **Still open from earlier:** U (real GitHub test on the first test server), F (email provider
 sign-up), legal pages, hosting (phase 8).
