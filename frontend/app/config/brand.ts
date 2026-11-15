@@ -1,7 +1,7 @@
 /**
- * Central brand settings. "TestHub" is a working name (placeholder) – the final name is decided by
- * the project owner (docs/OPEN-QUESTIONS.md, K). Never hard-code it anywhere else.
+ * Central brand settings. The name "Crashscouts" was decided by the project owner on 2026-11-15
+ * (docs/OPEN-QUESTIONS.md, K; domain crashscouts.org). Never hard-code it anywhere else.
  */
 export const brand = {
-  name: import.meta.env.VITE_PLATFORM_NAME ?? "TestHub",
+  name: import.meta.env.VITE_PLATFORM_NAME ?? "Crashscouts",
 } as const;

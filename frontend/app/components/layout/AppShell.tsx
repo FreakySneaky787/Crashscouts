@@ -61,7 +61,6 @@ export function AppShell({ user, theme, children }: { user: ShellUser; theme: Th
             {brand.name.slice(0, 1)}
           </span>
           {brand.name}
-          <span className={styles.working}>{t("shell.workingName")}</span>
         </div>
         <nav aria-label={t("shell.mainNav")}>
           <NavList items={items} />

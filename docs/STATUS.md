@@ -1133,6 +1133,17 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   axe in light and dark, no sideways scrolling at 390 px), gate run **4 passed**; Ruff,
   migrations check, OpenAPI, pip-audit, ESLint, typecheck, build clean.
 
+## Name decided (2026-11-15)
+
+- The owner chose **Crashscouts** with the main address **crashscouts.org** (question K). Switched
+  centrally: `frontend/app/config/brand.ts`, `PLATFORM_NAME` (backend default and
+  `.env.example`); the sidebar no longer shows "working name"; the platform name stays a reserved
+  username. README, CLAUDE.md, PRD, design system and phase 8 plan updated; ADRs keep the old
+  name as history. The repository keeps its technical name `testhub`.
+- **Verification (run on 2026-11-15):** pytest **752 passed**; Vitest **113 passed**; Playwright
+  main run **89 passed** (page titles with the new name), gate run **4 passed**; ESLint,
+  typecheck, Ruff clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are (end of the session on 2026-11-14):** phases 0 to 7 are complete; the last CI
@@ -1156,8 +1167,10 @@ metrics exists) comes first; present the work packages and open questions before
 moderate 60 / low 180 days), the two suspension rules of WP 7.2 confirmed, and the next step:
 plan phase 8 with all open questions and implement WP M.1 meanwhile. WP M.1 is done (see above).
 Phase 8: plan, the owner's first decisions, the hosting comparison and name proposals are in
-[`PHASE-8-PLAN.md`](PHASE-8-PLAN.md). **Next: the owner chooses name and domain (K) and the
-host**; until then only work that needs neither (legal drafts, WP 8.6, preparing 8.7).
+[`PHASE-8-PLAN.md`](PHASE-8-PLAN.md). Name decided on 2026-11-15:
+**Crashscouts**, `crashscouts.org` (switched centrally in `brand.ts` and `PLATFORM_NAME`). **Next:
+the owner registers the domain and chooses the host**; meanwhile legal drafts, WP 8.6 and
+preparing 8.7.
 
 **Still open from earlier:** U (real GitHub test on the first test server), F (email provider
 sign-up), legal pages, hosting (phase 8).

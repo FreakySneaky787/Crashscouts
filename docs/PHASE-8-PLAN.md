@@ -8,8 +8,8 @@
 
 | WP | Content | Waiting for |
 |---|---|---|
-| 8.1 | Hosting and production setup: server in CH/EU, PostgreSQL 18, file storage, reverse proxy with TLS 1.2/1.3, jobs (rate-limit purge, deletions), SSR behind the proxy (question P) | provider (comparison below), **name and domain (K)** |
-| 8.2 | Email in production (question F: Scaleway decided), sending domain with SPF, DKIM, DMARC | domain |
+| 8.1 | Hosting and production setup: server in CH/EU, PostgreSQL 18, file storage, reverse proxy with TLS 1.2/1.3, jobs (rate-limit purge, deletions), SSR behind the proxy (question P) | provider (comparison below), domain registration by the owner |
+| 8.2 | Email in production (question F: Scaleway decided), sending domain `crashscouts.org` with SPF, DKIM, DMARC | domain registration |
 | 8.3 | Encrypted off-site backups of the database and files; a **tested** restore with written steps | provider |
 | 8.4 | Monitoring and logs: health checks, error notifications, log retention without personal data | tool choice |
 | 8.5 | Legal texts: privacy policy, terms of use, imprint; AGPL source link in the footer | drafts by Claude, review by a professional (decided) |
@@ -20,7 +20,8 @@
 ## Decisions of the owner (2026-11-15)
 
 - **Hosting:** check the prices on the providers' own pages first (done below); decide afterwards.
-- **Name and domain first:** no test server before the final name and domain are decided (K).
+- **Name and domain first:** no test server before the final name and domain are decided (K) â€“
+  decided the same day: Crashscouts, crashscouts.org.
   This also holds back the real GitHub test (U) and the email sending domain (8.2).
 - **Beta access: open registration.** Everyone can sign up; production sets
   `DJANGO_SIGNUP_ENABLED=true` for the beta. The existing protections apply: confirmed email,
@@ -59,7 +60,15 @@ Sources: [Infomaniak VPS Lite](https://www.infomaniak.com/en/hosting/vps-lite) Â
   and the cost-optimized plans were not orderable on the day.
 - **Scaleway and Exoscale:** more expensive for the same size, or with no prices readable.
 
-## Name and domain: proposals (the owner decides, question K)
+## Name and domain: decided 2026-11-15
+
+**"Crashscouts", main address `crashscouts.org`** (owner's decision). On the day of the decision
+`crashscouts.org`, `.com` and `.ch` were all unregistered (RDAP: 404). Next steps for the owner:
+register at least the `.org` domain (preferably `.com` and `.ch` as well, so nobody else takes
+them) and have a trademark search done (Swissreg, EUIPO). The name is switched centrally in
+`brand.ts` and `PLATFORM_NAME`; the repository keeps the technical name `testhub`.
+
+## Name and domain: proposals (question K, history)
 
 Checked on 2026-11-15:
 - **Domains:** looked up in the registries' official RDAP services. "free" means not

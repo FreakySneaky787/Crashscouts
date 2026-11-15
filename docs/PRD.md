@@ -1,7 +1,7 @@
 # Product Requirements (PRD) – Core MVP
 
-> As of: 2026-11-12 · Status: **approved** (planning phase) · Working name: "TestHub" (placeholder,
-> not final)
+> As of: 2026-11-12 · Status: **approved** (planning phase) · Working name at the time: "TestHub";
+> the final name **"Crashscouts"** (crashscouts.org) was decided on 2026-11-15
 >
 > Basis: [`MASTER-PROMPT.md`](MASTER-PROMPT.md) plus the decisions made in the planning session.
 > Marker **⚑** = proposal approved together with the overall plan; details are confirmed again

@@ -10,7 +10,6 @@
 |---|---|---|---|
 | G | Contribution model: DCO or CLA | before going public | DCO |
 | J | Code of conduct | before going public | an established template, chosen by the project owner |
-| K | Final product name, logo, domain | open | decided exclusively by the project owner |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
@@ -37,6 +36,7 @@
 | – | Assigning admin and moderator roles | **On an admin page in the app** (2026-11-13). The first admin is created once with a server command; role changes need a fresh reauthentication and 2FA, are audited, and the last admin cannot remove themselves (phase 3B). |
 | – | Campaign data during the deletion grace period | Participations, invitations and applications **stay until the final deletion**; the person is hidden from team lists but keeps the place (2026-11-13). |
 | O | Shared cache for rate limits | **Django's database cache in PostgreSQL** (2026-11-13): no extra service, fits ADR 0003 (no Redis in the MVP); introduced in phase 3B. Implemented in WP 3B.5 (ADR 0022); IP addresses only as HMAC hashes, at most one day (owner, 2026-11-13). |
+| K | Product name and domain | **"Crashscouts"**, main address **crashscouts.org** (2026-11-15). All three of .org, .com and .ch were unregistered that day (RDAP); registering them and a trademark search (Swissreg, EUIPO) are up to the owner. Logo still open. The repository keeps the technical name `testhub` (renaming it is a GitHub settings change). |
 | X | Remediation time frames for vulnerable dependencies (ASVS 5.0 V15.1.1) | **critical 7 days, high 14 days, moderate 60 days, low 180 days** at the latest; development-only tools in the same tiers; a fix release younger than 7 days only for critical and high findings; monthly review of all dependency updates; exceptions with reason in `docs/STATUS.md`. Actively exploited critical issues are fixed as fast as possible; the frame is the upper limit (2026-11-15, [`SECURITY.md`](SECURITY.md) §10). |
 | – | Suspension rules (WP 7.2) | **Confirmed:** accounts with a platform role cannot be suspended (an admin removes the role first); nobody can suspend themselves (2026-11-15, [ADR 0027](adr/0027-account-suspensions.md)). |
 | – | Phase 8 (2026-11-15) | Prices checked on the providers' pages before choosing a host; **name and domain first**, no test server before; **open registration** for the beta; legal texts drafted by Claude and reviewed by a professional. Plan, hosting comparison and name proposals: [`PHASE-8-PLAN.md`](PHASE-8-PLAN.md). |

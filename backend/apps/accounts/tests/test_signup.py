@@ -147,7 +147,8 @@ def test_username_is_unique_ignoring_case(verified_user, username):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "username", ["ab", "-starts-with-hyphen", "has space", "ümlaut", "a" * 31, "admin", "testhub"]
+    "username",
+    ["ab", "-starts-with-hyphen", "has space", "ümlaut", "a" * 31, "admin", "crashscouts"],
 )
 def test_invalid_or_reserved_usernames_are_rejected(username):
     client, _ = csrf_client()

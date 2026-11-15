@@ -7,8 +7,9 @@ phase.
 ## The project in one sentence
 
 An open-source platform (AGPL-3.0) where developers find volunteer testers and testers discover new
-software. Campaigns, test tasks and structured feedback are organized on it. Working name:
-**"TestHub"**, a **placeholder**. Name, logo, domain and branding are decided by the project owner
+software. Campaigns, test tasks and structured feedback are organized on it. Name:
+**"Crashscouts"**, domain `crashscouts.org` (owner's decision 2026-11-15; the repository keeps the
+technical name `testhub`). Logo, design and further branding are decided by the project owner
 alone; the name is never scattered through the code (centrally in `frontend/app/config/brand.ts`
 and the `PLATFORM_NAME` setting).
 

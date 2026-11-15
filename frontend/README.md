@@ -19,7 +19,7 @@ frontend/
 │   ├── components/ui/         design system components, CSS Modules, icons.ts, statuses.ts
 │   ├── components/layout/     AppShell (sidebar, top bar, mobile menu)
 │   ├── i18n/                  react-i18next, one instance per request, typed keys (+ tests)
-│   └── config/brand.ts        central brand name (working name "TestHub")
+│   └── config/brand.ts        central brand name ("Crashscouts", decided 2026-11-15)
 ├── react-router.config.ts     `ssr: true`
 ├── vite.config.ts             dev server on 127.0.0.1:5173, proxies /api and /_allauth to Django
 └── vitest.config.ts

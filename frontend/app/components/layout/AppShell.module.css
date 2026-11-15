@@ -55,11 +55,6 @@
   font-size: 0.6875rem;
 }
 
-.working {
-  font-weight: var(--weight-regular);
-  font-size: var(--text-meta);
-  color: var(--color-fg-muted);
-}
 
 .secondary {
   margin-top: auto;

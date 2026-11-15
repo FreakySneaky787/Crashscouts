@@ -5,8 +5,9 @@ The design system implements the visual direction **Developer Workbench** (conce
 [ADR 0008](adr/0008-design-system-implementation.md). The living reference is the page
 `/design-system` (not indexed, fictional data).
 
-The name "TestHub", the placeholder favicon and the "T" mark in the sidebar are **not** a brand.
-The final name, logo and branding are open and decided by the project owner alone.
+The name is **"Crashscouts"** (owner's decision 2026-11-15). The placeholder favicon and the
+first-letter mark in the sidebar are **not** a logo; logo and further branding are open and decided
+by the project owner alone.
 
 ## 1. Principles
 

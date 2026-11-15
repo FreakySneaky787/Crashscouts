@@ -10,7 +10,7 @@ from .env import env_bool, env_int, env_list, env_str
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Central, replaceable platform name (the working name "TestHub" is a placeholder).
-PLATFORM_NAME = env_str("PLATFORM_NAME", "TestHub")
+PLATFORM_NAME = env_str("PLATFORM_NAME", "Crashscouts")  # owner's decision 2026-11-15 (K)
 
 DEBUG = False
 

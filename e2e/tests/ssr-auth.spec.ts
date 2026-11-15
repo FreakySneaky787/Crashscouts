@@ -207,8 +207,8 @@ test("(6) curl without JavaScript receives complete HTML with title and Open Gra
   const url = `${FRONTEND_URL}${publicPath()}`;
   const html = execFileSync("curl", ["-sS", "--fail", url], { encoding: "utf-8" });
 
-  expect(html).toContain("<title>Public probe item · TestHub</title>");
-  expect(html).toContain('<meta property="og:title" content="Public probe item · TestHub"/>');
+  expect(html).toContain("<title>Public probe item · Crashscouts</title>");
+  expect(html).toContain('<meta property="og:title" content="Public probe item · Crashscouts"/>');
   expect(html).toContain(
     '<meta property="og:description" content="A public item rendered on the server."/>',
   );

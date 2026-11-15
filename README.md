@@ -1,6 +1,7 @@
-# TestHub (working name)
+# Crashscouts
 
-> **Note:** "TestHub" is a provisional placeholder, not a product name.
+> The platform's name, decided by the project owner on 2026-11-15; planned address
+> `crashscouts.org`. The repository keeps its technical name `testhub` for now.
 
 An open-source platform that connects software developers with volunteer testers.
 Developers find testers for their beta versions; testers discover new software and help improve it
