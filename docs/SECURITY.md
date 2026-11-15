@@ -178,6 +178,9 @@ including the negative cases.
   live public campaigns (none while the gate is closed); drafts, reviews, private and blocked
   content never appear, also not through a search term (tested). Search terms are reduced to word
   characters before they reach PostgreSQL; 120 requests per minute and IP address.
+- **Legal texts (WP 8.5, [ADR 0031](adr/0031-legal-texts.md)):** the operator's personal details
+  exist only in the server configuration, are escaped when filled into the texts, and a public
+  deployment refuses to start without them.
 - **No tracking:** no analytics scripts, no tracking cookies, no third-party analytics. Growth
   metrics are computed from the platform's own data, as aggregates only, and shown internally
   ([`METRICS.md`](METRICS.md), owner's decision 2026-11-13).

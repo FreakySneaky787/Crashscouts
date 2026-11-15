@@ -7,6 +7,7 @@ import {
   hasSessionCookie,
   readAnyCookie,
   readAnySetCookie,
+  sourceCodeUrl,
   isUuid,
   privateNoStoreHeaders,
   publicCacheHeaders,
@@ -113,5 +114,16 @@ describe("prefixed cookie names (ASVS 5.0 V3.3.1)", () => {
     expect(hasSessionCookie(request("sessionid=s"))).toBe(true);
     expect(hasSessionCookie(request("theme=dark"))).toBe(false);
     expect(SESSION_COOKIES[0]).toBe("__Host-sessionid");
+  });
+});
+
+describe("AGPL source code link (WP 8.5)", () => {
+  it("accepts https addresses only", () => {
+    expect(sourceCodeUrl("https://github.com/example/project")).toBe("https://github.com/example/project");
+    expect(sourceCodeUrl(undefined)).toBeNull();
+    expect(sourceCodeUrl("")).toBeNull();
+    expect(sourceCodeUrl("http://example.test")).toBeNull();
+    expect(sourceCodeUrl("javascript:alert(1)")).toBeNull();
+    expect(sourceCodeUrl("not a url")).toBeNull();
   });
 });

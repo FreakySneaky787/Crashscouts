@@ -10,7 +10,16 @@ import { isbot } from "isbot";
 import type { RenderToPipeableStreamOptions } from "react-dom/server";
 import { renderToPipeableStream } from "react-dom/server";
 
+import { missingOperatorSettings } from "./lib/legal";
+
 export const streamTimeout = 5_000;
+
+// A public deployment must name its operator (privacy policy and imprint, WP 8.5): the server
+// refuses to start without these settings, like Django refuses a missing secret key.
+if (process.env.PUBLIC_DEPLOYMENT === "true") {
+  const missing = missingOperatorSettings(process.env);
+  if (missing.length) throw new Error(`Missing settings for a public deployment: ${missing.join(", ")}`);
+}
 
 function contentSecurityPolicy(nonce: string): string {
   return [

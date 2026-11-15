@@ -134,6 +134,11 @@ export default function Signup({ loaderData, actionData }: Route.ComponentProps)
               {t("signup.submit")}
             </Button>
           </div>
+          {/* Notice only, nothing stored (owner's decision 2026-11-15, WP 8.5). */}
+          <p className={styles.muted}>
+            {t("signup.legalBefore")} <Link to="/terms">{t("legal.terms")}</Link> {t("signup.legalMiddle")} <Link to="/privacy">{t("legal.privacy")}</Link>
+            {t("signup.legalAfter")}
+          </p>
         </Form>
       </Panel>
       {loaderData.github ? (

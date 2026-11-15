@@ -64,6 +64,17 @@ export function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_PATTERN.test(value);
 }
 
+/** The public source code address for the AGPL footer link: https only, else none. */
+export function sourceCodeUrl(value: string | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Does the request carry a (possible) session? Then the response must never be shared-cached. */
 export function hasSessionCookie(request: Request): boolean {
   return readAnyCookie(request.headers.get("Cookie"), SESSION_COOKIES) !== null;

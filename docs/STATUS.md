@@ -1145,6 +1145,28 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   main run **89 passed** (page titles with the new name), gate run **4 passed**; ESLint,
   typecheck, Ruff clean.
 
+## WP 8.5 – Legal text drafts (2026-11-15) ✅ (drafts, review pending)
+
+- `/privacy`, `/terms`, `/imprint` ([ADR 0031](adr/0031-legal-texts.md)): English drafts from the
+  documented data processing, as Markdown in `frontend/app/legal/`; "Draft – not yet reviewed"
+  until `LEGAL_TEXTS_REVIEWED=true`. Undetermined points are visible `[TO DECIDE: …]` markers
+  (question Y).
+- Operator details only from the SSR server's environment (`OPERATOR_NAME`, `OPERATOR_ADDRESS`,
+  `CONTACT_EMAIL`), escaped as plain text; visible placeholders when missing; with
+  `PUBLIC_DEPLOYMENT=true` the server refuses to start without them (verified on the production
+  build: refused without, started with).
+- Footer on every page (privacy, terms, imprint; "Source code (AGPL-3.0)" from `SOURCE_CODE_URL`,
+  https only, hidden while empty); a notice with both links under the signup button.
+- Found while drafting: django-allauth stores the full public GitHub profile (`extra_data`); the
+  privacy policy says so, and reducing it is proposed (question Z).
+- **Verification (run on 2026-11-15):** Vitest **118 passed** (5 new: filling and escaping of
+  operator details, placeholders, missing settings, review flag, https-only source link); pytest
+  **752 passed**; Playwright main run **92 passed** (3 new: footer links to all three pages with
+  the draft notice and placeholders, axe in light and dark, 390 px; the signup notice links; the
+  pages without JavaScript – the first run found that client-side navigation showed "page not
+  found" because the loader read `/privacy.data`; fixed), gate run **4 passed**; ESLint,
+  typecheck, build clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are (end of the session on 2026-11-14):** phases 0 to 7 are complete; the last CI
@@ -1170,8 +1192,8 @@ plan phase 8 with all open questions and implement WP M.1 meanwhile. WP M.1 is d
 Phase 8: plan, the owner's first decisions, the hosting comparison and name proposals are in
 [`PHASE-8-PLAN.md`](PHASE-8-PLAN.md). Name decided on 2026-11-15:
 **Crashscouts**, `crashscouts.org` (switched centrally in `brand.ts` and `PLATFORM_NAME`). **Next:
-the owner registers the domain and chooses the host**; meanwhile legal drafts, WP 8.6 and
-preparing 8.7.
+the owner registers the domain and chooses the host**. WP 8.5 (legal drafts) is done; open there:
+question Y and the professional review. Meanwhile possible: WP 8.6 and preparing 8.7.
 
 **Still open from earlier:** U (real GitHub test on the first test server), F (email provider
 sign-up), legal pages, hosting (phase 8).

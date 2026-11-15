@@ -56,6 +56,10 @@ export default [
   route("avatars/:key", "routes/avatar.tsx"),
   route("theme", "routes/theme.tsx"),
   route("design-system", "routes/design-system.tsx"),
+  // Legal texts (WP 8.5): one module, three addresses.
+  route("privacy", "routes/legal.tsx", { id: "legal-privacy" }),
+  route("terms", "routes/legal.tsx", { id: "legal-terms" }),
+  route("imprint", "routes/legal.tsx", { id: "legal-imprint" }),
   // Test-only probe for the SSR spike (WP 0.4). Always 404 without the probe backend (production).
   route("probe/public/:id", "routes/probe-public.tsx"),
   route("probe/private/:id", "routes/probe-private.tsx"),

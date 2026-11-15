@@ -36,7 +36,7 @@ function NavList({ items }: { items: NavItem[] }) {
  * bar and the main content area. On narrow screens the navigation moves into a <details> menu,
  * which works without JavaScript.
  */
-export function AppShell({ user, theme, children }: { user: ShellUser; theme: Theme; children: ReactNode }) {
+export function AppShell({ user, theme, sourceUrl = null, children }: { user: ShellUser; theme: Theme; sourceUrl?: string | null; children: ReactNode }) {
   const { t } = useTranslation();
   const items: NavItem[] = [
     { to: "/", label: t("nav.home"), icon: HouseIcon, end: true },
@@ -98,6 +98,28 @@ export function AppShell({ user, theme, children }: { user: ShellUser; theme: Th
           ) : null}
           {children}
         </main>
+        <footer className={styles.footer}>
+          <nav aria-label={t("legal.nav")}>
+            <ul className={styles.footerLinks}>
+              <li>
+                <NavLink to="/privacy">{t("legal.privacy")}</NavLink>
+              </li>
+              <li>
+                <NavLink to="/terms">{t("legal.terms")}</NavLink>
+              </li>
+              <li>
+                <NavLink to="/imprint">{t("legal.imprint")}</NavLink>
+              </li>
+              {sourceUrl ? (
+                <li>
+                  <a href={sourceUrl} rel="noopener noreferrer">
+                    {t("legal.source")}
+                  </a>
+                </li>
+              ) : null}
+            </ul>
+          </nav>
+        </footer>
       </div>
     </div>
   );
