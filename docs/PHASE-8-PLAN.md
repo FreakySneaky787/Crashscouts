@@ -92,3 +92,22 @@ Sources: RDAP services of [Verisign (.com)](https://rdap.verisign.com/com/v1/),
 name searches: web search on 2026-11-15 (no hits for "Testfellows", "Betaharbor" and "Betaroots";
 for "Testerling" the similar [Testling](https://stackshare.io/testling) and
 [TesterLink](https://www.producthunt.com/products/testerlink)).
+
+### Second round (2026-11-15, the owner asked for different names)
+
+The direction is shorter, more distinctive names instead of "test/beta + word". The domains
+were checked in the RDAP services as above (.com, .org, .ch).
+
+| Name | Idea | .com | .org | .ch | Same-name products found |
+|---|---|---|---|---|---|
+| **Nightlyclub** | "nightly" builds are what developers hand to early testers; "club" is the community | free | free | free | none for software; may remind of nightlife |
+| **Crashscouts** | scouts who go ahead and find the crashes | free | free | free | not searched |
+| **Releasecrew** | the crew that gets a release ready | taken | free | free | none |
+| Betascouts | testers as scouts | free | free | free | **"BetaScout" exists** (an Android beta-testing app): too close |
+| Pilotrun, Maidenrun | a first run before the real launch | taken | free | free | not searched |
+| Openscouts | open-source scouts | taken | free | free | "Open Scouts" exists (SourceForge) |
+| Scoutlab, Vorlauf, Testli | | taken | partly taken | taken | – |
+
+Sources: RDAP as above; web searches on 2026-11-15 (no hits for "Nightlyclub" or "Releasecrew"
+as software; [BetaScout on AlternativeTo](https://alternativeto.net/software/betascout/about/);
+[Open Scouts on SourceForge](https://sourceforge.net/projects/open-scouts.mirror/)).
