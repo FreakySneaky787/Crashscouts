@@ -101,7 +101,7 @@ were checked in the RDAP services as above (.com, .org, .ch).
 | Name | Idea | .com | .org | .ch | Same-name products found |
 |---|---|---|---|---|---|
 | **Nightlyclub** | "nightly" builds are what developers hand to early testers; "club" is the community | free | free | free | none for software; may remind of nightlife |
-| **Crashscouts** | scouts who go ahead and find the crashes | free | free | free | not searched |
+| **Crashscouts** | scouts who go ahead and find the crashes | free | free | free | none (only crash investigation and insurance topics) |
 | **Releasecrew** | the crew that gets a release ready | taken | free | free | none |
 | Betascouts | testers as scouts | free | free | free | **"BetaScout" exists** (an Android beta-testing app): too close |
 | Pilotrun, Maidenrun | a first run before the real launch | taken | free | free | not searched |
