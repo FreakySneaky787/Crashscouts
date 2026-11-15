@@ -13,7 +13,7 @@
 | 8.3 | Encrypted off-site backups of the database and files; a **tested** restore with written steps | provider |
 | 8.4 | Monitoring and logs: health checks, error notifications, log retention without personal data | tool choice |
 | 8.5 | Legal texts: privacy policy, terms of use, imprint; AGPL source link in the footer | **drafted 2026-11-15** ([ADR 0031](adr/0031-legal-texts.md)); open: the `[TO DECIDE]` points (question Y) and the professional review |
-| 8.6 | Integration, performance (load test of Discover, search, rate-limit cache) and accessibility pass | – |
+| 8.6 | Integration, performance (load test of Discover, search, rate-limit cache) and accessibility pass | in progress: part A (production-like stack, smoke tests, question P) done 2026-11-15 ([ADR 0032](adr/0032-production-setup.md)) |
 | 8.7 | Making the repository public: **DCO** (G) and **Contributor Covenant** (J) decided 2026-11-15, GitHub's free security features, README | the date |
 | 8.8 | Beta start: open registration (decided), gate checklist ticked, the owner switches `PUBLIC_CAMPAIGNS_ENABLED` | everything above |
 

@@ -45,6 +45,17 @@ export function fieldErrorCodes(body: unknown): Record<string, KnownErrorCode | 
   return result;
 }
 
+/**
+ * allauth refuses further failed logins with 400 `too_many_login_attempts` (not 429, ADR 0022).
+ * Shown as "too many attempts" instead of "wrong password": during the block even the correct
+ * password is refused (found in WP 8.6).
+ */
+export function isLoginRateLimited(status: number, body: unknown): boolean {
+  if (status === 429) return true;
+  const errors = (body as AllauthBody | null)?.errors;
+  return status === 400 && Array.isArray(errors) && errors.some((e) => e?.code === "too_many_login_attempts");
+}
+
 /** True if the response says that the given flow (e.g. "verify_email") is pending. */
 export function isFlowPending(body: unknown, flowId: string): boolean {
   const flows = (body as AllauthBody | null)?.data?.flows;

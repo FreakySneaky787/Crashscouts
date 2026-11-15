@@ -11,7 +11,7 @@ import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
-import { isFlowPending } from "~/lib/auth";
+import { isFlowPending, isLoginRateLimited } from "~/lib/auth";
 import { AUTH_BASE, backendFetch, ensureCsrfToken, getLoginProviders, getSessionUser } from "~/lib/backend.server";
 import { privateNoStoreHeaders, safeRedirectPath, setCookieHeaders } from "~/lib/http";
 
@@ -62,9 +62,11 @@ export async function action({ request }: Route.ActionArgs) {
   if (result.status === 401 && isFlowPending(result.data, "verify_email")) {
     return data({ error: "unverified" as const }, { status: 400, headers });
   }
-  // 400 = wrong credentials, 403 = CSRF check failed, 429 = rate limit. No further details.
-  const error = result.status === 403 ? "forbidden" : result.status === 429 ? "rateLimited" : "invalid";
-  return data({ error }, { status: result.status === 403 ? 403 : result.status === 429 ? 429 : 400, headers });
+  // 400 = wrong credentials or too many failed attempts, 403 = CSRF check failed, 429 = rate
+  // limit. No further details.
+  const limited = isLoginRateLimited(result.status, result.data);
+  const error = result.status === 403 ? "forbidden" : limited ? "rateLimited" : "invalid";
+  return data({ error }, { status: result.status === 403 ? 403 : limited ? 429 : 400, headers });
 }
 
 export function headers({ actionHeaders, loaderHeaders }: Route.HeadersArgs) {

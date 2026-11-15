@@ -3,6 +3,7 @@ import { data, redirect } from "react-router";
 import type { Route } from "./+types/theme";
 import { privateNoStoreHeaders, safeRedirectPath } from "~/lib/http";
 import { isTheme, themeCookie } from "~/lib/theme";
+import { publicProtocol } from "~/lib/proxy.server";
 
 // Only POST changes the theme; a GET (e.g. a link or image) never does.
 export function loader() {
@@ -17,7 +18,7 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const headers = privateNoStoreHeaders();
-  headers.append("Set-Cookie", themeCookie(theme, new URL(request.url).protocol === "https:"));
+  headers.append("Set-Cookie", themeCookie(theme, publicProtocol(request) === "https"));
 
   // With JavaScript the switch posts via a fetcher and updates in place; without it we redirect back.
   if (form.get("_js") === "1") {

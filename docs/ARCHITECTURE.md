@@ -7,12 +7,11 @@
 ## 1. Overview: modular monolith
 
 ```
-Browser ──HTTPS──► Reverse proxy (prod: e.g. Caddy, TLS)
-                    ├── /api/*, /_allauth/*  ──► Django (gunicorn) ──► PostgreSQL 18
-                    ├── /media-protected/*  (only via Django authorization, X-Accel)
-                    ├── /admin/*  ──► 404 (NOT routed publicly)
-                    └── everything else ──► React Router SSR server (Node 24)
-                                           └─ calls the Django API server-side (cookie forwarded)
+Browser ──HTTPS──► Caddy (TLS; ADR 0032)
+                    ├── /admin, /api, /_allauth, /media  ──► 404 (never routed publicly)
+                    └── everything else ──► React Router SSR server (Node 22)
+                                           └─ calls Django (Gunicorn) on the internal network
+                                              (cookie forwarded) ──► PostgreSQL 18
 Admin access (separate): SSH tunnel ──► Django admin on 127.0.0.1, login only with 2FA
 Task worker (django-tasks-db, same code as Django) ──► PostgreSQL
 ```

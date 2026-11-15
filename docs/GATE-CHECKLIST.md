@@ -29,6 +29,8 @@ and E2E `tests/campaigns.spec.ts` ("public campaigns stay drafts while the gate 
 These depend on the production server, which does not exist yet. Tick each one on the real
 server.
 
+- [ ] The stack of `compose.prod.yaml` runs on the server ([ADR 0032](adr/0032-production-setup.md));
+      the smoke tests (`pnpm test:smoke` in `e2e/`, with `SMOKE_URL` set to the real address) pass.
 - [ ] Production settings (`config.settings.prod`) start without errors; `manage.py check --deploy`
       shows only the documented HSTS warnings.
 - [ ] `DJANGO_TRUSTED_PROXY_COUNT=1`; the reverse proxy **overwrites** `X-Forwarded-For`,

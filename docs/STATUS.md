@@ -1181,6 +1181,29 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   (signal removed); Playwright main run **92 passed**, gate run **4 passed**; Ruff, migrations
   check clean.
 
+## WP 8.6 part A – Production-like stack and smoke tests (2026-11-15) ✅
+
+- `compose.prod.yaml` ([ADR 0032](adr/0032-production-setup.md)): Caddy (TLS, HTTP→HTTPS, 6 MB
+  body limit, 404 for `/admin`, `/api`, `/_allauth`, `/media`), the SSR server, Django under
+  Gunicorn 26.2.0 with production settings, PostgreSQL 18; official images pinned by digest;
+  apps as unprivileged users; settings from `.env.prod` (template `.env.prod.example`).
+- Question P resolved: the SSR server takes the public scheme from Caddy's `X-Forwarded-Proto`
+  only with `TRUST_PROXY_HEADERS=true` (`lib/proxy.server.ts`), forwards it to Django and sets the
+  theme cookie accordingly; React Router's `allowedActionOrigins` holds the public host.
+- Found on the way: the login page showed "email or password incorrect" when allauth refused
+  further attempts (400 `too_many_login_attempts`); it now says "Too many attempts".
+- `scripts/build-images.sh` builds behind a TLS-inspecting proxy with an optional CA build secret
+  (checked: no proxy or CA in the images); the setup scripts are unchanged otherwise.
+- New CI job "Production stack": builds the images, starts the stack and runs `pnpm test:smoke`.
+- **Verification (run on 2026-11-15):** smoke tests against `https://localhost` **3 passed**
+  (sign-up with email confirmation, sign-in and sign-out behind the proxy with `__Host-` cookies
+  and `Secure`, `__Host-theme`; HSTS, CSP, nosniff; 404 for admin, API, allauth and media; a
+  forged `X-Forwarded-For` does not get around the per-IP login limit – 2 mutation checks: Caddy
+  trusting client headers alone is still caught by Django's last-address rule; Caddy plus Django
+  trusting them is detected by the test); Vitest **121 passed** (3 new); pytest **753 passed**;
+  Playwright main run **92 passed**, gate run **4 passed**; Ruff, migrations check, pip-audit,
+  ESLint, typecheck clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are (end of the session on 2026-11-14):** phases 0 to 7 are complete; the last CI

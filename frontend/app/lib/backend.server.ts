@@ -13,6 +13,7 @@
 import { redirect } from "react-router";
 
 import { CSRF_COOKIES, readAnyCookie, readAnySetCookie } from "./http";
+import { publicProtocol } from "./proxy.server";
 
 const BACKEND_URL = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";
 
@@ -50,7 +51,7 @@ export async function backendFetch<T = unknown>(
   // For Django behind the proxy (SECURE_PROXY_SSL_HEADER); in production the reverse proxy sets
   // the protocol of the browser request.
   const publicUrl = new URL(request.url);
-  headers.set("X-Forwarded-Proto", publicUrl.protocol.replace(":", ""));
+  headers.set("X-Forwarded-Proto", publicProtocol(request));
   // Public host, so URLs Django builds (e.g. the GitHub callback) point to the frontend, not to
   // the internal backend address (USE_X_FORWARDED_HOST in the Django settings).
   headers.set("X-Forwarded-Host", publicUrl.host);

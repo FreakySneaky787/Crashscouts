@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { fieldErrorCodes, hasFlow, isFlowPending, isPlausibleKey } from "./auth";
+import { fieldErrorCodes, hasFlow, isFlowPending, isLoginRateLimited, isPlausibleKey } from "./auth";
 
 describe("fieldErrorCodes", () => {
   it("maps the first known code per field", () => {
@@ -60,5 +60,14 @@ describe("hasFlow", () => {
     expect(hasFlow({ data: { flows: [{ id: "reauthenticate" }] } }, "reauthenticate")).toBe(true);
     expect(hasFlow({ data: { flows: [{ id: "login" }] } }, "reauthenticate")).toBe(false);
     expect(hasFlow(null, "reauthenticate")).toBe(false);
+  });
+});
+
+describe("failed-login limit (WP 8.6)", () => {
+  it("recognises allauth's 400 too_many_login_attempts and 429", () => {
+    expect(isLoginRateLimited(400, { errors: [{ code: "too_many_login_attempts" }] })).toBe(true);
+    expect(isLoginRateLimited(429, null)).toBe(true);
+    expect(isLoginRateLimited(400, { errors: [{ code: "email_password_mismatch" }] })).toBe(false);
+    expect(isLoginRateLimited(400, null)).toBe(false);
   });
 });

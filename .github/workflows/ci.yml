@@ -164,3 +164,51 @@ jobs:
       - name: Run Playwright (security gate, flag on)
         working-directory: e2e
         run: pnpm test:gate
+
+  # WP 8.6 (ADR 0032): the production path – Caddy with TLS, SSR server and Django (Gunicorn,
+  # production settings) built from the Dockerfiles – with secrets generated for this run only.
+  production-stack:
+    name: Production stack (Docker, Caddy, smoke tests)
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Settings for this run (random secrets, local mail catcher)
+        run: |
+          {
+            echo "SITE_ADDRESS=localhost"
+            echo "PUBLIC_HOST=localhost"
+            echo "DJANGO_SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_urlsafe(64))')"
+            echo "POSTGRES_PASSWORD=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
+            echo "DJANGO_EMAIL_HOST=mailpit"
+            echo "DJANGO_EMAIL_PORT=1025"
+            echo "DJANGO_EMAIL_USE_TLS=false"
+            echo "DJANGO_DEFAULT_FROM_EMAIL=Crashscouts <no-reply@localhost>"
+            echo "DJANGO_SIGNUP_ENABLED=true"
+            echo "PUBLIC_DEPLOYMENT=true"
+            echo "OPERATOR_NAME=CI Test Operator"
+            echo "OPERATOR_ADDRESS=Example Street 1"
+            echo "CONTACT_EMAIL=contact@example.test"
+          } > .env.prod
+      - name: Build and start the stack
+        run: |
+          docker compose -f compose.prod.yaml --env-file .env.prod --profile local up -d --build --wait
+          docker compose -f compose.prod.yaml --env-file .env.prod exec -T backend python manage.py migrate --noinput
+      - name: Install Playwright
+        working-directory: e2e
+        run: |
+          npm install --global "pnpm@${PNPM_VERSION}"
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+      - name: Smoke tests against https://localhost
+        working-directory: e2e
+        run: pnpm test:smoke
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f compose.prod.yaml --env-file .env.prod logs --tail 200

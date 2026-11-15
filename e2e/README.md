@@ -44,6 +44,22 @@ pnpm test:gate
 
 The gate checklist for the project owner is [`docs/GATE-CHECKLIST.md`](../docs/GATE-CHECKLIST.md).
 
+### Production-like stack (smoke tests, WP 8.6)
+
+The production path – Caddy with TLS, the SSR server and Django under Gunicorn with production
+settings – runs from `compose.prod.yaml` ([ADR 0032](../docs/adr/0032-production-setup.md)):
+
+```bash
+cp ../.env.prod.example ../.env.prod   # local values: SITE_ADDRESS=localhost, PUBLIC_HOST=localhost, random secrets
+docker compose -f ../compose.prod.yaml --env-file ../.env.prod --profile local up -d --build
+docker compose -f ../compose.prod.yaml --env-file ../.env.prod exec -T backend python manage.py migrate --noinput
+pnpm test:smoke
+```
+
+Behind a TLS-inspecting proxy (Claude cloud sessions) build the images with
+`CA_BUNDLE=/root/.ccr/ca-bundle.crt PUBLIC_HOST=localhost ../scripts/build-images.sh` and start
+with `--no-build`. The login rate-limit test needs a fresh minute between two runs.
+
 ## Contents
 
 `tests/ssr-auth.spec.ts` covers the six acceptance criteria of the SSR auth spike (WP 0.4, see

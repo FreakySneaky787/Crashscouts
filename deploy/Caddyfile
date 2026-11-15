@@ -1,0 +1,24 @@
+# Reverse proxy for Crashscouts (WP 8.6, ADR 0032).
+# - TLS: SITE_ADDRESS "localhost" uses Caddy's internal CA (local test); the real domain gets a
+#   Let's Encrypt certificate automatically.
+# - Everything goes to the SSR server. Django is never routed: the browser talks only to the SSR
+#   server, which calls Django on the internal network (ARCHITECTURE.md §10).
+# - Caddy ignores X-Forwarded-* sent by clients (no trusted_proxies) and sets them itself.
+{
+	admin off
+}
+
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	# Uploads are at most 5 MB plus form overhead (ADR 0010, ADR 0024).
+	request_body {
+		max_size 6MB
+	}
+
+	# Never routed publicly (docs/SECURITY.md §7), also not through the SSR server.
+	@internal path /admin /admin/* /media /media/* /api /api/* /_allauth /_allauth/*
+	respond @internal 404
+
+	reverse_proxy frontend:3000
+}

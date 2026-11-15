@@ -37,6 +37,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0029](0029-moderation-statistics.md) | Moderation statistics | Accepted |
 | [0030](0030-growth-metrics.md) | Growth metrics page | Accepted |
 | [0031](0031-legal-texts.md) | Legal texts | Accepted (drafts) |
+| [0032](0032-production-setup.md) | Production setup | Accepted |
 
 ## Template
 
