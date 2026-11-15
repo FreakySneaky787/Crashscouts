@@ -1,6 +1,6 @@
 # Open Questions
 
-> As of: 2026-11-14. Every question is clarified **before** the phase that needs it. Until then,
+> As of: 2026-11-15. Every question is clarified **before** the phase that needs it. Until then,
 > nothing that depends on it is implemented.
 > The "Proposal" column is a recommendation, **not** a decision.
 
@@ -13,7 +13,6 @@
 | K | Final product name, logo, domain | open | decided exclusively by the project owner |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
-| X | Remediation time frames for vulnerable dependencies (ASVS 5.0 V15.1.1) | end of phase 7 | **critical** 3 days, **high** 7 days, **moderate** 30 days, **low** with the next regular update (at most 90 days); development-only tools in the same tiers; a fix release younger than 7 days is taken only for critical and high findings (supply-chain caution); a monthly review of all dependency updates; exceptions documented in `docs/STATUS.md`. Interim rule until confirmed ([`SECURITY.md`](SECURITY.md) §10) |
 
 ### Resolved
 
@@ -38,6 +37,8 @@
 | – | Assigning admin and moderator roles | **On an admin page in the app** (2026-11-13). The first admin is created once with a server command; role changes need a fresh reauthentication and 2FA, are audited, and the last admin cannot remove themselves (phase 3B). |
 | – | Campaign data during the deletion grace period | Participations, invitations and applications **stay until the final deletion**; the person is hidden from team lists but keeps the place (2026-11-13). |
 | O | Shared cache for rate limits | **Django's database cache in PostgreSQL** (2026-11-13): no extra service, fits ADR 0003 (no Redis in the MVP); introduced in phase 3B. Implemented in WP 3B.5 (ADR 0022); IP addresses only as HMAC hashes, at most one day (owner, 2026-11-13). |
+| X | Remediation time frames for vulnerable dependencies (ASVS 5.0 V15.1.1) | **critical 7 days, high 14 days, moderate 60 days, low 180 days** at the latest; development-only tools in the same tiers; a fix release younger than 7 days only for critical and high findings; monthly review of all dependency updates; exceptions with reason in `docs/STATUS.md`. Actively exploited critical issues are fixed as fast as possible; the frame is the upper limit (2026-11-15, [`SECURITY.md`](SECURITY.md) §10). |
+| – | Suspension rules (WP 7.2) | **Confirmed:** accounts with a platform role cannot be suspended (an admin removes the role first); nobody can suspend themselves (2026-11-15, [ADR 0027](adr/0027-account-suspensions.md)). |
 | – | Reporting people | Reasons **spam · harassment or insults · pretending to be someone else · inappropriate profile · other**, free text optional (2026-11-14, [ADR 0026](adr/0026-moderating-people-and-feedback.md)). |
 | – | Spam in published feedback | Moderators **hide** it: reversible, logged; it becomes private again and cannot be republished until the block is lifted (2026-11-14). |
 | – | Account suspensions | **Read only** (sign in, read, export, delete; no creating, reporting, feedback, joining or inviting); hidden profile; reason visible, **one appeal**; **free end date or permanent**, set by **any moderator**; any moderator decides the appeal, also the one who suspended (2026-11-14; WP 7.2). |

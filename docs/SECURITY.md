@@ -260,13 +260,13 @@ admin logins, deletions and exports.
 - ✅ Tools and images only from official sources with checksums or digests (e.g. `postgres:18`
   pinned by digest).
 - ✅ pnpm 10 does not run dependency install scripts unless explicitly allowed.
-- **Remediation time frames (ASVS 5.0 V15.1.1; proposal, question X, applied as the interim
-  rule):** a published advisory for a dependency is fixed within **3 days** (critical), **7 days**
-  (high), **30 days** (moderate) or with the next regular update, at most **90 days** (low);
-  development-only tools in the same tiers. A fix release younger than 7 days is taken only for
-  critical and high findings. All dependency updates are reviewed monthly. Exceptions with reason
-  go into `docs/STATUS.md`. Open finding: `minimatch` (moderate, ESLint only, since 2026-11-14;
-  due 2026-12-14).
+- ✅ **Remediation time frames (ASVS 5.0 V15.1.1; owner's decision 2026-11-15, question X):** a
+  published advisory for a dependency is fixed at the latest within **7 days** (critical),
+  **14 days** (high), **60 days** (moderate) or **180 days** (low); development-only tools in the
+  same tiers. Actively exploited critical issues are fixed as fast as possible – the frame is the
+  upper limit. A fix release younger than 7 days is taken only for critical and high findings. All
+  dependency updates are reviewed monthly. Exceptions with reason go into `docs/STATUS.md`. Open
+  finding: `minimatch` (moderate, ESLint only, since 2026-11-14; due 2027-01-13).
 
 ## 11. Claude Code in the development environment
 

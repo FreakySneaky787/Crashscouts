@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-14 (WP 7.5) · **Current phase:** 7 complete – next: 8, release preparation (closed beta), or WP M.1 (flag still off)
+**Last update:** 2026-11-15 (owner decisions after phase 7) · **Current phase:** 7 complete – next: WP M.1, phase 8 being planned (flag still off)
 
 ## Work packages
 
@@ -1132,18 +1132,15 @@ run 88 passed, gate run 4 passed.
 (statistics page for the growth metrics of [`METRICS.md`](METRICS.md); the data for all five
 metrics exists) comes first; present the work packages and open questions before starting.
 
-**Waiting for the owner:**
+**Decided by the owner on 2026-11-15:** question X (remediation time frames: critical 7 / high 14 /
+moderate 60 / low 180 days), the two suspension rules of WP 7.2 confirmed, and the next step:
+plan phase 8 with all open questions and implement WP M.1 meanwhile.
 
-1. Question X – remediation time frames for vulnerable dependencies (ASVS V15.1.1): proposal
-   critical 3 / high 7 / moderate 30 / low 90 days, applied as the interim rule.
-2. The two suspension rules chosen in WP 7.2: accounts with a platform role cannot be suspended
-   (an admin removes the role first); nobody can suspend themselves.
-3. Still open from earlier: U (real GitHub test on the first test server), F (email provider
-   sign-up), legal pages, hosting (phase 8).
+**Still open from earlier:** U (real GitHub test on the first test server), F (email provider
+sign-up), legal pages, hosting (phase 8).
 
 **Due dates:** the moderate `minimatch` advisory (ESLint only, not shipped) is due by
-**2026-12-14** under the interim rule; ESLint 10.15.0 fixes it (published 2026-11-13, so wait a
-few days before updating).
+**2027-01-13**; ESLint 10.15.0 fixes it (published 2026-11-13).
 
 Decided for 3B (2026-11-13): A – confirmed email and 2FA, no waiting period, review queue for
 every public campaign; H – the owner moderates alone, built role-based; admin and moderator roles

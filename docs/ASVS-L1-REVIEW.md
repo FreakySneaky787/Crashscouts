@@ -12,24 +12,23 @@
 > **phase 8** and are listed in [`GATE-CHECKLIST.md`](GATE-CHECKLIST.md).
 
 **Status:** ✅ met · 🔧 fixed in WP 7.5 · ➖ not applicable · 🕓 phase 8 (operations) ·
-❓ owner's decision pending
+❓ owner's decision pending (none since 2026-11-15)
 
 ## Summary
 
 | Status | Count |
 |---|---|
-| ✅ met | 47 |
+| ✅ met | 48 |
 | 🔧 fixed in WP 7.5 | 6 |
 | ➖ not applicable | 12 |
 | 🕓 phase 8 (operations) | 4 |
-| ❓ owner's decision pending | 1 |
 | **Total** | **70** |
 
 Fixes in WP 7.5: `__Host-` cookie names in production (V3.3.1), HSTS also on the frontend's
 responses (V3.4.1), the malicious-lockout documentation (V6.1.1, ADR 0022), password change in
-the settings (V6.2.2, V6.2.3), a new session ID after re-authentication (V7.2.4). Pending the
-owner's decision: the remediation time frames (V15.1.1, question X; applied as the interim rule).
-No open high or critical findings.
+the settings (V6.2.2, V6.2.3), a new session ID after re-authentication (V7.2.4). The remediation
+time frames (V15.1.1) were decided by the owner on 2026-11-15 (question X). No open high or
+critical findings.
 
 ## V1 Encoding and Sanitization
 
@@ -172,8 +171,8 @@ No open high or critical findings.
 
 | ID | Requirement | Status | Evidence / action |
 |---|---|---|---|
-| V15.1.1 | Documented remediation time frames for vulnerable components | ❓ | Proposal in [`SECURITY.md`](SECURITY.md) §10 and question X (critical 3 days, high 7, moderate 30, low 90); applied as the interim rule until the owner confirms |
-| V15.2.1 | Components within the documented time frames | ✅ | `pip-audit` clean; `pnpm audit`: one moderate advisory in ESLint's `minimatch` (development only) since 2026-11-14, due 2026-12-14 under the proposal; CI fails on high and critical |
+| V15.1.1 | Documented remediation time frames for vulnerable components | ✅ | [`SECURITY.md`](SECURITY.md) §10, owner's decision 2026-11-15 (question X): critical 7 days, high 14, moderate 60, low 180 at the latest |
+| V15.2.1 | Components within the documented time frames | ✅ | `pip-audit` clean; `pnpm audit`: one moderate advisory in ESLint's `minimatch` (development only) since 2026-11-14, due 2027-01-13; CI fails on high and critical |
 | V15.3.1 | Only the required fields returned | ✅ | Explicit serializer fields; public views use separate serializers (profiles, published feedback without author or files); tests check that private fields are absent |
 
 ## Not changed, noted for later levels

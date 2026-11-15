@@ -33,7 +33,8 @@ The last two points together mean there is no four-eyes principle; the owner acc
 - **Hidden profile:** `visible_profiles()` leaves out accounts with a suspension in force, so
   the public profile, its avatar and reporting the person answer 404 while it lasts.
 - **Rules:** a message is required; the end must lie in the future; moderators cannot suspend
-  themselves or an account with a platform role (an admin removes the role first, ADR 0018); one
+  themselves or an account with a platform role (an admin removes the role first, ADR 0018;
+  both confirmed by the owner on 2026-11-15); one
   suspension in force per account. Suspending closes the person's open reports (reporters get the
   usual short email). The person is emailed when suspended, when it is lifted and when the appeal
   is decided.
