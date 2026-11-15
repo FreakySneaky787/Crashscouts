@@ -67,12 +67,17 @@ uv run --env-file ../.env python manage.py spectacular --validate --fail-on-warn
 Tests run against a **real PostgreSQL** (not SQLite); the database from `compose.yaml` must be
 running.
 
+Test data at beta scale for performance measurements: `manage.py seed_load_data` (generated
+accounts, projects and campaigns; refuses a database with other accounts). How to run the load
+test: [`docs/PERFORMANCE.md`](../docs/PERFORMANCE.md).
+
 ## Settings
 
 | Module | Purpose |
 |---|---|
 | `config.settings.dev` | Default for `manage.py`. `DEBUG` on, browsable API and schema endpoint `/api/v1/schema/`, SSR probe installed, CSRF trusted origins `http://localhost:5173` and `http://127.0.0.1:5173` (override with `DJANGO_CSRF_TRUSTED_ORIGINS`) |
 | `config.settings.test` | Default for pytest. `DEBUG` off, no schema endpoint, SSR probe installed |
+| `config.settings.loadtest` | Local load test only (WP 8.6, [PERFORMANCE.md](../docs/PERFORMANCE.md)): production settings with the Discover IP limit raised and public campaigns enabled; refuses to start for anything but `https://localhost` |
 | `config.settings.prod` | Default for WSGI/ASGI. Refuses to start without `DJANGO_SECRET_KEY` (≥ 50 characters, not a development key) and `DJANGO_ALLOWED_HOSTS`, or if the SSR probe is installed; enforces secure cookies, HTTPS redirect and HSTS |
 
 Configuration comes exclusively from environment variables (see `.env.example`), never from the

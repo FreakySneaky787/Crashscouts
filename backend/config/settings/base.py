@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # PostgreSQL features: the GIN index for full-text search (WP 8.6).
+    "django.contrib.postgres",
     "rest_framework",
     "drf_spectacular",
     "allauth",

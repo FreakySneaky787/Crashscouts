@@ -7,6 +7,8 @@
 """
 
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models.functions import Lower
@@ -17,6 +19,18 @@ from apps.core.models import BaseModel
 from .validators import validate_project_slug
 
 DESCRIPTION_MAX_LENGTH = 10_000
+
+
+# Full-text search over projects (ADR 0025): the "simple" configuration (German and English
+# content), name before summary before description. Stored as a generated column with a GIN index
+# (WP 8.6, docs/PERFORMANCE.md): computing it per request for every row was the slowest part of
+# Discover. PostgreSQL keeps the column up to date on every write.
+SEARCH_CONFIG = "simple"
+SEARCH_VECTOR = (
+    SearchVector("name", weight="A", config=SEARCH_CONFIG)
+    + SearchVector("summary", weight="B", config=SEARCH_CONFIG)
+    + SearchVector("description", weight="C", config=SEARCH_CONFIG)
+)
 
 
 class Project(BaseModel):
@@ -53,11 +67,15 @@ class Project(BaseModel):
     logo_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
     # Blocked by moderators (WP 3B.3, ADR 0020): invisible to everyone but the team.
     blocked_at = models.DateTimeField(null=True, blank=True, editable=False)
+    search_vector = models.GeneratedField(
+        expression=SEARCH_VECTOR, output_field=SearchVectorField(), db_persist=True
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(Lower("slug"), name="projects_project_slug_ci_unique"),
         ]
+        indexes = [GinIndex(fields=["search_vector"], name="projects_project_search_gin")]
 
     def __str__(self) -> str:
         return self.name

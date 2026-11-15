@@ -213,6 +213,7 @@ def test_no_campaigns_while_the_gate_is_closed(campaigns, settings):
         ({"platform": "linux"}, ["open-beta"]),
         ({"software_type": "command-line"}, ["full-beta"]),
         ({"q": "harbor"}, ["full-beta"]),  # the project's name counts
+        ({"q": "tidewat"}, ["open-beta"]),  # only the project's name matches (WP 8.6)
         ({"q": "sync engine"}, ["open-beta"]),
         ({"q": "draft"}, []),
     ],

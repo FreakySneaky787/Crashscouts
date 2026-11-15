@@ -93,7 +93,10 @@ class FeedbackListView(APIView):
                 feedback = feedback.filter(task_id=serializers.UUIDField().to_internal_value(task))
             except serializers.ValidationError:
                 feedback = feedback.none()
-        context = {"request": request}
+        # Every item belongs to this one campaign: decide team membership once (WP 8.6).
+        team = policies.is_team(request.user, campaign)
+        feedback = feedback.prefetch_related("attachments")
+        context = {"request": request, "team": team}
         return Response(FeedbackSerializer(feedback, many=True, context=context).data)
 
     @extend_schema(

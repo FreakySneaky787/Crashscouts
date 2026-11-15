@@ -70,14 +70,20 @@ def visible_feedback(user, campaign: Campaign) -> QuerySet[Feedback]:
     return feedback.filter(Q(published_at__isnull=False, blocked_at__isnull=True) | mine)
 
 
-def can_see_attachments(user, feedback: Feedback) -> bool:
+def _team(user, feedback: Feedback, team: bool | None) -> bool:
+    """``team``: already decided for the feedback's campaign by a list of one campaign (WP 8.6,
+    one membership lookup per list instead of several per item)."""
+    return is_team(user, feedback.campaign) if team is None else team
+
+
+def can_see_attachments(user, feedback: Feedback, team: bool | None = None) -> bool:
     """Attachments: only the team and the author (owner's decision, 2026-11-14)."""
-    if is_team(user, feedback.campaign):
+    if _team(user, feedback, team):
         return True
     return not _blocked(feedback.campaign) and is_author(user, feedback)
 
 
-def can_see_author(user, feedback: Feedback) -> bool:
+def can_see_author(user, feedback: Feedback, team: bool | None = None) -> bool:
     """Who wrote it: the team and the author; others see "a tester" (decision D: only the team
     sees who takes part)."""
-    return is_team(user, feedback.campaign) or is_author(user, feedback)
+    return _team(user, feedback, team) or is_author(user, feedback)

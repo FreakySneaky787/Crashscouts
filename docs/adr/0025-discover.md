@@ -37,8 +37,11 @@ never by popularity; the filter "open source only" is preselected.
   Only word characters reach the query (at most 8 words of at most 40 characters), so a search
   term cannot inject tsquery syntax. Projects: name (weight A), summary (B), description (C);
   campaigns: title (A), project name and summary (B), description (C). With a search term, results
-  are ordered by rank, then by the chosen sort. Vectors are computed at query time; a GIN index
-  follows when measurements need it (before the beta).
+  are ordered by rank, then by the chosen sort. **Update WP 8.6 (2026-11-15):** the measurements
+  at beta scale showed the per-request vectors as the slowest part of Discover (campaign search
+  668 ms), so projects and campaigns now store their vector in a generated column
+  (`search_vector`, kept up to date by PostgreSQL) with a GIN index; the project name in campaign
+  search is matched and ranked from the short name at query time ([PERFORMANCE.md](../PERFORMANCE.md)).
 - **Filters:** projects – platform, category, language, software type, development status, "has
   a live campaign"; campaigns – the project's category, language, software type and licence, the
   campaign's platform, testing method and "free places only". Unknown values match nothing.
@@ -57,7 +60,10 @@ never by popularity; the filter "open source only" is preselected.
 
 - Closed-source projects are found only after unticking "open source only".
 - The campaigns tab stays empty until the owner opens the security gate.
-- Search cost grows with the number of public projects; to be measured before the beta.
+- Search cost grows with the number of public projects; measured in WP 8.6 at beta scale (search
+  29 ms for projects, 56 ms for campaigns in the backend, [PERFORMANCE.md](../PERFORMANCE.md)).
+- The stored search columns cost disk space and a little write time; any change to the weights
+  or texts needs a migration.
 - The page is cached publicly for 60 seconds for visitors without a session (like other public
   pages), so a newly approved campaign or a changed project can take up to a minute to show for
   them.

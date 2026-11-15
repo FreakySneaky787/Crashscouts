@@ -1,0 +1,7 @@
+# Local load tests only (WP 8.6, docs/PERFORMANCE.md): on top of compose.prod.yaml, Django uses
+# config.settings.loadtest (refuses anything but https://localhost).
+#   docker compose -f compose.prod.yaml -f compose.loadtest.yaml --env-file .env.prod --profile local up -d --no-build
+services:
+  backend:
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.loadtest

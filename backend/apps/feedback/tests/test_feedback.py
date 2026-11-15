@@ -165,6 +165,30 @@ def test_others_do_not_learn_who_wrote_it(world):
     assert client_for(world["author"]).get(url(feedback)).json()["author"] == "fb-author"
 
 
+def test_the_list_decides_the_team_once_and_still_hides_the_author(world):
+    """WP 8.6: the inbox checked the membership three times per item; now once per list."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    def inbox(user):
+        with CaptureQueriesContext(connection) as captured:
+            items = client_for(user).get(BASE).json()
+        return items, len(captured)
+
+    items, few = inbox(world["owner"])
+    for index in range(4):
+        assert give(world["other"], title=f"More {index}").status_code == 201
+    items, many = inbox(world["owner"])
+    assert many == few
+    assert len(items) == 5
+    assert all(item["can_manage"] for item in items)
+    assert {item["author"] for item in items} == {"fb-author", "fb-other"}
+    seen_by_other = client_for(world["other"]).get(BASE).json()
+    assert not any(item["can_manage"] for item in seen_by_other)
+    assert {item["author"] for item in seen_by_other} == {None, "fb-other"}
+    assert all(item["attachments"] == [] for item in seen_by_other)
+
+
 # --- Changing and withdrawing ---------------------------------------------------------------
 
 

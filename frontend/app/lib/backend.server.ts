@@ -106,6 +106,17 @@ export async function backendFetch<T = unknown>(
 
 export type SessionUser = { username: string };
 
+/**
+ * The same request without the visitor's cookies, for public data that must never depend on who
+ * asks (e.g. public profiles). Keeps the proxy headers, so Django still sees the public scheme
+ * behind the reverse proxy (found in WP 8.6: without them Django redirected to HTTPS).
+ */
+export function withoutCookies(request: Request): Request {
+  const headers = new Headers(request.headers);
+  headers.delete("Cookie");
+  return new Request(request.url, { headers });
+}
+
 /** Django's write guard answers 403 `{"code": "account_suspended"}` (ADR 0027). */
 export function isSuspendedRefusal(status: number, body: unknown): boolean {
   return status === 403 && Boolean(body) && typeof body === "object" && (body as { code?: unknown }).code === "account_suspended";

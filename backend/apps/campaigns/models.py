@@ -8,13 +8,15 @@
 """
 
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.db import models
 from django.db.models import F, Q
 from django.db.models.functions import Lower
 
 from apps.catalog.models import Platform
 from apps.core.models import BaseModel
-from apps.projects.models import Project
+from apps.projects.models import SEARCH_CONFIG, Project
 
 from . import status
 from .validators import validate_campaign_slug, validate_download_url, validate_timezone
@@ -22,6 +24,15 @@ from .validators import validate_campaign_slug, validate_download_url, validate_
 MARKDOWN_MAX_LENGTH = 10_000
 SHORT_MARKDOWN_MAX_LENGTH = 4_000
 MAX_TARGET_TESTERS = 1000
+
+
+# Full-text search over a campaign's own texts (ADR 0025), stored like the project's (WP 8.6).
+# The project name also counts in Discover; it is added at query time (apps.discover.queries).
+SEARCH_VECTOR = (
+    SearchVector("title", weight="A", config=SEARCH_CONFIG)
+    + SearchVector("summary", weight="B", config=SEARCH_CONFIG)
+    + SearchVector("description", weight="C", config=SEARCH_CONFIG)
+)
 
 
 class Campaign(BaseModel):
@@ -90,9 +101,13 @@ class Campaign(BaseModel):
         related_name="+",
         editable=False,
     )
+    search_vector = models.GeneratedField(
+        expression=SEARCH_VECTOR, output_field=SearchVectorField(), db_persist=True
+    )
 
     class Meta:
         ordering = ["-starts_at", "title"]
+        indexes = [GinIndex(fields=["search_vector"], name="campaigns_campaign_search_gin")]
         constraints = [
             models.UniqueConstraint(
                 "project", Lower("slug"), name="campaigns_slug_unique_per_project"

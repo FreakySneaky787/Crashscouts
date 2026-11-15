@@ -16,6 +16,7 @@ from apps.projects.policies import can_edit
 
 from . import access, suspensions
 from .actions import (
+    TARGET_MODELS,
     ModerationError,
     active_block,
     appeal,
@@ -91,6 +92,30 @@ def _summary(target_type: str, target) -> dict:
     return data
 
 
+# What each kind of target needs for its summary, loaded together with it (WP 8.6: one query
+# per kind instead of several per case; 300 open cases took 606 queries before).
+CASE_RELATIONS: dict[str, tuple[str, ...]] = {
+    "project": (),
+    "campaign": ("project",),
+    "link": ("campaign__project",),
+    "feedback": ("campaign__project",),
+    "user": (),
+}
+
+
+def _takers(field: str) -> dict:
+    """The moderator who took each case: the newest open report with one, as ``taken_by``."""
+    takers = {}
+    reports = (
+        Report.objects.filter(target_type=field, status__in=OPEN_STATES, taken_by__isnull=False)
+        .order_by("-created_at")
+        .values_list(field, "taken_by__username")
+    )
+    for target_id, username in reports:
+        takers.setdefault(target_id, username)
+    return takers
+
+
 class CasesView(ModeratorView):
     """Targets with open or in-review reports; malware and suspended links first, then oldest."""
 
@@ -112,8 +137,14 @@ class CasesView(ModeratorView):
                     oldest=Min("created_at"),
                 )
             )
+            grouped = list(grouped)
+            queryset = TARGET_MODELS[field].objects.all()
+            if CASE_RELATIONS[field]:
+                queryset = queryset.select_related(*CASE_RELATIONS[field])
+            targets = queryset.in_bulk([entry[field] for entry in grouped])
+            takers = _takers(field)
             for entry in grouped:
-                target = get_target(field, entry[field])
+                target = targets.get(entry[field])
                 if target is None:
                     continue
                 rows.append(
@@ -123,7 +154,7 @@ class CasesView(ModeratorView):
                         "reports": entry["count"],
                         "malware": entry["malware"] > 0,
                         "oldest": entry["oldest"].isoformat(),
-                        "taken_by": getattr(taken_by(target), "username", None),
+                        "taken_by": takers.get(target.pk),
                         **_summary(field, target),
                     }
                 )

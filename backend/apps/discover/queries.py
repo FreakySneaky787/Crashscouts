@@ -13,18 +13,23 @@ a search term can never inject tsquery syntax.
 import re
 from dataclasses import dataclass
 
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import Count, F, Max, Q, QuerySet, Value
+from django.contrib.postgres.search import (
+    SearchQuery,
+    SearchRank,
+    SearchVector,
+    SearchVectorField,
+)
+from django.db.models import Count, F, Func, Max, Q, QuerySet, Value
 from django.db.models.functions import Coalesce, Greatest
 
 from apps.campaigns.models import Campaign, Participation
 from apps.campaigns.policies import public_campaigns_enabled
-from apps.projects.models import Project
+from apps.projects.models import SEARCH_CONFIG, Project
 
 PAGE_SIZE = 20
 MAX_TERMS = 8
 MAX_TERM_LENGTH = 40
-CONFIG = "simple"
+CONFIG = SEARCH_CONFIG
 WORD = re.compile(r"\w+", re.UNICODE)
 
 
@@ -109,13 +114,10 @@ def projects(filters: dict, *, q: str = "", sort: str = "active", page: int = 1)
     order = ["-created_at", "pk"] if sort == "new" else ["-last_activity", "-created_at", "pk"]
     query = search_query(q)
     if query is not None:
-        vector = (
-            SearchVector("name", weight="A", config=CONFIG)
-            + SearchVector("summary", weight="B", config=CONFIG)
-            + SearchVector("description", weight="C", config=CONFIG)
+        # The stored, indexed column (WP 8.6): nothing is computed per row at query time.
+        queryset = queryset.filter(search_vector=query).annotate(
+            rank=SearchRank(F("search_vector"), query)
         )
-        matches = Project.objects.annotate(search=vector).filter(search=query).values("pk")
-        queryset = queryset.filter(pk__in=matches).annotate(rank=SearchRank(vector, query))
         order = ["-rank", *order]
     return paginate(queryset.order_by(*order), page)
 
@@ -144,13 +146,18 @@ def campaigns(filters: dict, *, q: str = "", sort: str = "active", page: int = 1
     order = ["-created_at", "pk"] if sort == "new" else ["-last_activity", "-created_at", "pk"]
     query = search_query(q)
     if query is not None:
-        vector = (
-            SearchVector("title", weight="A", config=CONFIG)
-            + SearchVector("project__name", weight="B", config=CONFIG)
-            + SearchVector("summary", weight="B", config=CONFIG)
-            + SearchVector("description", weight="C", config=CONFIG)
+        # The campaign's stored, indexed texts plus the project name (weight B), which only the
+        # short names cost at query time (WP 8.6).
+        name = SearchVector("name", weight="B", config=CONFIG)
+        named = Project.objects.annotate(search=name).filter(search=query).values("pk")
+        queryset = queryset.filter(Q(search_vector=query) | Q(project__in=named))
+        vector = Func(
+            F("search_vector"),
+            SearchVector("project__name", weight="B", config=CONFIG),
+            arg_joiner=" || ",
+            template="(%(expressions)s)",
+            output_field=SearchVectorField(),
         )
-        matches = Campaign.objects.annotate(search=vector).filter(search=query).values("pk")
-        queryset = queryset.filter(pk__in=matches).annotate(rank=SearchRank(vector, query))
+        queryset = queryset.annotate(rank=SearchRank(vector, query))
         order = ["-rank", *order]
     return paginate(queryset.order_by(*order), page)

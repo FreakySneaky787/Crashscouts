@@ -33,8 +33,9 @@ def has_private_access(user, campaign: Campaign) -> bool:
     )
 
 
-def can_view(user, campaign: Campaign) -> bool:
-    if is_team(user, campaign):
+def can_view(user, campaign: Campaign, team: bool | None = None) -> bool:
+    """``team``: already decided for the campaign's project by a list (WP 8.6)."""
+    if is_team(user, campaign) if team is None else team:
         return True
     if campaign.state in (Campaign.State.DRAFT, Campaign.State.IN_REVIEW):
         return False

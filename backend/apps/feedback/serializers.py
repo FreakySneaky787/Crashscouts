@@ -135,6 +135,10 @@ class FeedbackSerializer(serializers.Serializer):
     def _user(self):
         return self.context["request"].user
 
+    def _team(self) -> bool | None:
+        """Set by lists of one campaign's feedback (WP 8.6); None: decided per item."""
+        return self.context.get("team")
+
     def get_task(self, feedback) -> dict | None:
         task = feedback.task
         return {"id": str(task.pk), "title": task.title} if task else None
@@ -144,7 +148,9 @@ class FeedbackSerializer(serializers.Serializer):
         return {"id": str(original.pk), "title": original.title} if original else None
 
     def get_author(self, feedback) -> str | None:
-        if feedback.author is None or not policies.can_see_author(self._user(), feedback):
+        if feedback.author is None or not policies.can_see_author(
+            self._user(), feedback, self._team()
+        ):
             return None
         return feedback.author.username
 
@@ -164,11 +170,12 @@ class FeedbackSerializer(serializers.Serializer):
         return self.get_is_mine(feedback) and feedback.status == Feedback.Status.NEW
 
     def get_can_manage(self, feedback) -> bool:
-        return policies.is_team(self._user(), feedback.campaign)
+        team = self._team()
+        return policies.is_team(self._user(), feedback.campaign) if team is None else team
 
     def get_attachments(self, feedback) -> list[dict]:
         """Only for the team and the author; everyone else gets an empty list (ADR 0024)."""
-        if not policies.can_see_attachments(self._user(), feedback):
+        if not policies.can_see_attachments(self._user(), feedback, self._team()):
             return []
         return [
             {"key": str(a.key), "kind": a.kind, "name": a.name, "size": a.size}
@@ -177,7 +184,9 @@ class FeedbackSerializer(serializers.Serializer):
 
     def get_moderation(self, feedback) -> dict | None:
         """A moderators' block with its reason, for the team and the author only (WP 7.1)."""
-        if feedback.blocked_at is None or not policies.can_see_author(self._user(), feedback):
+        if feedback.blocked_at is None or not policies.can_see_author(
+            self._user(), feedback, self._team()
+        ):
             return None
         from apps.moderation.actions import team_block_info  # moderation builds on feedback
 

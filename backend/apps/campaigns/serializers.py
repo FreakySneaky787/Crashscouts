@@ -75,6 +75,12 @@ class CampaignSerializer(serializers.ModelSerializer):
             "updated_at",
         )
 
+    def _team(self, campaign) -> bool:
+        """``team`` in the context: decided once for a list of one project's campaigns (WP 8.6,
+        it was looked up five times per campaign)."""
+        team = self.context.get("team")
+        return is_team(self.context["request"].user, campaign) if team is None else team
+
     def get_participant_count(self, campaign) -> int:
         return participant_count(campaign)
 
@@ -88,17 +94,17 @@ class CampaignSerializer(serializers.ModelSerializer):
         )
 
     def get_can_edit(self, campaign) -> bool:
-        return is_team(self.context["request"].user, campaign)
+        return self._team(campaign)
 
     def get_review_note(self, campaign) -> str | None:
         """The moderators' reason for sending it back; for the team only."""
-        if not is_team(self.context["request"].user, campaign):
+        if not self._team(campaign):
             return None
         return campaign.review_note
 
     def get_moderation(self, campaign) -> dict | None:
         """Block with reason and appeal state, for the team only (ADR 0020)."""
-        if campaign.blocked_at is None or not is_team(self.context["request"].user, campaign):
+        if campaign.blocked_at is None or not self._team(campaign):
             return None
         from apps.moderation.actions import team_block_info
 
@@ -106,7 +112,7 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     def get_new_feedback(self, campaign) -> int | None:
         """Feedback with status "New", for the team only (owner's decision: shown, not emailed)."""
-        if not is_team(self.context["request"].user, campaign):
+        if not self._team(campaign):
             return None
         from apps.feedback.models import Feedback  # the feedback app builds on campaigns
 
@@ -114,7 +120,7 @@ class CampaignSerializer(serializers.ModelSerializer):
 
     def get_open_applications(self, campaign) -> int | None:
         """Number of open applications, for the team only (owner's decision: shown, not emailed)."""
-        if not is_team(self.context["request"].user, campaign):
+        if not self._team(campaign):
             return None
         return Application.objects.filter(
             campaign=campaign, status=Application.Status.PENDING

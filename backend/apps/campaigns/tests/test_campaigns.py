@@ -403,3 +403,33 @@ def test_time_zone_is_stored_and_validated(people, project):
         response = create(people["owner"], slug="beta-bad", timezone=bad)
         assert response.status_code == 400
         assert response.json()["timezone"][0] in {"invalid_timezone", "blank"}
+
+
+@pytest.mark.django_db
+def test_the_campaign_list_decides_the_team_once(settings):
+    """WP 8.6: the list looked up the viewer's membership five times per campaign."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    settings.PUBLIC_CAMPAIGNS_ENABLED = True
+    owner, stranger = make_user("list-owner"), make_user("list-stranger")
+    project = new_project(owner, "list-app", "public")
+    make_campaign(project, status.PUBLISHED, "public", slug="one")
+
+    def membership_lookups(user) -> tuple[list, int]:
+        with CaptureQueriesContext(connection) as captured:
+            items = client_for(user).get(base("list-app")).json()
+        return items, sum("projects_membership" in q["sql"] for q in captured)
+
+    _, few = membership_lookups(owner)
+    for index in range(3):
+        make_campaign(project, status.PUBLISHED, "public", slug=f"more-{index}")
+    make_campaign(project, status.DRAFT, "public", slug="draft")
+    items, many = membership_lookups(owner)
+    assert many == few
+    assert len(items) == 5
+    assert all(item["can_edit"] and item["new_feedback"] == 0 for item in items)
+    seen = client_for(stranger).get(base("list-app")).json()
+    assert sorted(item["slug"] for item in seen) == ["more-0", "more-1", "more-2", "one"]
+    assert not any(item["can_edit"] for item in seen)
+    assert all(item["new_feedback"] is None and item["open_applications"] is None for item in seen)

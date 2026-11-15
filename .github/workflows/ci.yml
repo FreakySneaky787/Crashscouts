@@ -83,6 +83,13 @@ jobs:
         run: |
           uv export --frozen --format requirements-txt > /tmp/requirements.txt
           uvx "pip-audit==2.10.1" --requirement /tmp/requirements.txt --disable-pip
+      - name: Dependency audit of the load test (Locust, docs/PERFORMANCE.md)
+        working-directory: loadtest
+        run: |
+          uv export --frozen --format requirements-txt > /tmp/loadtest-requirements.txt
+          uvx "pip-audit==2.10.1" --requirement /tmp/loadtest-requirements.txt --disable-pip
+      - name: Load test script is linted
+        run: uv run ruff check ../loadtest && uv run ruff format --check ../loadtest
 
   frontend:
     name: Frontend (lint, types, tests, build, audit)

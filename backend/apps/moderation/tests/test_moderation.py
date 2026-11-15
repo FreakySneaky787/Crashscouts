@@ -281,3 +281,29 @@ def test_upheld_appeals_keep_the_block(world):
     assert not visible(world["tester"], CAMPAIGN)
     campaign = client_for(world["owner"]).get(CAMPAIGN).json()
     assert campaign["moderation"]["appeal"] == "upheld"
+
+
+def test_the_queue_needs_the_same_queries_for_many_cases(world):
+    """WP 8.6: the queue loaded each case on its own (606 queries for 300 cases)."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    def queries() -> int:
+        with CaptureQueriesContext(connection) as captured:
+            response = client_for(world["mod"]).get("/api/v1/moderation/cases/")
+        assert response.status_code == 200
+        return len(captured)
+
+    report(world, world["tester"], "link", "malware", campaign="beta", link=str(world["link"].pk))
+    report(world, world["tester"], "campaign", "spam", campaign="beta")
+    report(world, world["tester"], "project", "spam")
+    few = queries()
+    for index in range(4):
+        new_project(world["owner"], f"mod-extra-{index}", "public")
+        report(world, world["tester"], "project", "spam", project=f"mod-extra-{index}")
+        report(world, world["stranger"], "project", "spam", project=f"mod-extra-{index}")
+    assert act(world["mod"], "project", Report.objects.first().project, "take").status_code == 204
+    assert queries() == few
+    cases = client_for(world["mod"]).get("/api/v1/moderation/cases/").json()
+    assert len(cases) == 7
+    assert sorted(c["taken_by"] or "" for c in cases) == [*[""] * 6, "mod-moderator"]

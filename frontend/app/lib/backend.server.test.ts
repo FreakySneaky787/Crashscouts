@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { backendFetch } from "./backend.server";
+import { backendFetch, withoutCookies } from "./backend.server";
 
 function captureHeaders(): { headers: () => Headers } {
   let captured = new Headers();
@@ -58,5 +58,18 @@ describe("refused writes of suspended accounts (WP 7.2)", () => {
     expect((await backendFetch(new Request("http://localhost/x"), "/api/v1/me/")).status).toBe(403);
     answer(403, { detail: "forbidden" });
     expect((await backendFetch(new Request("http://localhost/x"), "/api/v1/reports/", { method: "POST", json: {} })).status).toBe(403);
+  });
+});
+
+describe("withoutCookies (WP 8.6)", () => {
+  it("drops the cookies but keeps the proxy headers", () => {
+    const original = new Request("http://localhost/u/tess", {
+      headers: { Cookie: "__Host-sessionid=s", "X-Forwarded-Proto": "https", "X-Forwarded-For": "203.0.113.9" },
+    });
+    const copy = withoutCookies(original);
+    expect(copy.headers.get("Cookie")).toBeNull();
+    expect(copy.headers.get("X-Forwarded-Proto")).toBe("https");
+    expect(copy.headers.get("X-Forwarded-For")).toBe("203.0.113.9");
+    expect(copy.url).toBe(original.url);
   });
 });

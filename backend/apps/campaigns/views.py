@@ -57,8 +57,12 @@ class CampaignListView(APIView):
 
     @extend_schema(responses=CampaignSerializer(many=True))
     def get(self, request: Request, slug: str) -> Response:
-        campaigns = campaigns_of(request.user, _project(request, slug))
-        return Response(CampaignSerializer(campaigns, many=True, context={"request": request}).data)
+        project = _project(request, slug)
+        # All of one project: whether the viewer is its team is decided once (WP 8.6).
+        team = can_edit_project(request.user, project)
+        campaigns = campaigns_of(request.user, project, team)
+        context = {"request": request, "team": team}
+        return Response(CampaignSerializer(campaigns, many=True, context=context).data)
 
     @extend_schema(request=CampaignWriteSerializer, responses={201: CampaignSerializer})
     def post(self, request: Request, slug: str) -> Response:

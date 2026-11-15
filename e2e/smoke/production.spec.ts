@@ -69,6 +69,12 @@ test("sign up, confirm, sign in and out behind the proxy with __Host- cookies", 
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(new RegExp(`${SMOKE_URL}/$`));
   expect((await context.cookies()).find((c) => c.name === "__Host-sessionid")).toBeUndefined();
+
+  // Public profile, seen by a visitor: fetched without cookies, it must still reach Django as
+  // HTTPS behind the proxy (WP 8.6: it returned 404 when the forwarded scheme got lost).
+  const profile = await page.goto(`/u/${user.username}`);
+  expect(profile?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(user.username);
 });
 
 test("security headers; Django, admin and API are not reachable from outside", async ({ request }) => {

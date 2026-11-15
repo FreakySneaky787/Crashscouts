@@ -1,6 +1,6 @@
 # Data model
 
-> State after WP 6.1 (2026-11-14). Generated from the models in `backend/apps/*/models.py`;
+> State after WP 8.6 (2026-11-15). Generated from the models in `backend/apps/*/models.py`;
 > update this file in the same commit as any model change.
 
 All own tables use a random UUIDv4 primary key and `created_at`/`updated_at`
@@ -48,12 +48,12 @@ erDiagram
 | profiles | `Profile` | bio, link, interests, platforms, skills, avatar; `show_*` visibility per field | deleted with the account (CASCADE) |
 | audit | `AuditEvent` | append-only security log | `actor`/`subject` set to NULL when an account is deleted; no IPs, no tokens |
 | catalog | `Category`, `Platform`, `Skill`, `ProgrammingLanguage`, `SoftwareType`, `License` | fixed lists (SPDX licences; software types since WP 6.1) | none |
-| projects | `Project` | project with short name, visibility, licence, repository link, logo, `blocked_at` (ADR 0020), catalog lists (categories, platforms, languages, software types) | – |
+| projects | `Project` | project with short name, visibility, licence, repository link, logo, `blocked_at` (ADR 0020), catalog lists (categories, platforms, languages, software types); `search_vector`: generated, stored full-text column (name, summary, description) with GIN index (WP 8.6) | – |
 | projects | `Membership` | owner/maintainer | deleted with the account; projects are handed over first |
 | projects | `Invitation` | team invitations | invitee: CASCADE; `invited_by`: SET_NULL |
 | projects | `Screenshot`, `SlugHistory` | images, former short names | – |
 | projects | `RepositoryVerification` | proof of repository ownership (ADR 0015) | `verified_by`: SET_NULL |
-| campaigns | `Campaign` | test campaign; `method` (free, structured, combined – ADR 0023); stored state (draft, in review, published, completed, cancelled) plus `published_at`, `completed_at`, `cancelled_at`, `blocked_at`, `review_note` | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
+| campaigns | `Campaign` | test campaign; `method` (free, structured, combined – ADR 0023); stored state (draft, in review, published, completed, cancelled) plus `published_at`, `completed_at`, `cancelled_at`, `blocked_at`, `review_note`; `search_vector`: generated, stored full-text column (title, summary, description) with GIN index (WP 8.6) | `published_by`: SET_NULL (metrics, docs/METRICS.md) |
 | campaigns | `CampaignSlugHistory` | former short names | – |
 | campaigns | `CampaignLink` | download links (ADR 0017); suspension (ADR 0019), `blocked_at` (ADR 0020), `review_status`/`review_note` (ADR 0021) | – |
 | campaigns | `CampaignInvitation` | invitations to private campaigns | invitee: CASCADE; `invited_by`: SET_NULL |

@@ -26,9 +26,10 @@ def campaign_for(user, project: Project, slug: str) -> Campaign | None:
     return campaign
 
 
-def campaigns_of(user, project: Project) -> list[Campaign]:
+def campaigns_of(user, project: Project, team: bool) -> list[Campaign]:
+    """``team``: whether the user is in the project's team, decided once by the caller (WP 8.6)."""
     campaigns = Campaign.objects.select_related("project").filter(project=project)
-    return [c for c in campaigns.prefetch_related("platforms") if can_view(user, c)]
+    return [c for c in campaigns.prefetch_related("platforms") if can_view(user, c, team)]
 
 
 def participant_count(campaign: Campaign) -> int:

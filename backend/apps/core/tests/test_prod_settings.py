@@ -163,9 +163,11 @@ def test_prod_deploy_check_has_only_documented_warnings():
     """`manage.py check --deploy` may only report the deliberately open HSTS domain warnings.
 
     security.W005 (includeSubDomains) and security.W021 (preload) stay open until the domain
-    is decided (see config/settings/prod.py).
+    is decided (see config/settings/prod.py). The check needs the real database since WP 8.6:
+    for the stored search columns Django asks PostgreSQL for its version, as on the server.
     """
-    env = {**os.environ, **_prod_env(), "DJANGO_SETTINGS_MODULE": "config.settings.prod"}
+    database = {"POSTGRES_PASSWORD": os.environ.get("POSTGRES_PASSWORD", "")}
+    env = {**os.environ, **_prod_env(**database), "DJANGO_SETTINGS_MODULE": "config.settings.prod"}
     result = subprocess.run(
         [sys.executable, "manage.py", "check", "--deploy"],
         cwd=BACKEND_DIR,

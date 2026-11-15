@@ -10,7 +10,7 @@ import { Notice } from "~/components/ui/Notice";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Panel } from "~/components/ui/Panel";
 import { brand } from "~/config/brand";
-import { backendFetch, getSessionUser } from "~/lib/backend.server";
+import { backendFetch, getSessionUser, withoutCookies } from "~/lib/backend.server";
 import { cacheHeadersFor, hasSessionCookie } from "~/lib/http";
 import { avatarSrc, isValidUsername, linkLabel, type PublicProfile } from "~/lib/profile";
 import { reportHref } from "~/lib/reports";
@@ -32,7 +32,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw data(null, { status: 404 });
   }
   // Public data only: the request is made without the visitor's cookies.
-  const result = await backendFetch<PublicProfile>(new Request(request.url), `/api/v1/profiles/${username}/`);
+  const result = await backendFetch<PublicProfile>(withoutCookies(request), `/api/v1/profiles/${username}/`);
   if (result.status !== 200 || !result.data) {
     throw data(null, { status: 404 });
   }

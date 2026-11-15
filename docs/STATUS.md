@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-15 (WP M.1) · **Current phase:** 7 complete, WP M.1 done – next: phase 8 decisions (flag still off)
+**Last update:** 2026-11-15 (WP 8.6 part B) · **Current phase:** 8 (closed beta) – WP 8.5 and 8.6 parts A–B done, part C (accessibility) next (flag still off)
 
 ## Work packages
 
@@ -1203,6 +1203,38 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   trusting them is detected by the test); Vitest **121 passed** (3 new); pytest **753 passed**;
   Playwright main run **92 passed**, gate run **4 passed**; Ruff, migrations check, pip-audit,
   ESLint, typecheck clean.
+
+## WP 8.6 part B – Performance at beta scale (2026-11-15) ✅
+
+- Report: [`PERFORMANCE.md`](PERFORMANCE.md). Owner's target: 1,000 accounts, 2,000 projects,
+  5,000 campaigns, 20 concurrent users, p95 < 500 ms.
+- `manage.py seed_load_data` generates the data (no real people; refuses a database with other
+  accounts; random passwords only for 20 testers, written to a file outside the repository;
+  `--targets` lists public pages for the load test). `loadtest/` holds the Locust scenarios
+  (Locust 2.47.0, own lockfile, audited in CI); `compose.loadtest.yaml` selects
+  `config.settings.loadtest` (local only).
+- Changes the measurements called for:
+  - Discover search: generated, stored `search_vector` columns with GIN indexes on projects and
+    campaigns (migrations `projects/0007`, `campaigns/0013`; ADR 0025 updated): project search
+    358 → 29 ms, campaign search 668 → 56 ms.
+  - Moderation queue: 606 → 12 queries, 883 → 33 ms for 300 open reports.
+  - Feedback inbox and a project's campaign list: team membership decided once per list instead
+    of several times per entry; attachments prefetched.
+  - Real bug found behind the proxy: public profile pages returned 404 (the cookie-free request
+    lost `X-Forwarded-Proto`); fixed with `withoutCookies()` and covered by the smoke test.
+- **Load test (20 users, 5 minutes, through Caddy):** 1,998 requests, **0 failures**, aggregate
+  p95 **130 ms**, every page p95 ≤ 150 ms except the sign-in page (10 requests, slowest one 570 ms
+  = cold start after a restart, checked separately: then 20–33 ms). Before the changes: Discover
+  search p95 520 ms. Peak memory of the stack about 545 MiB.
+- **Verification (run on 2026-11-15):** pytest **760 passed** (7 new, no warnings); Vitest **122 passed**; new
+  regression tests fail when their change is undone (7 mutation checks); Ruff (backend and load
+  test), migrations check, OpenAPI, pip-audit (backend and load test), ESLint, typecheck, build
+  clean; Playwright main run **92 passed**, gate run **4 passed**; smoke tests **3 passed** (now
+  including a visitor opening a public profile behind Caddy).
+- `manage.py check --deploy` now needs the database (Django asks PostgreSQL 18 for its version
+  because of the generated columns); the deploy-check test uses the test database for it.
+- Measured on the development container (4 vCPUs), not on the VPS (2 vCPUs): WP 8.1 repeats the
+  run there.
 
 ## Handover – next session (written 2026-11-14)
 
