@@ -66,7 +66,7 @@ Sources: [Infomaniak VPS Lite](https://www.infomaniak.com/en/hosting/vps-lite) Â
 `crashscouts.org`, `.com` and `.ch` were all unregistered (RDAP: 404). Next steps for the owner:
 register at least the `.org` domain (preferably `.com` and `.ch` as well, so nobody else takes
 them) and have a trademark search done (Swissreg, EUIPO). The name is switched centrally in
-`brand.ts` and `PLATFORM_NAME`; the repository keeps the technical name `testhub`.
+`brand.ts` and `PLATFORM_NAME`; the repository was renamed to `FreakySneaky787/Crashscouts`.
 
 ## Name and domain: proposals (question K, history)
 

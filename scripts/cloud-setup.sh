@@ -13,10 +13,14 @@ UV_VERSION="0.13.7"
 PNPM_VERSION="10.34.9"
 GITLEAKS_VERSION="v8.30.1"
 
-if [ ! -d testhub ]; then
-  echo "cloud-setup: repository 'testhub' not found here, nothing to do."
+# The repository is the parent of this script's folder, whatever the checkout is called (the
+# repository was renamed from "testhub" to "Crashscouts" on 2026-11-15).
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [ ! -d "${REPO}/backend" ] || [ ! -d "${REPO}/frontend" ]; then
+  echo "cloud-setup: repository not found next to this script, nothing to do."
   exit 0
 fi
+echo "==> repository: ${REPO}"
 
 echo "==> uv ${UV_VERSION}"
 python3 -m pip install --user --break-system-packages --disable-pip-version-check --quiet \
@@ -35,13 +39,13 @@ echo "==> gitleaks ${GITLEAKS_VERSION} (Go module proxy, verified against sum.go
 GOBIN="${HOME}/.local/bin" go install "github.com/zricethezav/gitleaks/v8@${GITLEAKS_VERSION}"
 
 echo "==> git hooks"
-git -C testhub config core.hooksPath .githooks
+git -C "${REPO}" config core.hooksPath .githooks
 
 echo "==> backend dependencies"
-(cd testhub/backend && uv sync --frozen)
+(cd "${REPO}/backend" && uv sync --frozen)
 
 echo "==> frontend and e2e dependencies"
-(cd testhub/frontend && pnpm install --frozen-lockfile)
-(cd testhub/e2e && pnpm install --frozen-lockfile)
+(cd "${REPO}/frontend" && pnpm install --frozen-lockfile)
+(cd "${REPO}/e2e" && pnpm install --frozen-lockfile)
 
 echo "==> cloud-setup done"

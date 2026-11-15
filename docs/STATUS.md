@@ -1139,7 +1139,8 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   centrally: `frontend/app/config/brand.ts`, `PLATFORM_NAME` (backend default and
   `.env.example`); the sidebar no longer shows "working name"; the platform name stays a reserved
   username. README, CLAUDE.md, PRD, design system and phase 8 plan updated; ADRs keep the old
-  name as history. The repository keeps its technical name `testhub`.
+  name as history. The owner renamed the repository to `FreakySneaky787/Crashscouts` the same day
+  (the old address redirects; local checkouts point `origin` to the new name).
 - **Verification (run on 2026-11-15):** pytest **752 passed**; Vitest **113 passed**; Playwright
   main run **89 passed** (page titles with the new name), gate run **4 passed**; ESLint,
   typecheck, Ruff clean.

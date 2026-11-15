@@ -2,7 +2,7 @@
 // Reference: https://containers.dev/implementors/json_reference/
 // Claude Code feature: https://code.claude.com/docs/en/devcontainer
 {
-  "name": "testhub (working name)",
+  "name": "Crashscouts",
   "dockerComposeFile": ["../compose.yaml", "compose.devcontainer.yml"],
   "service": "workspace",
   "runServices": ["db", "workspace"],
