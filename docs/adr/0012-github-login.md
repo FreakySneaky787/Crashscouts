@@ -61,3 +61,9 @@ server (or later the reverse proxy) uses.
 - Django `USE_X_FORWARDED_HOST`: https://docs.djangoproject.com/en/6.1/ref/settings/#use-x-forwarded-host
 - CSP `form-action` and redirects: https://www.w3.org/TR/CSP3/#directive-form-action
 - Package licences and versions: PyPI metadata of requests, oauthlib and pyjwt.
+
+## Addendum 2026-11-15 – data minimisation
+
+Only the GitHub account number, username and profile link are kept in `SocialAccount.extra_data`;
+everything else GitHub sends is dropped before saving (`apps/accounts/socialdata.py`, owner's
+decision, question Z). Migration `accounts/0005` trims older rows.

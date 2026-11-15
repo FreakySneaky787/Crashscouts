@@ -49,6 +49,7 @@ require the operator's identity and contact details in the privacy policy.
 
 - The reviewer receives the three Markdown files and the list of `[TO DECIDE]` points.
 - A real deployment needs the operator settings; the check enforces that.
-- Drafting found that django-allauth stores the full public GitHub profile in `extra_data`. The
-  privacy policy says so; reducing it to what the platform needs is a separate proposal (data
-  minimisation, see `OPEN-QUESTIONS.md`).
+- Drafting found that django-allauth stored the full public GitHub profile in `extra_data`. The
+  owner decided on 2026-11-15 to keep only account number, username and profile link (question
+  Z): a `pre_save` signal trims every GitHub account, and migration `accounts/0005` trims the
+  rows stored before.

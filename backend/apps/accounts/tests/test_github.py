@@ -38,7 +38,15 @@ class FakeGitHub:
     """Stands in for allauth's requests session: token exchange, /user and /user/emails."""
 
     def __init__(self, uid: int, login: str, emails: list[dict]) -> None:
-        self.profile = {"id": uid, "login": login, "name": login.title(), "email": None}
+        self.profile = {
+            "id": uid,
+            "login": login,
+            "name": login.title(),
+            "email": None,
+            "bio": "Likes testing",
+            "location": "Somewhere",
+            "avatar_url": "https://avatars.example.test/u/1",
+        }
         self.emails = emails
 
     def __enter__(self):
@@ -194,6 +202,8 @@ def test_signed_in_user_can_connect_and_then_log_in_with_github(github, verified
 
     account = SocialAccount.objects.get(user=user)
     assert account.uid == "3003"
+    # Data minimisation (question Z): only account number, username and profile link are kept.
+    assert account.extra_data == {"id": 3003, "login": "verified-gh"}
 
     fresh, _ = csrf_client()
     finish(fresh, start(fresh))
@@ -224,3 +234,23 @@ def test_foreign_callback_urls_are_refused(github):
         HTTP_X_CSRFTOKEN=token,
     )
     assert "github.com" not in response.get("Location", "")
+
+
+def test_existing_github_profiles_are_trimmed_by_the_migration(db):
+    from importlib import import_module
+
+    from django.apps import apps as global_apps
+
+    user = get_user_model().objects.create_user(username="trim-me", email="trim@example.test")
+    account = SocialAccount(user=user, provider="github", uid="77")
+    SocialAccount.objects.bulk_create([account])  # bypasses the signal, like old rows
+    SocialAccount.objects.filter(pk=account.pk).update(
+        extra_data={"id": 77, "login": "old", "html_url": "https://github.com/old", "bio": "x"}
+    )
+    migration = import_module("apps.accounts.migrations.0005_trim_github_profile_data")
+    migration.trim(global_apps, None)
+    assert SocialAccount.objects.get(pk=account.pk).extra_data == {
+        "id": 77,
+        "login": "old",
+        "html_url": "https://github.com/old",
+    }

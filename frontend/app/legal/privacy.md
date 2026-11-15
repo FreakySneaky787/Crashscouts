@@ -32,9 +32,9 @@ review.]
 - **Data:** email address, username, password (stored only as an Argon2 hash), the time you
   confirmed being at least 16 years old, the confirmation of your email address, two-factor
   methods (authenticator app secret, recovery codes, public keys of passkeys).
-- **GitHub:** if you connect GitHub, we store your GitHub account number and the public profile data
-  GitHub sends at sign-in (for example username, display name, profile and avatar links and other
-  public profile fields). Access tokens are not stored.
+- **GitHub:** if you connect GitHub, we store only your GitHub account number, username and
+  profile link. Other profile data GitHub sends at sign-in is discarded, and access tokens are not
+  stored.
 - **Purpose:** to provide your account and keep it secure.
 - **Legal basis:** performance of the contract (GDPR art. 6(1)(b)).
 

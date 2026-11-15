@@ -8,11 +8,8 @@
 
 | # | Question | Due | Proposal |
 |---|---|---|---|
-| G | Contribution model: DCO or CLA | before going public | DCO |
-| J | Code of conduct | before going public | an established template, chosen by the project owner |
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
 | Y | Points marked `[TO DECIDE]` in the legal drafts (ADR 0031): hosting provider and location, web server logs and their retention, backup retention, processing agreement with Scaleway, legal basis for the GitHub transfer (USA), EU representative (GDPR art. 27), SPDX data attribution, place of jurisdiction | before the beta (with the legal review) | most follow from the hosting decision; the rest for the reviewer |
-| Z | Data minimisation for GitHub sign-in: django-allauth stores the full public GitHub profile (`extra_data`); keep only account number, username and profile link | before the beta | reduce it (small adapter change plus a migration that trims existing rows) |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
 ### Resolved
@@ -39,6 +36,10 @@
 | – | Campaign data during the deletion grace period | Participations, invitations and applications **stay until the final deletion**; the person is hidden from team lists but keeps the place (2026-11-13). |
 | O | Shared cache for rate limits | **Django's database cache in PostgreSQL** (2026-11-13): no extra service, fits ADR 0003 (no Redis in the MVP); introduced in phase 3B. Implemented in WP 3B.5 (ADR 0022); IP addresses only as HMAC hashes, at most one day (owner, 2026-11-13). |
 | K | Product name and domain | **"Crashscouts"**, main address **crashscouts.org** (2026-11-15). All three of .org, .com and .ch were unregistered that day (RDAP); registering them and a trademark search (Swissreg, EUIPO) are up to the owner. Logo still open. The owner renamed the repository to `FreakySneaky787/Crashscouts` the same day. |
+| G | Contribution model | **DCO** (Developer Certificate of Origin, "Signed-off-by"), no CLA (2026-11-15; set up in WP 8.7). |
+| J | Code of conduct | **Contributor Covenant**, reports to the contact address (2026-11-15; set up in WP 8.7). |
+| Z | GitHub profile data | **Reduced** to account number, username and profile link; older rows trimmed by migration (2026-11-15, ADR 0012 addendum). |
+| – | Hosting | **Infomaniak VPS Lite**, Switzerland, 2 vCPU / 4 GB / 60 GB, CHF 7.20 per month with an annual commitment (2026-11-15; prices from the provider's page, [`PHASE-8-PLAN.md`](PHASE-8-PLAN.md)). The owner orders it; domain and the free kSuite mailbox at Infomaniak as well. |
 | X | Remediation time frames for vulnerable dependencies (ASVS 5.0 V15.1.1) | **critical 7 days, high 14 days, moderate 60 days, low 180 days** at the latest; development-only tools in the same tiers; a fix release younger than 7 days only for critical and high findings; monthly review of all dependency updates; exceptions with reason in `docs/STATUS.md`. Actively exploited critical issues are fixed as fast as possible; the frame is the upper limit (2026-11-15, [`SECURITY.md`](SECURITY.md) §10). |
 | – | Suspension rules (WP 7.2) | **Confirmed:** accounts with a platform role cannot be suspended (an admin removes the role first); nobody can suspend themselves (2026-11-15, [ADR 0027](adr/0027-account-suspensions.md)). |
 | – | Legal texts (2026-11-15) | Drafts by Claude, **English only**, operator = the owner **as a private individual** (details only in the server configuration), at signup a **notice only** ([ADR 0031](adr/0031-legal-texts.md)). |

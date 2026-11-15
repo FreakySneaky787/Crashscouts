@@ -1167,6 +1167,20 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   found" because the loader read `/privacy.data`; fixed), gate run **4 passed**; ESLint,
   typecheck, build clean.
 
+## Owner decisions and GitHub data minimisation (2026-11-15)
+
+- Decided: hosting **Infomaniak VPS Lite** (Switzerland, CHF 7.20 per month with an annual
+  commitment); **DCO** for contributions (G); **Contributor Covenant** (J); GitHub profile data
+  **reduced** (Z). The owner orders the domain (without "Domain Plus" and website hosting, with the
+  free kSuite mailbox) and the server.
+- GitHub sign-in keeps only account number, username and profile link (`pre_save` signal,
+  `apps/accounts/socialdata.py`); migration `accounts/0005` trims older rows; the privacy draft
+  says so (ADR 0012 addendum).
+- **Verification (run on 2026-11-15):** pytest **753 passed** (new: a sign-in keeps only the three
+  fields although GitHub sends more; the migration trims an older row); 1 mutation check caught
+  (signal removed); Playwright main run **92 passed**, gate run **4 passed**; Ruff, migrations
+  check clean.
+
 ## Handover – next session (written 2026-11-14)
 
 **Where we are (end of the session on 2026-11-14):** phases 0 to 7 are complete; the last CI
@@ -1192,7 +1206,8 @@ plan phase 8 with all open questions and implement WP M.1 meanwhile. WP M.1 is d
 Phase 8: plan, the owner's first decisions, the hosting comparison and name proposals are in
 [`PHASE-8-PLAN.md`](PHASE-8-PLAN.md). Name decided on 2026-11-15:
 **Crashscouts**, `crashscouts.org` (switched centrally in `brand.ts` and `PLATFORM_NAME`). **Next:
-the owner registers the domain and chooses the host**. WP 8.5 (legal drafts) is done; open there:
+the owner orders the domain and the Infomaniak VPS Lite** (decided 2026-11-15). WP 8.5 (legal
+drafts) is done; open there:
 question Y and the professional review. Meanwhile possible: WP 8.6 and preparing 8.7.
 
 **Still open from earlier:** U (real GitHub test on the first test server), F (email provider
