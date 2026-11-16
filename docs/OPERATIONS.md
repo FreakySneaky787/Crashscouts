@@ -333,6 +333,23 @@ Test: `sudo docker compose -f compose.prod.yaml --env-file .env.prod exec -T bac
 then check the message source in the Infomaniak webmail for `spf=pass`, `dkim=pass` and
 `dmarc=pass`.
 
+Set up on 2026-11-16:
+
+- Scaleway Transactional Email, plan Essential, domain `crashscouts.org` verified (SPF, DKIM,
+  DMARC valid). The MX record stays at Infomaniak only (`host -t MX crashscouts.org`).
+- IAM application `crashscouts-smtp` with policy `crashscouts-smtp-only`: permission set
+  `TransactionalEmailEmailSmtpCreate`, scope the project "Crashscouts". Its API key **expires on
+  2027-11-16**; before that, generate a new key for the application, put its secret into
+  `.env.prod` and run `scripts/deploy.sh`.
+- **Pitfall:** the SMTP username is the **Project ID** (Project settings; it is also the DKIM
+  selector name), not the other ID shown on the domain page. With the wrong ID, SMTP answered
+  `535 5.7.8 Permission denied` and the API `insufficient permissions`. A direct API call shows
+  the reason faster than SMTP:
+  `curl -s -X POST https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails -H "X-Auth-Token: <secret>" …`
+  (needs the API permission set, not only SMTP).
+- The test email from `no-reply@crashscouts.org` arrived in the inbox of `contact@` (not in
+  spam), with DMARC at `p=reject`.
+
 Found while preparing this: `compose.prod.yaml` did not pass `DJANGO_EMAIL_HOST_USER` and
 `DJANGO_EMAIL_HOST_PASSWORD` to Django, so a provider that needs a login would have refused
 every email. Fixed, with a test that fails without the fix.

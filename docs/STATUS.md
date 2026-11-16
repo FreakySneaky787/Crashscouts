@@ -1351,11 +1351,24 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - the stack passes it (fails without the fix, checked).
 - `scripts/deploy.sh` starts the mail catcher only while it is configured.
 - Privacy policy: Scaleway's processing agreement filled in.
+- **Set up on 2026-11-16:**
+  - Scaleway account with Transactional Email (plan Essential);
+  - domain verified: SPF include added to the Infomaniak record, DKIM record added; MX and
+    DMARC unchanged;
+  - IAM application with an SMTP-only policy for the project;
+  - `.env.prod` switched from the mail catcher to Scaleway.
+- **Test email** from `no-reply@crashscouts.org` reached the inbox of `contact@` (not spam;
+  DMARC is `p=reject`).
+- **Pitfall found:**
+  - The first attempts failed with `535 Permission denied`: the username was another ID from
+    the domain page, not the Project ID.
+  - A direct API call (`insufficient permissions`) narrowed it down.
+  - Documented in OPERATIONS §12.
 - **Open:**
-  - the owner's Scaleway account;
-  - DNS records (SPF include, DKIM);
-  - `.env.prod`;
-  - a test email with SPF, DKIM and DMARC checked.
+  - the owner sets the policy back to `TransactionalEmailEmailSmtpCreate` (it was widened
+    while searching for the fault) and sends a second test email;
+  - the authentication headers of the test email are not yet read;
+  - the API key expires on 2027-11-16 (calendar reminder).
 
 ## Handover – next session (written 2026-11-14)
 
