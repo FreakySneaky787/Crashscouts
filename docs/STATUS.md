@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-16 (WP 8.2 started) · **Current phase:** 8 (closed beta) – WP 8.1, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.2 (email) in progress, then 8.4 (monitoring)
+**Last update:** 2026-11-16 (WP 8.2 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); next 8.4 (monitoring)
 
 ## Work packages
 
@@ -1340,7 +1340,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - `crashscouts-backup.timer` is enabled; the next run is at 03:15 UTC plus a random delay.
 - **Not done:** the emergency restore has not been rehearsed on a second server.
 
-## WP 8.2 – Email in production (started 2026-11-16) ◐
+## WP 8.2 – Email in production (2026-11-16) ✅
 
 - **Provider:** Scaleway Transactional Email (question F). SMTP on port 587 with STARTTLS; the
   first 300 emails per month are free. Steps in [`OPERATIONS.md`](OPERATIONS.md) §12.
@@ -1364,11 +1364,15 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     the domain page, not the Project ID.
   - A direct API call (`insufficient permissions`) narrowed it down.
   - Documented in OPERATIONS §12.
-- **Open:**
-  - the owner sets the policy back to `TransactionalEmailEmailSmtpCreate` (it was widened
-    while searching for the fault) and sends a second test email;
-  - the authentication headers of the test email are not yet read;
-  - the API key expires on 2027-11-16 (calendar reminder).
+- **Owner decision 2026-11-16:**
+  - The Scaleway policy keeps `TransactionalEmailEmailFullAccess`. It was widened from
+    SMTP-only during the search and works.
+  - Accepted risk: a leaked key could also use the email API and read the sending log, but no
+    other services.
+- **Not checked:**
+  - the `Authentication-Results` headers of the test email. Delivery to the inbox under
+    `p=reject` points to passing DMARC, but the headers were not read.
+- **Reminder:** the API key expires on 2027-11-16, together with the domain (2027-11-15).
 
 ## Handover – next session (written 2026-11-14)
 

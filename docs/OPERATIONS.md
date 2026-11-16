@@ -337,8 +337,13 @@ Set up on 2026-11-16:
 
 - Scaleway Transactional Email, plan Essential, domain `crashscouts.org` verified (SPF, DKIM,
   DMARC valid). The MX record stays at Infomaniak only (`host -t MX crashscouts.org`).
-- IAM application `crashscouts-smtp` with policy `crashscouts-smtp-only`: permission set
-  `TransactionalEmailEmailSmtpCreate`, scope the project "Crashscouts". Its API key **expires on
+- IAM application `crashscouts-smtp` with policy `crashscouts-smtp-only`, scope the project
+  "Crashscouts", permission set **`TransactionalEmailEmailFullAccess`**.
+  - It was widened from `TransactionalEmailEmailSmtpCreate` while searching for the fault.
+  - The owner decided on 2026-11-16 to keep it ("never change a running system").
+  - Accepted risk: with the key on the server, someone could also send email through the API
+    and read the sending log, which holds recipient addresses. They could not manage domains or
+    other Scaleway services. Its API key **expires on
   2027-11-16**; before that, generate a new key for the application, put its secret into
   `.env.prod` and run `scripts/deploy.sh`.
 - **Pitfall:** the SMTP username is the **Project ID** (Project settings; it is also the DKIM
