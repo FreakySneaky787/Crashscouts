@@ -1298,6 +1298,14 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
 - **Timers installed on the server:** started once by hand, both finished successfully; the
   hourly purge deleted 3 expired rate-limit entries (from the checks above), the daily jobs had
   nothing to delete. Next runs scheduled hourly and daily at 02:30 UTC (with a random delay).
+- **Flaky keyboard test fixed:**
+  - What happened: CI failed once in `keyboard.spec.ts` ("focused element in view: Privacy
+    policy"). The test pressed Tab while React Router was still rendering the page after a
+    redirect, and the scroll restoration moved the focused element out of view.
+  - Local check: reproduced in 1 of 24 parallel runs before the fix.
+  - Fix: `tabTo` now waits until the page has settled.
+  - After the fix: 48 parallel runs of the sign-up flow and 12 runs of the whole spec, all
+    passed.
 - **Not yet in place (next work packages):**
   - outgoing email (8.2);
   - backups (8.3; no user data on the server yet);

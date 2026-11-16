@@ -11,6 +11,12 @@ import { createProject, createSignedInAccount, linkFromMail, newAccount } from "
 
 /** Tabs forward until `target` has the focus; fails on a keyboard trap or an invisible focus. */
 async function tabTo(page: Page, target: Locator, maxPresses = 120) {
+  // Start only once the page has settled: right after a redirect React Router may still render the
+  // new page and restore the scroll position, which can move an already focused element out of
+  // view (a flaky CI failure, reproduced locally in 1 of 24 parallel runs). A person does not press
+  // Tab within those milliseconds.
+  await page.waitForLoadState("networkidle");
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
   let previous = "";
   let samePlace = 0;
   for (let press = 0; press < maxPresses; press++) {
