@@ -1,0 +1,11 @@
+# Hourly job of the production server (WP 8.1, docs/OPERATIONS.md): deletes expired rate-limit
+# entries with hashed IP addresses (ADR 0022). Started by crashscouts-hourly.timer.
+[Unit]
+Description=Crashscouts hourly job (purge expired rate-limit entries)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/crashscouts
+ExecStart=/usr/bin/docker compose -f compose.prod.yaml --env-file .env.prod exec -T backend python manage.py purge_rate_limit_cache

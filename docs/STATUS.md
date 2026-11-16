@@ -1280,9 +1280,22 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   memory peak 608 MiB ([`PERFORMANCE.md`](PERFORMANCE.md)). Sign-in p95 1.2 s with 10 samples
   (Argon2 on 2 vCPUs, Locust on the same machine).
 - **Firewall** (provider): only SSH (22) and ICMP open; 80 and 443 follow just before DNS.
-- **Open:**
-  - `.env.prod`, DNS, start, smoke tests against the domain;
-  - systemd timers for the jobs.
+- **Live since 2026-11-16: https://crashscouts.org**, registration closed (owner's decision).
+  Checked from the server over the internet:
+  - public pages answer 200;
+  - `/admin/`, `/api/`, `/_allauth/` and `/media/` answer 404;
+  - http redirects to https (308);
+  - HSTS, CSP, Referrer-Policy and nosniff are present;
+  - the certificate is from Let's Encrypt;
+  - the sign-up page says registration is closed;
+  - the imprint shows the operator and "draft".
+- **New:**
+  - systemd timers for the hourly and daily jobs (`deploy/systemd/`);
+  - `scripts/deploy.sh` for updates (pull, build, migrate, restart, wait, warm-up). The order and
+    the three job commands were tested on the local production stack. The test also showed that
+    `up --wait` returns before the SSR server listens (502 for about a second), so the script now
+    waits for a 200.
+- **Open:** install the timers on the server (owner).
 
 ## Handover – next session (written 2026-11-14)
 

@@ -1,0 +1,13 @@
+# Daily jobs of the production server (WP 8.1, docs/OPERATIONS.md): final deletion of accounts
+# whose grace period has ended (ADR 0013) and of application answers 30 days after a campaign
+# ended (ADR 0016). Started by crashscouts-daily.timer.
+[Unit]
+Description=Crashscouts daily jobs (account deletions, application answers)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/crashscouts
+ExecStart=/usr/bin/docker compose -f compose.prod.yaml --env-file .env.prod exec -T backend python manage.py purge_deleted_accounts
+ExecStart=/usr/bin/docker compose -f compose.prod.yaml --env-file .env.prod exec -T backend python manage.py purge_application_answers

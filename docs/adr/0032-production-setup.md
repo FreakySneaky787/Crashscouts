@@ -72,10 +72,11 @@ the SSR server behind a proxy (open question P).
 
 ## Consequences
 
-- WP 8.1 brings the same stack to the VPS. Still open there:
-  - the domain in `.env.prod`;
-  - the scheduler for the purge jobs;
-  - backups (WP 8.3);
-  - firewall and SSH access.
+- WP 8.1 brought the same stack to the VPS on 2026-11-16 ([OPERATIONS.md](../OPERATIONS.md)):
+  - firewall at the provider, SSH with keys only;
+  - systemd timers for the purge jobs;
+  - `scripts/deploy.sh` for updates.
+
+  Backups follow in WP 8.3.
 - Image updates change the digests in the Dockerfiles and `compose.prod.yaml`; Dependabot covers
   Docker.

@@ -134,18 +134,97 @@ The result goes into [PERFORMANCE.md](PERFORMANCE.md). First run on 2026-11-16: 
 failures, p95 330 ms. Building the images took a few minutes; run it inside `tmux`
 (`tmux new -s lasttest`, after a lost connection `tmux attach -t lasttest`).
 
-## Still to do in WP 8.1
+## 6. Settings (`.env.prod`)
 
-- Firewall in the Manager
-  ([Infomaniak](https://www.infomaniak.com/en/support/faq/2822/manage-vps-cloud-vps-lite-firewall)):
-  the default rules open only SSH (22) and ICMP; TCP 80 and 443 are added just before DNS.
-  A firewall on the server itself (ufw) would not help: Docker bypasses its rules for published
-  ports ([Docker](https://docs.docker.com/engine/network/packet-filtering-firewalls/)).
-- `.env.prod` on the server (secrets generated there; the operator details typed in by the owner),
-  with registration **off** until the beta starts (owner's decision 2026-11-16: the site is public,
-  sign-up closed).
-- DNS: `crashscouts.org` to the server; the mail records (MX) stay untouched; SPF/DKIM follow in
-  WP 8.2.
-- Start the stack, warm-up, smoke tests against the domain.
-- Scheduled jobs (deletion deadlines, rate-limit purge) as systemd timers.
-- Updates: how a new version is deployed.
+Created on the server from the template; the secrets are generated there and never shown:
+
+```bash
+cd /opt/crashscouts && umask 077 && cp .env.prod.example .env.prod
+sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_urlsafe(64))')|; s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')|" .env.prod
+nano .env.prod
+```
+
+Values set by hand (2026-11-16):
+
+| Setting | Value | Why |
+|---|---|---|
+| `DJANGO_EMAIL_HOST` / `_PORT` / `_USE_TLS` | `mailpit` / `1025` / `false` | no mail leaves the server until WP 8.2; the mail catcher (profile `local`) is reachable only inside Docker and on 127.0.0.1 |
+| `DJANGO_DEFAULT_FROM_EMAIL` | `Crashscouts <no-reply@crashscouts.org>` | |
+| `DJANGO_SIGNUP_ENABLED` | `false` | owner's decision 2026-11-16: public site, registration closed until the beta starts; this also closes sign-up via GitHub (the social adapter asks the account adapter) |
+| `OPERATOR_NAME`, `OPERATOR_ADDRESS` | typed in by the owner | imprint and privacy policy (ADR 0031) |
+| `CONTACT_EMAIL` | `contact@crashscouts.org` | the Infomaniak mailbox |
+| `LEGAL_TEXTS_REVIEWED` | `false` | the legal pages say "draft" until the professional review |
+| `SOURCE_CODE_URL` | empty | until the repository is public (WP 8.7) |
+
+Check without showing values: `grep -cE '^(DJANGO_SECRET_KEY|POSTGRES_PASSWORD|OPERATOR_NAME|OPERATOR_ADDRESS)=.+' .env.prod`
+gives `4`; `ls -l .env.prod` shows `-rw-------`.
+
+## 7. Firewall, DNS and first start
+
+1. Firewall in the Manager
+   ([Infomaniak](https://www.infomaniak.com/en/support/faq/2822/manage-vps-cloud-vps-lite-firewall)):
+   the default rules open SSH (22) and ICMP; added: **TCP 80 and 443**. A firewall on the server
+   itself (ufw) would not help: Docker bypasses its rules for published ports
+   ([Docker](https://docs.docker.com/engine/network/packet-filtering-firewalls/)).
+2. DNS zone of `crashscouts.org` (Manager → Web & Domains → crashscouts.org → DNS zone): one new
+   **A record** for `crashscouts.org` → the server's IPv4 address. Before, the domain had no A or
+   AAAA record and `www` did not exist. The mail records (MX `mta-gw.infomaniak.ch`, the SRV
+   records, DMARC) stay untouched. Check: `host -t A crashscouts.org`.
+3. Start only once DNS answers (otherwise Caddy's certificate request fails):
+
+   ```bash
+   cd /opt/crashscouts && sudo docker compose -f compose.prod.yaml --env-file .env.prod --profile local up -d --build --wait
+   sudo docker compose -f compose.prod.yaml --env-file .env.prod --profile local exec -T backend python manage.py migrate --noinput
+   ```
+
+Checked on 2026-11-16 from the server over the internet:
+
+- `/`, `/discover`, `/signup`, `/privacy`, `/imprint`: 200; `/admin/`, `/api/`, `/_allauth/`,
+  `/media/…`: 404;
+- `http://` answers 308 to `https://`; headers `Strict-Transport-Security`,
+  `Content-Security-Policy` (with nonce), `Referrer-Policy: same-origin`,
+  `X-Content-Type-Options: nosniff`;
+- certificate from Let's Encrypt (valid to 2027-02-14; Caddy renews it automatically);
+- the sign-up page says registration is closed; the imprint shows the operator and "draft".
+
+The automated smoke tests (`e2e/smoke/`) are **not** run against the real site: they create
+accounts. They run in CI against the same stack on `localhost`.
+
+## 8. Scheduled jobs
+
+Two systemd timers on the host run the management commands in the backend container
+(ARCHITECTURE.md §10):
+
+| Timer | When | Commands |
+|---|---|---|
+| `crashscouts-hourly.timer` | every hour | `purge_rate_limit_cache` (ADR 0022) |
+| `crashscouts-daily.timer` | 02:30 UTC | `purge_deleted_accounts` (ADR 0013), `purge_application_answers` (ADR 0016) |
+
+```bash
+cd /opt/crashscouts && sudo cp deploy/systemd/crashscouts-* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now crashscouts-hourly.timer crashscouts-daily.timer
+sudo systemctl start crashscouts-hourly.service crashscouts-daily.service && journalctl -u 'crashscouts-*' -n 10 --no-pager
+systemctl list-timers 'crashscouts-*'
+```
+
+`Persistent=true` catches up on a run that was missed while the server was off.
+
+## 9. Updates
+
+```bash
+cd /opt/crashscouts && scripts/deploy.sh
+```
+
+Run as `debian`, without sudo (git needs the deploy key). The script pulls `main`, builds the
+images, migrates the database with the new backend image, replaces the containers and sends
+warm-up requests once the SSR server answers. Tested locally on 2026-11-16: `up --wait` returns
+before the SSR server listens (Caddy answered 502 for about a second), so the script waits for a
+200 first.
+
+After a change to `deploy/systemd/`, copy the units again (§8).
+
+## Still open
+
+- Email through Scaleway (WP 8.2); then the `local` profile goes.
+- Backups (WP 8.3): until then there is no copy of the database; no real user data is on the
+  server yet because registration is closed.
+- Monitoring (WP 8.4).

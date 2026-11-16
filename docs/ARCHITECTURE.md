@@ -209,4 +209,5 @@ React Router's data requests.
   needed. The SSR server routes `/projects/github/verify/callback`, the second callback URL of the
   GitHub OAuth app.
 - Transactional email via Scaleway (open question F), configured through `DJANGO_EMAIL_*`.
-- The hosting provider is still open.
+- Hosting: Infomaniak VPS Lite in Switzerland, Docker Compose as in `compose.prod.yaml`; the set-up
+  and its checks are in [OPERATIONS.md](OPERATIONS.md) (WP 8.1).
