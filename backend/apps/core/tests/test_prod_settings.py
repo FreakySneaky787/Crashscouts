@@ -183,3 +183,26 @@ def test_prod_deploy_check_has_only_documented_warnings():
 
     assert result.returncode == 0, output
     assert reported <= {"security.W005", "security.W021"}, output
+
+
+def test_prod_uses_the_smtp_login_from_the_environment():
+    # Generated for this test only (not real credentials).
+    user, password = os.urandom(8).hex(), os.urandom(16).hex()
+    code = (
+        "import json, django\nfrom django.conf import settings\ndjango.setup()\n"
+        "o = settings.MAILERS['default']['OPTIONS']\n"
+        "print(json.dumps([o['username'], o['password'], o['port'], o['use_tls']]))"
+    )
+    result = _run(code, _prod_env(DJANGO_EMAIL_HOST_USER=user, DJANGO_EMAIL_HOST_PASSWORD=password))
+
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout.strip().splitlines()[-1]) == [user, password, 587, True]
+
+
+def test_the_production_stack_passes_the_smtp_login_to_django():
+    # WP 8.2: compose.prod.yaml did not pass the login, so a real provider would have refused mail.
+    compose = (BACKEND_DIR.parent / "compose.prod.yaml").read_text()
+    backend = compose.split("\n  backend:\n", 1)[1].split("\n  db:\n", 1)[0]
+
+    for name in ("DJANGO_EMAIL_HOST_USER", "DJANGO_EMAIL_HOST_PASSWORD"):
+        assert f"{name}: ${{{name}:-}}" in backend

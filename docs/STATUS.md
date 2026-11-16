@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-16 (WP 8.3 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); next 8.2 (email) and 8.4 (monitoring)
+**Last update:** 2026-11-16 (WP 8.2 started) · **Current phase:** 8 (closed beta) – WP 8.1, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.2 (email) in progress, then 8.4 (monitoring)
 
 ## Work packages
 
@@ -1339,6 +1339,23 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     is data;
   - `crashscouts-backup.timer` is enabled; the next run is at 03:15 UTC plus a random delay.
 - **Not done:** the emergency restore has not been rehearsed on a second server.
+
+## WP 8.2 – Email in production (started 2026-11-16) ◐
+
+- **Provider:** Scaleway Transactional Email (question F). SMTP on port 587 with STARTTLS; the
+  first 300 emails per month are free. Steps in [`OPERATIONS.md`](OPERATIONS.md) §12.
+- **Fixed:** `compose.prod.yaml` did not pass the SMTP login (`DJANGO_EMAIL_HOST_USER`,
+  `DJANGO_EMAIL_HOST_PASSWORD`) to Django, so a provider with a login would have refused every
+  email. New tests:
+  - prod reads the login;
+  - the stack passes it (fails without the fix, checked).
+- `scripts/deploy.sh` starts the mail catcher only while it is configured.
+- Privacy policy: Scaleway's processing agreement filled in.
+- **Open:**
+  - the owner's Scaleway account;
+  - DNS records (SPF include, DKIM);
+  - `.env.prod`;
+  - a test email with SPF, DKIM and DMARC checked.
 
 ## Handover – next session (written 2026-11-14)
 

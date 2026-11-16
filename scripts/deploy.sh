@@ -17,8 +17,9 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 [ -f .env.prod ] || { echo "Missing .env.prod (docs/OPERATIONS.md §6)." >&2; exit 1; }
 
-# The "local" profile starts the mail catcher; outgoing mail follows in WP 8.2.
-compose=(sudo docker compose -f compose.prod.yaml --env-file .env.prod --profile local)
+compose=(sudo docker compose -f compose.prod.yaml --env-file .env.prod)
+# The mail catcher (profile "local") runs only while mail goes to it instead of a provider.
+if grep -qx 'DJANGO_EMAIL_HOST=mailpit' .env.prod; then compose+=(--profile local); fi
 
 echo "== Pulling"
 git pull --ff-only

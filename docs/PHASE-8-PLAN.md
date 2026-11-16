@@ -9,7 +9,7 @@
 | WP | Content | Waiting for |
 |---|---|---|
 | 8.1 | Hosting and production setup: server in CH/EU, PostgreSQL 18, file storage, reverse proxy with TLS 1.2/1.3, jobs (rate-limit purge, deletions), SSR behind the proxy (question P) | ✅ **live since 2026-11-16 at https://crashscouts.org** (registration closed); set-up, checks, job timers and updates in [OPERATIONS.md](OPERATIONS.md) |
-| 8.2 | Email in production (question F: Scaleway decided), sending domain `crashscouts.org` with SPF, DKIM, DMARC | domain registration |
+| 8.2 | Email in production (question F: Scaleway decided), sending domain `crashscouts.org` with SPF, DKIM, DMARC | ◐ **in progress since 2026-11-16:** SMTP login fix and steps in [OPERATIONS.md](OPERATIONS.md) §12; open: Scaleway account, DNS, test email |
 | 8.3 | Encrypted off-site backups of the database and files; a **tested** restore with written steps | ✅ **done 2026-11-16** ([ADR 0033](adr/0033-backups.md)): restic to Infomaniak Swiss Backup, 7 days, nightly timer; restore test passed on the server |
 | 8.4 | Monitoring and logs: health checks, error notifications, log retention without personal data | tool choice |
 | 8.5 | Legal texts: privacy policy, terms of use, imprint; AGPL source link in the footer | **drafted 2026-11-15** ([ADR 0031](adr/0031-legal-texts.md)); open: the `[TO DECIDE]` points (question Y) and the professional review |

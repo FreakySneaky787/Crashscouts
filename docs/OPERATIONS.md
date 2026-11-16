@@ -303,7 +303,40 @@ Not yet rehearsed on a second server; the database part is the same as in the re
 4. Start everything (`$C up -d --build --wait`), point DNS to the new address if it changed (§7),
    install the timers (§8, §10) and check the site as in §7.
 
+## 12. Email (WP 8.2)
+
+Outgoing mail (sign-up confirmation, password reset, notifications) goes through **Scaleway
+Transactional Email** (question F): `smtp.tem.scaleway.com`, port 587 with STARTTLS; the login
+is the Scaleway project ID and an API secret key that may only send email
+([Scaleway SMTP](https://www.scaleway.com/en/docs/transactional-email/reference-content/smtp-configuration/),
+[API keys](https://www.scaleway.com/en/docs/transactional-email/how-to/generate-api-keys-for-tem-with-iam/)).
+The first 300 emails per month are free
+([pricing](https://www.scaleway.com/en/pricing/managed-services/)).
+
+DNS records in the Infomaniak zone
+([Scaleway: authenticate a domain](https://www.scaleway.com/en/docs/transactional-email/how-to/authenticate-domain/)):
+
+- **SPF:** add `include:_spf.tem.scaleway.com` to the existing `v=spf1` record. A domain may
+  have only one SPF record.
+- **DKIM:** a TXT record with the name and value the Scaleway console shows.
+- **MX stays at Infomaniak** (the `contact@` mailbox); Scaleway's MX suggestion is not used.
+- **DMARC** (`p=reject`, set by Infomaniak) stays. Mail from Scaleway passes it through the
+  DKIM signature for `crashscouts.org`.
+
+`.env.prod`: `DJANGO_EMAIL_HOST=smtp.tem.scaleway.com`, `DJANGO_EMAIL_PORT=587`,
+`DJANGO_EMAIL_USE_TLS=true`, `DJANGO_EMAIL_HOST_USER=<project ID>`,
+`DJANGO_EMAIL_HOST_PASSWORD=<API secret key>`. `scripts/deploy.sh` starts the mail catcher only
+while `DJANGO_EMAIL_HOST=mailpit`; after switching, remove it once with
+`sudo docker compose -f compose.prod.yaml --env-file .env.prod --profile local rm -sf mailpit`.
+
+Test: `sudo docker compose -f compose.prod.yaml --env-file .env.prod exec -T backend python manage.py sendtestemail contact@crashscouts.org`,
+then check the message source in the Infomaniak webmail for `spf=pass`, `dkim=pass` and
+`dmarc=pass`.
+
+Found while preparing this: `compose.prod.yaml` did not pass `DJANGO_EMAIL_HOST_USER` and
+`DJANGO_EMAIL_HOST_PASSWORD` to Django, so a provider that needs a login would have refused
+every email. Fixed, with a test that fails without the fix.
+
 ## Still open
 
-- Email through Scaleway (WP 8.2); then the `local` profile goes.
 - Monitoring (WP 8.4).

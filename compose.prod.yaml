@@ -49,6 +49,9 @@ services:
       DJANGO_EMAIL_HOST: ${DJANGO_EMAIL_HOST:?set DJANGO_EMAIL_HOST}
       DJANGO_EMAIL_PORT: ${DJANGO_EMAIL_PORT:-587}
       DJANGO_EMAIL_USE_TLS: ${DJANGO_EMAIL_USE_TLS:-true}
+      # SMTP login (Scaleway: the project ID and an API secret key, WP 8.2); empty for the mail catcher.
+      DJANGO_EMAIL_HOST_USER: ${DJANGO_EMAIL_HOST_USER:-}
+      DJANGO_EMAIL_HOST_PASSWORD: ${DJANGO_EMAIL_HOST_PASSWORD:-}
       DJANGO_DEFAULT_FROM_EMAIL: ${DJANGO_DEFAULT_FROM_EMAIL:?set DJANGO_DEFAULT_FROM_EMAIL}
       DJANGO_SIGNUP_ENABLED: ${DJANGO_SIGNUP_ENABLED:-false}
       # Only the owner opens the security gate (CLAUDE.md); never switched here.

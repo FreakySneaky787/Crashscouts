@@ -92,7 +92,8 @@ review.]
 - **What we send:** transactional emails only, such as address confirmation, password reset and
   notifications about your campaigns, feedback, reports and moderation decisions. No newsletters.
 - **Delivery:** emails are delivered by Scaleway SAS (France) on our behalf.
-- [TO DECIDE: data processing agreement with the email provider.]
+- **Processing agreement:** Scaleway processes the emails under its data processing agreement,
+  which is part of its contract terms.
 
 ## 4. Cookies
 
