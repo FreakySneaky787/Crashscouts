@@ -264,6 +264,11 @@ Checks:
 
 Run the restore test after changes to the backup and at least once a month.
 
+Set up on the server on 2026-11-16: Swiss Backup 200 GB with one Swift device
+(`swift:crashscouts-backup:/restic`, Keystone v3, cluster `swiss-backup02`). The first backup and
+the restore test passed (57 of 57 tables; the live database was still empty), and the timer is
+enabled.
+
 Tested locally on 2026-11-16 against a restic REST server in place of Swiss Backup:
 
 - backup, `check` and the restore test passed (57 of 57 tables, users 1 of 1, one uploaded file);

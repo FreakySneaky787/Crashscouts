@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-16 (WP 8.3 built) · **Current phase:** 8 (closed beta) – WP 8.1, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.3 (backups) built, waiting for Swiss Backup; then 8.2 (email)
+**Last update:** 2026-11-16 (WP 8.3 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); next 8.2 (email) and 8.4 (monitoring)
 
 ## Work packages
 
@@ -1311,7 +1311,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - backups (8.3; no user data on the server yet);
   - monitoring (8.4).
 
-## WP 8.3 – Backups (2026-11-16) ◐ built, set-up on the server pending
+## WP 8.3 – Backups (2026-11-16) ✅
 
 - **Owner decisions 2026-11-16:**
   - storage: **Infomaniak Swiss Backup**. The recommendation was a separate provider; the
@@ -1331,10 +1331,14 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     without one table (`pg_restore` failed).
 - **Privacy policy 0.2 (draft):** hosting and backups filled in. Infomaniak, Switzerland; backups
   kept for 7 days.
-- **Open:**
-  - the owner orders Swiss Backup;
-  - set-up, first backup and restore test on the server;
-  - the emergency restore is not yet rehearsed on a second server.
+- **Set up on the server (2026-11-16):**
+  - Swiss Backup ordered: 200 GB, one Swift device, renewal on;
+  - the repository was created and the first backup made;
+  - the restore test passed on the server (57 of 57 tables). The live database is still empty
+    (registration closed), so the row comparison was 0 against 0. The test means more once there
+    is data;
+  - `crashscouts-backup.timer` is enabled; the next run is at 03:15 UTC plus a random delay.
+- **Not done:** the emergency restore has not been rehearsed on a second server.
 
 ## Handover – next session (written 2026-11-14)
 
