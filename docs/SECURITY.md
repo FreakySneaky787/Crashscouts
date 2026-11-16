@@ -285,5 +285,7 @@ admin logins, deletions and exports.
 - TLS via the reverse proxy; the database has no public port.
 - `DJANGO_TRUSTED_PROXY_COUNT=1` (production refuses to start without it); the cache table comes
   with the migrations; `manage.py purge_rate_limit_cache` runs hourly (ADR 0022).
-- Automatic, encrypted, off-site PostgreSQL backups with a **tested** restore.
+- Automatic, encrypted, off-site PostgreSQL backups with a **tested** restore: restic to Infomaniak
+  Swiss Backup, 7 days, restore test script ([ADR 0033](adr/0033-backups.md)). Accepted risk: root
+  on the server can also delete the backups.
 - Security review against OWASP ASVS level 1 before the closed beta.

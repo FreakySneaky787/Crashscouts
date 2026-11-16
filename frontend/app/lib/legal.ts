@@ -6,7 +6,7 @@
  */
 
 export const LEGAL_PAGES = {
-  privacy: { title: "Privacy policy", version: "0.1 (draft)", updated: "2026-11-15" },
+  privacy: { title: "Privacy policy", version: "0.2 (draft)", updated: "2026-11-16" },
   terms: { title: "Terms of use", version: "0.1 (draft)", updated: "2026-11-15" },
   imprint: { title: "Imprint", version: "0.1 (draft)", updated: "2026-11-15" },
 } as const;

@@ -108,7 +108,8 @@ No tracking or advertising cookies are used, so no cookie banner is needed.
 
 Your data is shared only as far as necessary:
 
-- **Hosting provider:** [TO DECIDE: provider and location, e.g. Switzerland].
+- **Infomaniak Network SA (Switzerland):** hosting of the platform and storage of its encrypted
+  backups, both in Switzerland.
 - **Scaleway SAS (France):** email delivery.
 - **GitHub (USA):** only if you sign in with GitHub, connect GitHub, or let us verify a GitHub
   repository. GitHub then processes data under its own privacy policy. For verifying repositories
@@ -131,7 +132,9 @@ Your data is shared only as far as necessary:
   - your reports remain without a link to you;
   - entries in the security log remain without any reference to you.
 - **Other periods:** application answers and rate-limit data are kept as stated above.
-- [TO DECIDE: backups – how long deleted data can remain in backups.]
+- **Backups:** the database and uploaded files are copied every night, encrypted, and each copy
+  is kept for 7 days. Data deleted on the platform therefore remains in backups for at most
+  7 more days; they are used only to restore the platform after a failure.
 
 ## 8. Your rights
 

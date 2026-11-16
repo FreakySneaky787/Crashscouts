@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-16 (WP 8.1 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); next WP 8.2 (email) and 8.3 (backups)
+**Last update:** 2026-11-16 (WP 8.3 built) · **Current phase:** 8 (closed beta) – WP 8.1, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.3 (backups) built, waiting for Swiss Backup; then 8.2 (email)
 
 ## Work packages
 
@@ -1310,6 +1310,31 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - outgoing email (8.2);
   - backups (8.3; no user data on the server yet);
   - monitoring (8.4).
+
+## WP 8.3 – Backups (2026-11-16) ◐ built, set-up on the server pending
+
+- **Owner decisions 2026-11-16:**
+  - storage: **Infomaniak Swiss Backup**. The recommendation was a separate provider; the
+    trade-off is accepted and recorded;
+  - retention: **7 days** (30 was recommended).
+- **Built ([ADR 0033](adr/0033-backups.md), [`OPERATIONS.md`](OPERATIONS.md) §10–11):**
+  - `scripts/backup.sh`: a `pg_dump` and the `media` volume, backed up with restic 0.19.1
+    (official image, pinned by digest), encrypted on the server; it keeps 7 daily snapshots and
+    runs `restic check`;
+  - `scripts/backup-restore-test.sh`: restores into a throwaway database and compares the result
+    with the live data;
+  - `crashscouts-backup.timer` at 03:15 UTC, after the deletion jobs;
+  - written steps for an emergency restore onto a new server.
+- **Tested locally**, with a restic REST server in place of Swiss Backup:
+  - backup, check and restore passed (57 of 57 tables, user count equal, 1 uploaded file);
+  - two deliberately broken backups were caught: a schema-only dump (empty main table) and a dump
+    without one table (`pg_restore` failed).
+- **Privacy policy 0.2 (draft):** hosting and backups filled in. Infomaniak, Switzerland; backups
+  kept for 7 days.
+- **Open:**
+  - the owner orders Swiss Backup;
+  - set-up, first backup and restore test on the server;
+  - the emergency restore is not yet rehearsed on a second server.
 
 ## Handover – next session (written 2026-11-14)
 

@@ -224,9 +224,81 @@ before the SSR server listens (Caddy answered 502 for about a second), so the sc
 
 After a change to `deploy/systemd/`, copy the units again (§8).
 
+## 10. Backups (WP 8.3, ADR 0033)
+
+restic sends an encrypted copy of the database and of the uploaded files to **Infomaniak Swiss
+Backup** every night at 03:15 UTC, after the deletion jobs. It keeps **7 days** (owner's decisions
+2026-11-16).
+
+Setting up (once):
+
+1. Manager → Swiss Backup: order the smallest **cloud backup** (not Acronis), add a device
+   `crashscouts-prod` with the **Swift** protocol (Infomaniak documents restic with Swift:
+   [Getting Started Guide](https://www.infomaniak.com/en/support/faq/2543/getting-started-guide-swiss-backup-cloud-backup)).
+   The device password goes into the password manager.
+2. On the server, the storage settings and a new restic password, readable by root only:
+
+   ```bash
+   sudo install -d -m 700 /etc/crashscouts
+   sudo install -m 600 /dev/null /etc/crashscouts/backup.env
+   sudo sh -c 'head -c 32 /dev/urandom | base64 > /etc/crashscouts/restic-password' && sudo chmod 600 /etc/crashscouts/restic-password
+   sudo nano /etc/crashscouts/backup.env
+   ```
+
+   `backup.env` holds `RESTIC_REPOSITORY` and the device's credentials as restic environment
+   variables (for Swift the `OS_*` values Infomaniak shows for the device). Copy the restic
+   password (`sudo cat /etc/crashscouts/restic-password`) into the password manager: **without it
+   the backups cannot be read.**
+3. Create the repository, run the first backup and the restore test, then switch on the timer:
+
+   ```bash
+   cd /opt/crashscouts && sudo scripts/backup.sh init && sudo scripts/backup.sh && sudo scripts/backup-restore-test.sh
+   sudo cp deploy/systemd/crashscouts-backup.* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now crashscouts-backup.timer
+   ```
+
+Checks:
+
+- `sudo scripts/backup.sh snapshots` lists the snapshots;
+- `cat /var/lib/crashscouts/last-backup` shows the time of the last success;
+- `journalctl -u crashscouts-backup.service -n 30` shows the last run.
+
+Run the restore test after changes to the backup and at least once a month.
+
+Tested locally on 2026-11-16 against a restic REST server in place of Swiss Backup:
+
+- backup, `check` and the restore test passed (57 of 57 tables, users 1 of 1, one uploaded file);
+- two deliberately broken backups were caught:
+  - a dump without data (`--schema-only`) failed with "a main table is empty in the backup";
+  - a dump without the feedback table failed in `pg_restore`.
+
+## 11. Emergency restore onto a new server
+
+Not yet rehearsed on a second server; the database part is the same as in the restore test.
+
+1. Set up a server as in §1–4 and copy `.env.prod` (from the password manager) to
+   `/opt/crashscouts/.env.prod`; set up `/etc/crashscouts` as in §10 step 2, with the **existing**
+   restic password and device credentials.
+2. Start only the database and restore the latest snapshot into a temporary folder:
+
+   ```bash
+   cd /opt/crashscouts && C="sudo docker compose -f compose.prod.yaml --env-file .env.prod --profile local"
+   $C up -d db --wait
+   R=$(sed -n 's/^RESTIC_IMAGE=//p' scripts/backup.sh); T=$(sudo mktemp -d)
+   sudo docker run --rm --env-file /etc/crashscouts/backup.env -e RESTIC_PASSWORD_FILE=/p -v /etc/crashscouts/restic-password:/p:ro -v "$T:/restore" "$R" restore latest --tag nightly --target /restore
+   ```
+
+3. Load the database and the uploaded files:
+
+   ```bash
+   sudo cat "$T/backup/db/crashscouts.dump" | $C exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --exit-on-error'
+   sudo docker run --rm --entrypoint sh -v crashscouts_media:/m -v "$T/backup/media:/src:ro" "$R" -c 'cp -a /src/. /m/'
+   sudo rm -rf "$T"
+   ```
+
+4. Start everything (`$C up -d --build --wait`), point DNS to the new address if it changed (§7),
+   install the timers (§8, §10) and check the site as in §7.
+
 ## Still open
 
 - Email through Scaleway (WP 8.2); then the `local` profile goes.
-- Backups (WP 8.3): until then there is no copy of the database; no real user data is on the
-  server yet because registration is closed.
 - Monitoring (WP 8.4).

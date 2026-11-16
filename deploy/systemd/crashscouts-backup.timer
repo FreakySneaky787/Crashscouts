@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Crashscouts backup every night (UTC), after the daily jobs
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 UTC
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

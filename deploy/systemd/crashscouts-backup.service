@@ -1,0 +1,12 @@
+# Nightly encrypted off-site backup (WP 8.3, ADR 0033, docs/OPERATIONS.md §10): database dump and
+# uploaded files with restic to Infomaniak Swiss Backup; keeps 7 days. Started by
+# crashscouts-backup.timer, after the daily deletion jobs, so data deleted that night is not
+# copied again.
+[Unit]
+Description=Crashscouts nightly backup (restic)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/crashscouts/scripts/backup.sh
