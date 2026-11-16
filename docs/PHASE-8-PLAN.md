@@ -8,7 +8,7 @@
 
 | WP | Content | Waiting for |
 |---|---|---|
-| 8.1 | Hosting and production setup: server in CH/EU, PostgreSQL 18, file storage, reverse proxy with TLS 1.2/1.3, jobs (rate-limit purge, deletions), SSR behind the proxy (question P) | ◐ **live since 2026-11-16 at https://crashscouts.org** (registration closed); set-up in [OPERATIONS.md](OPERATIONS.md); open: the job timers on the server |
+| 8.1 | Hosting and production setup: server in CH/EU, PostgreSQL 18, file storage, reverse proxy with TLS 1.2/1.3, jobs (rate-limit purge, deletions), SSR behind the proxy (question P) | ✅ **live since 2026-11-16 at https://crashscouts.org** (registration closed); set-up, checks, job timers and updates in [OPERATIONS.md](OPERATIONS.md) |
 | 8.2 | Email in production (question F: Scaleway decided), sending domain `crashscouts.org` with SPF, DKIM, DMARC | domain registration |
 | 8.3 | Encrypted off-site backups of the database and files; a **tested** restore with written steps | provider |
 | 8.4 | Monitoring and logs: health checks, error notifications, log retention without personal data | tool choice |

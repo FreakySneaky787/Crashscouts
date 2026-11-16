@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-16 (WP 8.1 started) · **Current phase:** 8 (closed beta) – WP 8.5 and 8.6 done; WP 8.1 (server) in progress (flag still off)
+**Last update:** 2026-11-16 (WP 8.1 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); next WP 8.2 (email) and 8.3 (backups)
 
 ## Work packages
 
@@ -1257,7 +1257,7 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   run **4 passed**; Vitest **122 passed**; ESLint and typecheck clean (backend unchanged).
 - Open for the owner: the screen reader check in [`ACCESSIBILITY.md`](ACCESSIBILITY.md).
 
-## WP 8.1 – Production server (started 2026-11-16) ◐
+## WP 8.1 – Production server (2026-11-16) ✅
 
 Set up together with the owner, who runs the commands; Claude has no access to the server. Every
 step is in [`OPERATIONS.md`](OPERATIONS.md).
@@ -1295,7 +1295,13 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     the three job commands were tested on the local production stack. The test also showed that
     `up --wait` returns before the SSR server listens (502 for about a second), so the script now
     waits for a 200.
-- **Open:** install the timers on the server (owner).
+- **Timers installed on the server:** started once by hand, both finished successfully; the
+  hourly purge deleted 3 expired rate-limit entries (from the checks above), the daily jobs had
+  nothing to delete. Next runs scheduled hourly and daily at 02:30 UTC (with a random delay).
+- **Not yet in place (next work packages):**
+  - outgoing email (8.2);
+  - backups (8.3; no user data on the server yet);
+  - monitoring (8.4).
 
 ## Handover – next session (written 2026-11-14)
 

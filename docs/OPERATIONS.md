@@ -1,6 +1,6 @@
 # Operations: the production server (WP 8.1)
 
-> State: 2026-11-16, **set-up in progress**. This runbook lets the owner rebuild the server from
+> State: 2026-11-16, **live** at https://crashscouts.org (registration closed). This runbook lets the owner rebuild the server from
 > nothing. Every step was run on the real server; results are noted. Commands run on the server
 > unless marked "on your computer". Secrets never go into this file, the repository or a chat.
 
@@ -206,7 +206,9 @@ sudo systemctl start crashscouts-hourly.service crashscouts-daily.service && jou
 systemctl list-timers 'crashscouts-*'
 ```
 
-`Persistent=true` catches up on a run that was missed while the server was off.
+`Persistent=true` catches up on a run that was missed while the server was off. Checked on
+2026-11-16: both services finished successfully when started by hand (3 expired rate-limit
+entries deleted, nothing else to delete).
 
 ## 9. Updates
 
