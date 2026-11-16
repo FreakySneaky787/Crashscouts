@@ -153,5 +153,8 @@ put `targets.json` into `loadtest/` (ignored by git), then:
 cd loadtest && LOGINS=/path/outside/the/repository/logins.json uv run --frozen locust -f locustfile.py --headless -u 20 -r 2 -t 5m --host https://localhost --csv results/run --only-summary
 ```
 
+On the server, `scripts/server-loadtest.sh` does all of this in one go, bound to 127.0.0.1 and
+cleaned up afterwards ([OPERATIONS.md](OPERATIONS.md) §5).
+
 Build the images first with `scripts/build-images.sh` (ADR 0032). Start from an empty database
 (`docker compose ... down -v`): the generator refuses to run twice.

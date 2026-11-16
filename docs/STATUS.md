@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-15 (WP 8.6 part C) · **Current phase:** 8 (closed beta) – WP 8.5 and 8.6 done; next WP 8.1 (server) once the owner is ready (flag still off)
+**Last update:** 2026-11-16 (WP 8.1 started) · **Current phase:** 8 (closed beta) – WP 8.5 and 8.6 done; WP 8.1 (server) in progress (flag still off)
 
 ## Work packages
 
@@ -1256,6 +1256,31 @@ admins; a moderation statistics page; IP addresses stay out of the audit log.
   removed; date focus fix removed). Full runs: Playwright main run **101 passed** (9 new), gate
   run **4 passed**; Vitest **122 passed**; ESLint and typecheck clean (backend unchanged).
 - Open for the owner: the screen reader check in [`ACCESSIBILITY.md`](ACCESSIBILITY.md).
+
+## WP 8.1 – Production server (started 2026-11-16) ◐
+
+Set up together with the owner, who runs the commands; Claude has no access to the server. Every
+step is in [`OPERATIONS.md`](OPERATIONS.md).
+
+- **Owner decisions 2026-11-16:**
+  - the code comes to the server through a read-only **deploy key**;
+  - until the beta starts the site is **public with registration off**;
+  - SSH keys only on the owner's own computer, not on the work computer.
+- **Done and checked on the server:**
+  - Infomaniak VPS Lite ordered, Debian 13.5 (2 vCPU, 3.8 GiB, 59 GB);
+  - system upgraded (kernel 6.12.117 running after reboot) and automatic security updates installed;
+  - SSH keys only, no root login (`sshd -T`: all three `no`), and a 2 GB swap file;
+  - Docker 29.10.0 and Compose 5.7.1 from Docker's repository (`hello-world` ran);
+  - the code cloned with the deploy key; GitHub's host key matched the fingerprint GitHub
+    publishes.
+- **New:** `scripts/server-loadtest.sh`, the load test on the server, bound to 127.0.0.1 and
+  cleaned up afterwards. Checked locally: a 1-minute run gave 405 requests and 0 failures; the
+  test stack, its volumes and the localhost frontend image were removed afterwards.
+- **Open:**
+  - firewall in the Manager;
+  - load test on the server;
+  - `.env.prod`, DNS, start, smoke tests against the domain;
+  - systemd timers for the jobs.
 
 ## Handover – next session (written 2026-11-14)
 
