@@ -130,12 +130,15 @@ the memory peak, and then deletes the test stack, its data and the frontend imag
 cd /opt/crashscouts && git pull && sudo scripts/server-loadtest.sh
 ```
 
-The result goes into [PERFORMANCE.md](PERFORMANCE.md).
+The result goes into [PERFORMANCE.md](PERFORMANCE.md). First run on 2026-11-16: 1,957 requests, 0
+failures, p95 330 ms. Building the images took a few minutes; run it inside `tmux`
+(`tmux new -s lasttest`, after a lost connection `tmux attach -t lasttest`).
 
 ## Still to do in WP 8.1
 
-- Firewall in the Manager: incoming TCP 22, 80 and 443 only
-  ([Infomaniak](https://www.infomaniak.com/en/support/faq/2822/manage-vps-cloud-vps-lite-firewall)).
+- Firewall in the Manager
+  ([Infomaniak](https://www.infomaniak.com/en/support/faq/2822/manage-vps-cloud-vps-lite-firewall)):
+  the default rules open only SSH (22) and ICMP; TCP 80 and 443 are added just before DNS.
   A firewall on the server itself (ufw) would not help: Docker bypasses its rules for published
   ports ([Docker](https://docs.docker.com/engine/network/packet-filtering-firewalls/)).
 - `.env.prod` on the server (secrets generated there; the operator details typed in by the owner),

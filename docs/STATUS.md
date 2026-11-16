@@ -1276,9 +1276,11 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
 - **New:** `scripts/server-loadtest.sh`, the load test on the server, bound to 127.0.0.1 and
   cleaned up afterwards. Checked locally: a 1-minute run gave 405 requests and 0 failures; the
   test stack, its volumes and the localhost frontend image were removed afterwards.
+- **Load test on the server:** 1,957 requests, 0 failures, p95 330 ms (target < 500 ms), stack
+  memory peak 608 MiB ([`PERFORMANCE.md`](PERFORMANCE.md)). Sign-in p95 1.2 s with 10 samples
+  (Argon2 on 2 vCPUs, Locust on the same machine).
+- **Firewall** (provider): only SSH (22) and ICMP open; 80 and 443 follow just before DNS.
 - **Open:**
-  - firewall in the Manager;
-  - load test on the server;
   - `.env.prod`, DNS, start, smoke tests against the domain;
   - systemd timers for the jobs.
 

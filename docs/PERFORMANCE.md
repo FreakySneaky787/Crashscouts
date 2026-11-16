@@ -118,6 +118,46 @@ Highest values from `docker stats` every 15 seconds (18 samples). The whole stac
 (100 % = one CPU core.) Django and the SSR server together averaged about two thirds of a core;
 the VPS has two.
 
+## Load test on the VPS (2026-11-16, WP 8.1)
+
+Same data, users and duration, run with `scripts/server-loadtest.sh` on the real server
+(Infomaniak VPS Lite: 2 vCPU, 3.8 GiB, Debian 13) before it went live. **Locust ran on the same
+machine** and took CPU from the stack, so these values are pessimistic.
+
+**Target met: 0 failures in 1,957 requests; p95 of all requests 330 ms (target < 500 ms).** Every
+page stays below 500 ms at p95 except the two sign-in requests.
+
+| Page | Requests | p50 | p95 | max |
+|---|---|---|---|---|
+| `/` home | 142 | 19 | 52 | 165 |
+| `/discover` | 386 | 140 | 320 | 1,356 |
+| `/discover?q=…` search | 211 | 140 | 300 | 855 |
+| `/p/[project]` | 198 | 63 | 220 | 457 |
+| `/p/[project]` (team) | 139 | 100 | 330 | 976 |
+| `/p/[project]/c/[campaign]` | 356 | 120 | 350 | 1,157 |
+| `/p/[project]/c/[campaign]/feedback` inbox | 129 | 110 | 280 | 740 |
+| `/u/[username]` profile | 67 | 43 | 160 | 342 |
+| `/account` | 309 | 180 | 400 | 1,259 |
+| `/login` (page) | 10 | 230 | 530 | 530 |
+| `/login` (sign-in, POST) | 10 | 810 | 1,200 | 1,182 |
+| **All requests** | **1,957** | **120** | **330** | **1,356** |
+
+Locust reports percentiles rounded to two significant digits, which is why the sign-in p95
+(1,200) is above its max (1,182).
+
+- **About 2.5 times slower than on the development container** (aggregate p95 130 → 330 ms): half
+  the cores, and Locust on the same machine. The CPU is the limit: Django peaked at 91 % of one
+  core, the SSR server at 64 %.
+- **Sign-in:** 10 requests each, so the p95 is the slowest single one. Argon2 hashing is deliberately
+  CPU-heavy (about 240 ms on the development container) and competes for the two cores with the
+  other 19 users. Signing in happens once per session; acceptable for the beta, re-checked in
+  monitoring (WP 8.4).
+- **Single slow requests up to 1.4 s** (max column) appear on the busiest pages under full load;
+  they do not move the p95.
+- **Memory:** the stack peaked at **608 MiB** (Django 263, SSR server 214, PostgreSQL 91, Caddy 21,
+  Mailpit 20). The server has 3.8 GiB plus 2 GB swap.
+- **Warm-up** before the run: `/` 0.15 s, `/discover` 0.80 s, `/login` 0.53 s on the first request.
+
 ## Known risks and follow-ups
 
 - **Per-entry counts remain in two lists:** own participations (about 3 queries per entry: task
@@ -130,7 +170,8 @@ the VPS has two.
   of the load test (Discover requests); no lock waits or errors showed up. Re-check on the VPS.
 - **Sign-in** takes about 240 ms by design (Argon2 password hashing).
 - **Cold start:** the first requests after a restart take up to 0.7 s; WP 8.1 adds a warm-up.
-- **The VPS has 2 vCPUs** instead of 4: WP 8.1 repeats this run there before the beta starts.
+- **The VPS has 2 vCPUs** instead of 4: measured there on 2026-11-16 (section above); the CPU is
+  the first limit. If p95 rises toward 500 ms in real use, the next step is the 4-vCPU VPS Lite.
 
 ## Reproducing
 
