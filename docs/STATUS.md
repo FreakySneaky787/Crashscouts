@@ -1358,8 +1358,8 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - backup: a failure signal, then the email "DOWN | crashscouts-backup"; a success signal, then
     "UP";
   - site: frontend stopped. The next check (19:00) reported a failure, and the email "DOWN |
-    crashscouts-site" arrived within seconds. Then the frontend is started again (§13.4); the
-    "UP" email was not yet confirmed at the time of writing.
+    crashscouts-site" arrived within seconds. Frontend started again: `/discover` 200, and the
+    email "UP | crashscouts-site" arrived at 19:05 (downtime 5 minutes 8 seconds).
   - Not triggered one by one: the disk, hourly and daily alarms. They use the same script and
     the same email integration; their success signals arrived (disk, hourly) or arrive tonight
     (daily, backup).
