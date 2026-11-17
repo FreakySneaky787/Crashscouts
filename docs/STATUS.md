@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); launch plan written ([LAUNCH-PLAN.md](LAUNCH-PLAN.md)); WP 8.9 launch appearance done; next: stage 0 (8.7, legal review, 8.8)
+**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1 to 8.7 and 8.9 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); launch plan written ([LAUNCH-PLAN.md](LAUNCH-PLAN.md)); WP 8.9 launch appearance done; WP 8.7 done (repository public, protections on); next: stage 0 (legal review, 8.8)
 
 ## Work packages
 
@@ -1326,7 +1326,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   date (checked: with an end date in the past it fails).
 - To do: take the fix as soon as picomatch releases one, then remove the exception.
 
-## WP 8.7 – Making the repository public (2026-11-17) 🟡 prepared, the owner switches
+## WP 8.7 – Making the repository public (2026-11-17) ✅ done
 
 - **Owner's decisions 2026-11-17:**
   - future commits use GitHub's private address
@@ -1358,6 +1358,20 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
      `.env.prod`, then `scripts/deploy.sh`. The footer then links the source code, as the AGPL
      requires.
   5. Later: switch the server's clone to HTTPS and remove the deploy key (OPERATIONS §Access).
+- **Done 2026-11-17 (checked through the GitHub API where it exposes the setting):**
+  - repository visibility: public;
+  - secret scanning and push protection: enabled (API);
+  - ruleset `protect-main`: active on the default branch, rules `deletion` and `non_fast_forward`,
+    empty bypass list (API);
+  - Dependabot alerts and private vulnerability reporting: enabled by the owner (the API does not
+    show them); Dependabot security updates stay off, AI scan features stay off (they use AI
+    credits);
+  - `SOURCE_CODE_URL` set on the server and deployed: the home page links the source code
+    (checked with `curl`). Pitfall: the template already contains an empty `SOURCE_CODE_URL=`
+    line, so set the value with `sed` instead of appending a second line;
+  - the owner confirmed the two commitments in the public files: an answer within 7 days
+    (SECURITY.md) and `contact@crashscouts.org` as contact for reports and the code of conduct.
+- **Still open:** switch the server's clone to HTTPS and remove the deploy key (point 5).
 
 ## Security check with a focus on costs (2026-11-17)
 
