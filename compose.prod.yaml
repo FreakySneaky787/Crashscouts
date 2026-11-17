@@ -56,6 +56,9 @@ services:
       # Error emails without personal data go here (WP 8.4, ADR 0034); empty turns them off.
       DJANGO_ERROR_MAIL_TO: ${DJANGO_ERROR_MAIL_TO:-}
       DJANGO_SIGNUP_ENABLED: ${DJANGO_SIGNUP_ENABLED:-false}
+      # GitHub login and repository verification (WP 1.4, WP 2.5); empty turns both off.
+      DJANGO_GITHUB_CLIENT_ID: ${DJANGO_GITHUB_CLIENT_ID:-}
+      DJANGO_GITHUB_CLIENT_SECRET: ${DJANGO_GITHUB_CLIENT_SECRET:-}
       # Only the owner opens the security gate (CLAUDE.md); never switched here.
       PUBLIC_CAMPAIGNS_ENABLED: "false"
       POSTGRES_HOST: db

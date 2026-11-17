@@ -1373,6 +1373,19 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     (SECURITY.md) and `contact@crashscouts.org` as contact for reports and the code of conduct.
 - **Still open:** switch the server's clone to HTTPS and remove the deploy key (point 5).
 
+## Open question U – real GitHub login on crashscouts.org (2026-11-17) 🟡 in progress
+
+- **Found while preparing the test:** `compose.prod.yaml` did not pass `DJANGO_GITHUB_CLIENT_ID`
+  and `DJANGO_GITHUB_CLIENT_SECRET` to Django, so the GitHub login and the repository
+  verification were off in production without any error. Fixed; a test checks the compose file.
+  `.env.prod.example` lists both values.
+- **GitHub's rules, from the official docs repository (docs.github.com is blocked here):** an
+  OAuth app on github.com takes up to 10 callback URLs; without wildcard matching a redirect URL
+  must match one of them exactly (github/docs, `content/apps/oauth-apps/building-oauth-apps/`
+  `creating-an-oauth-app.md` and `authorizing-oauth-apps.md`, section "Redirect URLs").
+- **Next:** the owner registers the callback URLs, sets the two values on the server and tests
+  the login (OPEN-QUESTIONS U).
+
 ## Security check with a focus on costs (2026-11-17)
 
 - **Question of the owner:** can a large bill arrive overnight?

@@ -231,3 +231,13 @@ def test_the_production_stack_passes_the_error_mail_address_to_django():
     backend = compose.split("\n  backend:\n", 1)[1].split("\n  db:\n", 1)[0]
 
     assert "DJANGO_ERROR_MAIL_TO: ${DJANGO_ERROR_MAIL_TO:-}" in backend
+
+
+def test_the_production_stack_passes_the_github_app_to_django():
+    # Found during the first real GitHub test (open question U): without these the login and
+    # the repository verification were silently off in production.
+    compose = (BACKEND_DIR.parent / "compose.prod.yaml").read_text()
+    backend = compose.split("\n  backend:\n", 1)[1].split("\n  db:\n", 1)[0]
+
+    assert "DJANGO_GITHUB_CLIENT_ID: ${DJANGO_GITHUB_CLIENT_ID:-}" in backend
+    assert "DJANGO_GITHUB_CLIENT_SECRET: ${DJANGO_GITHUB_CLIENT_SECRET:-}" in backend
