@@ -15,6 +15,26 @@
   grid-column: 1 / -1;
 }
 
+.more {
+  grid-column: 1 / -1;
+}
+
+.moreSummary {
+  cursor: pointer;
+  width: fit-content;
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent-text);
+  padding-block: var(--space-1);
+}
+
+.moreGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  align-items: end;
+  padding-top: var(--space-3);
+}
+
 .buttons {
   grid-column: 1 / -1;
   display: flex;
@@ -31,34 +51,9 @@
   gap: var(--space-3);
 }
 
-.card {
-  display: flex;
-  gap: var(--space-3);
-  align-items: flex-start;
-  padding: var(--space-3);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  min-width: 0;
-}
 
-.cardBody {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-}
 
-.cardTitle {
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
-  overflow-wrap: anywhere;
-}
 
-.pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: center;
-}
 
 .muted {
   font-size: var(--text-sec);

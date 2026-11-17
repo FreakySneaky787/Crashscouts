@@ -55,6 +55,7 @@ export default [
   route("u/:username", "routes/profile.tsx"),
   route("avatars/:key", "routes/avatar.tsx"),
   route("theme", "routes/theme.tsx"),
+  route("site.webmanifest", "routes/manifest.tsx"),
   route("design-system", "routes/design-system.tsx"),
   // Legal texts (WP 8.5): one module, three addresses.
   route("privacy", "routes/legal.tsx", { id: "legal-privacy" }),

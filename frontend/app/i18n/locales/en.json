@@ -1,11 +1,33 @@
 {
   "home": {
-    "title": "Home",
-    "intro": "Early development build. Product features arrive phase by phase.",
-    "activity": "Activity",
-    "emptyTitle": "Nothing to show yet",
-    "emptyText": "Projects, campaigns and feedback will appear here once there is a feed. Meanwhile you can browse public projects and test campaigns.",
-    "emptyAction": "Discover projects and campaigns"
+    "headline": "Real testers for your open-source project",
+    "lead": "Crashscouts connects developers with volunteer testers. Publish a test campaign with clear tasks, let people try your software and get structured feedback you can act on.",
+    "ctaNeedTesters": "I need testers",
+    "ctaWantToTest": "I want to test",
+    "facts": "Free and open source (AGPL) · No tracking, no ads · Small projects are found too",
+    "howTitle": "How it works",
+    "step1Title": "Publish a campaign",
+    "step1Text": "Describe what to test, on which platforms, and how many testers you need. Add test tasks so people know where to start.",
+    "step2Title": "Testers join",
+    "step2Text": "Volunteers find your campaign on Discover, join and work through the tasks at their own pace.",
+    "step3Title": "Get structured feedback",
+    "step3Text": "Bug reports and suggestions arrive in one inbox, with steps to reproduce, expected and actual result, and the environment. You decide what to fix.",
+    "campaignsTitle": "Open test campaigns",
+    "campaignsAll": "All campaigns",
+    "campaignsEmptyTitle": "The first campaigns are on their way",
+    "campaignsEmptyText": "No public test campaign is open right now. Meanwhile you can browse the projects on Discover.",
+    "campaignsEmptyAction": "Browse projects",
+    "whyTitle": "Why Crashscouts",
+    "why1Title": "Open source.",
+    "why1Text": "The platform itself is AGPL licensed; you can read, run and improve every line.",
+    "why2Title": "No tracking.",
+    "why2Text": "No analytics scripts, no ads, no cookie banner. Statistics are counted on the server, never per person.",
+    "why3Title": "Fair for small projects.",
+    "why3Text": "Discover sorts by recent activity, never by popularity, so a new project is found as easily as a known one.",
+    "welcomeBack": "Welcome back, {{username}}",
+    "welcomeText": "Start a project to find testers, or join a campaign and help someone else ship better software.",
+    "ctaCreate": "Create a project",
+    "ctaTest": "Find a campaign to test"
   },
   "nav": {
     "home": "Home",
@@ -1327,7 +1349,8 @@
     "noProjects": "No projects match.",
     "noCampaigns": "No test campaigns match.",
     "noProjectsText": "Try fewer filters or other words. Projects that are not open source appear when you choose “All licences”.",
-    "campaignsLocked": "Public test campaigns are not open yet. They appear here once the platform opens them."
+    "campaignsLocked": "Public test campaigns are not open yet. They appear here once the platform opens them.",
+    "moreFilters": "More filters"
   },
   "suspension": {
     "banner": "Your account is suspended: you can read, but not create, change or report anything.",

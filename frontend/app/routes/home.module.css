@@ -1,0 +1,143 @@
+.page {
+  display: grid;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+/* Visitors: text and illustration side by side, stacked on narrow screens. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: center;
+  padding-block: var(--space-6) var(--space-2);
+}
+
+.heroText {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.headline {
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+.lead {
+  font-size: var(--text-panel);
+  color: var(--color-fg-secondary);
+  max-width: 60ch;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.facts {
+  font-size: var(--text-sec);
+  color: var(--color-fg-muted);
+}
+
+.heroArt {
+  max-width: 26rem;
+  justify-self: center;
+}
+
+.welcome {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.how,
+.why {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.how h2,
+.why h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-section);
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-4);
+  counter-reset: step;
+}
+
+.step {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  counter-increment: step;
+  min-width: 0;
+}
+
+.stepArt {
+  width: 6rem;
+}
+
+/* The order of the steps is real (create, join, feedback), so they are numbered. */
+.stepTitle {
+  font-size: var(--text-panel);
+}
+
+.stepTitle::before {
+  content: counter(step) ". ";
+  color: var(--color-accent-text);
+}
+
+.stepText {
+  color: var(--color-fg-secondary);
+}
+
+.campaigns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.more {
+  font-size: var(--text-sec);
+}
+
+.reasons {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: grid;
+  gap: var(--space-2);
+  max-width: 70ch;
+  color: var(--color-fg-secondary);
+}
+
+.reasons strong {
+  color: var(--color-fg);
+}
+
+@media (max-width: 48rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: var(--space-2) 0;
+  }
+
+  .heroArt {
+    max-width: 18rem;
+  }
+}

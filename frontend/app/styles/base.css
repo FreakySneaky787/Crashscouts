@@ -28,6 +28,15 @@ h4 {
   text-wrap: balance;
 }
 
+/* Page titles use the heading face (WP 8.9, ADR 0035). Panel titles stay in the UI face, which
+   reads better at small sizes; larger section titles opt in with `font-family: var(--font-heading)`. */
+h1 {
+  overflow-wrap: anywhere;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+
 p,
 ul,
 ol,

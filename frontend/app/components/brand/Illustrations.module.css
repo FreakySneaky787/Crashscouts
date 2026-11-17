@@ -1,0 +1,69 @@
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.surface {
+  fill: var(--color-surface);
+}
+
+.line,
+.soft,
+.lineAccent,
+.crash,
+.pointer,
+.check {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.line {
+  stroke: var(--color-fg-secondary);
+  stroke-width: 3;
+}
+
+.soft {
+  stroke: var(--color-line-strong);
+  stroke-width: 3;
+}
+
+.lineAccent {
+  stroke: var(--color-accent);
+  stroke-width: 3;
+}
+
+.fill {
+  fill: var(--color-line-strong);
+}
+
+.fillAccent {
+  fill: var(--color-accent);
+}
+
+.crash {
+  stroke: var(--color-fg);
+  stroke-width: 4;
+}
+
+.trail {
+  fill: var(--color-accent);
+  opacity: 0.6;
+}
+
+.found {
+  fill: var(--color-accent);
+}
+
+.check {
+  stroke: var(--color-accent-fg);
+  stroke-width: 3.5;
+}
+
+.pointer {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-dasharray: 2 6;
+}

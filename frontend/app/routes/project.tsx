@@ -19,6 +19,7 @@ import { backendFetch, ensureCsrfToken } from "~/lib/backend.server";
 import { campaignStatusStyleKey, formatInZone, type Campaign } from "~/lib/campaigns";
 import { reportHref } from "~/lib/reports";
 import { cacheHeadersFor, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+import { socialMeta } from "~/lib/social";
 import { isValidProjectSlug, projectImageSrc, statusLabel, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -33,12 +34,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
     { name: "robots", content: isPublic ? "index, follow" : "noindex" },
     ...(isPublic
       ? [
-          { property: "og:type", content: "website" },
-          { property: "og:title", content: project.name },
-          { property: "og:description", content: project.summary },
-          { property: "og:url", content: url },
-          { property: "og:site_name", content: brand.name },
-          { name: "twitter:card", content: "summary" },
+          ...socialMeta({ url, title: project.name, description: project.summary }),
         ]
       : []),
   ];

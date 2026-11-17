@@ -38,6 +38,7 @@ import {
 import type { Feedback } from "~/lib/feedback";
 import { reportHref } from "~/lib/reports";
 import { cacheHeadersFor, isUuid, privateNoStoreHeaders, setCookieHeaders } from "~/lib/http";
+import { socialMeta } from "~/lib/social";
 import { isValidProjectSlug, type Project } from "~/lib/projects";
 
 import styles from "./forms.module.css";
@@ -50,6 +51,8 @@ export function meta({ loaderData }: Route.MetaArgs) {
     { title: `${campaign.title} · ${project.name} · ${brand.name}` },
     { name: "description", content: campaign.summary },
     { name: "robots", content: indexable ? "index, follow" : "noindex" },
+    // Link previews only for campaigns that may be indexed (WP 8.9).
+    ...(indexable ? socialMeta({ url: loaderData.url, title: `${campaign.title} · ${project.name}`, description: campaign.summary }) : []),
   ];
 }
 
@@ -104,6 +107,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       feedback: feedback.status === 200 ? (feedback.data ?? []) : [],
       progressSaved: search.get("progress") === "saved",
       applied: (applied === "sent" || applied === "withdrawn" ? applied : null) as "sent" | "withdrawn" | null,
+      url: new URL(`/p/${project.data.slug}/c/${campaign.slug}`, request.url).toString(),
     },
     { headers },
   );

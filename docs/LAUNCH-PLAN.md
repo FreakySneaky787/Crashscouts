@@ -40,6 +40,7 @@
 - [ ] Legal texts reviewed (question Y); `LEGAL_TEXTS_REVIEWED=true`.
 - [ ] WP 8.8: open registration and `PUBLIC_CAMPAIGNS_ENABLED` switched on by the owner after
       the gate checklist. **Without the flag, Discover is empty for visitors.**
+- [x] WP 8.9 launch appearance: logo, icon, home page for visitors, link previews ([ADR 0035](adr/0035-brand-and-home-page.md)).
 - [ ] Crashscouts itself is the first campaign ("test Crashscouts"), so Discover is never empty.
 
 **Accounts (start now; communities trust accounts with a history):**

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); launch plan written ([LAUNCH-PLAN.md](LAUNCH-PLAN.md)); next: stage 0 (8.7, legal review, 8.8)
+**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); launch plan written ([LAUNCH-PLAN.md](LAUNCH-PLAN.md)); WP 8.9 launch appearance done; next: stage 0 (8.7, legal review, 8.8)
 
 ## Work packages
 
@@ -1325,6 +1325,43 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   high or critical finding still fails CI. `app/audit-exceptions.test.ts` fails after the end
   date (checked: with an end date in the past it fails).
 - To do: take the fix as soon as picomatch releases one, then remove the exception.
+
+## WP 8.9 – Launch appearance (2026-11-17) ✅
+
+- **Owner's decisions 2026-11-17** ([ADR 0035](adr/0035-brand-and-home-page.md)):
+  - no redesign of the app, only the launch appearance;
+  - logo: the "broken C" (chosen from six drafts, then drawn geometrically exact: design G1);
+  - icon: the mark in white on teal (G3);
+  - Bricolage Grotesque for page titles;
+  - **no** second accent colour;
+  - home page "clear, but in style", with small illustrations;
+  - Discover filters folded.
+- **Built:**
+  - the logo in the sidebar and the mobile bar;
+  - favicon, Apple touch icon, PNG icons 192/512 and a web app manifest built from
+    `config/brand.ts`;
+  - the self-hosted heading font (Fontsource 5.3.0, OFL);
+  - a new home page:
+    - for visitors: headline, two buttons, three steps, the newest campaigns, three reasons;
+    - for signed-in people: a welcome and their next steps;
+  - four line illustrations;
+  - the link preview image (1200 × 630) with Open Graph and Twitter tags on the home page,
+    Discover, public projects and indexable campaigns;
+  - Discover: "More filters" folded in a `<details>` element, open while one is set;
+  - the "Design system" link only in the development server.
+- **Corrected copy:** the home page first claimed "severity" for feedback. Feedback has no such
+  field; the text now names its real fields (steps, expected and actual result, environment).
+- **Tests:**
+  - new `e2e/tests/home.spec.ts` (4): visitor and signed-in views, the preview tags with a loading
+    image, icons and manifest, the logo and the font;
+  - Discover and the mobile-menu test adapted to the folded filters and the hidden link;
+  - `lib/social.test.ts`;
+  - Playwright main run: 104 passed and 1 failed at first. The failure: at 320 px (400 % zoom)
+    the mobile bar with logo, name, theme switch and avatar was too wide on six signed-in pages.
+    The name now gives way and long page titles wrap; `display.spec.ts` and `home.spec.ts` then
+    passed (7 of 7);
+  - gate run: 4 passed;
+  - Vitest: 125 passed; typecheck and ESLint clean.
 
 ## Launch plan (2026-11-17)
 

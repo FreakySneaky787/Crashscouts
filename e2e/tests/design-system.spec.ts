@@ -106,11 +106,14 @@ test("mobile navigation menu works without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto("/");
-  const menuLink = page.getByRole("link", { name: "Design system", exact: true });
+  const menu = page.locator("summary", { hasText: "Menu" });
+  const menuLink = page.locator("details").filter({ has: menu }).getByRole("link", { name: "Discover" });
   await expect(menuLink).toBeHidden();
-  await page.locator("summary", { hasText: "Menu" }).click();
+  await menu.click();
   await expect(menuLink).toBeVisible();
   await menuLink.click();
-  await expect(page).toHaveURL(/\/design-system$/);
+  await expect(page).toHaveURL(/\/discover$/);
+  // The design system reference is linked only in the development server (WP 8.9).
+  await expect(page.getByRole("link", { name: "Design system", exact: true })).toHaveCount(0);
   await context.close();
 });

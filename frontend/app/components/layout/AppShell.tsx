@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
 
 import { brand } from "~/config/brand";
+import { LogoMark } from "~/components/brand/Logo";
 import type { Theme } from "~/lib/theme";
 import { Avatar } from "~/components/ui/Data";
 import { Notice } from "~/components/ui/Notice";
@@ -48,7 +49,9 @@ export function AppShell({ user, theme, sourceUrl = null, children }: { user: Sh
           { to: "/signup", label: t("nav.signup"), icon: UserPlusIcon },
         ]),
   ];
-  const secondary: NavItem[] = [{ to: "/design-system", label: t("nav.designSystem"), icon: PaletteIcon }];
+  // The design system reference is a tool for development; production visitors do not see the link
+  // (WP 8.9). The page itself stays reachable and is not indexed.
+  const secondary: NavItem[] = import.meta.env.DEV ? [{ to: "/design-system", label: t("nav.designSystem"), icon: PaletteIcon }] : [];
 
   return (
     <div className={styles.shell}>
@@ -57,17 +60,17 @@ export function AppShell({ user, theme, sourceUrl = null, children }: { user: Sh
       </a>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <span className={styles.mark} aria-hidden="true">
-            {brand.name.slice(0, 1)}
-          </span>
+          <LogoMark />
           {brand.name}
         </div>
         <nav aria-label={t("shell.mainNav")}>
           <NavList items={items} />
         </nav>
-        <nav aria-label={t("shell.resourcesNav")} className={styles.secondary}>
-          <NavList items={secondary} />
-        </nav>
+        {secondary.length > 0 ? (
+          <nav aria-label={t("shell.resourcesNav")} className={styles.secondary}>
+            <NavList items={secondary} />
+          </nav>
+        ) : null}
       </aside>
       <div className={styles.column}>
         <header className={styles.topbar}>
@@ -80,7 +83,10 @@ export function AppShell({ user, theme, sourceUrl = null, children }: { user: Sh
               <NavList items={[...items, ...secondary]} />
             </nav>
           </details>
-          <span className={styles.mobileBrand}>{brand.name}</span>
+          <span className={styles.mobileBrand}>
+            <LogoMark />
+            <span className={styles.mobileBrandName}>{brand.name}</span>
+          </span>
           <span className={styles.spacer} />
           <ThemeToggle current={theme} />
           {user ? (

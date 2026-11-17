@@ -5,16 +5,19 @@ The design system implements the visual direction **Developer Workbench** (conce
 [ADR 0008](adr/0008-design-system-implementation.md). The living reference is the page
 `/design-system` (not indexed, fictional data).
 
-The name is **"Crashscouts"** (owner's decision 2026-11-15). The placeholder favicon and the
-first-letter mark in the sidebar are **not** a logo; logo and further branding are open and decided
-by the project owner alone.
+The name is **"Crashscouts"** (owner's decision 2026-11-15). Logo, icon and heading font were
+chosen by the owner on 2026-11-17 ([ADR 0035](adr/0035-brand-and-home-page.md)): the "broken C"
+(`app/components/brand/Logo.tsx`), the icon in white on teal (`public/favicon.svg`) and Bricolage
+Grotesque for page titles. There is no second accent colour.
 
 ## 1. Principles
 
 These follow from the design research (see the design exploration in [`STATUS.md`](STATUS.md)):
 
 1. **Work tool, not marketing page.** Dense but calm panels, tables and lists; no hero sections,
-   no decorative gradients, no glassmorphism, no oversized rounded cards.
+   no decorative gradients, no glassmorphism, no oversized rounded cards. One exception: the home
+   page for visitors has a larger headline, two buttons, three steps and small line illustrations,
+   in the same colours and fonts (owner's decision 2026-11-17, ADR 0035).
 2. **One accent colour.** Teal is reserved for primary actions, the active state and links.
    Everything else is graphite neutrals.
 3. **Status is never colour alone.** Every status shows an icon (where defined) and a text label.
@@ -53,8 +56,10 @@ first defined on `:root` (light). Dark values are redefined under
 
 - **Source Sans 3** (400, 600, 700) for the UI; **JetBrains Mono** (400, 500) for versions, IDs,
   environments and licences (`<code>`).
-- Both are **self-hosted** via Fontsource (SIL OFL 1.1). No request goes to a third-party font
-  service.
+- **Bricolage Grotesque** (700, 800, Latin) for page titles (`h1`), the brand name and the larger
+  sections of the home page (`--font-heading`, WP 8.9). Panel titles stay in Source Sans 3.
+- All three are **self-hosted** via Fontsource (SIL OFL 1.1). No request goes to a third-party
+  font service.
 
 | Token | Size | Use |
 |---|---|---|

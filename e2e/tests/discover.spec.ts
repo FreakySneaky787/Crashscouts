@@ -46,6 +46,10 @@ test("search and filter public projects; open source first, private never", asyn
   const searched = await new AxeBuilder({ page: visitor }).withTags(WCAG).analyze();
   expect(searched.violations.map((v) => v.id)).toEqual([]);
 
+  // The other filters start folded (WP 8.9) and open with one click.
+  await expect(visitor.getByLabel("Licence")).toBeHidden();
+  await visitor.locator("summary", { hasText: "More filters" }).click();
+
   // All licences: the closed-source project appears, clearly labelled; still no private one.
   await visitor.getByLabel("Licence").selectOption({ label: "All licences" });
   await visitor.getByRole("button", { name: "Apply" }).click();
@@ -53,7 +57,8 @@ test("search and filter public projects; open source first, private never", asyn
   await expect(cards.filter({ hasText: `Closedbox ${word}` })).toContainText("Not open source");
   await expect(visitor.getByText(`Hidden ${word}`)).toHaveCount(0);
 
-  // Filters combine with the search; the address can be shared.
+  // Filters combine with the search; the address can be shared. A set filter keeps them open.
+  await expect(visitor.getByLabel("Software type")).toBeVisible();
   await visitor.getByLabel("Software type").selectOption({ label: "Game" });
   await visitor.getByRole("button", { name: "Apply" }).click();
   await expect(cards).toHaveCount(1);
@@ -89,9 +94,11 @@ test("Discover works without JavaScript and is not indexed when filtered", async
   const page = await context.newPage();
   await page.goto("/discover");
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  await page.locator("summary", { hasText: "More filters" }).click();
   await page.getByLabel("Sort by").selectOption("new");
   await page.getByRole("button", { name: "Apply" }).click();
   await expect(page).toHaveURL(/sort=new/);
+  await expect(page.getByLabel("Sort by")).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
   await context.close();
 });

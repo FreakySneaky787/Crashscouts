@@ -47,6 +47,8 @@
 
   /* Typography */
   --font-ui: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Headings and the brand name (owner's decision 2026-11-17, WP 8.9, ADR 0035). */
+  --font-heading: "Bricolage Grotesque", "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   /* Type scale: meta / secondary / body / panel title / section / page title */
   --text-meta: 0.78125rem;   /* 12.5px */

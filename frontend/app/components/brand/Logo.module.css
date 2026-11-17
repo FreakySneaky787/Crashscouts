@@ -1,0 +1,11 @@
+.mark {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  color: var(--color-fg);
+}
+
+.dot {
+  fill: var(--color-accent);
+}

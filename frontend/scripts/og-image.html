@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Source of public/og-image.png (WP 8.9, ADR 0035). Rendered at 1200x630 by scripts/og-image.mjs. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Bricolage Grotesque"; font-weight: 800; src: url("../node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 400; src: url("../node_modules/@fontsource/source-sans-3/files/source-sans-3-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 600; src: url("../node_modules/@fontsource/source-sans-3/files/source-sans-3-latin-600-normal.woff2") format("woff2"); }
+html, body { margin: 0; width: 1200px; height: 630px; }
+body { background: #f5f6f6; color: #1a2021; font-family: "Source Sans 3", sans-serif; display: grid;
+  grid-template-columns: 1fr 330px; align-items: center; gap: 40px; padding: 0 80px; box-sizing: border-box;
+  border-top: 14px solid #0e6767; }
+.brand { display: flex; align-items: center; gap: 16px; font-family: "Bricolage Grotesque"; font-weight: 800; font-size: 40px; }
+.brand svg { width: 64px; height: 64px; }
+h1 { font-family: "Bricolage Grotesque"; font-weight: 800; font-size: 70px; line-height: 1.04; letter-spacing: -0.02em; margin: 40px 0 24px; }
+p { font-size: 27px; color: #475153; margin: 0; white-space: nowrap; }
+.nw { white-space: nowrap; }
+.art { width: 330px; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="brand">
+      <svg viewBox="0 0 48 48"><g fill="none" stroke="#1a2021" stroke-width="6" stroke-linecap="round"><path d="M35.49 14.36A15 15 0 0 0 9.33 20.88"/><path d="M9.33 27.12A15 15 0 0 0 35.49 33.64"/></g><circle cx="38.2" cy="24" r="3.5" fill="#0e6767"/></svg>
+      <span id="name"></span>
+    </div>
+    <h1>Real testers for your <span class="nw">open-source</span> project</h1>
+    <p>Test campaigns · structured feedback · AGPL, no tracking</p>
+  </div>
+  <svg class="art" viewBox="0 0 320 220" aria-hidden="true">
+    <rect x="20" y="24" width="250" height="168" rx="12" fill="#ffffff" stroke="#475153" stroke-width="3"/>
+    <path d="M20 52H270" stroke="#475153" stroke-width="3"/>
+    <circle cx="38" cy="38" r="4" fill="#c3c9c9"/><circle cx="52" cy="38" r="4" fill="#c3c9c9"/><circle cx="66" cy="38" r="4" fill="#c3c9c9"/>
+    <path d="M44 78H150M44 96H200M44 114H120" stroke="#c3c9c9" stroke-width="3" stroke-linecap="round"/>
+    <path d="M44 158L84 158L98 132L116 176L132 146L150 158L200 158" fill="none" stroke="#1a2021" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="300" cy="204" r="4" fill="#0e6767" opacity="0.6"/><circle cx="304" cy="182" r="4" fill="#0e6767" opacity="0.6"/><circle cx="300" cy="160" r="4" fill="#0e6767" opacity="0.6"/>
+    <path d="M276 120L132 146" stroke="#0e6767" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+    <circle cx="292" cy="132" r="18" fill="#0e6767"/>
+    <path d="M284 132L290 138L301 126" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <script>document.getElementById("name").textContent = new URLSearchParams(location.search).get("name") || "Crashscouts";</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.card {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  min-width: 0;
+}
+
+.cardBody {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  overflow-wrap: anywhere;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.muted {
+  font-size: var(--text-sec);
+  color: var(--color-fg-secondary);
+  overflow-wrap: anywhere;
+}

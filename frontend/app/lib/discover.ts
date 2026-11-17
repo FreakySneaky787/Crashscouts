@@ -115,6 +115,19 @@ export function discoverHref(params: DiscoverParams, change: Partial<DiscoverPar
 }
 
 /** Search results and filtered lists are not indexed; the plain lists are. */
+/** Whether a filter besides the search text is set; the collapsed filters then start open (WP 8.9). */
+export function hasMoreFilters(params: DiscoverParams): boolean {
+  return Boolean(
+    FILTERS.some((key) => params[key]) ||
+      params.status ||
+      params.has_campaign ||
+      params.method ||
+      params.free_places ||
+      params.open_source ||
+      params.sort,
+  );
+}
+
 export function isFiltered(params: DiscoverParams): boolean {
   return Boolean(
     params.q ||

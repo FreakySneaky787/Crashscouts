@@ -18,6 +18,8 @@ import "@fontsource/source-sans-3/600.css";
 import "@fontsource/source-sans-3/700.css";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
+import "@fontsource/bricolage-grotesque/latin-700.css";
+import "@fontsource/bricolage-grotesque/latin-800.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 
@@ -30,7 +32,12 @@ import { backendFetch, getSessionUser } from "./lib/backend.server";
 import { hasSessionCookie, sourceCodeUrl } from "./lib/http";
 import { isTheme, themeAttribute, themeFromCookieHeader, type Theme } from "./lib/theme";
 
-export const links: Route.LinksFunction = () => [{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" }];
+// Brand icons (design G3, WP 8.9, ADR 0035).
+export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "manifest", href: "/site.webmanifest" },
+];
 
 export async function loader({ request }: Route.LoaderArgs) {
   const theme = themeFromCookieHeader(request.headers.get("Cookie"));
