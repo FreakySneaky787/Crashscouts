@@ -1383,8 +1383,10 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   OAuth app on github.com takes up to 10 callback URLs; without wildcard matching a redirect URL
   must match one of them exactly (github/docs, `content/apps/oauth-apps/building-oauth-apps/`
   `creating-an-oauth-app.md` and `authorizing-oauth-apps.md`, section "Redirect URLs").
-- **Next:** the owner registers the callback URLs, sets the two values on the server and tests
-  the login (OPEN-QUESTIONS U).
+- **Owner's decision 2026-11-17:** a separate OAuth app for production (OPERATIONS §14), instead
+  of adding the production callbacks to the development app (decision of 2026-11-12).
+- **Next:** the owner creates the app, sets the two values on the server and tests the login
+  (OPERATIONS §14).
 
 ## Security check with a focus on costs (2026-11-17)
 

@@ -500,3 +500,35 @@ sudo docker compose -f compose.prod.yaml --env-file .env.prod start frontend
 - At most 500 account emails per day (confirmation, password reset), platform-wide. When the
   owner receives "Daily limit for account emails reached", check the sign-ups: a launch wave is
   fine (raise `ACCOUNT_EMAIL_DAILY_LIMIT` in a commit if needed), a flood of fake accounts is not.
+
+## 14. GitHub login and repository verification (open question U)
+
+Production uses its **own** GitHub OAuth app, separate from the development app (owner's decision
+2026-11-17): a leaked development secret never touches real logins, users see the name
+"Crashscouts" and crashscouts.org on GitHub's consent page, and the app can be revoked without
+affecting development.
+
+1. GitHub → Settings → Developer settings → OAuth Apps → **New OAuth App**:
+   - Application name `Crashscouts`, homepage `https://crashscouts.org`;
+   - authorization callback URL `https://crashscouts.org/accounts/github/login/callback/` (with the
+     trailing slash), then **Add callback URL**
+     `https://crashscouts.org/projects/github/verify/callback` (without);
+   - wildcard matching and device flow stay off;
+   - generate a client secret; optionally upload `frontend/public/icon-512.png` as the logo.
+
+   An OAuth app on github.com takes up to 10 callback URLs; without wildcard matching a redirect
+   must match one exactly (github/docs, `creating-an-oauth-app.md` and `authorizing-oauth-apps.md`,
+   "Redirect URLs").
+2. On the server, add `DJANGO_GITHUB_CLIENT_ID=` and `DJANGO_GITHUB_CLIENT_SECRET=` with `nano
+   .env.prod` (not `echo`, so the secret stays out of the shell history). Check without showing
+   values: `grep -cE '^DJANGO_GITHUB_CLIENT_(ID|SECRET)=.+' .env.prod` gives `2`. Then
+   `scripts/deploy.sh`.
+3. Test in the browser:
+   - signed out, "Sign in with GitHub" with an unlinked GitHub account is refused while
+     registration is closed, and no account is created;
+   - signed in with email, Settings → Security → **Connect GitHub** links the account;
+   - signed out, "Sign in with GitHub" signs in (with the two-factor step if enabled);
+   - repository verification through GitHub on a project.
+
+To replace the secret: generate a new one in the app, update `.env.prod`, deploy, then delete the
+old secret in GitHub.
