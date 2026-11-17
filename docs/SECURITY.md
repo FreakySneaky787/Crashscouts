@@ -292,6 +292,23 @@ admin logins, deletions and exports.
 - Automatic, encrypted, off-site PostgreSQL backups with a **tested** restore: restic to Infomaniak
   Swiss Backup, 7 days, restore test script ([ADR 0033](adr/0033-backups.md)). Accepted risk: root
   on the server can also delete the backups.
+- **Cost protection (security check 2026-11-17):**
+  - The server, its traffic and the backup storage are fixed-price plans at Infomaniak; no
+    usage-based charges were found.
+  - Scaleway email is billed by use. Its default quota of 10,000 emails per month caps the cost
+    ([Scaleway docs](https://github.com/scaleway/docs-content/blob/main/pages/transactional-email/reference-content/tem-capabilities-and-limits.mdx));
+    the quota is not raised.
+  - Owner's decision 2026-11-17: sign-ups are limited to 5 per hour and IP (allauth's default is
+    20 per minute), and at most 500 account emails per day are sent platform-wide
+    (`ACCOUNT_EMAIL_DAILY_LIMIT`). Beyond that they are dropped and the owner gets one error
+    email.
+  - The real cost risk is a takeover of the Scaleway account, which could start servers.
+    Countermeasures:
+    - two-factor sign-in on Scaleway, Infomaniak and GitHub;
+    - a Scaleway billing alert;
+    - no identity verification and no raised quotas at Scaleway, so expensive GPUs stay
+      unavailable;
+    - the server's API key may only send email.
 - Monitoring ([ADR 0034](adr/0034-monitoring.md)): Healthchecks.io alerts on a missing or failed
   job, backup, site check or disk check; the signals carry no personal data. Error emails carry
   no request data and no exception message. Logs (with IP addresses) are kept for 7 days.

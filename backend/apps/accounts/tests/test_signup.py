@@ -185,10 +185,11 @@ def test_database_enforces_case_insensitive_unique_email_and_username():
 
 @pytest.mark.django_db
 def test_signup_is_rate_limited_per_ip():
+    # 5 attempts per hour and IP (owner's decision 2026-11-17); invalid attempts count too.
     client, _ = csrf_client()
     statuses = [
         post(client, "/auth/signup", signup_data(username="x" * 2)).status_code  # invalid, cheap
-        for _ in range(21)
+        for _ in range(6)
     ]
-    assert statuses[:20] == [400] * 20
-    assert statuses[20] == 429
+    assert statuses[:5] == [400] * 5
+    assert statuses[5] == 429

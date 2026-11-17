@@ -65,6 +65,15 @@ Swap (a buffer while images are built):
 sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
+Name resolution for local networks (LLMNR, port 5355) is not needed on a server; switch it off
+(security check 2026-11-17):
+
+```bash
+sudo mkdir -p /etc/systemd/resolved.conf.d && printf '[Resolve]\nLLMNR=no\nMulticastDNS=no\n' | sudo tee /etc/systemd/resolved.conf.d/10-crashscouts.conf && sudo systemctl restart systemd-resolved
+```
+
+Check what listens publicly: `sudo ss -tlnp | grep -v 127.0.0` should show only 22, 80 and 443.
+
 Reboot after a kernel update: `sudo reboot`, then `uname -r`.
 
 ## 3. Docker
@@ -488,3 +497,6 @@ sudo docker compose -f compose.prod.yaml --env-file .env.prod start frontend
   unnoticed (ADR 0034).
 - Errors of the SSR server are not emailed; they are in the logs and in `crashscouts-site`.
 - At most 10 error emails per day; the details are in the logs.
+- At most 500 account emails per day (confirmation, password reset), platform-wide. When the
+  owner receives "Daily limit for account emails reached", check the sign-ups: a launch wave is
+  fine (raise `ACCOUNT_EMAIL_DAILY_LIMIT` in a commit if needed), a flood of fake accounts is not.

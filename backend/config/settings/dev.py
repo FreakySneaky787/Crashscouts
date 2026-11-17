@@ -40,6 +40,8 @@ if env_bool("DJANGO_E2E_RELAXED_RATE_LIMITS", False):
         "signup": "1000/m/ip",
         "reset_password": "1000/m/ip,100/m/key",
     }
+    # The counter outlives a run (database cache), and every run signs up many accounts.
+    ACCOUNT_EMAIL_DAILY_LIMIT = 100_000
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
         scope: "100000/day" if scope.endswith("_ip") else rate
         for scope, rate in REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"].items()

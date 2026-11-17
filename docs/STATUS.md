@@ -1326,6 +1326,38 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   date (checked: with an end date in the past it fails).
 - To do: take the fix as soon as picomatch releases one, then remove the exception.
 
+## Security check with a focus on costs (2026-11-17)
+
+- **Question of the owner:** can a large bill arrive overnight?
+- **Providers, checked on their pages:**
+  - the Infomaniak server, traffic and Swiss Backup are fixed-price (no usage charges found);
+  - Scaleway email is capped by its default quota of 10,000 emails per month (about EUR 2.40 at
+    most beyond the free 300, at the third-party price);
+  - the real risk is a takeover of the Scaleway account. Owner to-dos: two-factor sign-in on
+    Scaleway, Infomaniak and GitHub; a Scaleway billing alert; no identity verification and no
+    raised quotas at Scaleway.
+- **Technology:**
+  - gitleaks over the whole history (95 commits): no leaks;
+  - pip-audit: no known vulnerabilities;
+  - pnpm audit: only the known picomatch (excepted until 2026-12-01) and minimatch findings;
+  - email to unknown addresses is off (`ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS`).
+- **Server (the owner's output):**
+  - only 22, 80 and 443 public;
+  - SSH keys only, no root;
+  - unattended-upgrades active;
+  - 362 failed SSH logins in 24 hours: bots, harmless with keys only;
+  - disk 14 %;
+  - LLMNR (5355) listened on IPv6. The step to switch it off is now in OPERATIONS §2.
+- **Fixed (owner's decision):**
+  - sign-ups 5 per hour and IP instead of 20 per minute;
+  - at most 500 account emails per day platform-wide, then one error email to the owner.
+- **Tests:**
+  - new `test_email_limits.py` (3), mutation-checked: the default limit and a removed ceiling
+    each fail a test;
+  - the old signup rate test was adapted;
+  - accounts tests 84 passed. The full backend suite before that adaptation: 786 passed, 1
+    failed; the one failure was this test.
+
 ## WP 8.9 – Launch appearance (2026-11-17) ✅
 
 - **Owner's decisions 2026-11-17** ([ADR 0035](adr/0035-brand-and-home-page.md)):

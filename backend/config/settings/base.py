@@ -143,6 +143,14 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_PREVENT_ENUMERATION = True
 # Do not send mail to addresses without an account (abuse: mail bombing via password reset).
 ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
+# Stricter than allauth's default of 20 per minute (owner's decision 2026-11-17): every sign-up
+# sends a confirmation email to any address. The other limits keep allauth's defaults.
+ACCOUNT_RATE_LIMITS = {"signup": "5/h/ip"}
+# Platform-wide ceiling for account emails (confirmation, password reset, security notices) per
+# UTC day, so a flood of sign-ups cannot use up the provider's monthly quota (owner's decision
+# 2026-11-17; Scaleway's default quota is 10,000 emails per month). Beyond it they are dropped
+# and the owner gets one error email.
+ACCOUNT_EMAIL_DAILY_LIMIT = 500
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
 ACCOUNT_SESSION_REMEMBER = True
