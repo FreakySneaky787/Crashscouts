@@ -76,6 +76,10 @@ MAILERS = {
     )
 }
 DEFAULT_FROM_EMAIL = env_str("DJANGO_DEFAULT_FROM_EMAIL")
+# Error emails go to the owner (WP 8.4, ADR 0034); empty turns them off. Sent from the verified
+# sender address, because the provider rejects any other.
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+ADMINS = env_list("DJANGO_ERROR_MAIL_TO", [])
 
 
 # The SSR probe is a pure test tool and must never be active in production.

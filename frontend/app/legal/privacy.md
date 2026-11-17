@@ -84,8 +84,11 @@ review.]
   about one day after your last request.
 - **Security log:** a log records security events such as sign-ins, password changes, two-factor
   changes, role changes, moderation actions and data exports. It contains no IP addresses.
+- **Server logs:** the servers log each request (time, requested address, status code, browser
+  identification) and errors; error and sign-in records of the server itself can contain IP
+  addresses. The server logs are deleted automatically after 7 days. Only the operator can read
+  them; they are used to find faults and attacks.
 - **Legal basis:** legitimate interest in the security of the platform.
-- [TO DECIDE: web server logs on the production server – which data, how long.]
 
 ### Email
 

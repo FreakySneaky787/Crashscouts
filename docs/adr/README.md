@@ -39,6 +39,7 @@ ADRs are not rewritten after the fact: a changed decision gets a new ADR, and th
 | [0031](0031-legal-texts.md) | Legal texts | Accepted (drafts) |
 | [0032](0032-production-setup.md) | Production setup | Accepted |
 | [0033](0033-backups.md) | Backups | Accepted |
+| [0034](0034-monitoring.md) | Monitoring and logs | Accepted |
 
 ## Template
 

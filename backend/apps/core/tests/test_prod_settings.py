@@ -206,3 +206,28 @@ def test_the_production_stack_passes_the_smtp_login_to_django():
 
     for name in ("DJANGO_EMAIL_HOST_USER", "DJANGO_EMAIL_HOST_PASSWORD"):
         assert f"{name}: ${{{name}:-}}" in backend
+
+
+def test_prod_sends_error_mails_only_to_the_configured_address():
+    # WP 8.4: ADMINS from DJANGO_ERROR_MAIL_TO, sent from the provider's verified sender.
+    to = f"{os.urandom(4).hex()}@example.invalid"
+    code = (
+        "import json, django\nfrom django.conf import settings\ndjango.setup()\n"
+        "print(json.dumps([settings.ADMINS, settings.SERVER_EMAIL]))"
+    )
+    configured = _run(code, _prod_env(DJANGO_ERROR_MAIL_TO=to))
+    unset = _run(code, _prod_env(), drop=("DJANGO_ERROR_MAIL_TO",))
+
+    assert configured.returncode == 0, configured.stderr
+    assert json.loads(configured.stdout.strip().splitlines()[-1]) == [
+        [to],
+        "no-reply@example.invalid",
+    ]
+    assert json.loads(unset.stdout.strip().splitlines()[-1])[0] == []
+
+
+def test_the_production_stack_passes_the_error_mail_address_to_django():
+    compose = (BACKEND_DIR.parent / "compose.prod.yaml").read_text()
+    backend = compose.split("\n  backend:\n", 1)[1].split("\n  db:\n", 1)[0]
+
+    assert "DJANGO_ERROR_MAIL_TO: ${DJANGO_ERROR_MAIL_TO:-}" in backend

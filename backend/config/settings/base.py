@@ -371,9 +371,24 @@ SPECTACULAR_SETTINGS = {
 # The schema endpoint is only served in development (see dev.py / config/urls.py).
 SERVE_API_SCHEMA = False
 
+# Error emails (WP 8.4, ADR 0034): Django's default "mail_admins" handler would send cookies,
+# headers, the client IP and POST data, so the "django" logger is redefined without it, and
+# server errors go to a handler that sends no request data. ADMINS is empty except in
+# production (DJANGO_ERROR_MAIL_TO), so nothing is sent elsewhere.
+ADMINS: list[str] = []
+ERROR_MAIL_DAILY_LIMIT = 10
+EMAIL_SUBJECT_PREFIX = f"[{PLATFORM_NAME} error] "
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+        "error_mail": {"class": "apps.core.error_mail.MinimalAdminEmailHandler", "level": "ERROR"},
+    },
+    "loggers": {
+        # No handlers of its own: Django's "mail_admins" is removed, the root logger prints.
+        "django": {"handlers": [], "level": "INFO", "propagate": True},
+        "django.request": {"handlers": ["error_mail"], "level": "ERROR", "propagate": True},
+    },
     "root": {"handlers": ["console"], "level": "INFO"},
 }

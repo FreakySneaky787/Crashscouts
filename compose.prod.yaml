@@ -53,6 +53,8 @@ services:
       DJANGO_EMAIL_HOST_USER: ${DJANGO_EMAIL_HOST_USER:-}
       DJANGO_EMAIL_HOST_PASSWORD: ${DJANGO_EMAIL_HOST_PASSWORD:-}
       DJANGO_DEFAULT_FROM_EMAIL: ${DJANGO_DEFAULT_FROM_EMAIL:?set DJANGO_DEFAULT_FROM_EMAIL}
+      # Error emails without personal data go here (WP 8.4, ADR 0034); empty turns them off.
+      DJANGO_ERROR_MAIL_TO: ${DJANGO_ERROR_MAIL_TO:-}
       DJANGO_SIGNUP_ENABLED: ${DJANGO_SIGNUP_ENABLED:-false}
       # Only the owner opens the security gate (CLAUDE.md); never switched here.
       PUBLIC_CAMPAIGNS_ENABLED: "false"

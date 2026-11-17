@@ -1,0 +1,9 @@
+# Site and disk check (WP 8.4, ADR 0034, docs/OPERATIONS.md §13): reports to Healthchecks.io
+# through scripts/hc-ping.sh. Started by crashscouts-monitor.timer every 5 minutes.
+[Unit]
+Description=Crashscouts site and disk check
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/crashscouts/scripts/monitor.sh

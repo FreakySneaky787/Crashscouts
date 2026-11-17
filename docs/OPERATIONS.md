@@ -192,13 +192,16 @@ accounts. They run in CI against the same stack on `localhost`.
 
 ## 8. Scheduled jobs
 
-Two systemd timers on the host run the management commands in the backend container
-(ARCHITECTURE.md §10):
+systemd timers on the host run the management commands in the backend container
+(ARCHITECTURE.md §10), the backup and the monitoring. Every job reports its result to
+Healthchecks.io (§13):
 
 | Timer | When | Commands |
 |---|---|---|
 | `crashscouts-hourly.timer` | every hour | `purge_rate_limit_cache` (ADR 0022) |
 | `crashscouts-daily.timer` | 02:30 UTC | `purge_deleted_accounts` (ADR 0013), `purge_application_answers` (ADR 0016) |
+| `crashscouts-backup.timer` | 03:15 UTC | `scripts/backup.sh` (§10) |
+| `crashscouts-monitor.timer` | every 5 minutes | `scripts/monitor.sh` (§13) |
 
 ```bash
 cd /opt/crashscouts && sudo cp deploy/systemd/crashscouts-* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now crashscouts-hourly.timer crashscouts-daily.timer
@@ -359,6 +362,123 @@ Found while preparing this: `compose.prod.yaml` did not pass `DJANGO_EMAIL_HOST_
 `DJANGO_EMAIL_HOST_PASSWORD` to Django, so a provider that needs a login would have refused
 every email. Fixed, with a test that fails without the fix.
 
-## Still open
+## 13. Monitoring and logs (WP 8.4, ADR 0034)
 
-- Monitoring (WP 8.4).
+Healthchecks.io emails the owner when a signal is missing or reports a failure. Server errors of
+Django are emailed without request data. Logs are kept for 7 days.
+
+> **Not yet run on the server** (2026-11-17): built and tested locally; the owner sets it up from
+> home, where the SSH key is.
+
+| Check (slug) | Period | Grace | Sent by |
+|---|---|---|---|
+| `crashscouts-site` | 5 minutes | 10 minutes | `crashscouts-monitor.timer` (`/discover` answers 200) |
+| `crashscouts-disk` | 5 minutes | 10 minutes | `crashscouts-monitor.timer` (less than 80 % used) |
+| `crashscouts-hourly` | 1 hour | 30 minutes | `crashscouts-hourly.service` |
+| `crashscouts-daily` | 1 day | 2 hours | `crashscouts-daily.service` |
+| `crashscouts-backup` | 1 day | 2 hours | `crashscouts-backup.service` |
+
+### 13.1 Healthchecks.io (any device)
+
+1. Sign up at [healthchecks.io](https://healthchecks.io/) with the owner's address (free plan
+   "Hobbyist"), with two-factor sign-in.
+2. Create a project "Crashscouts". Create the five checks of the table:
+   - set the **slug** exactly as shown;
+   - choose "Simple" schedule with the period and grace from the table.
+3. Email notifications to the sign-up address are on by default; check under "Integrations".
+4. Project settings → "Ping key": create it. It is a credential: password manager, never in
+   chat or in the repository.
+
+### 13.2 On the server
+
+```bash
+cd /opt/crashscouts && scripts/deploy.sh
+```
+
+```bash
+sudo install -m 600 /dev/null /etc/crashscouts/monitoring.env && sudo nano /etc/crashscouts/monitoring.env
+```
+
+One line: `HC_PING_KEY=<the ping key>`. Then the timers (also copies the new `ExecStopPost=`
+lines of the job services):
+
+```bash
+sudo cp deploy/systemd/crashscouts-* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now crashscouts-monitor.timer
+```
+
+```bash
+sudo systemctl start crashscouts-monitor.service crashscouts-hourly.service && journalctl -u crashscouts-monitor -n 5 --no-pager
+```
+
+`crashscouts-site`, `crashscouts-disk` and `crashscouts-hourly` turn green on healthchecks.io.
+
+**Error emails:** in `.env.prod`, set `DJANGO_ERROR_MAIL_TO=` to the owner's address, then run
+`scripts/deploy.sh`. Test (sends one email "ZeroDivisionError at (no request)"):
+
+```bash
+sudo docker compose -f compose.prod.yaml --env-file .env.prod exec -T backend python manage.py shell -c "import logging, sys
+try:
+    1 / 0
+except ZeroDivisionError:
+    logging.getLogger('django.request').error('Manual test', exc_info=sys.exc_info())"
+```
+
+### 13.3 Logs: 7 days
+
+```bash
+sudo test -e /etc/docker/daemon.json && echo "STOP: daemon.json exists, merge by hand"
+```
+
+Must print nothing. Then:
+
+```bash
+sudo install -m 644 deploy/docker/daemon.json /etc/docker/daemon.json && sudo install -d /etc/systemd/journald.conf.d && sudo install -m 644 deploy/journald/10-crashscouts.conf /etc/systemd/journald.conf.d/
+```
+
+```bash
+sudo systemctl restart systemd-journald docker && sudo docker compose -f compose.prod.yaml --env-file .env.prod up -d --force-recreate --wait
+```
+
+Existing containers keep their old log driver, hence `--force-recreate`. The site is down for
+about a minute. Check:
+
+```bash
+sudo docker inspect -f '{{.Name}} {{.HostConfig.LogConfig.Type}}' $(sudo docker ps -q)
+```
+
+Every line ends in `journald`. Logs are read as before (`docker compose logs`) or with
+`journalctl CONTAINER_NAME=crashscouts-proxy-1`. After 8 days, the oldest entry of
+`journalctl -o short-iso | head -n 2` must be at most 8 days old (files are rotated daily).
+
+### 13.4 Alarm test (once)
+
+Each alarm must really arrive by email:
+
+```bash
+sudo scripts/hc-ping.sh backup 1
+```
+
+The email "crashscouts-backup is DOWN" arrives within a minute. Back to up:
+
+```bash
+sudo scripts/hc-ping.sh backup 0
+```
+
+Site down (about 15 minutes without the site; registration is closed, so nobody is locked out):
+
+```bash
+sudo docker compose -f compose.prod.yaml --env-file .env.prod stop frontend
+```
+
+Wait for the email "crashscouts-site is DOWN" (at most period plus grace), then:
+
+```bash
+sudo docker compose -f compose.prod.yaml --env-file .env.prod start frontend
+```
+
+### 13.5 Limits
+
+- The site check runs on the server, so a DNS or firewall fault that only visitors see goes
+  unnoticed (ADR 0034).
+- Errors of the SSR server are not emailed; they are in the logs and in `crashscouts-site`.
+- At most 10 error emails per day; the details are in the logs.

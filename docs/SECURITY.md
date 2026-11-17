@@ -288,4 +288,7 @@ admin logins, deletions and exports.
 - Automatic, encrypted, off-site PostgreSQL backups with a **tested** restore: restic to Infomaniak
   Swiss Backup, 7 days, restore test script ([ADR 0033](adr/0033-backups.md)). Accepted risk: root
   on the server can also delete the backups.
+- Monitoring ([ADR 0034](adr/0034-monitoring.md)): Healthchecks.io alerts on a missing or failed
+  job, backup, site check or disk check; the signals carry no personal data. Error emails carry
+  no request data and no exception message. Logs (with IP addresses) are kept for 7 days.
 - Security review against OWASP ASVS level 1 before the closed beta.

@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-16 (WP 8.2 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); next 8.4 (monitoring)
+**Last update:** 2026-11-17 (WP 8.4 built) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) built and tested locally, set-up on the server open
 
 ## Work packages
 
@@ -1310,6 +1310,48 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - outgoing email (8.2);
   - backups (8.3; no user data on the server yet);
   - monitoring (8.4).
+
+## WP 8.4 – Monitoring and logs (2026-11-17) 🟡 built, server set-up open
+
+- **Owner decisions 2026-11-17:**
+  - alerts with **Healthchecks.io**;
+  - logs with IP addresses kept for **7 days**;
+  - error emails **yes, without personal data**.
+- **Checked on the official pages** (healthchecks.io was added to this environment's allowed
+  hosts for that):
+  - free plan with 20 checks;
+  - Latvian company, data in Germany;
+  - **no processing agreement**, so the signals carry no personal data.
+  - The earlier figures came from secondary sources; the official pages confirmed them.
+- **Built ([ADR 0034](adr/0034-monitoring.md), [`OPERATIONS.md`](OPERATIONS.md) §13):**
+  - `scripts/hc-ping.sh`: one empty signal with the exit status. It reads systemd's
+    `$SERVICE_RESULT` as `ExecStopPost=` of the hourly, daily and backup services. The ping key
+    is never printed, and nothing is sent without it;
+  - `scripts/monitor.sh` with `crashscouts-monitor.timer` (every 5 minutes): `/discover` answers
+    200, and the disk is less than 80 % used;
+  - error emails: `apps.core.error_mail.MinimalAdminEmailHandler` sends the URL pattern, the
+    exception class and the stack frames, at most 10 per day. Django's full-report handler is
+    removed. The recipient is `DJANGO_ERROR_MAIL_TO`;
+  - logs: Docker's default driver becomes `journald`, and journald keeps entries for 7 days
+    (`MaxRetentionSec=7day`, `MaxFileSec=1day`, at most 1 GB).
+- **Tests:**
+  - `test_error_mail.py` (6). The mail contains none of the user name, email, session cookie, IP
+    or user agent sent with the request, and not the exception message. The daily limit holds,
+    and a broken mail server does not break the response. Mutation-checked: route instead of
+    path, class instead of message, limit removed. Each mutant fails a test.
+  - `test_monitoring_scripts.py` (13) with fake `curl` and `df`: success and failure states, no
+    key means no signal, the key is never in the output, invalid check names are refused, every
+    job service reports, the retention is 7 days.
+  - `test_prod_settings.py`: `ADMINS` from the environment, the sender is the verified address,
+    and compose passes the variable.
+  - `systemd-analyze verify` of all units passed; the full backend suite: 783 passed; frontend
+    unit tests 122 passed, typecheck and lint clean.
+- **Privacy policy 0.3 (draft):** server logs and their 7 days filled in (question Y).
+- **Not done:**
+  - the set-up on the server (OPERATIONS §13): the owner is on the work computer today, and the
+    SSH key is only at home;
+  - the alarm test with real emails;
+  - the proof of the 7-day deletion (only visible after 8 days).
 
 ## WP 8.3 – Backups (2026-11-16) ✅
 

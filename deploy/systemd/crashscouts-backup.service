@@ -10,3 +10,5 @@ After=docker.service
 [Service]
 Type=oneshot
 ExecStart=/opt/crashscouts/scripts/backup.sh
+# Reports success or failure to Healthchecks.io (WP 8.4, ADR 0034).
+ExecStopPost=/opt/crashscouts/scripts/hc-ping.sh backup

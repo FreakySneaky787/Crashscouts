@@ -44,6 +44,8 @@ server.
 - [ ] Outgoing email works (verification, reports, block notices); provider decided (open
       question F).
 - [ ] Encrypted off-site backups of the database and uploaded files, with a **tested** restore.
+- [ ] Monitoring: an alarm for the site, the disk, the jobs and the backup really arrives by email;
+      logs are kept for 7 days ([ADR 0034](adr/0034-monitoring.md), OPERATIONS §13.4).
 - [ ] Real GitHub test on the test server (open question U), including the callback
       `<frontend>/projects/github/verify/callback`.
 - [ ] Legal pages (terms, privacy, imprint) published for public content (see the legal section
