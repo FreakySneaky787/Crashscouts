@@ -1326,6 +1326,39 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   date (checked: with an end date in the past it fails).
 - To do: take the fix as soon as picomatch releases one, then remove the exception.
 
+## WP 8.7 – Making the repository public (2026-11-17) 🟡 prepared, the owner switches
+
+- **Owner's decisions 2026-11-17:**
+  - future commits use GitHub's private address
+    (`263385744+FreakySneaky787@users.noreply.github.com`); the history is **not** rewritten, so
+    older commits keep the previous address;
+  - the owner switches the visibility himself.
+- **Scanned before going public:**
+  - the working tree and the whole history for names, email addresses, the server's IP and host
+    name, the owner's computer name, the backup account and the Scaleway IDs. The only hit is the
+    previous author address in old versions of CLAUDE.md and in commit metadata, as decided;
+  - gitleaks over all commits: no leaks.
+- **Added:**
+  - a new README with a screenshot (light and dark), features, status, self-hosting and
+    contributing;
+  - CONTRIBUTING.md: DCO 1.1 with `git commit -s`;
+  - CODE_OF_CONDUCT.md: Contributor Covenant 2.1, the official text from
+    EthicalSource/contributor_covenant, contact `contact@crashscouts.org`;
+  - SECURITY.md: private vulnerability reporting through GitHub or email, an answer within
+    7 days, fixes in the SECURITY §10 time frames;
+  - `scripts/check-dco.sh` and a CI job "Developer Certificate of Origin" for pull requests.
+    Tested locally in a throwaway repository: signed passes; unsigned and a sign-off by someone
+    else fail.
+- **Owner's checklist (GitHub settings and server):**
+  1. Settings → General → Danger Zone → Change visibility → Public.
+  2. Settings → Advanced Security: turn on Dependabot alerts, secret scanning with push protection
+     and private vulnerability reporting.
+  3. Settings → Rules → Rulesets: a ruleset for `main` that blocks force pushes and deletion.
+  4. On the server: `SOURCE_CODE_URL=https://github.com/FreakySneaky787/Crashscouts` in
+     `.env.prod`, then `scripts/deploy.sh`. The footer then links the source code, as the AGPL
+     requires.
+  5. Later: switch the server's clone to HTTPS and remove the deploy key (OPERATIONS §Access).
+
 ## Security check with a focus on costs (2026-11-17)
 
 - **Question of the owner:** can a large bill arrive overnight?
@@ -1347,7 +1380,8 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - unattended-upgrades active;
   - 362 failed SSH logins in 24 hours: bots, harmless with keys only;
   - disk 14 %;
-  - LLMNR (5355) listened on IPv6. The step to switch it off is now in OPERATIONS §2.
+  - LLMNR (5355) listened on IPv6. It is switched off now (`5355 closed`, checked by the owner);
+    the step is in OPERATIONS §2.
 - **Fixed (owner's decision):**
   - sign-ups 5 per hour and IP instead of 20 per minute;
   - at most 500 account emails per day platform-wide, then one error email to the owner.

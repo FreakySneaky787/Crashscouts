@@ -79,7 +79,10 @@ Open items live in [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md).
 ## Git
 
 - Commits go directly to `main` (decided). Small, traceable commits per work package.
-- **Author and committer are exclusively `FreakySneaky787 <aaron.veider11@gmail.com>`** (project
+- **Author and committer are exclusively
+  `FreakySneaky787 <263385744+FreakySneaky787@users.noreply.github.com>`**, GitHub's private
+  address, since the repository goes public (owner's decision 2026-11-17; older commits keep the
+  previous address). Sign off every commit (`git commit -s`, DCO, CONTRIBUTING.md) (project
   owner's decision). Set `git config user.name` and `git config user.email` before the first commit
   in every new clone.
 - **No** `Co-Authored-By: Claude` or `Claude-Session:` lines in commit messages.

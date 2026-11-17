@@ -1,42 +1,66 @@
 # Crashscouts
 
-> The platform's name, decided by the project owner on 2026-11-15; planned address
-> `crashscouts.org`. Repository: `FreakySneaky787/Crashscouts` (renamed from `testhub` on 2026-11-15).
+**Real testers for your open-source project.** Crashscouts connects software developers with
+volunteer testers. Developers publish a test campaign with clear tasks; testers find it, try the
+software and send structured feedback the team can act on.
 
-An open-source platform that connects software developers with volunteer testers.
-Developers find testers for their beta versions; testers discover new software and help improve it
-with structured feedback.
+Live at **[crashscouts.org](https://crashscouts.org)**; registration opens with the beta start.
 
-*Test software together. Make it better together.*
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.png">
+  <img alt="The Crashscouts home page: the headline 'Real testers for your open-source project', two buttons and three steps" src="docs/images/home-light.png">
+</picture>
+
+## What it does
+
+- **Projects and test campaigns:** describe what to test, on which platforms, how many testers
+  you need, and add test tasks.
+- **Testers join** directly, by invitation or after an application, and report progress per task.
+- **Structured feedback:** bug reports and suggestions with steps to reproduce, expected and
+  actual result and environment, in one inbox per campaign, with a status for each item.
+- **Discover:** public projects and campaigns, sorted by recent activity, never by popularity, so
+  small projects are found too.
+- **Moderation:** reports, warnings, blocks and account suspensions with appeals.
+- **Privacy first:** no tracking, no ads, no cookie banner; statistics are counted on the server,
+  never per person. Sign-in with email, passkeys, two-factor authentication or GitHub.
 
 ## Status
 
-🚧 **Early development, phase 0 (foundation).** A backend skeleton and a validated server-side
-rendering spike exist; there are no product features yet. The actual state is tracked in
+Live since November 2026, registration still closed. Phases 0 to 7 of the
+[MVP plan](docs/MVP-PLAN.md) are done; phase 8 (release, closed beta) is in progress. The actual state is tracked in
 [`docs/STATUS.md`](docs/STATUS.md).
+
+## Stack
+
+Python 3.14 · Django 6.1 · Django REST Framework · django-allauth · PostgreSQL 18 · React 19 ·
+React Router 8 (server-side rendering) · Vite 8 · TypeScript 6 · Caddy · Docker Compose
+
+## Run it yourself
+
+- **Development:** GitHub Codespaces sets everything up; elsewhere see
+  [`CONTRIBUTING.md`](CONTRIBUTING.md#development-environment).
+- **Production:** one server with Docker Compose, Caddy and automatic TLS. The runbook
+  [`docs/OPERATIONS.md`](docs/OPERATIONS.md) covers set-up, backups, email, monitoring and
+  updates; the settings template is [`.env.prod.example`](.env.prod.example).
+
+## Contributing
+
+Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md): open an issue
+first, sign off every commit (Developer Certificate of Origin), and follow the
+[code of conduct](CODE_OF_CONDUCT.md). Report security problems privately, as described in
+[`SECURITY.md`](SECURITY.md).
 
 ## Documentation
 
 | Document | Content |
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | Product requirements (core MVP) |
-| [`docs/MVP-PLAN.md`](docs/MVP-PLAN.md) | Phases, work packages, security gate |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture, data model, API, permissions |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Security concept |
 | [`docs/adr/`](docs/adr/) | Architecture decision records |
-| [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md) | Open questions |
+| [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Design system |
+| [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Running the production server |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Plans beyond the MVP |
-| [`docs/MASTER-PROMPT.md`](docs/MASTER-PROMPT.md) | Original project brief (English translation; German original in [`MASTER-PROMPT.de.md`](docs/MASTER-PROMPT.de.md)) |
-
-## Stack
-
-Python 3.14 · Django 6.1 · Django REST Framework · django-allauth · PostgreSQL 18 · React 19 ·
-React Router 8 (SSR) · Vite 8 · TypeScript 6 · Docker Compose
-
-## Getting started
-
-- **GitHub Codespaces:** open the repository in a Codespace – the dev container sets everything up.
-- **Elsewhere:** see [`CONTRIBUTING.md`](CONTRIBUTING.md#development-environment).
 
 ## Repository layout
 
@@ -45,10 +69,9 @@ React Router 8 (SSR) · Vite 8 · TypeScript 6 · Docker Compose
 | [`backend/`](backend/) | Django API ([README](backend/README.md)) |
 | [`frontend/`](frontend/) | React Router SSR app ([README](frontend/README.md)) |
 | [`e2e/`](e2e/) | Playwright end-to-end tests ([README](e2e/README.md)) |
-| [`docs/`](docs/) | Product and architecture documentation |
-| [`.devcontainer/`](.devcontainer/) | Dev container for Codespaces |
-| [`scripts/`](scripts/) | Setup script for Claude Code cloud sessions |
-| `compose.yaml` | Development services (PostgreSQL) |
+| [`deploy/`](deploy/) | Caddy, systemd units and server settings |
+| [`scripts/`](scripts/) | Deploy, backup, monitoring and setup scripts |
+| [`docs/`](docs/) | Product, architecture and operations documentation |
 
 ## License
 

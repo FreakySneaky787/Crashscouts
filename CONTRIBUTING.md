@@ -1,8 +1,30 @@
 # Contributing
 
-> **Draft.** The repository is still private. The contribution model (DCO or CLA) and the code of
-> conduct will be decided before it goes public (see
-> [`docs/OPEN-QUESTIONS.md`](docs/OPEN-QUESTIONS.md), questions G and J).
+Thank you for helping. Crashscouts is in a closed beta, built by one person; small, focused
+contributions are the easiest to review.
+
+- **Bugs and ideas:** open an issue first, so we can agree on the approach before you write code.
+  Security problems go through [`SECURITY.md`](SECURITY.md), never a public issue.
+- **Pull requests:** against `main`, with tests, and with the documentation updated in the same
+  change. CI must be green.
+- **Code of conduct:** everyone taking part follows the
+  [Contributor Covenant](CODE_OF_CONDUCT.md).
+
+## Developer Certificate of Origin (DCO)
+
+Every commit must be signed off. With the sign-off you confirm the
+[Developer Certificate of Origin 1.1](https://developercertificate.org/): you wrote the change
+or have the right to submit it under the project's licence (AGPL-3.0). There is no contributor
+licence agreement to sign.
+
+```bash
+git commit -s -m "Fix the date in the campaign list"
+```
+
+`-s` adds the line `Signed-off-by: Your Name <you@example.org>`, which must match the commit's
+author. A check in CI refuses pull requests with commits that are not signed off
+(`scripts/check-dco.sh`). To sign off commits you already made: `git rebase --signoff main`, then
+push again.
 
 ## Principles
 
