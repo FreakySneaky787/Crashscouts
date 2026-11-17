@@ -15,6 +15,7 @@
 | 8.5 | Legal texts: privacy policy, terms of use, imprint; AGPL source link in the footer | **drafted 2026-11-15** ([ADR 0031](adr/0031-legal-texts.md)); open: the `[TO DECIDE]` points (question Y) and the professional review |
 | 8.6 | Integration, performance (load test of Discover, search, rate-limit cache) and accessibility pass | ✅ done 2026-11-15: part A (production-like stack, smoke tests, question P, [ADR 0032](adr/0032-production-setup.md)), part B (performance, [PERFORMANCE.md](PERFORMANCE.md)), part C (accessibility, [ACCESSIBILITY.md](ACCESSIBILITY.md); the owner's screen reader check with Orca and TalkBack is open) |
 | 8.7 | Making the repository public: **DCO** (G) and **Contributor Covenant** (J) decided 2026-11-15, GitHub's free security features, README | the date |
+| – | Launch plan in stages ([LAUNCH-PLAN.md](LAUNCH-PLAN.md), decided 2026-11-17) | – |
 | 8.8 | Beta start: open registration (decided), gate checklist ticked, the owner switches `PUBLIC_CAMPAIGNS_ENABLED` | everything above |
 
 ## Decisions of the owner (2026-11-15)

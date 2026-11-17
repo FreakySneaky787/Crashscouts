@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); next: the launch plan
+**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); launch plan written ([LAUNCH-PLAN.md](LAUNCH-PLAN.md)); next: stage 0 (8.7, legal review, 8.8)
 
 ## Work packages
 
@@ -1310,6 +1310,17 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - outgoing email (8.2);
   - backups (8.3; no user data on the server yet);
   - monitoring (8.4).
+
+## Launch plan (2026-11-17)
+
+- [`LAUNCH-PLAN.md`](LAUNCH-PLAN.md), with the owner's decisions:
+  - stages instead of one launch day;
+  - first audience: open-source and indie developers;
+  - goal for 6 weeks: 20 campaigns, 80 % with a first tester within 48 hours, 50 active testers;
+  - the owner takes part publicly, 5–10 hours per week.
+- Sources checked: the Show HN rules (official) and Scaleway's plan page (official). Chen's
+  marketplace advice, the Reddit rules and Fosstodon's sign-up came from secondary sources.
+- Proposed, not yet approved: a second load test of the public pages before the public launch.
 
 ## WP 8.4 – Monitoring and logs (2026-11-17) ✅
 
