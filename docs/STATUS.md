@@ -3,7 +3,7 @@
 > This file describes the **actual** state. It is updated with every completed work package.
 > Only what has demonstrably been verified counts as done.
 
-**Last update:** 2026-11-17 (WP 8.4 built) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) built and tested locally, set-up on the server open
+**Last update:** 2026-11-17 (WP 8.4 done) · **Current phase:** 8 (closed beta) – WP 8.1, 8.2, 8.3, 8.4, 8.5 and 8.6 done; https://crashscouts.org live with registration closed (flag still off); WP 8.4 (monitoring) done on the server (7-day log check due on 2026-11-25); next: the launch plan
 
 ## Work packages
 
@@ -1311,7 +1311,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - backups (8.3; no user data on the server yet);
   - monitoring (8.4).
 
-## WP 8.4 – Monitoring and logs (2026-11-17) 🟡 built, server set-up open
+## WP 8.4 – Monitoring and logs (2026-11-17) ✅
 
 - **Owner decisions 2026-11-17:**
   - alerts with **Healthchecks.io**;
@@ -1347,11 +1347,33 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - `systemd-analyze verify` of all units passed; the full backend suite: 783 passed; frontend
     unit tests 122 passed, typecheck and lint clean.
 - **Privacy policy 0.3 (draft):** server logs and their 7 days filled in (question Y).
-- **Not done:**
-  - the set-up on the server (OPERATIONS §13): the owner is on the work computer today, and the
-    SSH key is only at home;
-  - the alarm test with real emails;
-  - the proof of the 7-day deletion (only visible after 8 days).
+- **Set up on the server (2026-11-17, evening):**
+  - five checks on Healthchecks.io; the ping key in `/etc/crashscouts/monitoring.env` (mode 600);
+  - `crashscouts-monitor.timer` enabled; the first run reported `site: ok, disk: 13% used`;
+  - the four containers log to `journald` (`docker inspect`); the journal is persistent
+    (`/var/log/journal`, 16 MB);
+  - error emails to the owner: the manual test email arrived with only the error class, the
+    time and one stack frame.
+- **Alarm test with real emails:**
+  - backup: a failure signal, then the email "DOWN | crashscouts-backup"; a success signal, then
+    "UP";
+  - site: frontend stopped. The next check (19:00) reported a failure, and the email "DOWN |
+    crashscouts-site" arrived within seconds. Then the frontend is started again (§13.4); the
+    "UP" email was not yet confirmed at the time of writing.
+  - Not triggered one by one: the disk, hourly and daily alarms. They use the same script and
+    the same email integration; their success signals arrived (disk, hourly) or arrive tonight
+    (daily, backup).
+- **Problems found during the set-up:**
+  - The disk check was missing on Healthchecks.io. The signal answered `not found` (404), and
+    `hc-ping.sh` logged "could not reach" without the key.
+  - The site check had a period of 5 days instead of 5 minutes.
+  - The first backup alarm sent no email: the email address was confirmed only after the check
+    had gone down, and a second failure signal does not change the status. Repeating the test
+    (up, then down) worked.
+  - All three are now notes in OPERATIONS §13.1.
+- **Fixed afterwards:** the error email showed a double space when there was no request
+  ("Route:    (no request)"); a regression test now covers it.
+- **Open:** the proof of the 7-day deletion (only visible after 8 days, OPERATIONS §13.3).
 
 ## WP 8.3 – Backups (2026-11-16) ✅
 

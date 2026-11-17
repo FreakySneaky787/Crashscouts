@@ -367,8 +367,8 @@ every email. Fixed, with a test that fails without the fix.
 Healthchecks.io emails the owner when a signal is missing or reports a failure. Server errors of
 Django are emailed without request data. Logs are kept for 7 days.
 
-> **Not yet run on the server** (2026-11-17): built and tested locally; the owner sets it up from
-> home, where the SSH key is.
+> **Set up on the server on 2026-11-17** (§13.2–13.4); every alarm was triggered and its email
+> arrived. Open: the check of the 7-day deletion after 8 days (§13.3).
 
 | Check (slug) | Period | Grace | Sent by |
 |---|---|---|---|
@@ -384,9 +384,15 @@ Django are emailed without request data. Logs are kept for 7 days.
    "Hobbyist"), with two-factor sign-in.
 2. Create a project "Crashscouts". Create the five checks of the table:
    - set the **slug** exactly as shown;
-   - choose "Simple" schedule with the period and grace from the table.
+   - choose "Simple" schedule with the period and grace from the table;
+   - pitfalls seen on 2026-11-17: a check created without its slug (the signal answers
+     `not found`, HTTP 404), and a period set to days instead of minutes. Compare the list with
+     the table before going on.
 3. Email notifications to the sign-up address are on by default; check under "Integrations".
-4. Project settings → "Ping key": create it. It is a credential: password manager, never in
+4. Confirm the email address of the email integration **before** the alarm test: Healthchecks.io
+   skips unconfirmed addresses, and it emails only when a check's status **changes**, so a second
+   failure signal while a check is already down sends nothing.
+5. Project settings → "Ping key": create it. It is a credential: password manager, never in
    chat or in the repository.
 
 ### 13.2 On the server

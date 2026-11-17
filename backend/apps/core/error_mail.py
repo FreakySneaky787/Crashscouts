@@ -60,11 +60,12 @@ def build_report(record: logging.LogRecord) -> tuple[str, str]:
     exc_info = record.exc_info
     error = exc_info[0].__name__ if exc_info and exc_info[0] else record.levelname
     status = getattr(record, "status_code", None)
-    subject = f"{error} at {method} {route}".strip()
+    where = f"{method} {route}".strip()
+    subject = f"{error} at {where}"
     body = "\n".join(
         [
             f"Error:   {error}",
-            f"Route:   {method} {route}",
+            f"Route:   {where}",
             f"Status:  {status if status is not None else '-'}",
             f"Time:    {timezone.now().isoformat(timespec='seconds')}",
             "",

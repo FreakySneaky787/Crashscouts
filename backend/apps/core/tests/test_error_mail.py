@@ -2,11 +2,14 @@
 
 import logging
 import secrets
+import sys
 
 import pytest
 from django.core import mail
 from django.test import Client
 from django.utils.log import AdminEmailHandler
+
+from apps.core.error_mail import build_report
 
 pytestmark = [pytest.mark.django_db, pytest.mark.urls("apps.core.tests.error_urls")]
 
@@ -87,3 +90,17 @@ def test_a_failing_mail_server_does_not_break_the_error_response(admins, monkeyp
     response = _fail(Client(raise_request_exception=False), "someone", "a@example.org")
 
     assert response.status_code == 500
+
+
+def test_an_error_outside_a_request_is_reported_without_a_gap():
+    # Seen on the server on 2026-11-17: "Route:    (no request)" had a double space.
+    try:
+        1 / 0  # noqa: B018
+    except ZeroDivisionError:
+        info = sys.exc_info()
+    record = logging.LogRecord("django.request", logging.ERROR, "", 0, "x", None, info)
+
+    subject, body = build_report(record)
+
+    assert subject == "ZeroDivisionError at (no request)"
+    assert "Route:   (no request)\n" in body
