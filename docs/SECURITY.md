@@ -270,6 +270,10 @@ admin logins, deletions and exports.
   upper limit. A fix release younger than 7 days is taken only for critical and high findings. All
   dependency updates are reviewed monthly. Exceptions with reason go into `docs/STATUS.md`. Open
   finding: `minimatch` (moderate, ESLint only, since 2026-11-14; due 2027-01-13).
+  **Exception:** `picomatch` GHSA-fc5q-39xc-vjpf (high, ReDoS; build and test tools only, not in
+  the production image; no fixed release yet) is ignored in `pnpm audit` until **2026-12-01**
+  (owner's decision 2026-11-17). `app/audit-exceptions.test.ts` fails after that date and when an
+  ignored advisory is not documented there.
 
 ## 11. Claude Code in the development environment
 

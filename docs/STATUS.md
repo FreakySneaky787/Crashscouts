@@ -1311,6 +1311,21 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - backups (8.3; no user data on the server yet);
   - monitoring (8.4).
 
+## Audit exception: picomatch (2026-11-17)
+
+- CI failed on `3a41295`: `pnpm audit` reported GHSA-fc5q-39xc-vjpf (picomatch <= 4.0.7, high,
+  ReDoS through attacker-supplied glob patterns), new in the audit database that day.
+- **Assessment:**
+  - only in build and test tools (Vite, Vitest, ESLint, the React Router build);
+    `pnpm why picomatch --prod` finds nothing, so it is not in the production image;
+  - our glob patterns are fixed in the configuration;
+  - no fixed release exists (4.0.7 is the latest on npm).
+- **Owner's decision:** a temporary exception until 2026-12-01, within the 14 days for "high"
+  (SECURITY §10). Only this advisory is ignored (`pnpm.auditConfig.ignoreGhsas`); every other
+  high or critical finding still fails CI. `app/audit-exceptions.test.ts` fails after the end
+  date (checked: with an end date in the past it fails).
+- To do: take the fix as soon as picomatch releases one, then remove the exception.
+
 ## Launch plan (2026-11-17)
 
 - [`LAUNCH-PLAN.md`](LAUNCH-PLAN.md), with the owner's decisions:
