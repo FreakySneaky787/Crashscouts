@@ -46,8 +46,8 @@ server.
 - [ ] Encrypted off-site backups of the database and uploaded files, with a **tested** restore.
 - [ ] Monitoring: an alarm for the site, the disk, the jobs and the backup really arrives by email;
       logs are kept for 7 days ([ADR 0034](adr/0034-monitoring.md), OPERATIONS §13.4).
-- [ ] Real GitHub test on the test server (open question U), including the callback
-      `<frontend>/projects/github/verify/callback`.
+- [x] Real GitHub test on the test server (open question U), including the callback
+      `<frontend>/projects/github/verify/callback`. Passed on crashscouts.org on 2026-11-18.
 - [ ] Legal pages (terms, privacy, imprint) published for public content (see the legal section
       of [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
 - [ ] ASVS 5.0 level 1 operations items ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)): the proxy

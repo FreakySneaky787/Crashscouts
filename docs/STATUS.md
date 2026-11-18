@@ -1373,7 +1373,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     (SECURITY.md) and `contact@crashscouts.org` as contact for reports and the code of conduct.
 - **Still open:** switch the server's clone to HTTPS and remove the deploy key (point 5).
 
-## Open question U – real GitHub login on crashscouts.org (2026-11-17) 🟡 in progress
+## Open question U – real GitHub login on crashscouts.org (2026-11-17/18) ✅ done
 
 - **Found while preparing the test:** `compose.prod.yaml` did not pass `DJANGO_GITHUB_CLIENT_ID`
   and `DJANGO_GITHUB_CLIENT_SECRET` to Django, so the GitHub login and the repository
@@ -1397,7 +1397,8 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
 - **Owner's account 2026-11-18:** registration opened for a few minutes, the owner signed up
   (confirmation email arrived), registration closed again.
 - **Passed 2026-11-18:** unlinked GitHub account refused while registration is closed; Connect
-  GitHub; sign-in with GitHub. Open: repository verification through GitHub.
+  GitHub; sign-in with GitHub; repository verification through GitHub (reported by the owner).
+  Registration is closed again (`DJANGO_SIGNUP_ENABLED=false`, checked on the server).
 - **Settings (owner's request 2026-11-18):** signed-in users find "Settings" at the bottom of the
   sidebar and in the mobile menu. It opens a new overview page `/settings` with profile, security
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
