@@ -29,28 +29,36 @@ and E2E `tests/campaigns.spec.ts` ("public campaigns stay drafts while the gate 
 These depend on the production server, which does not exist yet. Tick each one on the real
 server.
 
-- [ ] The stack of `compose.prod.yaml` runs on the server ([ADR 0032](adr/0032-production-setup.md));
+- [x] The stack of `compose.prod.yaml` runs on the server ([ADR 0032](adr/0032-production-setup.md));
       the smoke tests (`pnpm test:smoke` in `e2e/`, with `SMOKE_URL` set to the real address) pass.
-- [ ] Production settings (`config.settings.prod`) start without errors; `manage.py check --deploy`
+      2026-11-18: runs on crashscouts.org; smoke test "forged X-Forwarded-For" passed against it; the header checks done with curl (Playwright's API client cannot use the cloud session's proxy); sign-up with confirmation, sign-in and sign-out done by hand.
+- [x] Production settings (`config.settings.prod`) start without errors; `manage.py check --deploy`
       shows only the documented HSTS warnings.
-- [ ] `DJANGO_TRUSTED_PROXY_COUNT=1`; the reverse proxy **overwrites** `X-Forwarded-For`,
+      2026-11-18: only `security.W005` and `security.W021` (open question N).
+- [x] `DJANGO_TRUSTED_PROXY_COUNT=1`; the reverse proxy **overwrites** `X-Forwarded-For`,
       `X-Forwarded-Host` and `X-Forwarded-Proto` (never appends client values). Check: a request
       with a forged `X-Forwarded-For` does not change the address Django counts.
-- [ ] Django is reachable only through the reverse proxy; the Django admin is not routed
+      2026-11-18: the smoke test with forged addresses hit the login limit after 10 attempts.
+- [x] Django is reachable only through the reverse proxy; the Django admin is not routed
       (`/admin/` → 404 from outside).
-- [ ] Jobs: `manage.py purge_rate_limit_cache` hourly; `purge_deleted_accounts` and
+      2026-11-18: `/admin/`, `/api/`, `/_allauth/`, `/media/` answer 404 from outside; only ports 22, 80 and 443 listen publicly (security check 2026-11-17).
+- [x] Jobs: `manage.py purge_rate_limit_cache` hourly; `purge_deleted_accounts` and
       `purge_application_answers` daily.
-- [ ] At least one moderator (or admin) account with 2FA; it can open `/moderation`.
-- [ ] Outgoing email works (verification, reports, block notices); provider decided (open
+      2026-11-18: `hourly` and `daily` green on healthchecks.io.
+- [x] At least one moderator (or admin) account with 2FA; it can open `/moderation`.
+      2026-11-18: the owner's account, 2FA with an authenticator app, opens `/moderation`.
+- [x] Outgoing email works (verification, reports, block notices); provider decided (open
       question F).
-- [ ] Encrypted off-site backups of the database and uploaded files, with a **tested** restore.
+      2026-11-18: the confirmation email of the owner's sign-up arrived through Scaleway. Reports and block notices use the same SMTP path and were not sent one by one.
+- [x] Encrypted off-site backups of the database and uploaded files, with a **tested** restore.
+      2026-11-17: restore test on the server passed (57 of 57 tables); `backup` green on healthchecks.io. Known gap: emergency restore onto a second server not rehearsed.
 - [ ] Monitoring: an alarm for the site, the disk, the jobs and the backup really arrives by email;
       logs are kept for 7 days ([ADR 0034](adr/0034-monitoring.md), OPERATIONS §13.4).
 - [x] Real GitHub test on the test server (open question U), including the callback
       `<frontend>/projects/github/verify/callback`. Passed on crashscouts.org on 2026-11-18.
 - [ ] Legal pages (terms, privacy, imprint) published for public content (see the legal section
       of [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
-- [ ] ASVS 5.0 level 1 operations items ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)): the proxy
+- [x] ASVS 5.0 level 1 operations items ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)): the proxy
       offers TLS 1.2 and 1.3 only (V12.1.1) with a publicly trusted certificate (V12.2.2), plain
       HTTP only redirects (V12.2.1); the deployed files contain no `.git` folder (V13.4.1); the
       browser receives `__Host-sessionid`, `__Host-csrftoken` and `Strict-Transport-Security` on
@@ -80,3 +88,4 @@ server.
 3. The date and the person are recorded in `STATUS.md`.
 4. Switching back is the same variable set to `false`: published public campaigns are then hidden
    again from everyone outside their team (tested in `test_campaigns.py`).
+      2026-11-18: TLS 1.0/1.1 refused, 1.2/1.3 accepted, Let's Encrypt certificate; HTTP answers 308 to HTTPS; `/.git/` 404 and no `.git` in the images; `__Host-csrftoken` with `Secure`; HSTS on every response, including Caddy's own 404s since the fix of 2026-11-18.

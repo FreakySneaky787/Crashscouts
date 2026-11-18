@@ -1404,7 +1404,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
   in `a11y.spec.ts`).
 
-## Gate checklist part 2 on crashscouts.org (2026-11-18) 🟡 in progress
+## Gate checklist part 2 on crashscouts.org (2026-11-18) 🟡 10 of 12 ticked
 
 - **Checked from outside** (this session, crashscouts.org added to the network allowlist):
   - TLS 1.0 and 1.1 refused by the server (alert "protocol version"), TLS 1.2 and 1.3 accepted;
@@ -1423,6 +1423,12 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
 - **Found after the deploy:** the HSTS fix was not active, because `deploy.sh` never restarted
   Caddy for a changed Caddyfile. `deploy.sh` now restarts the proxy when the pull changed
   `deploy/Caddyfile` (OPERATIONS §9).
+- **After restarting the proxy:** HSTS on every checked response, exactly once.
+- **Ticked with evidence** (GATE-CHECKLIST part 2): stack and smoke, `check --deploy`, proxy
+  headers, no public Django, jobs, moderator with 2FA, email, backups with restore test, ASVS
+  operations items, GitHub test.
+- **Still open:** monitoring (disk and job alarms not triggered on purpose yet; 7-day log proof on
+  2026-11-25) and the legal pages (professional review).
 
 ## Security check with a focus on costs (2026-11-17)
 
