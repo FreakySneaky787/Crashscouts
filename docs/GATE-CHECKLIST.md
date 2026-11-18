@@ -84,8 +84,9 @@ server.
 ## Part 4 – Switching
 
 1. Every line in parts 1 and 2 is ticked; the owner accepts part 3.
-2. The owner sets `PUBLIC_CAMPAIGNS_ENABLED=true` in the production environment and restarts
-   Django.
+2. The owner sets `PUBLIC_CAMPAIGNS_ENABLED=true` in `.env.prod` on the server and runs
+   `scripts/deploy.sh`, which recreates Django with the new value (`compose.prod.yaml` passes it
+   through, default `false`).
 3. The date and the person are recorded in `STATUS.md`.
 4. Switching back is the same variable set to `false`: published public campaigns are then hidden
    again from everyone outside their team (tested in `test_campaigns.py`).

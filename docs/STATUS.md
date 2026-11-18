@@ -1404,6 +1404,13 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
   in `a11y.spec.ts`).
 
+## Gate switch in `.env.prod` (2026-11-18)
+
+- `compose.prod.yaml` had `PUBLIC_CAMPAIGNS_ENABLED: "false"` written into the file, so the owner
+  could not open the gate on the server without changing the repository. It now passes
+  `${PUBLIC_CAMPAIGNS_ENABLED:-false}` through (owner's approval 2026-11-18); `.env.prod.example`
+  lists it as `false`. A test checks that the default stays off.
+
 ## Legal texts final (2026-11-18) ✅ live
 
 - The reviewer approved the drafts; the owner decided the four open points (OPEN-QUESTIONS Y):

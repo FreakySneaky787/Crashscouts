@@ -163,6 +163,7 @@ Values set by hand (2026-11-16):
 | `OPERATOR_NAME`, `OPERATOR_ADDRESS` | typed in by the owner | imprint and privacy policy (ADR 0031) |
 | `CONTACT_EMAIL` | `contact@crashscouts.org` | the Infomaniak mailbox |
 | `LEGAL_TEXTS_REVIEWED` | `false` | the legal pages say "draft" until the professional review |
+| `PUBLIC_CAMPAIGNS_ENABLED` | `false` | security gate: only the owner switches it to `true`, after the gate checklist (GATE-CHECKLIST part 4) |
 | `SOURCE_CODE_URL` | empty | until the repository is public (WP 8.7) |
 
 Check without showing values: `grep -cE '^(DJANGO_SECRET_KEY|POSTGRES_PASSWORD|OPERATOR_NAME|OPERATOR_ADDRESS)=.+' .env.prod`

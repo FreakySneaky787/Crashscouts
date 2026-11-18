@@ -59,8 +59,9 @@ services:
       # GitHub login and repository verification (WP 1.4, WP 2.5); empty turns both off.
       DJANGO_GITHUB_CLIENT_ID: ${DJANGO_GITHUB_CLIENT_ID:-}
       DJANGO_GITHUB_CLIENT_SECRET: ${DJANGO_GITHUB_CLIENT_SECRET:-}
-      # Only the owner opens the security gate (CLAUDE.md); never switched here.
-      PUBLIC_CAMPAIGNS_ENABLED: "false"
+      # Only the owner opens the security gate (CLAUDE.md, GATE-CHECKLIST part 4): in .env.prod on
+      # the server, never in this file. Off unless set to "true".
+      PUBLIC_CAMPAIGNS_ENABLED: ${PUBLIC_CAMPAIGNS_ENABLED:-false}
       POSTGRES_HOST: db
       POSTGRES_DB: ${POSTGRES_DB:-crashscouts}
       POSTGRES_USER: ${POSTGRES_USER:-crashscouts}

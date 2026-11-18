@@ -241,3 +241,12 @@ def test_the_production_stack_passes_the_github_app_to_django():
 
     assert "DJANGO_GITHUB_CLIENT_ID: ${DJANGO_GITHUB_CLIENT_ID:-}" in backend
     assert "DJANGO_GITHUB_CLIENT_SECRET: ${DJANGO_GITHUB_CLIENT_SECRET:-}" in backend
+
+
+def test_public_campaigns_stay_off_unless_the_server_switches_them_on():
+    # The owner opens the gate in .env.prod (GATE-CHECKLIST part 4); the default stays "false".
+    compose = (BACKEND_DIR.parent / "compose.prod.yaml").read_text()
+    backend = compose.split("\n  backend:\n", 1)[1].split("\n  db:\n", 1)[0]
+    assert "PUBLIC_CAMPAIGNS_ENABLED: ${PUBLIC_CAMPAIGNS_ENABLED:-false}" in backend
+    example = (BACKEND_DIR.parent / ".env.prod.example").read_text()
+    assert "\nPUBLIC_CAMPAIGNS_ENABLED=false\n" in example
