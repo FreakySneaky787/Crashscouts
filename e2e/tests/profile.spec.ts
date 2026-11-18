@@ -117,3 +117,16 @@ test("profile pages have no WCAG A/AA violations in light and dark", async ({ pa
     }
   }
 });
+
+test("signed-in users find Settings at the bottom of the sidebar; visitors do not", async ({ page, browser, request }) => {
+  await createSignedInAccount(page, request);
+  const more = page.getByRole("navigation", { name: "More" });
+  await more.getByRole("link", { name: "Settings" }).click();
+  await expect(page).toHaveURL(/\/settings\/profile$/);
+
+  const anonymous = await browser.newContext();
+  const visitor = await anonymous.newPage();
+  await visitor.goto("/discover");
+  await expect(visitor.getByRole("link", { name: "Settings" })).toHaveCount(0);
+  await anonymous.close();
+});

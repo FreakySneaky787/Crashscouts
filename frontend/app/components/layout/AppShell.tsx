@@ -8,7 +8,7 @@ import type { Theme } from "~/lib/theme";
 import { Avatar } from "~/components/ui/Data";
 import { Notice } from "~/components/ui/Notice";
 import { ThemeToggle } from "~/components/ui/ThemeToggle";
-import { CompassIcon, HouseIcon, ListIcon, PaletteIcon, SignInIcon, UserCircleIcon, UserPlusIcon, type IconComponent } from "~/components/ui/icons";
+import { CompassIcon, GearSixIcon, HouseIcon, ListIcon, PaletteIcon, SignInIcon, UserCircleIcon, UserPlusIcon, type IconComponent } from "~/components/ui/icons";
 
 import styles from "./AppShell.module.css";
 
@@ -51,7 +51,11 @@ export function AppShell({ user, theme, sourceUrl = null, children }: { user: Sh
   ];
   // The design system reference is a tool for development; production visitors do not see the link
   // (WP 8.9). The page itself stays reachable and is not indexed.
-  const secondary: NavItem[] = import.meta.env.DEV ? [{ to: "/design-system", label: t("nav.designSystem"), icon: PaletteIcon }] : [];
+  // Settings sit at the bottom of the sidebar for signed-in users (owner's request 2026-11-18).
+  const secondary: NavItem[] = [
+    ...(import.meta.env.DEV ? [{ to: "/design-system", label: t("nav.designSystem"), icon: PaletteIcon }] : []),
+    ...(user ? [{ to: "/settings/profile", label: t("nav.settings"), icon: GearSixIcon }] : []),
+  ];
 
   return (
     <div className={styles.shell}>
@@ -67,7 +71,7 @@ export function AppShell({ user, theme, sourceUrl = null, children }: { user: Sh
           <NavList items={items} />
         </nav>
         {secondary.length > 0 ? (
-          <nav aria-label={t("shell.resourcesNav")} className={styles.secondary}>
+          <nav aria-label={t("shell.secondaryNav")} className={styles.secondary}>
             <NavList items={secondary} />
           </nav>
         ) : null}

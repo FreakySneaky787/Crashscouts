@@ -1394,7 +1394,12 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
     created, but the page only said "The GitHub sign-in did not work". allauth reports
     `signup_closed`; the page now says that signing up is not possible right now and how to
     connect GitHub to an existing account.
-- **Next:** connect GitHub to the owner's account, then sign in with GitHub (OPERATIONS §14).
+- **Owner's account 2026-11-18:** registration opened for a few minutes, the owner signed up
+  (confirmation email arrived), registration closed again.
+- **Passed 2026-11-18:** unlinked GitHub account refused while registration is closed; Connect
+  GitHub; sign-in with GitHub. Open: repository verification through GitHub.
+- **Settings link (owner's request 2026-11-18):** signed-in users find "Settings" at the bottom
+  of the sidebar and in the mobile menu (E2E `profile.spec.ts`).
 
 ## Security check with a focus on costs (2026-11-17)
 

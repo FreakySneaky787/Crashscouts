@@ -37,7 +37,8 @@
     "designSystem": "Design system",
     "signup": "Sign up",
     "profile": "Profile",
-    "discover": "Discover"
+    "discover": "Discover",
+    "settings": "Settings"
   },
   "login": {
     "title": "Log in",
@@ -84,7 +85,7 @@
   "shell": {
     "skip": "Skip to content",
     "mainNav": "Main",
-    "resourcesNav": "Resources",
+    "secondaryNav": "More",
     "menu": "Menu",
     "signedInAs": "Signed in as {{username}}"
   },
