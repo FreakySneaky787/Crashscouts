@@ -56,8 +56,9 @@ server.
       logs are kept for 7 days ([ADR 0034](adr/0034-monitoring.md), OPERATIONS §13.4).
 - [x] Real GitHub test on the test server (open question U), including the callback
       `<frontend>/projects/github/verify/callback`. Passed on crashscouts.org on 2026-11-18.
-- [ ] Legal pages (terms, privacy, imprint) published for public content (see the legal section
+- [x] Legal pages (terms, privacy, imprint) published for public content (see the legal section
       of [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)).
+      2026-11-18: version 1.0 live on crashscouts.org, `LEGAL_TEXTS_REVIEWED=true`; checked from outside: no draft notice and no `[TO DECIDE]` on /privacy, /terms and /imprint.
 - [x] ASVS 5.0 level 1 operations items ([`ASVS-L1-REVIEW.md`](ASVS-L1-REVIEW.md)): the proxy
       offers TLS 1.2 and 1.3 only (V12.1.1) with a publicly trusted certificate (V12.2.2), plain
       HTTP only redirects (V12.2.1); the deployed files contain no `.git` folder (V13.4.1); the

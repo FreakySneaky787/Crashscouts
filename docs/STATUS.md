@@ -1404,7 +1404,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
   in `a11y.spec.ts`).
 
-## Legal texts final (2026-11-18) 🟡 the owner switches `LEGAL_TEXTS_REVIEWED`
+## Legal texts final (2026-11-18) ✅ live
 
 - The reviewer approved the drafts; the owner decided the four open points (OPEN-QUESTIONS Y):
   - no EU representative under GDPR art. 27 (accepted risk: the exemption in art. 27(2)(a) is for
@@ -1419,10 +1419,10 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   - no place-of-jurisdiction clause; Swiss law applies; consumer rules stay unaffected (Lugano
     Convention art. 15 to 17, EUR-Lex).
 - Version 1.0 of privacy policy, terms and imprint, dated 2026-11-18.
-- **Owner's step:** `LEGAL_TEXTS_REVIEWED=true` in `.env.prod`, then deploy; the draft notice
-  disappears.
+- `LEGAL_TEXTS_REVIEWED=true` set and deployed by the owner; checked from outside: no draft
+  notice, version 1.0 on all three pages.
 
-## Gate checklist part 2 on crashscouts.org (2026-11-18) 🟡 10 of 12 ticked
+## Gate checklist part 2 on crashscouts.org (2026-11-18) 🟡 11 of 12 ticked
 
 - **Checked from outside** (this session, crashscouts.org added to the network allowlist):
   - TLS 1.0 and 1.1 refused by the server (alert "protocol version"), TLS 1.2 and 1.3 accepted;
@@ -1448,7 +1448,7 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
 - **Monitoring alarms:** disk, hourly and daily alarms triggered on purpose and received
   (2026-11-18); with site and backup all five arrived. Still open: the 7-day log proof on
   2026-11-25.
-- **Still open:** that log proof and the legal pages going live (`LEGAL_TEXTS_REVIEWED=true`).
+- **Still open:** only the 7-day log proof on 2026-11-25.
 
 ## Security check with a focus on costs (2026-11-17)
 
