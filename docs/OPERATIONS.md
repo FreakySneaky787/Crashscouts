@@ -234,6 +234,11 @@ warm-up requests once the SSR server answers. Tested locally on 2026-11-16: `up 
 before the SSR server listens (Caddy answered 502 for about a second), so the script waits for a
 200 first.
 
+When the pull changed `deploy/Caddyfile`, the script restarts the proxy (a second or so without
+answers): Caddy reads the mounted file only at start, `admin off` rules out a live reload, and
+`up` does not recreate a container for a changed file. Found on 2026-11-18, when the HSTS fix was
+deployed but not active.
+
 After a change to `deploy/systemd/`, copy the units again (§8).
 
 ## 10. Backups (WP 8.3, ADR 0033)

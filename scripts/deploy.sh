@@ -22,6 +22,7 @@ compose=(sudo docker compose -f compose.prod.yaml --env-file .env.prod)
 if grep -qx 'DJANGO_EMAIL_HOST=mailpit' .env.prod; then compose+=(--profile local); fi
 
 echo "== Pulling"
+before="$(git rev-parse HEAD)"
 git pull --ff-only
 git log --oneline -1
 echo "== Building"
@@ -30,6 +31,12 @@ echo "== Migrating"
 "${compose[@]}" run --rm --no-deps backend python manage.py migrate --noinput
 echo "== Starting"
 "${compose[@]}" up -d --no-build --wait
+# Caddy reads its mounted Caddyfile only at start ("admin off" rules out a live reload), and
+# `up` does not recreate the container for a changed file: restart it when the file changed.
+if ! git diff --quiet "$before" HEAD -- deploy/Caddyfile; then
+  echo "== Restarting the proxy (Caddyfile changed)"
+  "${compose[@]}" restart proxy
+fi
 echo "== Warm-up"
 host="$(sed -n 's/^PUBLIC_HOST=//p' .env.prod)"
 # `up --wait` only waits for the database's health check; the SSR server needs a few seconds

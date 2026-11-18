@@ -1420,6 +1420,9 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   image (one header on proxied pages, one on Caddy's 404). The smoke test now checks HSTS on the
   blocked paths too.
 - `.git` is not in the images: the build contexts are `backend/` and `frontend/`.
+- **Found after the deploy:** the HSTS fix was not active, because `deploy.sh` never restarted
+  Caddy for a changed Caddyfile. `deploy.sh` now restarts the proxy when the pull changed
+  `deploy/Caddyfile` (OPERATIONS §9).
 
 ## Security check with a focus on costs (2026-11-17)
 
