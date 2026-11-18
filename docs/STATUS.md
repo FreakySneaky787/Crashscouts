@@ -1404,6 +1404,24 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
   in `a11y.spec.ts`).
 
+## Legal texts final (2026-11-18) 🟡 the owner switches `LEGAL_TEXTS_REVIEWED`
+
+- The reviewer approved the drafts; the owner decided the four open points (OPEN-QUESTIONS Y):
+  - no EU representative under GDPR art. 27 (accepted risk: the exemption in art. 27(2)(a) is for
+    occasional processing; a platform with accounts is hardly occasional);
+  - GitHub transfer: EU-U.S. and Swiss-U.S. Data Privacy Framework. Checked: Commission
+    Implementing Decision (EU) 2023/1795, art. 1 (EUR-Lex); Swiss Data Protection Ordinance
+    (SR 235.11), Annex 1, entry "Vereinigte Staaten" for certified organisations, in force since
+    2024-09-15 (Fedlex); GitHub's privacy statement (effective 2026-04-27) names both
+    certifications;
+  - SPDX: attribution with a link (no licence statement found on spdx.org/licenses or in the
+    data repositories, so attribution is the safe choice);
+  - no place-of-jurisdiction clause; Swiss law applies; consumer rules stay unaffected (Lugano
+    Convention art. 15 to 17, EUR-Lex).
+- Version 1.0 of privacy policy, terms and imprint, dated 2026-11-18.
+- **Owner's step:** `LEGAL_TEXTS_REVIEWED=true` in `.env.prod`, then deploy; the draft notice
+  disappears.
+
 ## Gate checklist part 2 on crashscouts.org (2026-11-18) 🟡 10 of 12 ticked
 
 - **Checked from outside** (this session, crashscouts.org added to the network allowlist):
@@ -1427,8 +1445,10 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
 - **Ticked with evidence** (GATE-CHECKLIST part 2): stack and smoke, `check --deploy`, proxy
   headers, no public Django, jobs, moderator with 2FA, email, backups with restore test, ASVS
   operations items, GitHub test.
-- **Still open:** monitoring (disk and job alarms not triggered on purpose yet; 7-day log proof on
-  2026-11-25) and the legal pages (professional review).
+- **Monitoring alarms:** disk, hourly and daily alarms triggered on purpose and received
+  (2026-11-18); with site and backup all five arrived. Still open: the 7-day log proof on
+  2026-11-25.
+- **Still open:** that log proof and the legal pages going live (`LEGAL_TEXTS_REVIEWED=true`).
 
 ## Security check with a focus on costs (2026-11-17)
 

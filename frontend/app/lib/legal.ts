@@ -6,9 +6,9 @@
  */
 
 export const LEGAL_PAGES = {
-  privacy: { title: "Privacy policy", version: "0.3 (draft)", updated: "2026-11-17" },
-  terms: { title: "Terms of use", version: "0.1 (draft)", updated: "2026-11-15" },
-  imprint: { title: "Imprint", version: "0.1 (draft)", updated: "2026-11-15" },
+  privacy: { title: "Privacy policy", version: "1.0", updated: "2026-11-18" },
+  terms: { title: "Terms of use", version: "1.0", updated: "2026-11-18" },
+  imprint: { title: "Imprint", version: "1.0", updated: "2026-11-18" },
 } as const;
 
 export type LegalSlug = keyof typeof LEGAL_PAGES;

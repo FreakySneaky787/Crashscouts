@@ -13,9 +13,6 @@ Email: {{contact_email}}
 
 Write to this address for every question about your data and to exercise your rights.
 
-[TO DECIDE: whether an EU representative under GDPR art. 27 is needed – question for the legal
-review.]
-
 ## 2. Principles
 
 - We process only the data the platform needs to work.
@@ -124,8 +121,12 @@ Your data is shared only as far as necessary:
 
 - **Switzerland and the EU:** your data is processed here. The EU offers adequate data protection
   in the view of the Swiss Federal Council.
-- **GitHub (USA):** if you use GitHub sign-in, data is exchanged with GitHub. [TO DECIDE: legal
-  basis for this transfer – question for the legal review.]
+- **GitHub (USA):** if you use GitHub sign-in, connect GitHub or verify a GitHub repository,
+  data is exchanged with GitHub, Inc. GitHub is certified under the EU-U.S. Data Privacy
+  Framework and the Swiss-U.S. Data Privacy Framework. For organisations certified under the
+  Swiss-U.S. framework, the Swiss Federal Council recognises an adequate level of data protection
+  (Data Protection Ordinance, Annex 1); for the EU, the European Commission's adequacy decision
+  for the EU-U.S. framework applies. Details are in GitHub's privacy statement.
 
 ## 7. How long we keep data
 

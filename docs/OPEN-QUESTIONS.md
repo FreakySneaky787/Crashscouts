@@ -9,7 +9,7 @@
 | # | Question | Due | Proposal |
 |---|---|---|---|
 | T | Store IP addresses in the audit log? | phase 3B | not stored so far (data minimisation); for abuse handling consider a truncated or keyed-hash IP with a short retention period |
-| Y | Points marked `[TO DECIDE]` in the legal drafts (ADR 0031): ~~hosting provider and location~~ (Infomaniak, Switzerland, 2026-11-16), ~~web server logs and their retention~~ (7 days, ADR 0034), ~~backup retention~~ (7 days, ADR 0033), ~~processing agreement with Scaleway~~ (Scaleway's DPA, part of its terms), legal basis for the GitHub transfer (USA), EU representative (GDPR art. 27), SPDX data attribution, place of jurisdiction | before the beta (with the legal review) | most follow from the hosting decision; the rest for the reviewer |
+| Y | Points marked `[TO DECIDE]` in the legal drafts (ADR 0031) | **Resolved 2026-11-18** (reviewer approved the drafts; the owner decided the rest): hosting Infomaniak (Switzerland); logs and backups 7 days; Scaleway's DPA; **no EU representative** (GDPR art. 27, owner's decision, accepted risk); GitHub transfer based on the EU-U.S. and Swiss-U.S. Data Privacy Framework (Commission Implementing Decision (EU) 2023/1795; Swiss Data Protection Ordinance, Annex 1, since 2024-09-15); SPDX attribution with a link; **no place-of-jurisdiction clause**, Swiss law applies | – |
 | N | HSTS `includeSubDomains` and `preload` | after choosing the domain | enable only once all subdomains are permanently HTTPS-only |
 
 ### Resolved

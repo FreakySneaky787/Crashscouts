@@ -97,17 +97,16 @@ damage caused intentionally or by gross negligence, as far as Swiss law allows s
 The software of {{platform}} is free software under the GNU Affero General Public License,
 version 3. The link to the source code is at the bottom of every page.
 
-Licence information of projects uses data from the SPDX License List. [TO DECIDE: attribution or
-licence of the SPDX data – question for the legal review.]
+Licence identifiers and names of projects come from the SPDX License List
+(https://spdx.org/licenses/).
 
 ## 11. Changes to these terms
 
 - **Notice:** we announce important changes on the platform before they take effect.
 - **Your choice:** if you do not agree, you can delete your account.
 
-## 12. Law and place of jurisdiction
+## 12. Applicable law
 
 - **Law:** Swiss law applies.
-- **Place of jurisdiction:** [TO DECIDE: place of jurisdiction].
 - **Consumers:** mandatory consumer protection rules of your country of residence remain
   unaffected.

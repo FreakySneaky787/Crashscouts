@@ -53,3 +53,9 @@ require the operator's identity and contact details in the privacy policy.
   owner decided on 2026-11-15 to keep only account number, username and profile link (question
   Z): a `pre_save` signal trims every GitHub account, and migration `accounts/0005` trims the
   rows stored before.
+
+## Update 2026-11-18
+
+The reviewer approved the drafts and the owner decided the remaining points (OPEN-QUESTIONS Y):
+no EU representative, the GitHub transfer under the Data Privacy Framework, SPDX attribution
+with a link and no place-of-jurisdiction clause. Version 1.0 of all three texts.
