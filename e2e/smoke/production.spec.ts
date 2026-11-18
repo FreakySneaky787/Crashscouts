@@ -84,7 +84,10 @@ test("security headers; Django, admin and API are not reachable from outside", a
   expect(home.headers()["content-security-policy"]).toContain("default-src 'self'");
   expect(home.headers()["x-content-type-options"]).toBe("nosniff");
   for (const path of ["/admin/", "/admin/login/", "/api/v1/health/", "/_allauth/browser/v1/config", "/media/x"]) {
-    expect((await request.get(path)).status(), path).toBe(404);
+    const blocked = await request.get(path);
+    expect(blocked.status(), path).toBe(404);
+    // Caddy answers these itself; HSTS must be there too (ASVS 5.0 V3.4.1).
+    expect(blocked.headers()["strict-transport-security"], path).toBe("max-age=31536000");
   }
 });
 

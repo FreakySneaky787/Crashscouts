@@ -1404,6 +1404,23 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
   in `a11y.spec.ts`).
 
+## Gate checklist part 2 on crashscouts.org (2026-11-18) 🟡 in progress
+
+- **Checked from outside** (this session, crashscouts.org added to the network allowlist):
+  - TLS 1.0 and 1.1 refused by the server (alert "protocol version"), TLS 1.2 and 1.3 accepted;
+    Let's Encrypt certificate for crashscouts.org;
+  - `/admin/`, `/admin/login/`, `/api/...`, `/_allauth/...`, `/media/...`, `/.git/...`: 404;
+  - `__Host-csrftoken` with `Secure`; CSP, `nosniff`, `X-Frame-Options: DENY`, HSTS on pages;
+  - smoke test "a forged X-Forwarded-For does not get around the login rate limit": passed
+    against crashscouts.org. The header smoke test could not run here (Playwright's API client
+    does not use the session's proxy); its checks were done with curl.
+- **Found:** the 404 answers Caddy writes itself (`/admin/`, `/api/`, `/media/`) had no HSTS
+  header (ASVS 5.0 V3.4.1 asks for every response). Fixed in `deploy/Caddyfile` with a default
+  header that is only set when the SSR server has not set one; tested with the pinned Caddy
+  image (one header on proxied pages, one on Caddy's 404). The smoke test now checks HSTS on the
+  blocked paths too.
+- `.git` is not in the images: the build contexts are `backend/` and `frontend/`.
+
 ## Security check with a focus on costs (2026-11-17)
 
 - **Question of the owner:** can a large bill arrive overnight?

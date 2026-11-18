@@ -16,6 +16,10 @@
 		max_size 6MB
 	}
 
+	# HSTS on every response (ASVS 5.0 V3.4.1), also on answers Caddy writes itself (the 404 below,
+	# errors). "?" only sets it when the SSR server has not, so it is never sent twice.
+	header ?Strict-Transport-Security "max-age=31536000"
+
 	# Never routed publicly (docs/SECURITY.md §7), also not through the SSR server.
 	@internal path /admin /admin/* /media /media/* /api /api/* /_allauth /_allauth/*
 	respond @internal 404
