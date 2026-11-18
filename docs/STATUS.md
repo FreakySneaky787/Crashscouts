@@ -1385,8 +1385,16 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   `creating-an-oauth-app.md` and `authorizing-oauth-apps.md`, section "Redirect URLs").
 - **Owner's decision 2026-11-17:** a separate OAuth app for production (OPERATIONS §14), instead
   of adding the production callbacks to the development app (decision of 2026-11-12).
-- **Next:** the owner creates the app, sets the two values on the server and tests the login
-  (OPERATIONS §14).
+- **First real test 2026-11-18:**
+  - pitfall: the placeholders `<Client ID>` and `<Secret>` were left in `.env.prod`; GitHub then
+    answers 404. The check in OPERATIONS §14 now also looks for `<` and `>`;
+  - GitHub's consent page shows "Crashscouts", read-only email and profile, redirect to
+    crashscouts.org;
+  - an unlinked GitHub account with registration closed: the callback answers 302, no account is
+    created, but the page only said "The GitHub sign-in did not work". allauth reports
+    `signup_closed`; the page now says that signing up is not possible right now and how to
+    connect GitHub to an existing account.
+- **Next:** connect GitHub to the owner's account, then sign in with GitHub (OPERATIONS §14).
 
 ## Security check with a focus on costs (2026-11-17)
 

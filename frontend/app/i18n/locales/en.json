@@ -283,9 +283,11 @@
     "error": {
       "cancelled": "The GitHub sign-in was cancelled.",
       "denied": "This GitHub action is not allowed here.",
-      "failed": "The GitHub sign-in did not work."
+      "failed": "The GitHub sign-in did not work.",
+      "closed": "Signing up is not possible right now."
     },
     "errorText": "Nothing was changed. Try again, or sign in with your email address and password.",
+    "errorTextClosed": "This GitHub account is not connected to an account here, and new accounts are currently not accepted. If you already have an account, sign in with your email address and connect GitHub under Settings → Security.",
     "signupTitle": "Finish signing up",
     "signupIntro": "Your GitHub account is confirmed. Choose a username and confirm your age.",
     "emailHint": "From your GitHub account. If you use another address, we send it a confirmation link.",

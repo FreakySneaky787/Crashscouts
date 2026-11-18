@@ -12,9 +12,14 @@ export function isGitHubAuthorizeUrl(url: string | null | undefined): url is str
 }
 
 /** Errors allauth reports on the callback page, mapped to the texts we show. */
-export function providerErrorKey(error: string | null): "cancelled" | "denied" | "failed" | null {
+export function providerErrorKey(
+  error: string | null,
+): "cancelled" | "closed" | "denied" | "failed" | null {
   if (!error) return null;
   if (error === "cancelled") return "cancelled";
+  // allauth's answer when an unknown GitHub account would create a new account while
+  // registration is closed (DJANGO_SIGNUP_ENABLED=false).
+  if (error === "signup_closed") return "closed";
   if (error === "permission_denied") return "denied";
   return "failed";
 }

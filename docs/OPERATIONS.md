@@ -521,8 +521,9 @@ affecting development.
    "Redirect URLs").
 2. On the server, add `DJANGO_GITHUB_CLIENT_ID=` and `DJANGO_GITHUB_CLIENT_SECRET=` with `nano
    .env.prod` (not `echo`, so the secret stays out of the shell history). Check without showing
-   values: `grep -cE '^DJANGO_GITHUB_CLIENT_(ID|SECRET)=.+' .env.prod` gives `2`. Then
-   `scripts/deploy.sh`.
+   values: `grep -cE '^DJANGO_GITHUB_CLIENT_(ID|SECRET)=.+' .env.prod` gives `2`, and
+   `grep -cE '^DJANGO_GITHUB_CLIENT_(ID|SECRET)=.*[<>]' .env.prod` gives `0` (no placeholder left;
+   GitHub answers a placeholder ID with 404). Then `scripts/deploy.sh`.
 3. Test in the browser:
    - signed out, "Sign in with GitHub" with an unlinked GitHub account is refused while
      registration is closed, and no account is created;

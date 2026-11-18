@@ -43,7 +43,7 @@ export default function ProviderCallback({ loaderData }: Route.ComponentProps) {
     <div className={styles.narrow}>
       <PageHeader title={t("github.callbackTitle")} />
       <Notice tone="danger" title={t(`github.error.${loaderData.error}`)}>
-        {t("github.errorText")}
+        {loaderData.error === "closed" ? t("github.errorTextClosed") : t("github.errorText")}
       </Notice>
       <p className={styles.aside}>
         <Link to="/login">{t("nav.login")}</Link>

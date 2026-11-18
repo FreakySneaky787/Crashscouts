@@ -25,6 +25,7 @@ describe("providerErrorKey", () => {
     expect(providerErrorKey(null)).toBeNull();
     expect(providerErrorKey("cancelled")).toBe("cancelled");
     expect(providerErrorKey("permission_denied")).toBe("denied");
+    expect(providerErrorKey("signup_closed")).toBe("closed");
     expect(providerErrorKey("unknown")).toBe("failed");
   });
 });
