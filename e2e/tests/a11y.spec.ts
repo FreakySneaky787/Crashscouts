@@ -105,6 +105,7 @@ test("team and tester pages at phone width, light and dark", async ({ page, requ
   for (const [path, pattern] of [
     ["/account", "account"],
     ["/settings/profile", "settings/profile"],
+    ["/settings", "settings"],
     ["/settings/security", "settings/security"],
     ["/settings/account", "settings/account"],
     ["/projects/new", "projects/new"],

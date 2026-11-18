@@ -122,7 +122,13 @@ test("signed-in users find Settings at the bottom of the sidebar; visitors do no
   await createSignedInAccount(page, request);
   const more = page.getByRole("navigation", { name: "More" });
   await more.getByRole("link", { name: "Settings" }).click();
-  await expect(page).toHaveURL(/\/settings\/profile$/);
+  await expect(page).toHaveURL(/\/settings$/);
+  // The overview leads to every settings area, and the sidebar link stays active inside them.
+  await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Security settings" })).toBeVisible();
+  await page.getByRole("link", { name: "Data and account" }).click();
+  await expect(page).toHaveURL(/\/settings\/account$/);
+  await expect(more.getByRole("link", { name: "Settings" })).toHaveAttribute("aria-current", "page");
 
   const anonymous = await browser.newContext();
   const visitor = await anonymous.newPage();

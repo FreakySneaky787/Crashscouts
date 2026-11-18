@@ -18,6 +18,7 @@ export default [
   route("password/reset/:key", "routes/password-reset.tsx"),
   route("logout", "routes/logout.tsx"),
   route("account", "routes/account.tsx"),
+  route("settings", "routes/settings.tsx"),
   route("settings/profile", "routes/settings-profile.tsx"),
   route("settings/security", "routes/settings-security.tsx"),
   route("settings/account", "routes/settings-account.tsx"),

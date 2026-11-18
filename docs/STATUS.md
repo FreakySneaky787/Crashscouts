@@ -1398,8 +1398,10 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   (confirmation email arrived), registration closed again.
 - **Passed 2026-11-18:** unlinked GitHub account refused while registration is closed; Connect
   GitHub; sign-in with GitHub. Open: repository verification through GitHub.
-- **Settings link (owner's request 2026-11-18):** signed-in users find "Settings" at the bottom
-  of the sidebar and in the mobile menu (E2E `profile.spec.ts`).
+- **Settings (owner's request 2026-11-18):** signed-in users find "Settings" at the bottom of the
+  sidebar and in the mobile menu. It opens a new overview page `/settings` with profile, security
+  and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
+  in `a11y.spec.ts`).
 
 ## Security check with a focus on costs (2026-11-17)
 

@@ -54,7 +54,7 @@ export function AppShell({ user, theme, sourceUrl = null, children }: { user: Sh
   // Settings sit at the bottom of the sidebar for signed-in users (owner's request 2026-11-18).
   const secondary: NavItem[] = [
     ...(import.meta.env.DEV ? [{ to: "/design-system", label: t("nav.designSystem"), icon: PaletteIcon }] : []),
-    ...(user ? [{ to: "/settings/profile", label: t("nav.settings"), icon: GearSixIcon }] : []),
+    ...(user ? [{ to: "/settings", label: t("nav.settings"), icon: GearSixIcon }] : []),
   ];
 
   return (
