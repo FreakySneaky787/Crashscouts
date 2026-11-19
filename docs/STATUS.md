@@ -1404,6 +1404,18 @@ step is in [`OPERATIONS.md`](OPERATIONS.md).
   and data; the link stays marked on every `/settings/...` page (E2E `profile.spec.ts`, axe check
   in `a11y.spec.ts`).
 
+## Images empty in production (2026-11-19) ✅ fixed
+
+- **Report of the owner:** the uploaded avatar showed as an empty circle on crashscouts.org.
+- **Cause:** the SSR server fetched uploaded images (avatars, project images, feedback
+  attachments) from Django without the forwarded headers. Production Django then saw the internal
+  host `backend:8000` (not in `ALLOWED_HOSTS`) and plain HTTP (`SECURE_SSL_REDIRECT`), so every
+  image answered with an error and the SSR route returned 404. The development server and the
+  E2E run do not have these checks, so only production was affected.
+- **Fix:** `backendFetchBinary` sets the same forwarded headers as every other backend request;
+  avatars are still fetched without the visitor's cookies. The production smoke test now uploads
+  an avatar and loads it through the proxy.
+
 ## Gate switch in `.env.prod` (2026-11-18)
 
 - `compose.prod.yaml` had `PUBLIC_CAMPAIGNS_ENABLED: "false"` written into the file, so the owner

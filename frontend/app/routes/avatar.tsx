@@ -7,11 +7,11 @@ import type { Route } from "./+types/avatar";
 import { backendFetchBinary } from "~/lib/backend.server";
 import { isUuid } from "~/lib/http";
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   if (!isUuid(params.key)) {
     return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
   }
-  const upstream = await backendFetchBinary(`/api/v1/avatars/${params.key}/`);
+  const upstream = await backendFetchBinary(`/api/v1/avatars/${params.key}/`, request, { withCookies: false });
   if (upstream.status !== 200 || upstream.headers.get("Content-Type") !== "image/webp") {
     await upstream.body?.cancel();
     return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });

@@ -37,6 +37,24 @@ export type BackendResult<T> = {
   location: string | null;
 };
 
+/**
+ * Headers Django needs behind the SSR server. Without them production Django sees the internal
+ * host "backend:8000" (not in ALLOWED_HOSTS) and plain HTTP (redirected by SECURE_SSL_REDIRECT).
+ */
+function setProxyHeaders(headers: Headers, request: Request) {
+  // For Django behind the proxy (SECURE_PROXY_SSL_HEADER); in production the reverse proxy sets
+  // the protocol of the browser request.
+  headers.set("X-Forwarded-Proto", publicProtocol(request));
+  // Public host, so URLs Django builds (e.g. the GitHub callback) point to the frontend, not to
+  // the internal backend address (USE_X_FORWARDED_HOST in the Django settings).
+  headers.set("X-Forwarded-Host", new URL(request.url).host);
+  // Client address for Django's rate limits per IP (ADR 0022). Passed on unchanged: the reverse
+  // proxy overwrites it with the client's address, and Django trusts exactly that one proxy
+  // (DJANGO_TRUSTED_PROXY_COUNT). Without a proxy (development) Django ignores the header.
+  const forwardedFor = request.headers.get("X-Forwarded-For");
+  if (forwardedFor) headers.set("X-Forwarded-For", forwardedFor);
+}
+
 export async function backendFetch<T = unknown>(
   request: Request,
   path: string,
@@ -48,18 +66,7 @@ export async function backendFetch<T = unknown>(
   const cookie = request.headers.get("Cookie");
   if (cookie) headers.set("Cookie", cookie);
 
-  // For Django behind the proxy (SECURE_PROXY_SSL_HEADER); in production the reverse proxy sets
-  // the protocol of the browser request.
-  const publicUrl = new URL(request.url);
-  headers.set("X-Forwarded-Proto", publicProtocol(request));
-  // Public host, so URLs Django builds (e.g. the GitHub callback) point to the frontend, not to
-  // the internal backend address (USE_X_FORWARDED_HOST in the Django settings).
-  headers.set("X-Forwarded-Host", publicUrl.host);
-  // Client address for Django's rate limits per IP (ADR 0022). Passed on unchanged: the reverse
-  // proxy overwrites it with the client's address, and Django trusts exactly that one proxy
-  // (DJANGO_TRUSTED_PROXY_COUNT). Without a proxy (development) Django ignores the header.
-  const forwardedFor = request.headers.get("X-Forwarded-For");
-  if (forwardedFor) headers.set("X-Forwarded-For", forwardedFor);
+  setProxyHeaders(headers, request);
 
   if (method !== "GET") {
     for (const name of ["Origin", "Referer"] as const) {
@@ -127,9 +134,14 @@ export function isSuspendedRefusal(status: number, body: unknown): boolean {
  * Without `request` no cookies are forwarded (public resources such as avatars); with it the
  * browser's session goes along, so Django can check access (e.g. images of private projects).
  */
-export async function backendFetchBinary(path: string, request?: Request): Promise<Response> {
+export async function backendFetchBinary(
+  path: string,
+  request: Request,
+  { withCookies = true }: { withCookies?: boolean } = {},
+): Promise<Response> {
   const headers = new Headers({ Accept: "image/webp,image/*" });
-  const cookie = request?.headers.get("Cookie");
+  setProxyHeaders(headers, request);
+  const cookie = withCookies ? request.headers.get("Cookie") : null;
   if (cookie) headers.set("Cookie", cookie);
   return fetch(new URL(path, BACKEND_URL), { headers, redirect: "manual" });
 }

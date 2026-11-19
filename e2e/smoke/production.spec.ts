@@ -10,6 +10,7 @@ import { randomBytes } from "node:crypto";
 import { expect, test, type APIRequestContext } from "@playwright/test";
 
 import { SMOKE_MAILPIT_URL, SMOKE_URL } from "../playwright.smoke.config";
+import { png } from "../tests/helpers";
 
 function account() {
   const id = randomBytes(5).toString("hex");
@@ -62,6 +63,20 @@ test("sign up, confirm, sign in and out behind the proxy with __Host- cookies", 
     expect(cookie?.path).toBe("/");
   }
   expect(cookies.find((c) => c.name === "sessionid" || c.name === "csrftoken")).toBeUndefined();
+
+  // Uploaded images reach the browser through the SSR server (avatars, project images,
+  // attachments). In production Django only answers for the public host over HTTPS, so the
+  // image request must carry the forwarded headers too (found 2026-11-19: avatars showed empty).
+  await page.goto("/settings/profile");
+  await page.getByLabel("Image file").setInputFiles({ name: "me.png", mimeType: "image/png", buffer: png(320, 200) });
+  await page.getByRole("button", { name: "Upload avatar" }).click();
+  await expect(page.getByRole("status")).toContainText("Your avatar was updated.");
+  const own = await (await page.request.get(`/u/${user.username}`)).text();
+  const avatar = own.match(/src="(\/avatars\/[0-9a-f-]{36})"/)?.[1];
+  expect(avatar).toBeTruthy();
+  const image = await request.get(avatar!);
+  expect(image.status()).toBe(200);
+  expect(image.headers()["content-type"]).toBe("image/webp");
 
   await page.getByRole("button", { name: "Dark theme" }).click();
   await expect.poll(async () => (await context.cookies()).find((c) => c.name === "__Host-theme")?.secure).toBe(true);
