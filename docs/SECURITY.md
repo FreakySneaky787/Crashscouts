@@ -32,7 +32,7 @@ including the negative cases.
 - ✅ Mandatory email verification by link; confirmation only via POST (mail scanners open links).
 - ✅ No account enumeration: signup with a registered address and reset requests for unknown
   addresses answer like the success case; no mail to unknown addresses; per-address cooldown.
-- ✅ Rate limits verified in tests (e.g. signup 20/min per IP).
+- ✅ Rate limits verified in tests (e.g. signup 5 per hour and IP since 2026-11-17).
 - 2FA (TOTP, passkeys, recovery codes) optional; ⚑ mandatory for owners of public campaigns and for
   moderators (phase 3B, open question A).
   - ✅ TOTP and recovery codes (WP 1.3a, [ADR 0011](adr/0011-two-factor-authentication.md)): no
@@ -75,8 +75,6 @@ including the negative cases.
   rules.
 - ✅ Open-redirect protection for redirect targets (`safeRedirectPath`, unit-tested).
 - ✅ URL parameters are validated (UUID) before they are used in backend paths.
-- Markdown only through a sanitizer allowlist (when introduced).
-
 - ✅ User Markdown (project descriptions) is rendered as React elements with an allowlist
   (`react-markdown` 10.1.0, MIT, with `remark-gfm` 4.0.1): raw HTML skipped, no images (no
   third-party requests), links only http(s)/mailto with `nofollow ugc`; `dangerouslySetInnerHTML`
