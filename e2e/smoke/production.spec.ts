@@ -81,6 +81,7 @@ test("sign up, confirm, sign in and out behind the proxy with __Host- cookies", 
   await page.getByRole("button", { name: "Dark theme" }).click();
   await expect.poll(async () => (await context.cookies()).find((c) => c.name === "__Host-theme")?.secure).toBe(true);
 
+  await page.goto("/account");
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(new RegExp(`${SMOKE_URL}/$`));
   expect((await context.cookies()).find((c) => c.name === "__Host-sessionid")).toBeUndefined();
